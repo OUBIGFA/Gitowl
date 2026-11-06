@@ -11,6 +11,8 @@
     "check:eslint": "tsc -P eslint-rules/",
     "test:eslint": "node script/test.mjs eslint-rules",
     "test:script": "node script/test.mjs script",
+    "check:repo": "python tools/check_repo.py",
+    "test:repo": "python -m unittest discover -s tests/repository -v",
     "test": "node script/test.mjs",
     "test:unit": "node script/test.mjs",
     "test:setup": "ts-node -P script/tsconfig.json script/test-setup.ts",

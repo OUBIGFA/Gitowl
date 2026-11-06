@@ -51,7 +51,7 @@ function parseChannel(arg: string): Channel {
  */
 function printInstructions(nextVersion: string, entries: Array<string>) {
   const baseSteps = [
-    'Revise the release notes according to https://github.com/desktop/desktop/blob/development/docs/process/writing-release-notes.md',
+    'Review the release entries in changelog.json and confirm the target version before publishing.',
     'Lint them with: npm run draft-release:format',
     'Commit these changes (on a "release" branch) and push them to GitHub',
     'See the deploy repo for details on performing the release: https://github.com/desktop/deploy',

@@ -19,3 +19,72 @@ junit*.xml
 *.swp
 tslint-rules/
 playwright-videos/
+
+# Reusable local inputs, toolchains and generated output (never publish)
+.local/
+**/output/
+
+# Root upstream reference documents are local-only
+/docs/
+
+# Local instructions and agent state (never publish)
+**/AGENTS.md
+**/CLAUDE.md
+**/.agents/
+**/.claude/
+**/copilot-instructions.md
+.github/agents/
+.github/skills/
+
+# Dependencies and package-manager caches
+.pnp.*
+.bun/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.tsbuildinfo
+
+# Credentials and private local data
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+*.keystore
+credentials*.json
+secrets*.json
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+*.log
+
+# Binary and distribution output
+*.exe
+*.dll
+*.so
+*.dylib
+*.msi
+*.dmg
+*.app/
+*.AppImage
+*.wasm
+*.onnx
+*.safetensors
+*.gguf
+*.pt
+*.pth
+*.zip
+*.7z
+*.tar
+*.tar.gz
+*.tgz
+
+# Must remain after every negation: ignore scratch directories at all depths.
+**/_temp/

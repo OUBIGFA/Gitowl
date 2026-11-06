@@ -1,3 +1,18 @@
+* text=auto eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.icns binary
+*.car binary
+*.docx binary
+
 /app/test/fixtures/** -text
 /app/static/win32/github.sh eol=lf
 

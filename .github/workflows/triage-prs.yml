@@ -17,7 +17,7 @@ jobs:
     if: github.event.action == 'opened'
     uses: desktop/gh-cli-and-desktop-shared-workflows/.github/workflows/triage-close-from-default-branch.yml@main
     with:
-      default_branch: 'development'
+      default_branch: 'main'
     permissions:
       pull-requests: write
 

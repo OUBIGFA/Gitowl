@@ -7,7 +7,7 @@ import { generateUsageDataExample } from '../helpers/usage-data'
 
 describe('usage data example', () => {
   it('matches the request body sent by StatsStore', async () => {
-    const examplePath = resolve('docs/process/usage-data.json')
+    const examplePath = resolve('references/usage-data.json')
     const checkedInExample = await readFile(examplePath, 'utf8')
     const generatedExample = generateUsageDataExample()
     const expected = `${JSON.stringify(generatedExample, null, 2)}\n`
