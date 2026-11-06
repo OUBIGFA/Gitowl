@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "reviewed_on": "2026-11-06",
+  "scope": "research inputs, not a release dependency bill of materials",
+  "sources": [
+    {
+      "repository": "https://github.com/desktop/desktop",
+      "revision": "a95e13a7429f4e7f9e45d7b38a68bc1a3eb972f7",
+      "relationship": "application upstream",
+      "license": "MIT",
+      "use": "existing application source; BYOK file identity checked against local Git blob",
+      "files": [
+        {
+          "path": "app/src/lib/copilot/byok.ts",
+          "git_blob": "9e61b2747c10d0b729985bad84edff954fa9a84f",
+          "sha256": "0db5cb15208d7e0d62a9396ee3b3b1b00c39344ca0ca69dd3f988ab3243654ba"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/desktop-plus/desktop-plus",
+      "revision": "8c9bb791c1845539965689542036a7a6b3b736dd",
+      "relationship": "confirmed GitHub fork of desktop/desktop",
+      "license": "MIT",
+      "use": "source and test comparison only; no fork code imported",
+      "files": [
+        {
+          "path": "LICENSE",
+          "git_blob": "68afe6febb3f4ab2155b436e2e5a43f62399388b",
+          "sha256": "891d678cd6aa67c0712f663b5fee690f24d11d360795300814f7bf2eb91ba530"
+        },
+        {
+          "path": "app/src/models/account.ts",
+          "git_blob": "5524c9cf665bf67e12552c6b95862a5f8588846c",
+          "sha256": "d5bbdf57d7ea87eeb53f63e2e4a2af16e9cbaa6fb0a48ae48520193cd78c08b2"
+        },
+        {
+          "path": "app/src/lib/get-account-for-repository.ts",
+          "git_blob": "8ff3407581ba0888dc3fc0b3678d245b004513cb",
+          "sha256": "6bd876059896a463a81cacb336c887c041fafc7f95b018ed3f231199759719e4"
+        },
+        {
+          "path": "app/src/lib/stores/accounts-store.ts",
+          "git_blob": "fe49fabf115db41e292b9f8b6f5f635d7fe92eb4",
+          "sha256": "63cad116c3fcac016278a339d65f684f4d56e15cadd0b0a07079eef7d311173f"
+        },
+        {
+          "path": "app/src/lib/trampoline/find-account.ts",
+          "git_blob": "d8f2ffd865b88ba35a5102eeb3128df9b86f058d",
+          "sha256": "4d105c077a124aa89b47aed70a281c5b3501df9d6e78d0436c58a0c0f5c354ee"
+        },
+        {
+          "path": "app/src/lib/find-account.ts",
+          "git_blob": "7e02b2e3f269a5e9a87c3ed3fe5434f87083c595",
+          "sha256": "3cf38498023e3d7b7605bff2b71cafa8951d762c651369214b21af6d98e08d76"
+        },
+        {
+          "path": "app/src/lib/api.ts",
+          "git_blob": "c5045fd3d47253a043c164bfe80e43528185d5b4",
+          "sha256": "7ab90f3a948d3dee23621c26b098ad054259f88cea56f63fd46d4a1f258983c9"
+        },
+        {
+          "path": "app/test/unit/find-account-test.ts",
+          "git_blob": "ac0b8dc1bd33f5abbe2a8a1b366a9c2b9f3106a3",
+          "sha256": "c2de55f7da24bd2454a7d39ea2b5f3dade8a146cf6bde7aca978c7cc6591c11b"
+        },
+        {
+          "path": "app/src/lib/copilot/byok.ts",
+          "git_blob": "b6293bd59d2cfbe725facf279e9cdb456686ec63",
+          "sha256": "48f99616ead5042fbf7e4d0a6610e7c28b60f0501dba6ebf6bbadd5f36ee98e8"
+        },
+        {
+          "path": "app/src/lib/stores/copilot-store.ts",
+          "git_blob": "3ca3c6a3085d480b13816f476b7fe8babbedb835",
+          "sha256": "994a4521e73104915f476e9e88b65d1fa1eaf51d092a857e958ec5a1f94002f6"
+        },
+        {
+          "path": "app/test/unit/copilot-byok-test.ts",
+          "git_blob": "991b3b20f48a2df71f958868de9905be60fba270",
+          "sha256": "c9a2c2b12b63fe9a9724645a970ab9285703e156a8469bfa05ebd647a371b47e"
+        },
+        {
+          "path": "app/test/unit/copilot-commit-message-prompt-test.ts",
+          "git_blob": "10999915c64a45c492e907bc9ef519621a3dac7f",
+          "sha256": "807577127829b988f0a986312235326f7bee455c0ed5320181066d46a1bb1357"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/GI-STANDARDS/GITmaxed",
+      "revision": "14c988c131a098c57df05cf894fef6ba295725c6",
+      "relationship": "source derivative according to README and source structure; GitHub fork metadata is false",
+      "license": "MIT",
+      "use": "account selection comparison; directory/login guessing rejected",
+      "files": [
+        {
+          "path": "app/src/lib/get-account-for-repository.ts",
+          "git_blob": "0cf8d43d84752e67e82c893c40c01aaf78125ee2",
+          "sha256": "71fc912a43f1d5bbe43f8209921b991a80fb8de9d3e5cbfe7d265efa194f2805"
+        },
+        {
+          "path": "LICENSE",
+          "git_blob": "68afe6febb3f4ab2155b436e2e5a43f62399388b",
+          "sha256": "891d678cd6aa67c0712f663b5fee690f24d11d360795300814f7bf2eb91ba530"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/egoist/mygo",
+      "version": "v0.7.4",
+      "revision": "9bd34e1eb9525d9a1fe698aadc964c49c8ff8e7e",
+      "latest_main_observed": "218f76c25a2809c54ad25e1a9241cff7827576a0",
+      "go_version": "1.27.3",
+      "license": "MIT",
+      "use": "isolated native UI feasibility probe; not integrated into the release build",
+      "patches": [],
+      "module_sum": "h1:0qkDpDRo7C9g8PM8eu4V6FVouhLiTrUdqKD6I31Lv3Q=",
+      "go_mod_sum": "h1:dVav53PwF2xEotjf4oA5lTY2Jp2exgzyjLhbSXhbMwE=",
+      "module_archive_sha256": "70f732abb2c726cb22cc4233a26db33f43f7bb9065d27e7bb57c381aaa4d212b",
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "f0b56f4ab53beb6e18c5e155219c2e2b6000b5475c0ae3ddb3af3894fd9349b4"
+        },
+        {
+          "path": "go.mod",
+          "sha256": "92f788f08ee788fc0e81f4cc0acb203f0723d746ce7a11b8554122375f607336"
+        },
+        {
+          "path": "go.sum",
+          "sha256": "f28c6f4e0485b350a8777da168a19d718db5fd116c3e4a9bae2400a864091cc8"
+        },
+        {
+          "path": "docs/ui/views.md",
+          "sha256": "ef4d738fb3c50d0c6c79c1b6ef2fc5d5e2b4e206270e919314ea8c1641e6a093"
+        },
+        {
+          "path": "docs/ui/layout.md",
+          "sha256": "bf575df1d9a43dd8b8cec1e1583e23d68e8569f6a87280cfb47fc76bfc3efa78"
+        },
+        {
+          "path": "docs/ui/testing.md",
+          "sha256": "f4fc40b73d9e5311cba7490627da2d2fd3c53b47255bee5fb32c44fb39715122"
+        },
+        {
+          "path": "docs/ui/styling.md",
+          "sha256": "7765e8a3f8fc3ead6fcd72d215e6a6159755cebaa8307d122ba27f01ca62fcda"
+        },
+        {
+          "path": "docs/ui/diff-viewer.md",
+          "sha256": "9b79a0d2d825632bed51315eaf1fbd162345792ed853ae86f2ebc3edd89602e7"
+        },
+        {
+          "path": "docs/i18n.md",
+          "sha256": "58baa696dffbd47461375c349ff6f32d88f414be8a163cf13aaffa9e9874b258"
+        },
+        {
+          "path": "docs/distribution.md",
+          "sha256": "1abd04d0637a53c05550165b8bd9bbee4d004fe75f7db2f993f1a32b4b4dc632"
+        },
+        {
+          "path": "locale.go",
+          "sha256": "92aac3934e5a9cd119a2a457ce48fc27487c861ceb9030d0550afe1aedb1a6d3"
+        },
+        {
+          "path": "internal/windows/locale.go",
+          "sha256": "941fcb637887681a8982d4dc719d2a4be449cd12d8ca2c850d81832a651cdf43"
+        },
+        {
+          "path": "cmd/mygo/languages.go",
+          "sha256": "f80711347477df505e1cc85d958f69d76a2c95dccd7ff66c0d1fa73af46635c5"
+        },
+        {
+          "path": "cmd/mygo/nsis.go",
+          "sha256": "1a666c780024f42d80b5659e251e519aa21a7727bfdff809c019add37b4b1adb"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/sj817/github-desktop-plus",
+      "use": "README-level research only; no installation or source import; license not independently audited",
+      "files": [
+        {
+          "path": "README.md",
+          "git_blob": "931845d882dc7d4670a24168a664d6ecc32c479c",
+          "sha256": "14b9393e36f05346ff534964936feda40388942354c8faadd2bf54519f974b41"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/pbakaus/impeccable",
+      "use": "README-level research only; no installation or source import; license not independently audited",
+      "files": [
+        {
+          "path": "README.md",
+          "git_blob": "555fd9a67de957c750950e62bf1baad167f61b00",
+          "sha256": "6c4a86424a12eac2a568e4cc3afa411d9f2acb08fce3e97b41c9d6e951ba8bdf"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/heydamir/unslop",
+      "use": "README-level research only; no installation or source import; license not independently audited",
+      "files": [
+        {
+          "path": "README.md",
+          "git_blob": "d908769e172a2b57dd9e74451e4ef735ddf53c75",
+          "sha256": "7d2b1f2e441448338c39bc08648aca991e80cf78ebcd0e150a9ab2dd805c0920"
+        }
+      ]
+    }
+  ],
+  "product_logo": {
+    "input": "dist/logo.png",
+    "source": "provided by the user",
+    "tracked_source": "app/static/logos/gitowl/logo.png",
+    "sha256": "6049efa7d6375edbb72b867b6b39246b1763ae632cfbddd1450a595bb817dbd2",
+    "integration_status": "canonical source preserved; runtime icons and branding not yet migrated"
+  },
+  "toolchains": [
+    {
+      "name": "Node.js",
+      "version": "24.22.1",
+      "platform": "windows-x64",
+      "source": "https://nodejs.org/dist/v24.22.1/node-v24.22.1-win-x64.zip",
+      "sha256": "d2046d28c2c3dcd211ac5145c0bf30e2047ef9dfb306693c8c6e2eccd8b95fa5",
+      "verification": "matched official SHASUMS256.txt",
+      "version_lock": ".node-version"
+    },
+    {
+      "name": "Go",
+      "version": "1.27.3",
+      "platform": "windows-amd64",
+      "source": "https://proxy.golang.org/golang.org/toolchain/@v/v0.0.1-go1.27.3.windows-amd64.zip",
+      "sha256": "ed8a27b55d5b20235641122b320ded78ea8e9c815eb82b880ca41a67e83e3805",
+      "use": "isolated MyGo native probe"
+    }
+  ]
+}

@@ -10,7 +10,9 @@ const version = getVersion()
 const projectRoot = Path.join(__dirname, '..')
 
 export function getDistRoot() {
-  return Path.join(projectRoot, 'dist')
+  // Packaging removes this entire directory. Keep cleanup away from inputs
+  // such as dist/logo.png and tracked assets; only generated output goes here.
+  return Path.join(projectRoot, 'output', 'distribution')
 }
 
 export function getDistPath() {

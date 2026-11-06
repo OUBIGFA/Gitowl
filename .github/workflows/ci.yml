@@ -194,12 +194,12 @@ jobs:
         with:
           name: ${{matrix.friendlyName}}-${{matrix.arch}}
           path: |
-            dist/GitHub Desktop-${{matrix.arch}}.zip
-            dist/GitHubDesktop-*.nupkg
-            dist/GitHubDesktopSetup-${{matrix.arch}}.exe
-            dist/GitHubDesktopSetup-${{matrix.arch}}.msi
-            dist/bundle-size.json
-            dist/bundle-hash.json
+            output/distribution/GitHub Desktop-${{matrix.arch}}.zip
+            output/distribution/GitHubDesktop-*.nupkg
+            output/distribution/GitHubDesktopSetup-${{matrix.arch}}.exe
+            output/distribution/GitHubDesktopSetup-${{matrix.arch}}.msi
+            output/distribution/bundle-size.json
+            output/distribution/bundle-hash.json
           if-no-files-found: error
   e2e-smoke:
     name: E2E Smoke ${{ matrix.friendlyName }} ${{ matrix.arch }}
@@ -303,7 +303,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           rm -rf "/Applications/GitHub Desktop.app"
-          ditto "dist/GitHub Desktop-darwin-arm64/GitHub Desktop.app" "/Applications/GitHub Desktop.app"
+          ditto "output/distribution/GitHub Desktop-darwin-arm64/GitHub Desktop.app" "/Applications/GitHub Desktop.app"
           echo "DESKTOP_E2E_APP_PATH=/Applications/GitHub Desktop.app/Contents/MacOS/GitHub Desktop" >> "$GITHUB_ENV"
       - name: Install app on Windows
         if: runner.os == 'Windows'
@@ -323,7 +323,7 @@ jobs:
             }
           }
 
-          $setupExe = "dist/GitHubDesktopSetup-${{ matrix.arch }}.exe"
+          $setupExe = "output/distribution/GitHubDesktopSetup-${{ matrix.arch }}.exe"
           $installer = Start-Process -FilePath $setupExe -ArgumentList "/S" -PassThru
 
           try {

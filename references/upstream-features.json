@@ -1,0 +1,2581 @@
+{
+  "schema_version": 1,
+  "upstream_revision": "a95e13a7429f4e7f9e45d7b38a68bc1a3eb972f7",
+  "source_baseline": {
+    "kind": "local-git-baseline",
+    "revision": "a95e13a7429f4e7f9e45d7b38a68bc1a3eb972f7",
+    "remote_content_verified": false,
+    "description": "Declared local Git comparison baseline; entries are extracted from working-tree sources. No online upstream identity verification is claimed."
+  },
+  "migration_status": "not-assessed",
+  "scope": {
+    "parser": "Restricted TypeScript source structures; unsupported declarations fail. See tools/generate_feature_inventory.py.",
+    "context_menus": "Covers RequestResponseChannels:show-contextual-menu transport and shared menu/popup declarations. Dynamic IMenuItem action callbacks in app/src/ui/** are not enumerated; app/src/lib/menu-item.ts dispatches them by index.",
+    "failure_recovery": "Covers all PopupType, BannerType and RetryActionType members plus IPC error channels; runtime retry execution and availability are not verified.",
+    "exclusions": [
+      "Dynamic context-menu callback bodies",
+      "Popup, banner and foldout payloads and callback implementations",
+      "Platform and account availability conditions",
+      "Keyboard shortcut bindings",
+      "Runtime behavior and MyGo migration acceptance"
+    ]
+  },
+  "counts": {
+    "banner": 15,
+    "failure-recovery": 13,
+    "foldout": 6,
+    "ipc-request": 51,
+    "ipc-request-response": 28,
+    "menu-event": 87,
+    "popup": 97,
+    "preferences-tab": 9,
+    "repository-tab": 2,
+    "url-action": 3
+  },
+  "features": [
+    {
+      "id": "BannerType:BranchAlreadyUpToDate",
+      "source_file": "app/src/models/banner.ts",
+      "symbol": "BannerType",
+      "member": "BranchAlreadyUpToDate",
+      "category": "banner",
+      "value": "BranchAlreadyUpToDate"
+    },
+    {
+      "id": "BannerType:CherryPickConflictsFound",
+      "source_file": "app/src/models/banner.ts",
+      "symbol": "BannerType",
+      "member": "CherryPickConflictsFound",
+      "category": "banner",
+      "value": "CherryPickConflictsFound"
+    },
+    {
+      "id": "BannerType:CherryPickUndone",
+      "source_file": "app/src/models/banner.ts",
+      "symbol": "BannerType",
+      "member": "CherryPickUndone",
+      "category": "banner",
+      "value": "CherryPickUndone"
+    },
+    {
+      "id": "BannerType:ConflictsFound",
+      "source_file": "app/src/models/banner.ts",
+      "symbol": "BannerType",
+      "member": "ConflictsFound",
+      "category": "banner",
+      "value": "ConflictsFound"
+    },
+    {
+      "id": "BannerType:MergeConflictsFound",
+      "source_file": "app/src/models/banner.ts",
+      "symbol": "BannerType",
+      "member": "MergeConflictsFound",
+      "category": "banner",
+      "value": "MergeConflictsFound"
+    },
+    {
+      "id": "BannerType:OSVersionNoLongerSupported",
+      "source_file": "app/src/models/banner.ts",
+      "symbol": "BannerType",
+      "member": "OSVersionNoLongerSupported",
+      "category": "banner",
+      "value": "OSVersionNoLongerSupported"
+    },
+    {
+      "id": "BannerType:OpenThankYouCard",
+      "source_file": "app/src/models/banner.ts",
+      "symbol": "BannerType",
+      "member": "OpenThankYouCard",
+      "category": "banner",
+      "value": "OpenThankYouCard"
+    },
+    {
+      "id": "BannerType:RebaseConflictsFound",
+      "source_file": "app/src/models/banner.ts",
+      "symbol": "BannerType",
+      "member": "RebaseConflictsFound",
+      "category": "banner",
+      "value": "RebaseConflictsFound"
+    },
+    {
+      "id": "BannerType:ReorderUndone",
+      "source_file": "app/src/models/banner.ts",
+      "symbol": "BannerType",
+      "member": "ReorderUndone",
+      "category": "banner",
+      "value": "ReorderUndone"
+    },
+    {
+      "id": "BannerType:SquashUndone",
+      "source_file": "app/src/models/banner.ts",
+      "symbol": "BannerType",
+      "member": "SquashUndone",
+      "category": "banner",
+      "value": "SquashUndone"
+    },
+    {
+      "id": "BannerType:SuccessfulCherryPick",
+      "source_file": "app/src/models/banner.ts",
+      "symbol": "BannerType",
+      "member": "SuccessfulCherryPick",
+      "category": "banner",
+      "value": "SuccessfulCherryPick"
+    },
+    {
+      "id": "BannerType:SuccessfulMerge",
+      "source_file": "app/src/models/banner.ts",
+      "symbol": "BannerType",
+      "member": "SuccessfulMerge",
+      "category": "banner",
+      "value": "SuccessfulMerge"
+    },
+    {
+      "id": "BannerType:SuccessfulRebase",
+      "source_file": "app/src/models/banner.ts",
+      "symbol": "BannerType",
+      "member": "SuccessfulRebase",
+      "category": "banner",
+      "value": "SuccessfulRebase"
+    },
+    {
+      "id": "BannerType:SuccessfulReorder",
+      "source_file": "app/src/models/banner.ts",
+      "symbol": "BannerType",
+      "member": "SuccessfulReorder",
+      "category": "banner",
+      "value": "SuccessfulReorder"
+    },
+    {
+      "id": "BannerType:SuccessfulSquash",
+      "source_file": "app/src/models/banner.ts",
+      "symbol": "BannerType",
+      "member": "SuccessfulSquash",
+      "category": "banner",
+      "value": "SuccessfulSquash"
+    },
+    {
+      "id": "RetryActionType:Checkout",
+      "source_file": "app/src/models/retry-actions.ts",
+      "symbol": "RetryActionType",
+      "member": "Checkout",
+      "category": "failure-recovery",
+      "value": 5
+    },
+    {
+      "id": "RetryActionType:CherryPick",
+      "source_file": "app/src/models/retry-actions.ts",
+      "symbol": "RetryActionType",
+      "member": "CherryPick",
+      "category": "failure-recovery",
+      "value": 8
+    },
+    {
+      "id": "RetryActionType:Clone",
+      "source_file": "app/src/models/retry-actions.ts",
+      "symbol": "RetryActionType",
+      "member": "Clone",
+      "category": "failure-recovery",
+      "value": 4
+    },
+    {
+      "id": "RetryActionType:CreateBranchForCherryPick",
+      "source_file": "app/src/models/retry-actions.ts",
+      "symbol": "RetryActionType",
+      "member": "CreateBranchForCherryPick",
+      "category": "failure-recovery",
+      "value": 9
+    },
+    {
+      "id": "RetryActionType:DiscardChanges",
+      "source_file": "app/src/models/retry-actions.ts",
+      "symbol": "RetryActionType",
+      "member": "DiscardChanges",
+      "category": "failure-recovery",
+      "value": 12
+    },
+    {
+      "id": "RetryActionType:Fetch",
+      "source_file": "app/src/models/retry-actions.ts",
+      "symbol": "RetryActionType",
+      "member": "Fetch",
+      "category": "failure-recovery",
+      "value": 3
+    },
+    {
+      "id": "RetryActionType:Merge",
+      "source_file": "app/src/models/retry-actions.ts",
+      "symbol": "RetryActionType",
+      "member": "Merge",
+      "category": "failure-recovery",
+      "value": 6
+    },
+    {
+      "id": "RetryActionType:PopStash",
+      "source_file": "app/src/models/retry-actions.ts",
+      "symbol": "RetryActionType",
+      "member": "PopStash",
+      "category": "failure-recovery",
+      "value": 13
+    },
+    {
+      "id": "RetryActionType:Pull",
+      "source_file": "app/src/models/retry-actions.ts",
+      "symbol": "RetryActionType",
+      "member": "Pull",
+      "category": "failure-recovery",
+      "value": 2
+    },
+    {
+      "id": "RetryActionType:Push",
+      "source_file": "app/src/models/retry-actions.ts",
+      "symbol": "RetryActionType",
+      "member": "Push",
+      "category": "failure-recovery",
+      "value": 1
+    },
+    {
+      "id": "RetryActionType:Rebase",
+      "source_file": "app/src/models/retry-actions.ts",
+      "symbol": "RetryActionType",
+      "member": "Rebase",
+      "category": "failure-recovery",
+      "value": 7
+    },
+    {
+      "id": "RetryActionType:Reorder",
+      "source_file": "app/src/models/retry-actions.ts",
+      "symbol": "RetryActionType",
+      "member": "Reorder",
+      "category": "failure-recovery",
+      "value": 11
+    },
+    {
+      "id": "RetryActionType:Squash",
+      "source_file": "app/src/models/retry-actions.ts",
+      "symbol": "RetryActionType",
+      "member": "Squash",
+      "category": "failure-recovery",
+      "value": 10
+    },
+    {
+      "id": "FoldoutType:AddMenu",
+      "source_file": "app/src/lib/app-state.ts",
+      "symbol": "FoldoutType",
+      "member": "AddMenu",
+      "category": "foldout",
+      "value": 3
+    },
+    {
+      "id": "FoldoutType:AppMenu",
+      "source_file": "app/src/lib/app-state.ts",
+      "symbol": "FoldoutType",
+      "member": "AppMenu",
+      "category": "foldout",
+      "value": 2
+    },
+    {
+      "id": "FoldoutType:Branch",
+      "source_file": "app/src/lib/app-state.ts",
+      "symbol": "FoldoutType",
+      "member": "Branch",
+      "category": "foldout",
+      "value": 1
+    },
+    {
+      "id": "FoldoutType:PushPull",
+      "source_file": "app/src/lib/app-state.ts",
+      "symbol": "FoldoutType",
+      "member": "PushPull",
+      "category": "foldout",
+      "value": 4
+    },
+    {
+      "id": "FoldoutType:Repository",
+      "source_file": "app/src/lib/app-state.ts",
+      "symbol": "FoldoutType",
+      "member": "Repository",
+      "category": "foldout",
+      "value": 0
+    },
+    {
+      "id": "FoldoutType:Worktree",
+      "source_file": "app/src/lib/app-state.ts",
+      "symbol": "FoldoutType",
+      "member": "Worktree",
+      "category": "foldout",
+      "value": 5
+    },
+    {
+      "id": "RequestChannels:app-menu",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "app-menu",
+      "category": "ipc-request",
+      "signature": "(menu: IMenu) => void"
+    },
+    {
+      "id": "RequestChannels:auto-updater-checking-for-update",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "auto-updater-checking-for-update",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:auto-updater-error",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "auto-updater-error",
+      "category": "ipc-request",
+      "signature": "(error: Error) => void"
+    },
+    {
+      "id": "RequestChannels:auto-updater-update-available",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "auto-updater-update-available",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:auto-updater-update-downloaded",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "auto-updater-update-downloaded",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:auto-updater-update-not-available",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "auto-updater-update-not-available",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:blur",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "blur",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:cancel-quitting",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "cancel-quitting",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:certificate-error",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "certificate-error",
+      "category": "ipc-request",
+      "signature": "( certificate: Electron.Certificate, error: string, url: string ) => void"
+    },
+    {
+      "id": "RequestChannels:cli-action",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "cli-action",
+      "category": "ipc-request",
+      "signature": "(action: CLIAction) => void"
+    },
+    {
+      "id": "RequestChannels:close-window",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "close-window",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:crash-quit",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "crash-quit",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:crash-ready",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "crash-ready",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:dialog-did-open",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "dialog-did-open",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:error",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "error",
+      "category": "ipc-request",
+      "signature": "(crashDetails: ICrashDetails) => void"
+    },
+    {
+      "id": "RequestChannels:execute-menu-item-by-id",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "execute-menu-item-by-id",
+      "category": "ipc-request",
+      "signature": "(id: string) => void"
+    },
+    {
+      "id": "RequestChannels:focus",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "focus",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:focus-window",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "focus-window",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:get-app-menu",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "get-app-menu",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:install-windows-cli",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "install-windows-cli",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:launch-timing-stats",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "launch-timing-stats",
+      "category": "ipc-request",
+      "signature": "(stats: ILaunchStats) => void"
+    },
+    {
+      "id": "RequestChannels:log",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "log",
+      "category": "ipc-request",
+      "signature": "(level: LogLevel, message: string) => void"
+    },
+    {
+      "id": "RequestChannels:maximize-window",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "maximize-window",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:menu-event",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "menu-event",
+      "category": "ipc-request",
+      "signature": "(name: MenuEvent) => void"
+    },
+    {
+      "id": "RequestChannels:minimize-window",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "minimize-window",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:native-theme-updated",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "native-theme-updated",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:notification-event",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "notification-event",
+      "category": "ipc-request",
+      "signature": "NotificationCallback<DesktopAliveEvent>"
+    },
+    {
+      "id": "RequestChannels:quit-and-install-updates",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "quit-and-install-updates",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:quit-app",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "quit-app",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:renderer-ready",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "renderer-ready",
+      "category": "ipc-request",
+      "signature": "(time: number) => void"
+    },
+    {
+      "id": "RequestChannels:resolve-image-token",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "resolve-image-token",
+      "category": "ipc-request",
+      "signature": "( requestId: number, endpoint: string, token: string ) => void"
+    },
+    {
+      "id": "RequestChannels:resolved-image-token",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "resolved-image-token",
+      "category": "ipc-request",
+      "signature": "(requestId: number, token: string | null) => void"
+    },
+    {
+      "id": "RequestChannels:select-all-window-contents",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "select-all-window-contents",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:send-error-report",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "send-error-report",
+      "category": "ipc-request",
+      "signature": "( error: Error, extra: Record<string, string>, nonFatal: boolean ) => void"
+    },
+    {
+      "id": "RequestChannels:set-native-theme-source",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "set-native-theme-source",
+      "category": "ipc-request",
+      "signature": "(themeName: ThemeSource) => void"
+    },
+    {
+      "id": "RequestChannels:set-window-zoom-factor",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "set-window-zoom-factor",
+      "category": "ipc-request",
+      "signature": "(zoomFactor: number) => void"
+    },
+    {
+      "id": "RequestChannels:show-certificate-trust-dialog",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "show-certificate-trust-dialog",
+      "category": "ipc-request",
+      "signature": "( certificate: Electron.Certificate, message: string ) => void"
+    },
+    {
+      "id": "RequestChannels:show-installing-update",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "show-installing-update",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:uncaught-exception",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "uncaught-exception",
+      "category": "ipc-request",
+      "signature": "(error: Error) => void"
+    },
+    {
+      "id": "RequestChannels:uninstall-windows-cli",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "uninstall-windows-cli",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:unmaximize-window",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "unmaximize-window",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:unsafe-open-directory",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "unsafe-open-directory",
+      "category": "ipc-request",
+      "signature": "(path: string) => void"
+    },
+    {
+      "id": "RequestChannels:update-accounts",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "update-accounts",
+      "category": "ipc-request",
+      "signature": "(accounts: ReadonlyArray<EndpointToken>) => void"
+    },
+    {
+      "id": "RequestChannels:update-menu-state",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "update-menu-state",
+      "category": "ipc-request",
+      "signature": "( state: Array<{ id: MenuIDs; state: IMenuItemState }> ) => void"
+    },
+    {
+      "id": "RequestChannels:update-preferred-app-menu-item-labels",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "update-preferred-app-menu-item-labels",
+      "category": "ipc-request",
+      "signature": "(labels: MenuLabelsEvent) => void"
+    },
+    {
+      "id": "RequestChannels:update-window-background-color",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "update-window-background-color",
+      "category": "ipc-request",
+      "signature": "(color: string) => void"
+    },
+    {
+      "id": "RequestChannels:url-action",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "url-action",
+      "category": "ipc-request",
+      "signature": "(action: URLActionType) => void"
+    },
+    {
+      "id": "RequestChannels:will-quit",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "will-quit",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:will-quit-even-if-updating",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "will-quit-even-if-updating",
+      "category": "ipc-request",
+      "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:window-state-changed",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "window-state-changed",
+      "category": "ipc-request",
+      "signature": "(windowState: WindowState) => void"
+    },
+    {
+      "id": "RequestChannels:zoom-factor-changed",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "zoom-factor-changed",
+      "category": "ipc-request",
+      "signature": "(zoomFactor: number) => void"
+    },
+    {
+      "id": "RequestResponseChannels:check-for-updates",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "check-for-updates",
+      "category": "ipc-request-response",
+      "signature": "(url: string) => Promise<Error | undefined>"
+    },
+    {
+      "id": "RequestResponseChannels:confirm-reveal-directory",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "confirm-reveal-directory",
+      "category": "ipc-request-response",
+      "signature": "() => Promise<boolean>"
+    },
+    {
+      "id": "RequestResponseChannels:get-app-architecture",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "get-app-architecture",
+      "category": "ipc-request-response",
+      "signature": "() => Promise<Architecture>"
+    },
+    {
+      "id": "RequestResponseChannels:get-app-path",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "get-app-path",
+      "category": "ipc-request-response",
+      "signature": "() => Promise<string>"
+    },
+    {
+      "id": "RequestResponseChannels:get-apple-action-on-double-click",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "get-apple-action-on-double-click",
+      "category": "ipc-request-response",
+      "signature": "() => Promise<Electron.AppleActionOnDoubleClickPref>"
+    },
+    {
+      "id": "RequestResponseChannels:get-current-window-state",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "get-current-window-state",
+      "category": "ipc-request-response",
+      "signature": "() => Promise<WindowState | undefined>"
+    },
+    {
+      "id": "RequestResponseChannels:get-current-window-zoom-factor",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "get-current-window-zoom-factor",
+      "category": "ipc-request-response",
+      "signature": "() => Promise<number | undefined>"
+    },
+    {
+      "id": "RequestResponseChannels:get-exec-path",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "get-exec-path",
+      "category": "ipc-request-response",
+      "signature": "() => Promise<string>"
+    },
+    {
+      "id": "RequestResponseChannels:get-guid",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "get-guid",
+      "category": "ipc-request-response",
+      "signature": "() => Promise<string>"
+    },
+    {
+      "id": "RequestResponseChannels:get-notifications-permission",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "get-notifications-permission",
+      "category": "ipc-request-response",
+      "signature": "() => Promise<DesktopNotificationPermission>"
+    },
+    {
+      "id": "RequestResponseChannels:get-path",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "get-path",
+      "category": "ipc-request-response",
+      "signature": "(path: PathType) => Promise<string>"
+    },
+    {
+      "id": "RequestResponseChannels:is-in-application-folder",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "is-in-application-folder",
+      "category": "ipc-request-response",
+      "signature": "() => Promise<boolean | null>"
+    },
+    {
+      "id": "RequestResponseChannels:is-running-under-arm64-translation",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "is-running-under-arm64-translation",
+      "category": "ipc-request-response",
+      "signature": "() => Promise<boolean>"
+    },
+    {
+      "id": "RequestResponseChannels:is-window-focused",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "is-window-focused",
+      "category": "ipc-request-response",
+      "signature": "() => Promise<boolean>"
+    },
+    {
+      "id": "RequestResponseChannels:is-window-maximized",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "is-window-maximized",
+      "category": "ipc-request-response",
+      "signature": "() => Promise<boolean>"
+    },
+    {
+      "id": "RequestResponseChannels:move-to-applications-folder",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "move-to-applications-folder",
+      "category": "ipc-request-response",
+      "signature": "() => Promise<void>"
+    },
+    {
+      "id": "RequestResponseChannels:move-to-trash",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "move-to-trash",
+      "category": "ipc-request-response",
+      "signature": "(path: string) => Promise<void>"
+    },
+    {
+      "id": "RequestResponseChannels:open-external",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "open-external",
+      "category": "ipc-request-response",
+      "signature": "(path: string) => Promise<boolean>"
+    },
+    {
+      "id": "RequestResponseChannels:request-notifications-permission",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "request-notifications-permission",
+      "category": "ipc-request-response",
+      "signature": "() => Promise<boolean>"
+    },
+    {
+      "id": "RequestResponseChannels:resolve-proxy",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "resolve-proxy",
+      "category": "ipc-request-response",
+      "signature": "(url: string) => Promise<string>"
+    },
+    {
+      "id": "RequestResponseChannels:save-guid",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "save-guid",
+      "category": "ipc-request-response",
+      "signature": "(guid: string) => Promise<void>"
+    },
+    {
+      "id": "RequestResponseChannels:should-use-dark-colors",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "should-use-dark-colors",
+      "category": "ipc-request-response",
+      "signature": "() => Promise<boolean>"
+    },
+    {
+      "id": "RequestResponseChannels:show-contextual-menu",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "show-contextual-menu",
+      "category": "ipc-request-response",
+      "signature": "( items: ReadonlyArray<ISerializableMenuItem>, addSpellCheckMenu: boolean ) => Promise<ReadonlyArray<number> | null>"
+    },
+    {
+      "id": "RequestResponseChannels:show-item-in-folder",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "show-item-in-folder",
+      "category": "ipc-request-response",
+      "signature": "(path: string) => Promise<void>"
+    },
+    {
+      "id": "RequestResponseChannels:show-notification",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "show-notification",
+      "category": "ipc-request-response",
+      "signature": "( title: string, body: string, userInfo?: DesktopAliveEvent ) => Promise<string | null>"
+    },
+    {
+      "id": "RequestResponseChannels:show-open-dialog",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "show-open-dialog",
+      "category": "ipc-request-response",
+      "signature": "( options: Electron.OpenDialogOptions ) => Promise<string | null>"
+    },
+    {
+      "id": "RequestResponseChannels:show-save-dialog",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "show-save-dialog",
+      "category": "ipc-request-response",
+      "signature": "( options: Electron.SaveDialogOptions ) => Promise<string | null>"
+    },
+    {
+      "id": "RequestResponseChannels:write-clipboard-text",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestResponseChannels",
+      "member": "write-clipboard-text",
+      "category": "ipc-request-response",
+      "signature": "(text: string) => Promise<void>"
+    },
+    {
+      "id": "MenuEvent:add-local-repository",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "add-local-repository",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:boomtown",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "boomtown",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:branch-on-github",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "branch-on-github",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:choose-repository",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "choose-repository",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:clone-repository",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "clone-repository",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:compare-on-github",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "compare-on-github",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:compare-to-branch",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "compare-to-branch",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:create-branch",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "create-branch",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:create-issue-in-repository-on-github",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "create-issue-in-repository-on-github",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:create-repository",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "create-repository",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:create-worktree",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "create-worktree",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:decrease-active-resizable-width",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "decrease-active-resizable-width",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:delete-branch",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "delete-branch",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:discard-all-changes",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "discard-all-changes",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:fetch",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "fetch",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:find-text",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "find-text",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:force-push",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "force-push",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:go-to-commit-message",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "go-to-commit-message",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:hide-stashed-changes",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "hide-stashed-changes",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:increase-active-resizable-width",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "increase-active-resizable-width",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:install-darwin-cli",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "install-darwin-cli",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:install-windows-cli",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "install-windows-cli",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:merge-branch",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "merge-branch",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:open-external-editor",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "open-external-editor",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:open-in-copilot-app",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "open-in-copilot-app",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:open-in-shell",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "open-in-shell",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:open-pull-request",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "open-pull-request",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:open-with-external-editor",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "open-with-external-editor",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:open-working-directory",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "open-working-directory",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:preview-pull-request",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "preview-pull-request",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:pull",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "pull",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:push",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "push",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:rebase-branch",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "rebase-branch",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:remove-repository",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "remove-repository",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:rename-branch",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "rename-branch",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:select-all",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "select-all",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:show-about",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "show-about",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:show-branches",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "show-branches",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:show-changes",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "show-changes",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:show-history",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "show-history",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:show-preferences",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "show-preferences",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:show-repository-settings",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "show-repository-settings",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:show-stashed-changes",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "show-stashed-changes",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:show-worktrees",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "show-worktrees",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:squash-and-merge-branch",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "squash-and-merge-branch",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:stash-all-changes",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "stash-all-changes",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:test-about-dialog",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-about-dialog",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-app-error",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-app-error",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-arm64-banner",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-arm64-banner",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-cherry-pick-conflicts-banner",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-cherry-pick-conflicts-banner",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-cli-action",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-cli-action",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-confirm-committing-conflicted-files",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-confirm-committing-conflicted-files",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-copilot-snapshot-card",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-copilot-snapshot-card",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-discarded-changes-will-be-unrecoverable",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-discarded-changes-will-be-unrecoverable",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-do-you-want-fork-this-repository",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-do-you-want-fork-this-repository",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-files-too-large",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-files-too-large",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-generic-git-authentication",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-generic-git-authentication",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-icons",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-icons",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-invalidated-account-token",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-invalidated-account-token",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-merge-successful-banner",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-merge-successful-banner",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-move-to-application-folder",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-move-to-application-folder",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-newer-commits-on-remote",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-newer-commits-on-remote",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-no-external-editor",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-no-external-editor",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-notification",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-notification",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-os-version-no-longer-supported",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-os-version-no-longer-supported",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-prioritized-update-banner",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-prioritized-update-banner",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-prune-branches",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-prune-branches",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-push-rejected",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-push-rejected",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-re-authorization-required",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-re-authorization-required",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-release-notes-popup",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-release-notes-popup",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-reorder-banner",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-reorder-banner",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-send-stats",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-send-stats",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-showcase-update-banner",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-showcase-update-banner",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-thank-you-banner",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-thank-you-banner",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-thank-you-popup",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-thank-you-popup",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-token-expiration",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-token-expiration",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-unable-to-locate-git",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-unable-to-locate-git",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-unable-to-open-shell",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-unable-to-open-shell",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-undone-banner",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-undone-banner",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-untrusted-server",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-untrusted-server",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-update-banner",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-update-banner",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-update-existing-git-lfs-filters",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-update-existing-git-lfs-filters",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:test-upstream-already-exists",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "test-upstream-already-exists",
+      "category": "menu-event",
+      "test_only": true
+    },
+    {
+      "id": "MenuEvent:toggle-changes-filter",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "toggle-changes-filter",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:uninstall-windows-cli",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "uninstall-windows-cli",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:update-branch-with-contribution-target-branch",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "update-branch-with-contribution-target-branch",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "MenuEvent:view-repository-on-github",
+      "source_file": "app/src/main-process/menu/menu-event.ts",
+      "symbol": "MenuEvent",
+      "member": "view-repository-on-github",
+      "category": "menu-event",
+      "test_only": false
+    },
+    {
+      "id": "PopupType:About",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "About",
+      "category": "popup",
+      "value": "About"
+    },
+    {
+      "id": "PopupType:Acknowledgements",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "Acknowledgements",
+      "category": "popup",
+      "value": "Acknowledgements"
+    },
+    {
+      "id": "PopupType:AddRepository",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "AddRepository",
+      "category": "popup",
+      "value": "AddRepository"
+    },
+    {
+      "id": "PopupType:AddSSHHost",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "AddSSHHost",
+      "category": "popup",
+      "value": "AddSSHHost"
+    },
+    {
+      "id": "PopupType:AddWorktree",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "AddWorktree",
+      "category": "popup",
+      "value": "AddWorktree"
+    },
+    {
+      "id": "PopupType:AssistedCommitDisclaimer",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "AssistedCommitDisclaimer",
+      "category": "popup",
+      "value": "AssistedCommitDisclaimer"
+    },
+    {
+      "id": "PopupType:BypassPushProtection",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "BypassPushProtection",
+      "category": "popup",
+      "value": "BypassPushProtection"
+    },
+    {
+      "id": "PopupType:CICheckRunRerun",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "CICheckRunRerun",
+      "category": "popup",
+      "value": "CICheckRunRerun"
+    },
+    {
+      "id": "PopupType:CLIInstalled",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "CLIInstalled",
+      "category": "popup",
+      "value": "CLIInstalled"
+    },
+    {
+      "id": "PopupType:ChangeRepositoryAlias",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "ChangeRepositoryAlias",
+      "category": "popup",
+      "value": "ChangeRepositoryAlias"
+    },
+    {
+      "id": "PopupType:ChooseForkSettings",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "ChooseForkSettings",
+      "category": "popup",
+      "value": "ChooseForkSettings"
+    },
+    {
+      "id": "PopupType:CloneRepository",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "CloneRepository",
+      "category": "popup",
+      "value": "CloneRepository"
+    },
+    {
+      "id": "PopupType:CommitConflictsWarning",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "CommitConflictsWarning",
+      "category": "popup",
+      "value": "CommitConflictsWarning"
+    },
+    {
+      "id": "PopupType:CommitMessage",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "CommitMessage",
+      "category": "popup",
+      "value": "CommitMessage"
+    },
+    {
+      "id": "PopupType:CommitProgress",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "CommitProgress",
+      "category": "popup",
+      "value": "CommitProgress"
+    },
+    {
+      "id": "PopupType:ConfirmAccountSignOut",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "ConfirmAccountSignOut",
+      "category": "popup",
+      "value": "ConfirmAccountSignOut"
+    },
+    {
+      "id": "PopupType:ConfirmCheckoutCommit",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "ConfirmCheckoutCommit",
+      "category": "popup",
+      "value": "ConfirmCheckoutCommit"
+    },
+    {
+      "id": "PopupType:ConfirmCommitFilteredChanges",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "ConfirmCommitFilteredChanges",
+      "category": "popup",
+      "value": "ConfirmCommitFilteredChanges"
+    },
+    {
+      "id": "PopupType:ConfirmDeleteCopilotBYOKProvider",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "ConfirmDeleteCopilotBYOKProvider",
+      "category": "popup",
+      "value": "ConfirmDeleteCopilotBYOKProvider"
+    },
+    {
+      "id": "PopupType:ConfirmDiscardChanges",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "ConfirmDiscardChanges",
+      "category": "popup",
+      "value": "ConfirmDiscardChanges"
+    },
+    {
+      "id": "PopupType:ConfirmDiscardSelection",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "ConfirmDiscardSelection",
+      "category": "popup",
+      "value": "ConfirmDiscardSelection"
+    },
+    {
+      "id": "PopupType:ConfirmDiscardStash",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "ConfirmDiscardStash",
+      "category": "popup",
+      "value": "ConfirmDiscardStash"
+    },
+    {
+      "id": "PopupType:ConfirmExitTutorial",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "ConfirmExitTutorial",
+      "category": "popup",
+      "value": "ConfirmExitTutorial"
+    },
+    {
+      "id": "PopupType:ConfirmForcePush",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "ConfirmForcePush",
+      "category": "popup",
+      "value": "ConfirmForcePush"
+    },
+    {
+      "id": "PopupType:ConfirmOverwriteStash",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "ConfirmOverwriteStash",
+      "category": "popup",
+      "value": "ConfirmOverwriteStash"
+    },
+    {
+      "id": "PopupType:CopilotAppNotFound",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "CopilotAppNotFound",
+      "category": "popup",
+      "value": "CopilotAppNotFound"
+    },
+    {
+      "id": "PopupType:CopilotConflictResolutionAlwaysNudge",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "CopilotConflictResolutionAlwaysNudge",
+      "category": "popup",
+      "value": "CopilotConflictResolutionAlwaysNudge"
+    },
+    {
+      "id": "PopupType:CopilotConflictResolutionDisclaimer",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "CopilotConflictResolutionDisclaimer",
+      "category": "popup",
+      "value": "CopilotConflictResolutionDisclaimer"
+    },
+    {
+      "id": "PopupType:CopilotCustomProviders",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "CopilotCustomProviders",
+      "category": "popup",
+      "value": "CopilotCustomProviders"
+    },
+    {
+      "id": "PopupType:CopilotUserSettings",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "CopilotUserSettings",
+      "category": "popup",
+      "value": "CopilotUserSettings"
+    },
+    {
+      "id": "PopupType:CreateBranch",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "CreateBranch",
+      "category": "popup",
+      "value": "CreateBranch"
+    },
+    {
+      "id": "PopupType:CreateFork",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "CreateFork",
+      "category": "popup",
+      "value": "CreateFork"
+    },
+    {
+      "id": "PopupType:CreateRepository",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "CreateRepository",
+      "category": "popup",
+      "value": "CreateRepository"
+    },
+    {
+      "id": "PopupType:CreateTag",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "CreateTag",
+      "category": "popup",
+      "value": "CreateTag"
+    },
+    {
+      "id": "PopupType:CreateTutorialRepository",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "CreateTutorialRepository",
+      "category": "popup",
+      "value": "CreateTutorialRepository"
+    },
+    {
+      "id": "PopupType:DeleteBranch",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "DeleteBranch",
+      "category": "popup",
+      "value": "DeleteBranch"
+    },
+    {
+      "id": "PopupType:DeletePullRequest",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "DeletePullRequest",
+      "category": "popup",
+      "value": "DeletePullRequest"
+    },
+    {
+      "id": "PopupType:DeleteRemoteBranch",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "DeleteRemoteBranch",
+      "category": "popup",
+      "value": "DeleteRemoteBranch"
+    },
+    {
+      "id": "PopupType:DeleteTag",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "DeleteTag",
+      "category": "popup",
+      "value": "DeleteTag"
+    },
+    {
+      "id": "PopupType:DeleteWorktree",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "DeleteWorktree",
+      "category": "popup",
+      "value": "DeleteWorktree"
+    },
+    {
+      "id": "PopupType:DeleteWorktreeFailed",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "DeleteWorktreeFailed",
+      "category": "popup",
+      "value": "DeleteWorktreeFailed"
+    },
+    {
+      "id": "PopupType:DiscardChangesRetry",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "DiscardChangesRetry",
+      "category": "popup",
+      "value": "DiscardChangesRetry"
+    },
+    {
+      "id": "PopupType:EditCopilotBYOKModel",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "EditCopilotBYOKModel",
+      "category": "popup",
+      "value": "EditCopilotBYOKModel"
+    },
+    {
+      "id": "PopupType:EditCopilotBYOKProvider",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "EditCopilotBYOKProvider",
+      "category": "popup",
+      "value": "EditCopilotBYOKProvider"
+    },
+    {
+      "id": "PopupType:Error",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "Error",
+      "category": "popup",
+      "value": "Error"
+    },
+    {
+      "id": "PopupType:ExternalEditorFailed",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "ExternalEditorFailed",
+      "category": "popup",
+      "value": "ExternalEditorFailed"
+    },
+    {
+      "id": "PopupType:GenerateCommitMessageDisclaimer",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "GenerateCommitMessageDisclaimer",
+      "category": "popup",
+      "value": "GenerateCommitMessageDisclaimer"
+    },
+    {
+      "id": "PopupType:GenerateCommitMessageOverrideWarning",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "GenerateCommitMessageOverrideWarning",
+      "category": "popup",
+      "value": "GenerateCommitMessageOverrideWarning"
+    },
+    {
+      "id": "PopupType:GenericGitAuthentication",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "GenericGitAuthentication",
+      "category": "popup",
+      "value": "GenericGitAuthentication"
+    },
+    {
+      "id": "PopupType:HookFailed",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "HookFailed",
+      "category": "popup",
+      "value": "HookFailed"
+    },
+    {
+      "id": "PopupType:InitializeLFS",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "InitializeLFS",
+      "category": "popup",
+      "value": "InitializeLFS"
+    },
+    {
+      "id": "PopupType:InstallGit",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "InstallGit",
+      "category": "popup",
+      "value": "InstallGit"
+    },
+    {
+      "id": "PopupType:InstallingUpdate",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "InstallingUpdate",
+      "category": "popup",
+      "value": "InstallingUpdate"
+    },
+    {
+      "id": "PopupType:InvalidatedToken",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "InvalidatedToken",
+      "category": "popup",
+      "value": "InvalidatedToken"
+    },
+    {
+      "id": "PopupType:LFSAttributeMismatch",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "LFSAttributeMismatch",
+      "category": "popup",
+      "value": "LFSAttributeMismatch"
+    },
+    {
+      "id": "PopupType:LocalChangesOverwritten",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "LocalChangesOverwritten",
+      "category": "popup",
+      "value": "LocalChangesOverwritten"
+    },
+    {
+      "id": "PopupType:MoveToApplicationsFolder",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "MoveToApplicationsFolder",
+      "category": "popup",
+      "value": "MoveToApplicationsFolder"
+    },
+    {
+      "id": "PopupType:MultiCommitOperation",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "MultiCommitOperation",
+      "category": "popup",
+      "value": "MultiCommitOperation"
+    },
+    {
+      "id": "PopupType:OpenShellFailed",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "OpenShellFailed",
+      "category": "popup",
+      "value": "OpenShellFailed"
+    },
+    {
+      "id": "PopupType:OpenWithExternalEditor",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "OpenWithExternalEditor",
+      "category": "popup",
+      "value": "OpenWithExternalEditor"
+    },
+    {
+      "id": "PopupType:OversizedFiles",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "OversizedFiles",
+      "category": "popup",
+      "value": "OversizedFiles"
+    },
+    {
+      "id": "PopupType:Preferences",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "Preferences",
+      "category": "popup",
+      "value": "Preferences"
+    },
+    {
+      "id": "PopupType:PublishRepository",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "PublishRepository",
+      "category": "popup",
+      "value": "PublishRepository"
+    },
+    {
+      "id": "PopupType:PullRequestChecksFailed",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "PullRequestChecksFailed",
+      "category": "popup",
+      "value": "PullRequestChecksFailed"
+    },
+    {
+      "id": "PopupType:PullRequestComment",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "PullRequestComment",
+      "category": "popup",
+      "value": "PullRequestComment"
+    },
+    {
+      "id": "PopupType:PullRequestReview",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "PullRequestReview",
+      "category": "popup",
+      "value": "PullRequestReview"
+    },
+    {
+      "id": "PopupType:PushBranchCommits",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "PushBranchCommits",
+      "category": "popup",
+      "value": "PushBranchCommits"
+    },
+    {
+      "id": "PopupType:PushNeedsPull",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "PushNeedsPull",
+      "category": "popup",
+      "value": "PushNeedsPull"
+    },
+    {
+      "id": "PopupType:PushProtectionError",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "PushProtectionError",
+      "category": "popup",
+      "value": "PushProtectionError"
+    },
+    {
+      "id": "PopupType:PushRejectedDueToMissingWorkflowScope",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "PushRejectedDueToMissingWorkflowScope",
+      "category": "popup",
+      "value": "PushRejectedDueToMissingWorkflowScope"
+    },
+    {
+      "id": "PopupType:ReleaseNotes",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "ReleaseNotes",
+      "category": "popup",
+      "value": "ReleaseNotes"
+    },
+    {
+      "id": "PopupType:RemoveRepository",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "RemoveRepository",
+      "category": "popup",
+      "value": "RemoveRepository"
+    },
+    {
+      "id": "PopupType:RenameBranch",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "RenameBranch",
+      "category": "popup",
+      "value": "RenameBranch"
+    },
+    {
+      "id": "PopupType:RenameWorktree",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "RenameWorktree",
+      "category": "popup",
+      "value": "RenameWorktree"
+    },
+    {
+      "id": "PopupType:RepositoryAccount",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "RepositoryAccount",
+      "category": "popup",
+      "value": "RepositoryAccount"
+    },
+    {
+      "id": "PopupType:RepositorySettings",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "RepositorySettings",
+      "category": "popup",
+      "value": "RepositorySettings"
+    },
+    {
+      "id": "PopupType:SAMLReauthRequired",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "SAMLReauthRequired",
+      "category": "popup",
+      "value": "SAMLReauthRequired"
+    },
+    {
+      "id": "PopupType:SSHKeyPassphrase",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "SSHKeyPassphrase",
+      "category": "popup",
+      "value": "SSHKeyPassphrase"
+    },
+    {
+      "id": "PopupType:SSHUserPassword",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "SSHUserPassword",
+      "category": "popup",
+      "value": "SSHUserPassword"
+    },
+    {
+      "id": "PopupType:SignIn",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "SignIn",
+      "category": "popup",
+      "value": "SignIn"
+    },
+    {
+      "id": "PopupType:StartPullRequest",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "StartPullRequest",
+      "category": "popup",
+      "value": "StartPullRequest"
+    },
+    {
+      "id": "PopupType:StashAndSwitchBranch",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "StashAndSwitchBranch",
+      "category": "popup",
+      "value": "StashAndSwitchBranch"
+    },
+    {
+      "id": "PopupType:TermsAndConditions",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "TermsAndConditions",
+      "category": "popup",
+      "value": "TermsAndConditions"
+    },
+    {
+      "id": "PopupType:TestAbout",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "TestAbout",
+      "category": "popup",
+      "value": "TestAbout"
+    },
+    {
+      "id": "PopupType:TestCLIAction",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "TestCLIAction",
+      "category": "popup",
+      "value": "TestCLIAction"
+    },
+    {
+      "id": "PopupType:TestCopilotSnapshotCard",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "TestCopilotSnapshotCard",
+      "category": "popup",
+      "value": "TestCopilotSnapshotCard"
+    },
+    {
+      "id": "PopupType:TestIcons",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "TestIcons",
+      "category": "popup",
+      "value": "TestIcons"
+    },
+    {
+      "id": "PopupType:TestNotifications",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "TestNotifications",
+      "category": "popup",
+      "value": "TestNotifications"
+    },
+    {
+      "id": "PopupType:TestTokenExpiration",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "TestTokenExpiration",
+      "category": "popup",
+      "value": "TestTokenExpiration"
+    },
+    {
+      "id": "PopupType:ThankYou",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "ThankYou",
+      "category": "popup",
+      "value": "ThankYou"
+    },
+    {
+      "id": "PopupType:UnknownAuthors",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "UnknownAuthors",
+      "category": "popup",
+      "value": "UnknownAuthors"
+    },
+    {
+      "id": "PopupType:UnreachableCommits",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "UnreachableCommits",
+      "category": "popup",
+      "value": "UnreachableCommits"
+    },
+    {
+      "id": "PopupType:UntrustedCertificate",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "UntrustedCertificate",
+      "category": "popup",
+      "value": "UntrustedCertificate"
+    },
+    {
+      "id": "PopupType:UpstreamAlreadyExists",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "UpstreamAlreadyExists",
+      "category": "popup",
+      "value": "UpstreamAlreadyExists"
+    },
+    {
+      "id": "PopupType:WarnForcePush",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "WarnForcePush",
+      "category": "popup",
+      "value": "WarnForcePush"
+    },
+    {
+      "id": "PopupType:WarnLocalChangesBeforeUndo",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "WarnLocalChangesBeforeUndo",
+      "category": "popup",
+      "value": "WarnLocalChangesBeforeUndo"
+    },
+    {
+      "id": "PopupType:WarningBeforeReset",
+      "source_file": "app/src/models/popup.ts",
+      "symbol": "PopupType",
+      "member": "WarningBeforeReset",
+      "category": "popup",
+      "value": "WarningBeforeReset"
+    },
+    {
+      "id": "PreferencesTab:Accessibility",
+      "source_file": "app/src/models/preferences.ts",
+      "symbol": "PreferencesTab",
+      "member": "Accessibility",
+      "category": "preferences-tab",
+      "value": 8
+    },
+    {
+      "id": "PreferencesTab:Accounts",
+      "source_file": "app/src/models/preferences.ts",
+      "symbol": "PreferencesTab",
+      "member": "Accounts",
+      "category": "preferences-tab",
+      "value": 0
+    },
+    {
+      "id": "PreferencesTab:Advanced",
+      "source_file": "app/src/models/preferences.ts",
+      "symbol": "PreferencesTab",
+      "member": "Advanced",
+      "category": "preferences-tab",
+      "value": 7
+    },
+    {
+      "id": "PreferencesTab:Appearance",
+      "source_file": "app/src/models/preferences.ts",
+      "symbol": "PreferencesTab",
+      "member": "Appearance",
+      "category": "preferences-tab",
+      "value": 4
+    },
+    {
+      "id": "PreferencesTab:Copilot",
+      "source_file": "app/src/models/preferences.ts",
+      "symbol": "PreferencesTab",
+      "member": "Copilot",
+      "category": "preferences-tab",
+      "value": 2
+    },
+    {
+      "id": "PreferencesTab:Git",
+      "source_file": "app/src/models/preferences.ts",
+      "symbol": "PreferencesTab",
+      "member": "Git",
+      "category": "preferences-tab",
+      "value": 3
+    },
+    {
+      "id": "PreferencesTab:Integrations",
+      "source_file": "app/src/models/preferences.ts",
+      "symbol": "PreferencesTab",
+      "member": "Integrations",
+      "category": "preferences-tab",
+      "value": 1
+    },
+    {
+      "id": "PreferencesTab:Notifications",
+      "source_file": "app/src/models/preferences.ts",
+      "symbol": "PreferencesTab",
+      "member": "Notifications",
+      "category": "preferences-tab",
+      "value": 5
+    },
+    {
+      "id": "PreferencesTab:Prompts",
+      "source_file": "app/src/models/preferences.ts",
+      "symbol": "PreferencesTab",
+      "member": "Prompts",
+      "category": "preferences-tab",
+      "value": 6
+    },
+    {
+      "id": "RepositorySectionTab:Changes",
+      "source_file": "app/src/lib/app-state.ts",
+      "symbol": "RepositorySectionTab",
+      "member": "Changes",
+      "category": "repository-tab",
+      "value": 0
+    },
+    {
+      "id": "RepositorySectionTab:History",
+      "source_file": "app/src/lib/app-state.ts",
+      "symbol": "RepositorySectionTab",
+      "member": "History",
+      "category": "repository-tab",
+      "value": 1
+    },
+    {
+      "id": "IOAuthAction:oauth",
+      "source_file": "app/src/lib/parse-app-url.ts",
+      "symbol": "IOAuthAction",
+      "member": "oauth",
+      "category": "url-action",
+      "union": "URLActionType",
+      "fields": [
+        {
+          "name": "name",
+          "optional": false,
+          "type": "'oauth'"
+        },
+        {
+          "name": "code",
+          "optional": false,
+          "type": "string"
+        },
+        {
+          "name": "state",
+          "optional": false,
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "id": "IOpenRepositoryFromURLAction:open-repository-from-url",
+      "source_file": "app/src/lib/parse-app-url.ts",
+      "symbol": "IOpenRepositoryFromURLAction",
+      "member": "open-repository-from-url",
+      "category": "url-action",
+      "union": "URLActionType",
+      "fields": [
+        {
+          "name": "name",
+          "optional": false,
+          "type": "'open-repository-from-url'"
+        },
+        {
+          "name": "url",
+          "optional": false,
+          "type": "string"
+        },
+        {
+          "name": "branch",
+          "optional": false,
+          "type": "string | null"
+        },
+        {
+          "name": "pr",
+          "optional": false,
+          "type": "string | null"
+        },
+        {
+          "name": "filepath",
+          "optional": false,
+          "type": "string | null"
+        }
+      ]
+    },
+    {
+      "id": "IUnknownAction:unknown",
+      "source_file": "app/src/lib/parse-app-url.ts",
+      "symbol": "IUnknownAction",
+      "member": "unknown",
+      "category": "url-action",
+      "union": "URLActionType",
+      "fields": [
+        {
+          "name": "name",
+          "optional": false,
+          "type": "'unknown'"
+        },
+        {
+          "name": "url",
+          "optional": false,
+          "type": "string"
+        }
+      ]
+    }
+  ]
+}
