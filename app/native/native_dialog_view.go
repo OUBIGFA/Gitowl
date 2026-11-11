@@ -399,7 +399,7 @@ func renderNativeDialog(c *ui.Context, tx locales.Messages, popup *backend.Kerne
 				ui.Column(c.Key("dialog-navigation")).Width(preferences.navigation).Shrink(0).FillHeight().Gap(4).Children(func() {
 					for _, choice := range navigation.Choices {
 						label := nativeDialogChoiceLabel(c.Locale(), choice.Label)
-						button := quietButton(c.Key(choice.ID), label, "").MinHeight(36).FillWidth().Justify(ui.Start).
+						button := quietButton(c.Key(choice.ID), label, settingsNavigationIcon(popup.Type, choice.ID)).MinHeight(36).FillWidth().Justify(ui.Start).
 							Disabled(form.busy || navigation.Disabled || choice.Disabled)
 						if form.section == "" && form.values[navigation.ID].text == choice.ID {
 							button.Background(c.Theme().SurfacePressed).Value(tx.CurrentPage())
@@ -419,7 +419,7 @@ func renderNativeDialog(c *ui.Context, tx locales.Messages, popup *backend.Kerne
 						})
 					}
 					for _, section := range form.sections {
-						button := quietButton(c.Key(section.id), section.label, "").MinHeight(36).FillWidth().Justify(ui.Start).Disabled(form.busy)
+						button := quietButton(c.Key(section.id), section.label, settingsNavigationIcon(popup.Type, section.id)).MinHeight(36).FillWidth().Justify(ui.Start).Disabled(form.busy)
 						if form.section == section.id {
 							button.Background(c.Theme().SurfacePressed).Value(tx.CurrentPage())
 						}

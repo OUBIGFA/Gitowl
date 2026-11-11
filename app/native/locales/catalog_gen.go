@@ -3854,6 +3854,68 @@ func (msgs Messages) WindowPreferenceFailed(behavior string) string {
 	return Catalog.Format(msgs.locale, "windowPreferenceFailed", map[string]any{"behavior": behavior})
 }
 
+// AheadBehind says "{ahead, number} ahead, {behind, number} behind"
+// in the language the app shows.
+//
+// A project's branch divergence from its upstream, from the original
+// repository list.
+func AheadBehind(ahead int, behind int) string { return In(i18n.Locale()).AheadBehind(ahead, behind) }
+
+// AheadBehind says "{ahead, number} ahead, {behind, number} behind"
+// in the language of msgs.
+//
+// A project's branch divergence from its upstream, from the original
+// repository list.
+func (msgs Messages) AheadBehind(ahead int, behind int) string {
+	return Catalog.Format(msgs.locale, "aheadBehind", map[string]any{"ahead": ahead, "behind": behind})
+}
+
+// NotPushed says "Not pushed"
+// in the language the app shows.
+//
+// A history record that exists only locally; the original GitStore's local
+// commits.
+func NotPushed() string { return In(i18n.Locale()).NotPushed() }
+
+// NotPushed says "Not pushed"
+// in the language of msgs.
+//
+// A history record that exists only locally; the original GitStore's local
+// commits.
+func (msgs Messages) NotPushed() string {
+	return Catalog.Format(msgs.locale, "notPushed", nil)
+}
+
+// TagNotPushed says "Tag {name} is not pushed yet"
+// in the language the app shows.
+//
+// Tooltip of a tag the next push will publish.
+func TagNotPushed(name string) string { return In(i18n.Locale()).TagNotPushed(name) }
+
+// TagNotPushed says "Tag {name} is not pushed yet"
+// in the language of msgs.
+//
+// Tooltip of a tag the next push will publish.
+func (msgs Messages) TagNotPushed(name string) string {
+	return Catalog.Format(msgs.locale, "tagNotPushed", map[string]any{"name": name})
+}
+
+// SelectedOfTotal says "{selected, number} of {total, number} selected"
+// in the language the app shows.
+//
+// How many changed files are included in the version.
+func SelectedOfTotal(selected int, total int) string {
+	return In(i18n.Locale()).SelectedOfTotal(selected, total)
+}
+
+// SelectedOfTotal says "{selected, number} of {total, number} selected"
+// in the language of msgs.
+//
+// How many changed files are included in the version.
+func (msgs Messages) SelectedOfTotal(selected int, total int) string {
+	return Catalog.Format(msgs.locale, "selectedOfTotal", map[string]any{"selected": selected, "total": total})
+}
+
 // DialogLabelD72e38d1b248cd9a says "Select account"
 // in the language the app shows.
 func DialogLabelD72e38d1b248cd9a() string { return In(i18n.Locale()).DialogLabelD72e38d1b248cd9a() }

@@ -217,12 +217,12 @@ func measurePreferencesWithin(c *ui.Context, popup *backend.KernelPopupPresentat
 	if navigation != nil {
 		for _, choice := range navigation.Choices {
 			w, _ := preferenceTextSize(c, 0, nativeDialogChoiceLabel(c.Locale(), choice.Label), c.Theme().FontSize)
-			navWidth, navCount = max(navWidth, w+20), navCount+1
+			navWidth, navCount = max(navWidth, w+20+settingsNavigationIconWidth(popup.Type, choice.ID)), navCount+1
 		}
 	}
 	for _, section := range form.sections {
 		w, _ := preferenceTextSize(c, 0, section.label, c.Theme().FontSize)
-		navWidth, navCount = max(navWidth, w+20), navCount+1
+		navWidth, navCount = max(navWidth, w+20+settingsNavigationIconWidth(popup.Type, section.id)), navCount+1
 	}
 	pages := popup.LayoutPages
 	if len(pages) == 0 {

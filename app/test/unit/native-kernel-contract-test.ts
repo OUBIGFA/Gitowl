@@ -98,6 +98,7 @@ function fixture(): Pick<
   | 'accounts'
   | 'signInState'
   | 'repositories'
+  | 'localRepositoryStateLookup'
   | 'selectedState'
   | 'allPopups'
   | 'currentPopup'
@@ -147,6 +148,7 @@ function fixture(): Pick<
     ],
     signInState: null,
     repositories: [repository],
+    localRepositoryStateLookup: new Map(),
     selectedState: {
       type: SelectionType.Repository,
       repository,

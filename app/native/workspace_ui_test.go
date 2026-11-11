@@ -75,7 +75,7 @@ func TestWorkspaceOverviewReviewBackAcrossSizesAndLanguages(t *testing.T) {
 				h.tt.SetTitleBar(ui.TitleBar{Height: 48, Right: 138})
 				h.tt.SetLocale(tag)
 				tx := locales.In(tag)
-				for _, label := range []string{tx.OpenRepository(), tx.Changes(), tx.History(), tx.Settings(), tx.CurrentChanges(), tx.FileCount(2), tx.IncludeAll(), tx.ReviewFilesHint(), tx.CommitSummary(), tx.SaveVersion()} {
+				for _, label := range []string{tx.OpenRepository(), tx.Changes(), tx.History(), tx.Settings(), tx.CurrentChanges(), tx.SelectedOfTotal(0, 2), tx.IncludeAll(), tx.CommitSummary(), tx.SaveVersion()} {
 					visibleControl(t, h.tt, label, size.width, size.height)
 				}
 				for _, other := range []string{"en", "zh-Hans", "zh-Hant"} {

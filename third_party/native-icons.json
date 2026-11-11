@@ -103,6 +103,62 @@
     {
       "path": "app/native/icons/copy.svg",
       "sha256": "865d4712a410fef237c2fbbeda4b4efcad30f98f22bac6d7a1b4d35daf82019b"
+    },
+    {
+      "path": "app/native/icons/arrow-down.svg",
+      "sha256": "4b369faeb45175bfa70c4f4f7cbb2e87096b4bf12d288c1d2c15d2c0e927db12"
+    },
+    {
+      "path": "app/native/icons/arrow-up.svg",
+      "sha256": "39c82281c3562da84645699a3fe17012328340c4e2582741b013dab78e6d346b"
+    },
+    {
+      "path": "app/native/icons/cloud-upload.svg",
+      "sha256": "02a39d3749bc738e547547b7451e00e240ab62c2e7a6d34e6950a371248cd248"
+    },
+    {
+      "path": "app/native/icons/user-round.svg",
+      "sha256": "a189200fd41929f4bd66c4f0e5e6b3e2ee74e0db344f2d194e188535d9c57d16"
+    },
+    {
+      "path": "app/native/icons/plug.svg",
+      "sha256": "d02bec451480121c8cca9757b345b622e4907adf5aa3d265b27aaf1470499c4d"
+    },
+    {
+      "path": "app/native/icons/bot.svg",
+      "sha256": "209e6fd51b785f01fd8ceeb9919225f38c4c7f934d168239cebd5cb13af426f8"
+    },
+    {
+      "path": "app/native/icons/palette.svg",
+      "sha256": "b5a2443964f532ea9aa3a4db3589b0e939a6865a4f702b83254bcf27e039be19"
+    },
+    {
+      "path": "app/native/icons/bell.svg",
+      "sha256": "09e02e4e2732612f66ba3c602a459749ce3f3d6d616df06471edbbe36f37959d"
+    },
+    {
+      "path": "app/native/icons/shield-check.svg",
+      "sha256": "4472323e4d46471c0e7e6448d5bd042cd66bc8e11b65108be6321e7cb76541af"
+    },
+    {
+      "path": "app/native/icons/sliders-horizontal.svg",
+      "sha256": "19bc958ca282ef044b9e43cfc6a22c6a252ff153919917c2b479c0e0c1202ada"
+    },
+    {
+      "path": "app/native/icons/accessibility.svg",
+      "sha256": "70592d366f3e373c261ed063923010050c16c173a7db19d7433512f6ca15679b"
+    },
+    {
+      "path": "app/native/icons/server.svg",
+      "sha256": "a9360713df211361ff9e3796f55e594cf75ff70a0f9b60d2f042c33a72689105"
+    },
+    {
+      "path": "app/native/icons/tag.svg",
+      "sha256": "68bb0f33c0fcf497f46e5375c89ce90fa11edcad31288cc5b1a40d9a2f29d068"
+    },
+    {
+      "path": "app/native/icons/download.svg",
+      "sha256": "ad2856652924190146d9a439a8f4540c666311a5c142e0d7d012a2a2f74bb01e"
     }
   ]
 }

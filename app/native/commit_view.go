@@ -66,7 +66,14 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 			})
 			description.Panel(func() {
 				// Give long descriptions more editing space as the window grows.
-				editorHeight := max(c.Theme().Rem(64.0/15), min(c.Theme().Rem(8), (height-620)/2+64))
+				// Three lines at the minimum window, about five on large screens:
+				// the draft stays a footer to the review, not a second page.
+				editorHeight := max(c.Theme().Rem(64.0/15), min(c.Theme().Rem(7), (height-620)/3+64))
+				if a.reviewingFile {
+					// The diff is what is being read; two lines keep the
+					// description at hand without taking its room.
+					editorHeight = c.Theme().Rem(52.0 / 15)
+				}
 				ui.TextArea(c.Key("commit-description"), &a.commitDescription).FillWidth().Height(editorHeight).MinHeight(editorHeight).MaxHeight(editorHeight).Padding(10, 12).
 					Placeholder(tx.DescriptionPlaceholder()).Label(tx.VersionDescription()).KeepScrollbars(true).Disabled(a.composerLocked()).OnChange(a.generationDraftEdited)
 			})
@@ -106,9 +113,8 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 		ui.Row(c.Key("composer-actions")).FillWidth().Gap(8).AlignItems(ui.Center).Wrap().Children(func() {
 			if a.core != nil && (vm == nil || vm.Mode != "copilot") {
 				a.coreGenerationMenu(c, tx)
-			} else {
-				ui.Spacer(c)
 			}
+			ui.Spacer(c)
 			a.nativeCommitOptions(c)
 			if vm == nil || vm.Mode != "copilot" {
 				if a.generating {
@@ -129,7 +135,12 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 			// An inline caption shares the action baseline, without creating a
 			// floating status row above Save. Keep the pair together on wrap.
 			ui.Row(c.Key("commit-save-group")).Shrink(0).AlignItems(ui.Center).Gap(12).Children(func() {
-				ui.Text(c, tx.IncludedFiles(len(a.included))).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted).FontFeatures("tnum").NoWrap()
+				// Of all changed files, so the scope reads in review mode too.
+				scope := tx.IncludedFiles(len(a.included))
+				if a.status != nil && len(a.status.Files) > 0 {
+					scope = tx.SelectedOfTotal(len(a.included), len(a.status.Files))
+				}
+				ui.Text(c, scope).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted).FontFeatures("tnum").NoWrap().Tooltip(tx.IncludedFiles(len(a.included)))
 				save := ui.PrimaryButton(c.Key("save-version"), saveLabel).Height(40).Padding(8, 16).FontWeight(500).Label(saveLabel).
 					Tooltip(tx.SaveVersionTooltip() + " · " + tx.SaveShortcut() + " · " + tx.IncludedFiles(len(a.included))).Disabled(!a.canSaveVersion()).OnClick(a.saveVersion)
 				if a.coreFocusTarget == "commit-submit" {

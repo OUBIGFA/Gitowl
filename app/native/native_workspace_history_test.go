@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"slices"
+	"strings"
 	"testing"
 	"time"
 
@@ -281,7 +282,8 @@ func TestHistoryRecordTitleSelectsWithSelectableDescription(t *testing.T) {
 		})
 	}, 900, 620)
 	tt.Advance(time.Second)
-	if !tt.HasText(body) {
+	// Unselected, the description reads as one line.
+	if !tt.HasText(strings.ReplaceAll(body, "\n", " ")) {
 		t.Fatal("the actual history description is missing")
 	}
 	clickHistoryRecordTitle(t, tt, commits[0].Summary, 0)

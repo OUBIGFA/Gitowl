@@ -30,6 +30,15 @@ type KernelRepository struct {
 	Missing bool    `json:"missing"`
 	Login   *string `json:"login"`
 	Kind    string  `json:"kind"`
+	// Local is the original repository list's ahead/behind and change count.
+	Local *KernelRepositoryLocal `json:"local,omitempty"`
+}
+
+// Ahead and Behind are nil without a tracking branch.
+type KernelRepositoryLocal struct {
+	Ahead        *int `json:"ahead"`
+	Behind       *int `json:"behind"`
+	ChangedFiles int  `json:"changedFiles"`
 }
 
 type KernelCloningRepository struct {

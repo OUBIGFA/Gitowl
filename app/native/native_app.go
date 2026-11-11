@@ -637,48 +637,6 @@ func (a *app) reportCoreWindowState() {
 	}()
 }
 
-func (a *app) coreRemoteControls(c *ui.Context, tx locales.Messages) {
-	if a.coreSnapshot == nil || a.coreSnapshot.Selected == nil {
-		return
-	}
-	reason := ""
-	switch {
-	case !a.ready:
-		reason = tx.ActionNeedsReady()
-	case a.savingVersion:
-		reason = tx.ActionSaveBusy()
-	case a.coreSnapshot.Selected.RemoteInProgress || a.coreRemotePending:
-		reason = tx.RemoteBusy()
-	}
-	for _, action := range []struct{ name, key, label string }{
-		{"fetch", "fetch-updates", tx.FetchUpdates()}, {"pull", "pull-updates", tx.PullUpdates()}, {"push", "push-changes", tx.PushChanges()},
-	} {
-		item, available := nativeMenuAction(a.coreSnapshot.Menu.Items, action.name)
-		label, unavailable := action.label, reason
-		if action.name == "push" && !a.coreSnapshot.Selected.HasRemote {
-			label = nativeDialogLabel(c.Locale(), "repositoryDialog.PublishRepository")
-		} else if action.name == "push" && a.coreSnapshot.Selected.ForcePushRecommended && available {
-			item.AccessKey = ""
-			label = nativeMenuLabel(item, c.Locale())
-		}
-		if unavailable == "" && (!available || !item.Enabled) {
-			if !a.coreSnapshot.Selected.HasRemote {
-				unavailable = tx.RemoteUnconfigured()
-			} else {
-				unavailable = tx.ActionNotAvailable()
-			}
-		}
-		width, _ := c.Size()
-		if action.name == "fetch" && width < 1100 {
-			// Fetch is the secondary sync action; Pull and Push/Publish retain
-			// visible words even at the minimum window width.
-			iconButton(c.Key(action.key), label, "refresh-cw").Size(32, 32).Padding(7).Tooltip(label + " " + unavailable).Disabled(unavailable != "").OnClick(func() { a.coreRemoteAction(action.name) })
-		} else {
-			quietButton(c.Key(action.key), label, "").Height(32).Tooltip(unavailable).Disabled(unavailable != "").OnClick(func() { a.coreRemoteAction(action.name) })
-		}
-	}
-}
-
 func (a *app) generationTooltip(tx locales.Messages) string {
 	if a.core == nil {
 		return tx.GenerationOnly()
@@ -787,10 +745,10 @@ func (a *app) coreProjectList(c *ui.Context, tx locales.Messages, colors workspa
 		if current {
 			button.Background(colors.selected).Value(tx.CurrentPage())
 		}
-		button.Children(func() {
-			ui.Icon(c, icons["folder"]).FontSize(18).Shrink(0)
-			ui.Text(c, name).SingleLine().Grow(1).MinWidth(0)
-		}).OnClick(func() { a.coreProjectCursor = i; selectProject(i) })
+		if description := projectRowDescription(tx, repository); description != "" {
+			button.Description(description)
+		}
+		button.Children(func() { projectRowContent(c, repository, name, current) }).OnClick(func() { a.coreProjectCursor = i; selectProject(i) })
 	}).Grow(1).MinHeight(0).FillWidth().Gap(2).Label(tx.Projects())
 	// Arrow navigation focuses the native list, not its nested button. Give
 	// that focus owner the current row's same menu for Menu and Shift+F10.

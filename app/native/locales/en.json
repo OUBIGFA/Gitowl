@@ -465,6 +465,43 @@
   "minimizeToTray": "Minimize to tray",
   "openGitowl": "Open Gitowl",
   "windowPreferenceFailed": "Window setting error. Current close behavior: {behavior}.",
+  "aheadBehind": "{ahead, number} ahead, {behind, number} behind",
+  "@aheadBehind": {
+    "description": "A project's branch divergence from its upstream, from the original repository list.",
+    "placeholders": {
+      "ahead": {
+        "type": "int"
+      },
+      "behind": {
+        "type": "int"
+      }
+    }
+  },
+  "notPushed": "Not pushed",
+  "@notPushed": {
+    "description": "A history record that exists only locally; the original GitStore's local commits."
+  },
+  "tagNotPushed": "Tag {name} is not pushed yet",
+  "@tagNotPushed": {
+    "description": "Tooltip of a tag the next push will publish.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "selectedOfTotal": "{selected, number} of {total, number} selected",
+  "@selectedOfTotal": {
+    "description": "How many changed files are included in the version.",
+    "placeholders": {
+      "selected": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "dialogLabel_d72e38d1b248cd9a": "Select account",
   "dialogLabel_89d8e0f4706b3636": "Sign out of this account?",
   "dialogLabel_a548a373051c9879": "Keep repository assignments to reuse this account next time, or clear them to choose an account again.",

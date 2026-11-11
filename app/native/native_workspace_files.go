@@ -104,14 +104,10 @@ func renderWorkspaceChangesList(c *ui.Context, state *nativeWorkspaceState, list
 				} else {
 					ui.Spacer(c)
 				}
-				color := c.Theme().TextMuted
-				switch strings.ToLower(file.Status) {
-				case "added", "new", "untracked", "a", "?", "??":
-					color = c.Theme().Success
-				case "deleted", "conflicted", "d", "u":
-					color = c.Theme().Danger
-				}
-				ui.Text(c, fileStatus(tx, file.Status)).FontSize(c.Theme().Rem(14.0 / 15)).Shrink(0).TextColor(color)
+				// The pill keeps the base theme's colors on a selected row.
+				c.SetTheme(baseTheme)
+				fileStatusPill(c, tx, file.Status, file.IsSubmodule)
+				c.SetTheme(&listTheme)
 			})
 			// Inherit the list's selected foreground, rather than resetting a
 			// dark selected row to the unselected theme's dark text color.

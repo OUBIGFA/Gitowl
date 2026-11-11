@@ -21,6 +21,8 @@ type KernelWorkspace struct {
 	Worktrees                  []KernelWorkspaceWorktree        `json:"worktrees"`
 	Compare                    KernelWorkspaceCompare           `json:"compare"`
 	HistorySelectionContiguous bool                             `json:"historySelectionContiguous"`
+	LocalCommitSHAs            []string                         `json:"localCommitSHAs"`
+	TagsToPush                 []string                         `json:"tagsToPush"`
 	ReorderSelection           []string                         `json:"reorderSelection"`
 	Stash                      *KernelWorkspaceStash            `json:"stash"`
 	FilesFilter                KernelWorkspaceFileFilter        `json:"filesFilter"`

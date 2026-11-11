@@ -31,8 +31,10 @@ func TestNativeReviewExplainsSidesAndRetainsRawRangeTooltip(t *testing.T) {
 				t.Fatalf("original range is not available in the native tooltip: %q", h.tt.Texts())
 			}
 			h.tt.SetSize(900, 620)
-			if !h.tt.HasText(tx.UnifiedDiffHint()) || h.tt.HasText(tx.ImageBefore()) || h.a.preview.patches[0].state.Layout != editor.DiffUnified {
-				t.Fatal("narrow unified review did not explain its meaning")
+			// Red and green lines carry the unified layout; only split columns
+			// need visible names. Its reading order stays in the description.
+			if h.tt.HasText(tx.UnifiedDiffHint()) || h.tt.HasText(tx.ImageBefore()) || h.a.preview.patches[0].state.Layout != editor.DiffUnified {
+				t.Fatal("narrow unified review kept split labels or a redundant caption")
 			}
 			h.click(t, tx.ReviewOptions())
 			if !h.tt.HasText(tx.NarrowDiffLayout()) || h.tt.HasText(tx.SideBySide()) {
@@ -46,7 +48,7 @@ func TestNativeReviewExplainsSidesAndRetainsRawRangeTooltip(t *testing.T) {
 			h.tt.SetSize(1180, 760)
 			h.click(t, tx.ReviewOptions())
 			h.click(t, tx.Unified())
-			if !h.tt.HasText(tx.UnifiedDiffHint()) || h.a.preview.patches[0].state.Layout != editor.DiffUnified {
+			if h.tt.HasText(tx.ImageBefore()) || h.a.preview.patches[0].state.Layout != editor.DiffUnified {
 				t.Fatal("the real unified option did not change the native view")
 			}
 			h.click(t, tx.SideBySide())

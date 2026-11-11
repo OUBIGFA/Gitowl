@@ -1,6 +1,7 @@
 package main
 
 import (
+	"path"
 	"strings"
 	"time"
 
@@ -270,8 +271,10 @@ func (a *app) noProject(c *ui.Context, tx locales.Messages) {
 }
 
 func (a *app) changesOverview(c *ui.Context, tx locales.Messages, colors workspaceColors) {
+	// The tab already shows the count; with saving available the selection
+	// row says how many of these files the version includes.
 	count := ""
-	if a.status != nil {
+	if a.status != nil && !a.commitCapable {
 		count = tx.FileCount(len(a.status.Files))
 	}
 	taskTitle(c, tx.CurrentChanges(), count)
@@ -303,7 +306,11 @@ func (a *app) changesOverview(c *ui.Context, tx locales.Messages, colors workspa
 				OnChange(func() { a.changeAllIncluded(all == ui.CheckOn) })
 		}
 		ui.Spacer(c)
-		ui.Text(c, tx.ReviewFilesHint()).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted).NoWrap()
+		// With saving available, the composer beside Save states the scope
+		// and each row's chevron says how to open it.
+		if !a.commitCapable {
+			ui.Text(c, tx.ReviewFilesHint()).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted).NoWrap()
+		}
 	})
 	a.fileList(c, tx, a.status.Files, a.changesList.list(), colors)
 }
@@ -334,18 +341,7 @@ func (a *app) fileList(c *ui.Context, tx locales.Messages, files []backend.File,
 			quietSurface(c, button).Children(func() {
 				ui.Icon(c, icons[fileIcon(file.Path, file.IsSubmodule)]).FontSize(18).Shrink(0).TextColor(c.Theme().TextMuted)
 				ui.Text(c, file.Path).SingleLine().Grow(1).MinWidth(0)
-				label, color := fileStatus(tx, file.Status), c.Theme().TextMuted
-				if file.IsSubmodule {
-					label = tx.FileSubmodule()
-				} else {
-					switch strings.ToLower(file.Status) {
-					case "added", "new", "untracked", "a", "?", "??":
-						color = c.Theme().Success
-					case "deleted", "conflicted", "d", "u":
-						color = c.Theme().Danger
-					}
-				}
-				ui.Text(c, label).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(color).NoWrap().Shrink(0)
+				fileStatusPill(c, tx, file.Status, file.IsSubmodule)
 				ui.Icon(c, icons["chevron-right"]).FontSize(18).Shrink(0).TextColor(c.Theme().TextMuted)
 			}).OnClick(func() { a.reviewFile(i) })
 		})
@@ -440,7 +436,25 @@ func (a *app) diffPane(c *ui.Context, tx locales.Messages, width float32) {
 	}
 	ui.Row(c).Gap(12).Margin(0, 0, 8, 0).Children(func() {
 		iconButton(c.Key("back-to-overview"), back, "arrow-left").OnClick(a.backFromReview)
-		ui.Text(c, label).FontSize(c.Theme().Rem(18.0 / 15)).FontWeight(500).SingleLine().Tooltip(label).Grow(1).MinWidth(0).Role(ui.RoleHeading).Level(1)
+		// The file name leads; its folder is quiet context and its change size
+		// follows, as in the file list the review was opened from.
+		ui.Row(c.Key("review-title")).Grow(1).MinWidth(0).Gap(10).AlignItems(ui.Center).Children(func() {
+			name, directory := label, ""
+			if selected {
+				name = path.Base(file.Path)
+				if d := path.Dir(file.Path); d != "." {
+					directory = d
+				}
+			}
+			ui.Text(c, name).FontSize(c.Theme().Rem(18.0 / 15)).FontWeight(500).SingleLine().Shrink(1).MinWidth(0).Tooltip(label).Role(ui.RoleHeading).Level(1).Label(label)
+			if directory != "" {
+				ui.Text(c, directory).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted).SingleLine().Shrink(2).MinWidth(0).Tooltip(label)
+			}
+			if added, deleted := patchStats(a.preview); added+deleted > 0 && !a.loadingDiff {
+				changeStats(c, tx, added, deleted)
+			}
+			ui.Spacer(c)
+		})
 		if a.tab == changesTab && a.commitCapable && selected {
 			included := a.fileCheckState(file.Path)
 			ui.CheckboxState(c.Key("include-reviewed-file"), &included, tx.IncludeForSave()).Label(tx.IncludeFile(file.Path)).
@@ -518,8 +532,9 @@ func (a *app) previewView(c *ui.Context, tx locales.Messages, width float32) {
 		if width < 760 {
 			layout = editor.DiffUnified
 		}
-		_, height := c.Size()
-		if layout == editor.DiffSplit || height >= 700 || a.core == nil {
+		// Split columns need their before/after names; the unified layout's
+		// red and green lines explain themselves.
+		if layout == editor.DiffSplit {
 			ui.Row(c.Key("diff-context")).Shrink(0).FillWidth().MinHeight(24).Margin(0, 0, 8, 0).Children(func() {
 				if layout == editor.DiffSplit {
 					for _, label := range []string{tx.ImageBefore(), tx.ImageAfter()} {
@@ -551,6 +566,10 @@ func (a *app) previewView(c *ui.Context, tx locales.Messages, width float32) {
 				emptyState(c, tx.DiffEmpty())
 			} else {
 				diffElement := editor.DiffView(c.Key("patch"), patch.state).Grow(1).MinHeight(0).FillWidth().Label(tx.DiffTitle())
+				if layout == editor.DiffUnified {
+					// Assistive technology still hears how the single column reads.
+					diffElement.Description(tx.UnifiedDiffHint())
+				}
 				a.workspaceDiffContextMenu(c, diffElement)
 			}
 		} else {

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/OUBIGFA/Gitowl/app/native/locales"
+	"github.com/egoist/mygo/i18n"
 	"github.com/egoist/mygo/ui"
 	"github.com/egoist/mygo/ui/editor"
 )
@@ -38,6 +39,54 @@ func iconButton(c *ui.Context, label, icon string) ui.Element {
 		ui.Icon(c, icons[icon]).FontSize(18)
 	})
 	return button
+}
+
+// changeStats shows lines added and deleted as +n −n in the diff colors, the
+// form every Git tool uses; a zero side is left out. Its label is the sentence.
+func changeStats(c *ui.Context, tx locales.Messages, added, deleted int) ui.Element {
+	locale, t := c.Locale(), c.Theme()
+	stats := tx.CommitStats(added, deleted)
+	return ui.Row(c.Key("change-stats")).Shrink(0).Gap(6).AlignItems(ui.Center).FontSize(t.Rem(14.0 / 15)).FontFeatures("tnum").Label(stats).Tooltip(stats).Children(func() {
+		if added > 0 {
+			ui.Text(c, "+"+i18n.FormatNumber(locale, added, i18n.NumberOptions{})).TextColor(t.Success).NoWrap()
+		}
+		if deleted > 0 {
+			ui.Text(c, "−"+i18n.FormatNumber(locale, deleted, i18n.NumberOptions{})).TextColor(t.Danger).NoWrap()
+		}
+	})
+}
+
+// patchStats counts the lines a text preview adds and deletes.
+func patchStats(p *preview) (added, deleted int) {
+	if p == nil {
+		return 0, 0
+	}
+	for _, patch := range p.patches {
+		for _, hunk := range patch.file.Hunks {
+			for _, line := range hunk.Lines {
+				switch {
+				case strings.HasPrefix(line, "+"):
+					added++
+				case strings.HasPrefix(line, "-"):
+					deleted++
+				}
+			}
+		}
+	}
+	return added, deleted
+}
+
+// fileStatusPill names a file's change kind on a faint tint of its color:
+// the color finds the kind in a long list, the word keeps it readable alone.
+func fileStatusPill(c *ui.Context, tx locales.Messages, status string, submodule bool) ui.Element {
+	t := c.Theme()
+	label, color := fileStatus(tx, status), fileStatusColor(t, status)
+	if submodule {
+		label, color = tx.FileSubmodule(), t.TextMuted
+	}
+	return ui.Box(c.Key("status")).Shrink(0).Padding(1, 8).Radius(6).Background(color.Alpha(0.12)).Children(func() {
+		ui.Text(c, label).FontSize(t.Rem(13.0 / 15)).TextColor(color).NoWrap()
+	})
 }
 
 func taskTitle(c *ui.Context, title, detail string) {

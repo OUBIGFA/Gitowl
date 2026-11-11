@@ -173,6 +173,16 @@ export interface KernelRepository extends NativeRepositoryReference {
   readonly missing: boolean
   readonly login: string | null
   readonly kind: 'repository' | 'cloning'
+  /**
+   * The original repository list's local state: the current branch's
+   * ahead/behind (null without a tracking branch) and uncommitted file count.
+   * Present only in the repository list; absent until Desktop has read it.
+   */
+  readonly local?: {
+    readonly ahead: number | null
+    readonly behind: number | null
+    readonly changedFiles: number
+  }
 }
 
 export interface KernelFile {

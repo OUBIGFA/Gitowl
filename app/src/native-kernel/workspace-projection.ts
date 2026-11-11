@@ -147,6 +147,10 @@ export interface KernelWorkspaceDTO {
     readonly branches: ReadonlyArray<KernelWorkspaceBranch>
   }
   readonly historySelectionContiguous: boolean
+  /** Original GitStore commits not on the upstream (or on no remote). */
+  readonly localCommitSHAs: ReadonlyArray<string>
+  /** Original tags created locally that the next push will publish. */
+  readonly tagsToPush: ReadonlyArray<string>
   readonly reorderSelection: ReadonlyArray<string>
   readonly stash: {
     readonly sha: string
@@ -563,6 +567,8 @@ export function projectNativeWorkspace(app: IAppState): KernelWorkspaceDTO {
       ).map(branchView),
     },
     historySelectionContiguous: state?.commitSelection.isContiguous ?? true,
+    localCommitSHAs: state?.localCommitSHAs ?? [],
+    tagsToPush: state?.tagsToPush ?? [],
     reorderSelection:
       repository === undefined
         ? []

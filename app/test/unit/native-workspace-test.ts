@@ -131,6 +131,32 @@ describe(
       return { repository, path, git, act, state, view }
     }
 
+    it('projects the original unpushed commits and repository list state', async t => {
+      const f = await fixture(t)
+      const base = await f.git(['rev-parse', 'HEAD'])
+      await writeFile(join(f.path, 'file.txt'), 'changed\n')
+      await runtime.dispatcher.refreshRepository(f.repository)
+      // Without a remote every commit is local in the original GitStore.
+      await until(() => f.view().localCommitSHAs.includes(base))
+      assert.deepEqual(f.view().tagsToPush, [])
+      await until(
+        () =>
+          runtime.appStore
+            .getState()
+            .localRepositoryStateLookup.get(f.repository.id)
+            ?.changedFilesCount === 1
+      )
+      const listed = projectKernelState(
+        runtime.appStore.getState(),
+        1
+      ).repositories.find(r => r.id === f.repository.id)
+      assert.deepEqual(listed?.local, {
+        ahead: null,
+        behind: null,
+        changedFiles: 1,
+      })
+    })
+
     it('projects real submodule commits and opens only the selected original submodule', async t => {
       const paths: string[] = []
       const refreshes: Promise<void>[] = []

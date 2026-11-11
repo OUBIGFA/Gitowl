@@ -155,7 +155,21 @@ export function projectKernelState(
   menu?: KernelMenuDTO,
   missingRepository: KernelMissingRepository | null = null
 ): NativeKernelSnapshot {
-  const repositories = state.repositories.map(repositoryView)
+  // The same local state the original repository list shows per item.
+  const repositories = state.repositories.map(repository => {
+    const view = repositoryView(repository)
+    const local = state.localRepositoryStateLookup.get(repository.id)
+    return local === undefined
+      ? view
+      : {
+          ...view,
+          local: {
+            ahead: local.aheadBehind?.ahead ?? null,
+            behind: local.aheadBehind?.behind ?? null,
+            changedFiles: local.changedFilesCount,
+          },
+        }
+  })
   const repositoryFilterText = state.repositoryFilterText ?? ''
   // Keep original alias/name fuzzy scoring and group order. The project rail
   // shows each repository once even when the original recent group repeats it.
