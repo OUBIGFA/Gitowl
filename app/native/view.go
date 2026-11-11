@@ -225,8 +225,15 @@ func showError(c *ui.Context, message string) {
 		Background(c.Theme().Background).TextColor(c.Theme().Danger).Margin(0, 0, 12, 0).Label(message)
 }
 
-func emptyState(c *ui.Context, message string) {
-	ui.Column(c).Grow(1).MinHeight(0).FillWidth().Center().Padding(24).Children(func() {
+func emptyState(c *ui.Context, message string) { emptyStateIcon(c, "", message) }
+
+// A resting state of a whole page gets one quiet icon, so an empty canvas
+// reads as an answer rather than as missing content.
+func emptyStateIcon(c *ui.Context, icon, message string) {
+	ui.Column(c).Grow(1).MinHeight(0).FillWidth().Center().Padding(24).Gap(12).Children(func() {
+		if icon != "" {
+			ui.Icon(c, icons[icon]).FontSize(28).TextColor(c.Theme().TextMuted.Alpha(0.7))
+		}
 		ui.Text(c, message).TextColor(c.Theme().TextMuted)
 	})
 }
@@ -281,7 +288,7 @@ func (a *app) changesOverview(c *ui.Context, tx locales.Messages, colors workspa
 	}
 	if len(a.status.Files) == 0 {
 		if !a.loadingStatus && a.statusErr == nil {
-			emptyState(c, tx.NoChanges())
+			emptyStateIcon(c, "circle-check", tx.NoChanges())
 		} else {
 			ui.Spacer(c)
 		}

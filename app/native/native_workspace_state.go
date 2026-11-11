@@ -42,6 +42,7 @@ type nativeWorkspaceState struct {
 	workspaceHistoryFilesSHA          string
 	workspaceHistoryCombinedFilesOpen bool
 	workspaceHistoryCursor            int
+	workspaceHistoryRows              []int // commit index per list row; -1 is a day heading
 	workspaceHistorySummaries         map[string]backend.KernelHistorySummary
 	workspaceHistorySummaryLoading    bool
 	workspaceHistorySummaryError      error
