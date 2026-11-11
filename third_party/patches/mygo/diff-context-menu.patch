@@ -1,0 +1,104 @@
+diff --git a/docs/ui/diff-viewer.md b/docs/ui/diff-viewer.md
+index 50d4849bef..c9d56d2ccb 100644
+--- a/docs/ui/diff-viewer.md
++++ b/docs/ui/diff-viewer.md
+@@ -103,6 +103,10 @@ keystroke. Cmd+F8 and Shift+Cmd+F8 go to the next and previous changes
+   of a review does.
+ - `OnGutterButton` shows a + on the gutter of the line under the pointer,
+   as to comment on it, and is called with the line when it is clicked.
++- `ContextMenu` appends items to the text editors' context menus after their
++  standard editing commands, as `State.ContextMenu` does. It applies to both
++  sides in split layout and to the text editor in unified layout. Set it before
++  building `DiffView`; leaving it nil keeps the standard menus unchanged.
+ - `Annotations` leave room under lines for what `RenderAnnotation` builds
+   there, as the comments of a review, each as high as it asks; the other
+   side of a split view leaves the room empty, so that the lines stay
+diff --git a/ui/editor/diff_context_menu_test.go b/ui/editor/diff_context_menu_test.go
+new file mode 100644
+index 0000000000..c41d360d38
+--- /dev/null
++++ b/ui/editor/diff_context_menu_test.go
+@@ -0,0 +1,60 @@
++package editor
++
++import (
++	"fmt"
++	"slices"
++	"testing"
++
++	"github.com/egoist/mygo/ui"
++)
++
++func TestDiffContextMenuExtensionKeepsEditingItems(t *testing.T) {
++	for _, presentation := range []ui.MenuPresentation{ui.SystemMenus, ui.PopoverMenus} {
++		for _, layout := range []DiffLayout{DiffSplit, DiffUnified} {
++			xs := []float32{180}
++			if layout == DiffSplit {
++				xs = append(xs, 630)
++			}
++			for _, x := range xs {
++				t.Run(fmt.Sprintf("presentation=%d/layout=%d/x=%v", presentation, layout, x), func(t *testing.T) {
++					d := &DiffState{Old: NewBuffer("old line\n"), New: NewBuffer("new line\n"), Layout: layout}
++					chosen := 0
++					d.ContextMenu = func(m *ui.Menu) {
++						if m.Item("Review selected change").ID("review").Chosen() {
++							chosen++
++						}
++					}
++					tt := ui.NewTester(func(c *ui.Context) { c.SetMenuPresentation(presentation); DiffView(c, d).Fill() }, 900, 400)
++					tt.Frame()
++					if chosen != 0 {
++						t.Fatal("building the diff invoked its context action")
++					}
++					tt.RightClickAt(x, 15)
++					labels := tt.Menu()
++					if !slices.Contains(labels, "Copy") || !slices.Contains(labels, "Select All") || !slices.Contains(labels, "Review selected change") {
++						t.Fatalf("context menu lost original editing or extension items: %v", labels)
++					}
++					if err := tt.ChooseMenuItem("Review selected change"); err != nil {
++						t.Fatal(err)
++					}
++					if chosen != 1 || d.Old.String() != "old line\n" || d.New.String() != "new line\n" {
++						t.Fatal("context action was lost, replayed, or edited the diff")
++					}
++					// Nil remains exactly the standard editor menu; no stale callback.
++					d.ContextMenu = nil
++					tt.Frame()
++					tt.RightClickAt(x, 15)
++					if slices.Contains(tt.Menu(), "Review selected change") {
++						t.Fatal("removed context extension was retained")
++					}
++					tt.CloseMenu()
++					tt.ClickAt(x, 15)
++					tt.Key(ui.Shift, ui.KeyF10)
++					if !slices.Contains(tt.Menu(), "Copy") {
++						t.Fatalf("keyboard context menu lost its native editing commands: %v", tt.Menu())
++					}
++				})
++			}
++		}
++	}
++}
+diff --git a/ui/editor/diffview.go b/ui/editor/diffview.go
+index cc072913f0..319cbe588c 100644
+--- a/ui/editor/diffview.go
++++ b/ui/editor/diffview.go
+@@ -62,6 +62,10 @@ type DiffState struct {
+ 	Theme      *Theme
+ 	// Bindings add key bindings to the editors of the sides.
+ 	Bindings []Binding
++	// ContextMenu adds items after the standard editing items in either side's
++	// context menu, in split and unified layouts, as State.ContextMenu does.
++	// A nil callback preserves the viewer's existing menus.
++	ContextMenu func(m *ui.Menu)
+ 	// HunkActions shows Revert and Keep on the change under the pointer,
+ 	// or the caret's, which put the old lines back in New, or make the
+ 	// new lines Old's, as an agent's changes are reviewed.
+@@ -543,6 +547,7 @@ func (d *DiffState) sideOptions(old bool) options {
+ 		theme: d.Theme, bindings: d.Bindings, fitContent: d.FitContent, minDigits: digits,
+ 		keepScrollbars: d.KeepScrollbars, hideScrollbars: d.NoScrollbars,
+ 		renderFindBar: d.RenderFindBar, renderGoToLine: d.RenderGoToLine,
++		contextMenu: d.ContextMenu,
+ 	}
+ 	if d.NoLineNumbers {
+ 		o.lineNumbers = LineNumbersOff

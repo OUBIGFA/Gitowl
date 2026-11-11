@@ -24,7 +24,7 @@
     "banner": 15,
     "failure-recovery": 13,
     "foldout": 6,
-    "ipc-request": 51,
+    "ipc-request": 56,
     "ipc-request-response": 28,
     "menu-event": 87,
     "popup": 97,
@@ -504,6 +504,46 @@
       "member": "minimize-window",
       "category": "ipc-request",
       "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:native-kernel-failure",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "native-kernel-failure",
+      "category": "ipc-request",
+      "signature": "(phase: NativeKernelInitializationFailure) => void"
+    },
+    {
+      "id": "RequestChannels:native-kernel-presentation-action",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "native-kernel-presentation-action",
+      "category": "ipc-request",
+      "signature": "(action: AppMenuPresentationAction) => void"
+    },
+    {
+      "id": "RequestChannels:native-kernel-request",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "native-kernel-request",
+      "category": "ipc-request",
+      "signature": "(request: NativeKernelRequest) => void"
+    },
+    {
+      "id": "RequestChannels:native-kernel-response",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "native-kernel-response",
+      "category": "ipc-request",
+      "signature": "(response: NativeKernelResponse) => void"
+    },
+    {
+      "id": "RequestChannels:native-kernel-state",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "native-kernel-state",
+      "category": "ipc-request",
+      "signature": "(snapshot: NativeKernelSnapshot) => void"
     },
     {
       "id": "RequestChannels:native-theme-updated",

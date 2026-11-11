@@ -16,10 +16,12 @@ import {
 import { Button } from '../lib/button'
 import { Octicon, syncClockwise } from '../octicons'
 import { FoldoutType } from '../../lib/app-state'
-import { startTimer } from '../lib/timing'
+import {
+  checkoutWorkspacePullRequest,
+  pullRequestSearchText,
+} from './branch-controller'
 import { DragType } from '../../models/drag-drop'
 import { dragAndDropManager } from '../../lib/drag-and-drop-manager'
-import { formatRelative } from '../../lib/format-relative'
 import { AriaLiveContainer } from '../accessibility/aria-live-container'
 import { SectionFilterList } from '../lib/section-filter-list'
 import { generatePullRequestContextMenuItems } from './pull-request-list-item-context-menu'
@@ -295,14 +297,11 @@ export class PullRequestList extends React.Component<
   ) => {
     const pullRequest = item.pullRequest
 
-    this.props.dispatcher.closeFoldout(FoldoutType.Branch)
-    const timer = startTimer(
-      'checkout pull request from list',
-      this.props.repository
+    checkoutWorkspacePullRequest(
+      this.props.dispatcher,
+      this.props.repository,
+      pullRequest
     )
-    this.props.dispatcher
-      .checkoutPullRequest(this.props.repository, pullRequest)
-      .then(() => timer.done())
 
     this.props.onSelectionChanged(pullRequest, source)
   }
@@ -361,16 +360,11 @@ export class PullRequestList extends React.Component<
   }
 }
 
-function getSubtitle(pr: PullRequest) {
-  const timeAgo = formatRelative(pr.created.getTime() - Date.now())
-  return `#${pr.pullRequestNumber} opened ${timeAgo} by ${pr.author}`
-}
-
 function createListItems(
   pullRequests: ReadonlyArray<PullRequest>
 ): IFilterListGroup<IPullRequestListItem> {
   const items = pullRequests.map(pr => ({
-    text: [pr.title, getSubtitle(pr)],
+    text: pullRequestSearchText(pr),
     id: pr.pullRequestNumber.toString(),
     pullRequest: pr,
   }))

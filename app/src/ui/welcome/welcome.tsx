@@ -11,14 +11,8 @@ import { SignInEnterprise } from './sign-in-enterprise'
 import { ConfigureGit } from './configure-git'
 import { UiView } from '../ui-view'
 import { getGlobalConfigValue } from '../../lib/git'
-
-/** The steps along the Welcome flow. */
-export enum WelcomeStep {
-  Start = 'Start',
-  SignInToDotComWithBrowser = 'SignInToDotComWithBrowser',
-  SignInToEnterprise = 'SignInToEnterprise',
-  ConfigureGit = 'ConfigureGit',
-}
+import { WelcomeStep } from './welcome-step'
+export { WelcomeStep } from './welcome-step'
 
 interface IWelcomeProps {
   readonly dispatcher: Dispatcher

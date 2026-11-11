@@ -12,12 +12,14 @@ import {
 import { FoldoutType } from '../../lib/app-state'
 import {
   IRepositoryIdentifier,
-  parseRepositoryIdentifier,
-  parseRemote,
   sanitizeCloneName,
 } from '../../lib/remote-parsing'
-import { resolveURLCloneInfo } from '../../lib/clone-info'
-import { API, IAPIRepository, IAPIRepositoryCloneInfo } from '../../lib/api'
+import {
+  validateRepositoryClonePath,
+  resolveRepositoryCloneInfo,
+  updatedRepositoryCloneURL,
+} from '../lib/repository-clone'
+import { IAPIRepository, IAPIRepositoryCloneInfo } from '../../lib/api'
 import { Dialog, DialogError, DialogFooter, DialogContent } from '../dialog'
 import { TabBar } from '../tab-bar'
 import { CloneRepositoryTab } from '../../models/clone-repository-tab'
@@ -30,17 +32,13 @@ import { merge } from '../../lib/merge'
 import { ClickSource } from '../lib/list'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { showOpenDialog, showSaveDialog } from '../main-process-proxy'
-import { readdir } from 'fs/promises'
 import { isTopMostDialog } from '../dialog/is-top-most'
 import memoizeOne from 'memoize-one'
 import { groupAccountsByHost } from '../../lib/group-accounts-by-host'
 import { SignInResult } from '../../lib/stores/sign-in-store'
 import { LinkButton } from '../lib/link-button'
 import { Row } from '../lib/row'
-import {
-  canonicalMutationPath,
-  isRepositoryAffectedByAssistedCommit,
-} from '../../lib/git/repository-operation'
+import { isRepositoryAffectedByAssistedCommit } from '../../lib/git/repository-operation'
 
 interface ICloneRepositoryProps {
   readonly dispatcher: Dispatcher
@@ -689,99 +687,24 @@ export class CloneRepository extends React.Component<
   }
 
   private updateUrl = async (url: string) => {
-    const parsed = parseRepositoryIdentifier(url)
     const tabState = this.getSelectedTabState()
-    const lastParsedIdentifier = tabState.lastParsedIdentifier
-
-    // If there is no path yet, just update the url
-    if (tabState.path === null) {
-      this.setSelectedTabState({ url }, this.validatePath)
-      return
-    }
-
-    const safeName = parsed ? sanitizeCloneName(parsed.name) : null
-
-    let newPath: string
-
-    const dirPath = tabState.path
-    if (lastParsedIdentifier) {
-      if (safeName) {
-        newPath = Path.join(Path.dirname(dirPath), safeName)
-      } else {
-        newPath = Path.dirname(dirPath)
-      }
-    } else if (safeName) {
-      newPath = Path.join(dirPath, safeName)
-    } else {
-      newPath = dirPath
-    }
-
     this.setSelectedTabState(
-      {
+      updatedRepositoryCloneURL(
         url,
-        lastParsedIdentifier: parsed,
-        path: newPath,
-      },
+        tabState.path,
+        tabState.lastParsedIdentifier
+      ),
       this.validatePath
     )
   }
 
   /** Validate the destination before cloning can create files in it. */
   private async validateClonePath(path: string | null): Promise<null | Error> {
-    if (path === null) {
-      return new Error(
-        'Unable to read path on disk. Please check the path and try again.'
-      )
-    }
-
-    if (
-      __DARWIN__ &&
-      Path.basename(Path.resolve(path)).toLowerCase().endsWith('.app')
-    ) {
-      return new Error(
-        'The local path cannot end in .app on macOS. Choose a different folder name to avoid creating an application bundle.'
-      )
-    }
-
-    try {
-      const canonical = await canonicalMutationPath(path)
-      if (this.getSelectedTabState().path === path) {
+    return validateRepositoryClonePath(path, canonical => {
+      if (this.getSelectedTabState().path === path && path !== null) {
         this.validatedClonePath = { path, canonical }
       }
-      if (isRepositoryAffectedByAssistedCommit(canonical)) {
-        return new Error(
-          'Finish or cancel the assisted commit run before cloning into this directory.'
-        )
-      }
-      const directoryFiles = await readdir(path)
-
-      if (directoryFiles.length === 0) {
-        return null
-      } else {
-        return new Error(
-          'This folder contains files. Git can only clone to empty folders.'
-        )
-      }
-    } catch (error) {
-      if (error.code === 'ENOTDIR') {
-        // path refers to a file or other file system entry
-        return new Error(
-          'There is already a file with this name. Git can only clone to a folder.'
-        )
-      }
-
-      if (error.code === 'ENOENT') {
-        // Folder does not exist
-        return null
-      }
-
-      log.error(
-        'CloneRepository: Path validation failed. Error: ' + error.message
-      )
-      return new Error(
-        'Unable to read path on disk. Please check the path and try again.'
-      )
-    }
+    })
   }
 
   /**
@@ -792,29 +715,7 @@ export class CloneRepository extends React.Component<
   private async resolveCloneInfo(
     request: ICloneRequest
   ): Promise<IAPIRepositoryCloneInfo | null> {
-    const { tab, url, lastParsedIdentifier, account } = request
-
-    if (url.endsWith('.wiki.git')) {
-      return { url }
-    }
-
-    if (tab === CloneRepositoryTab.Generic) {
-      return resolveURLCloneInfo(url, this.props.accounts)
-    }
-
-    if (lastParsedIdentifier !== null && account !== null) {
-      const api = API.fromAccount(account)
-      const { owner, name } = lastParsedIdentifier
-      // Respect the user's preference if they provided an SSH URL
-      const protocol = parseRemote(url)?.protocol
-
-      return api.fetchRepositoryCloneInfo(owner, name, protocol).catch(err => {
-        log.error(`Failed to look up repository clone info for '${url}'`, err)
-        return { url }
-      })
-    }
-
-    return { url }
+    return resolveRepositoryCloneInfo(request, this.props.accounts)
   }
 
   private onItemClicked = (repository: IAPIRepository, source: ClickSource) => {

@@ -82,8 +82,10 @@ describe('git/remote', () => {
     it('returns promisor remote', async t => {
       const repository = await setupEmptyRepository(t)
 
-      // Add a remote
-      const url = 'https://github.com/desktop/not-found.git'
+      // Git records the promisor filter for a local remote too. Keep this
+      // regression independent of network access and credential prompts.
+      const source = await setupEmptyRepository(t)
+      const url = source.path.replace(/\\/g, '/')
       await exec(['remote', 'add', 'hasBlobFilter', url], repository.path)
 
       // Fetch a remote and add a filter

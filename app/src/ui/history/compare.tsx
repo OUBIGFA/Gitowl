@@ -1,6 +1,10 @@
 import * as React from 'react'
 
-import { Commit, CommitOneLine, ICommitContext } from '../../models/commit'
+import { Commit, CommitOneLine } from '../../models/commit'
+import {
+  reorderWorkspaceCommits,
+  squashWorkspaceCommits,
+} from './history-workspace-controller'
 import {
   HistoryTabMode,
   ICompareState,
@@ -11,7 +15,7 @@ import {
 import { CommitList } from './commit-list'
 import { Repository } from '../../models/repository'
 import { Branch } from '../../models/branch'
-import { defaultErrorHandler, Dispatcher } from '../dispatcher'
+import { Dispatcher } from '../dispatcher'
 import { ThrottledScheduler } from '../lib/throttled-scheduler'
 import { BranchList } from '../branches'
 import { TextBox } from '../lib/text-box'
@@ -27,9 +31,6 @@ import { MergeCallToActionWithConflicts } from './merge-call-to-action-with-conf
 import { AheadBehindStore } from '../../lib/stores/ahead-behind-store'
 import { DragType } from '../../models/drag-drop'
 import { PopupType } from '../../models/popup'
-import { getUniqueCoauthorsAsAuthors } from '../../lib/unique-coauthors-as-authors'
-import { getSquashedCommitDescription } from '../../lib/squash/squashed-commit-description'
-import { doMergeCommitsExistAfterCommit } from '../../lib/git'
 import { KeyboardInsertionData } from '../lib/list'
 import { Account } from '../../models/account'
 import { Emoji } from '../../lib/emoji'
@@ -307,25 +308,11 @@ export class CompareSidebar extends React.Component<
   ) => {
     this.setState({ keyboardReorderData: undefined })
 
-    if (
-      await doMergeCommitsExistAfterCommit(
-        this.props.repository,
-        lastRetainedCommitRef
-      )
-    ) {
-      defaultErrorHandler(
-        new Error(
-          `Unable to reorder. Reordering replays all commits up to the last one required for the reorder. A merge commit cannot exist among those commits.`
-        ),
-        this.props.dispatcher
-      )
-      return
-    }
-
-    return this.props.dispatcher.reorderCommits(
+    return reorderWorkspaceCommits(
+      this.props.dispatcher,
       this.props.repository,
-      commitsToInsert,
       baseCommit,
+      commitsToInsert,
       lastRetainedCommitRef
     )
   }
@@ -675,61 +662,14 @@ export class CompareSidebar extends React.Component<
     lastRetainedCommitRef: string | null,
     isInvokedByContextMenu: boolean
   ) => {
-    const toSquashSansSquashOnto = toSquash.filter(
-      c => c.sha !== squashOnto.sha
+    return squashWorkspaceCommits(
+      this.props.dispatcher,
+      this.props.repository,
+      toSquash,
+      squashOnto,
+      lastRetainedCommitRef,
+      isInvokedByContextMenu
     )
-
-    const allCommitsInSquash = [...toSquashSansSquashOnto, squashOnto]
-    const coAuthors = getUniqueCoauthorsAsAuthors(allCommitsInSquash)
-
-    const squashedDescription = getSquashedCommitDescription(
-      toSquashSansSquashOnto,
-      squashOnto
-    )
-
-    if (
-      await doMergeCommitsExistAfterCommit(
-        this.props.repository,
-        lastRetainedCommitRef
-      )
-    ) {
-      defaultErrorHandler(
-        new Error(
-          `Unable to squash. Squashing replays all commits up to the last one required for the squash. A merge commit cannot exist among those commits.`
-        ),
-        this.props.dispatcher
-      )
-      return
-    }
-
-    this.props.dispatcher.recordSquashInvoked(isInvokedByContextMenu)
-
-    this.props.dispatcher.showPopup({
-      type: PopupType.CommitMessage,
-      repository: this.props.repository,
-      coAuthors,
-      showCoAuthoredBy: coAuthors.length > 0,
-      commitMessage: {
-        summary: squashOnto.summary,
-        description: squashedDescription,
-        timestamp: Date.now(),
-      },
-      dialogTitle: `Squash ${allCommitsInSquash.length} Commits`,
-      dialogButtonText: `Squash ${allCommitsInSquash.length} Commits`,
-      prepopulateCommitSummary: true,
-      onSubmitCommitMessage: async (context: ICommitContext) => {
-        this.props.dispatcher.closePopup(PopupType.CommitMessage)
-
-        this.props.dispatcher.squash(
-          this.props.repository,
-          toSquashSansSquashOnto,
-          squashOnto,
-          lastRetainedCommitRef,
-          context
-        )
-        return true
-      },
-    })
   }
 }
 

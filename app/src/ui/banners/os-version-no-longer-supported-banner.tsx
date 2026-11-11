@@ -5,8 +5,8 @@ import { Banner } from './banner'
 import { LinkButton } from '../lib/link-button'
 import { setNumber } from '../../lib/local-storage'
 
-export const UnsupportedOSBannerDismissedAtKey =
-  'unsupported-os-banner-dismissed-at'
+export { UnsupportedOSBannerDismissedAtKey } from './unsupported-os-state'
+import { UnsupportedOSBannerDismissedAtKey } from './unsupported-os-state'
 
 export class OSVersionNoLongerSupportedBanner extends React.Component<{
   onDismissed: () => void

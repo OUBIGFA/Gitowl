@@ -1,8 +1,10 @@
 import React from 'react'
-import { isMergeConflictState, RepositorySectionTab } from '../../lib/app-state'
+import {
+  continueOperation,
+  abortOperation,
+} from '../../native-kernel/operation-dialogs'
+import { isMergeConflictState } from '../../lib/app-state'
 import { getConflictedFiles } from '../../lib/status'
-import { BannerType } from '../../models/banner'
-import { DefaultCommitMessage } from '../../models/commit-message'
 import {
   MultiCommitOperationKind,
   MultiCommitOperationStepKind,
@@ -13,9 +15,6 @@ import { MergeChooseBranchDialog } from './choose-branch/merge-choose-branch-dia
 export abstract class Merge extends BaseMultiCommitOperation {
   protected onContinueAfterConflicts = async (): Promise<void> => {
     const {
-      repository,
-      dispatcher,
-      workingDirectory,
       state,
       conflictState,
       state: { operationDetail },
@@ -38,42 +37,11 @@ export abstract class Merge extends BaseMultiCommitOperation {
       return
     }
 
-    const { theirBranch } = state.step.conflictState
-    const { currentBranch: ourBranch } = conflictState
-    await dispatcher.finishConflictedMerge(
-      repository,
-      workingDirectory,
-      {
-        type: BannerType.SuccessfulMerge,
-        ourBranch,
-        theirBranch,
-      },
-      operationDetail.isSquash
-    )
-
-    await dispatcher.setCommitMessage(repository, DefaultCommitMessage)
-    await this.props.dispatcher.changeRepositorySection(
-      repository,
-      RepositorySectionTab.Changes
-    )
-    this.onFlowEnded()
-    dispatcher.incrementMetric('guidedConflictedMergeCompletionCount')
+    await continueOperation(this.props)
   }
 
   protected onAbort = async (): Promise<void> => {
-    const {
-      repository,
-      dispatcher,
-      state: { operationDetail },
-    } = this.props
-    this.onFlowEnded()
-    if (
-      operationDetail.kind === MultiCommitOperationKind.Merge &&
-      operationDetail.isSquash
-    ) {
-      return dispatcher.abortSquashMerge(repository)
-    }
-    return dispatcher.abortMerge(repository)
+    return abortOperation(this.props)
   }
 
   protected onConflictsDialogDismissed = () => {

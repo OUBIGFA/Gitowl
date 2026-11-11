@@ -32,6 +32,7 @@ import {
 import { getSnapshotData } from '../../../src/lib/git/assisted-commit/state'
 import { getWorkingDirectoryDiff } from '../../../src/lib/git/diff'
 import { setHooksEnvEnabled } from '../../../src/lib/hooks/config'
+import { bash } from '../../../src/lib/hooks/shell-escape'
 import {
   DiffLineType,
   DiffSelection,
@@ -73,6 +74,11 @@ const FilterDirectoryIdentityCheck = [
   'assert.equal(cwd.ino, worktree.ino)',
   "assert.ok(fs.existsSync('context-marker'))",
 ].join('\n')
+
+// The bundled Windows Git intentionally omits coreutils sleep. Use the test
+// runtime so delayed hooks and filters run on every supported platform.
+const hookDelay = (milliseconds: number) =>
+  bash.quoteCommand(process.execPath.replace(/\\/g, '/'), '-e', `setTimeout(() => {}, ${milliseconds})`)
 
 describe('git/assisted-commit', () => {
   beforeEach(() => setHooksEnvEnabled(false))
@@ -1336,7 +1342,7 @@ describe('git/assisted-commit', () => {
     await writeHook(
       repository,
       'post-commit',
-      'sleep 0.2\nprintf settled > hook-settled'
+      `${hookDelay(200)}\nprintf settled > hook-settled`
     )
     const controller = new AbortController()
     let timer: ReturnType<typeof setTimeout> | undefined
@@ -1381,7 +1387,7 @@ describe('git/assisted-commit', () => {
     await writeHook(
       repository,
       'post-commit',
-      'sleep 0.05\nprintf settled > hook-settled'
+      `${hookDelay(50)}\nprintf settled > hook-settled`
     )
     await assert.rejects(
       single(repository, input, {
@@ -1983,7 +1989,7 @@ describe('git/assisted-commit', () => {
     await writeHook(
       repository,
       'post-commit',
-      'sleep 0.2\nprintf settled > hook-settled'
+      `${hookDelay(200)}\nprintf settled > hook-settled`
     )
     const controller = new AbortController()
     let calls = 0
@@ -3182,12 +3188,12 @@ describe('git/assisted-commit', () => {
     await rawGit(repository, [
       'config',
       'filter.change.clean',
-      'cat; sleep 0.02; printf "TRANSIENT UNSELECTED B\\n" > b',
+      `cat; ${hookDelay(20)}; printf "TRANSIENT UNSELECTED B\\n" > b`,
     ])
     await rawGit(repository, [
       'config',
       'filter.restore.clean',
-      'cat; sleep 0.02; printf "SELECTED B\\n" > b',
+      `cat; ${hookDelay(20)}; printf "SELECTED B\\n" > b`,
     ])
     await assert.rejects(
       withAssistedCommitSnapshot(repository, input, async () => {

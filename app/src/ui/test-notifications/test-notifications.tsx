@@ -30,71 +30,16 @@ import {
   supportsNotificationsPermissionRequest,
 } from 'desktop-notifications'
 import { LinkButton } from '../lib/link-button'
-
-enum TestNotificationType {
-  PullRequestReview,
-  PullRequestComment,
-  ChecksFailed,
-}
-
-enum TestNotificationStepKind {
-  SelectPullRequest,
-  SelectPullRequestReview,
-  SelectPullRequestComment,
-}
-
-type TestNotificationFlow = {
-  readonly type: TestNotificationType
-  readonly steps: ReadonlyArray<TestNotificationStepKind>
-}
-
-const TestNotificationFlows: ReadonlyArray<TestNotificationFlow> = [
-  {
-    type: TestNotificationType.PullRequestReview,
-    steps: [
-      TestNotificationStepKind.SelectPullRequest,
-      TestNotificationStepKind.SelectPullRequestReview,
-    ],
-  },
-  {
-    type: TestNotificationType.PullRequestComment,
-    steps: [
-      TestNotificationStepKind.SelectPullRequest,
-      TestNotificationStepKind.SelectPullRequestComment,
-    ],
-  },
-  {
-    type: TestNotificationType.ChecksFailed,
-    steps: [TestNotificationStepKind.SelectPullRequest],
-  },
-]
-
-type TestNotificationStepSelectPullRequestResult = {
-  readonly kind: TestNotificationStepKind.SelectPullRequest
-  readonly pullRequest: PullRequest
-}
-type TestNotificationStepSelectPullRequestReviewResult = {
-  readonly kind: TestNotificationStepKind.SelectPullRequestReview
-  readonly review: ValidNotificationPullRequestReview
-}
-type TestNotificationStepSelectPullRequestCommentResult = {
-  readonly kind: TestNotificationStepKind.SelectPullRequestComment
-  readonly comment: IAPIComment
-  readonly isIssueComment: boolean
-}
-
-type TestNotificationStepResultMap = Map<
-  TestNotificationStepKind.SelectPullRequest,
-  TestNotificationStepSelectPullRequestResult
-> &
-  Map<
-    TestNotificationStepKind.SelectPullRequestReview,
-    TestNotificationStepSelectPullRequestReviewResult
-  > &
-  Map<
-    TestNotificationStepKind.SelectPullRequestComment,
-    TestNotificationStepSelectPullRequestCommentResult
-  >
+import {
+  TestNotificationType,
+  TestNotificationStepKind,
+  TestNotificationFlow,
+  TestNotificationFlows,
+  TestNotificationStepResultMap,
+  loadNotificationTestStep,
+  simulateTestNotification,
+  backNotificationTest,
+} from '../lib/dialog-development-actions'
 
 interface ITestNotificationsState {
   readonly selectedFlow: TestNotificationFlow | null
@@ -283,190 +228,43 @@ export class TestNotifications extends React.Component<
   }
 
   private doFinalAction() {
-    const selectedFlow = this.state.selectedFlow
-
-    if (selectedFlow === null) {
-      return
-    }
-
-    switch (selectedFlow.type) {
-      case TestNotificationType.PullRequestReview: {
-        const pullRequestNumber = this.getPullRequest()
-        const review = this.getReview()
-
-        if (pullRequestNumber === null || review === null) {
-          return
-        }
-
-        this.props.notificationsDebugStore.simulatePullRequestReviewNotification(
-          this.props.repository,
-          pullRequestNumber,
-          review
-        )
-        break
-      }
-      case TestNotificationType.PullRequestComment: {
-        const pullRequest = this.getPullRequest()
-        const commentInfo = this.getCommentInfo()
-
-        if (pullRequest === null || commentInfo === null) {
-          return
-        }
-
-        const { comment, isIssueComment } = commentInfo
-
-        this.props.notificationsDebugStore.simulatePullRequestCommentNotification(
-          this.props.repository,
-          pullRequest,
-          comment,
-          isIssueComment
-        )
-        break
-      }
-      case TestNotificationType.ChecksFailed: {
-        const pullRequest = this.getPullRequest()
-
-        if (pullRequest === null) {
-          return
-        }
-
-        this.props.notificationsDebugStore.simulatePullRequestChecksFailed(
-          this.props.repository,
-          pullRequest,
-          this.props.dispatcher
-        )
-        break
-      }
-      default:
-        assertNever(selectedFlow.type, `Unknown flow type: ${selectedFlow}`)
+    const { selectedFlow, stepResults } = this.state
+    if (selectedFlow !== null) {
+      simulateTestNotification(
+        this.props.notificationsDebugStore,
+        this.props.dispatcher,
+        this.props.repository,
+        selectedFlow,
+        stepResults
+      )
     }
   }
 
   private prepareForNextStep() {
-    const nextStep = this.state.selectedFlow?.steps[this.state.stepResults.size]
-
-    if (nextStep === undefined) {
+    const { selectedFlow, stepResults } = this.state
+    const nextStep = selectedFlow?.steps[stepResults.size]
+    if (nextStep === undefined || selectedFlow === null) {
       this.doFinalAction()
       this.back()
       return
     }
-
-    switch (nextStep) {
-      case TestNotificationStepKind.SelectPullRequest: {
-        this.setState({
-          loading: true,
-        })
-
-        this.props.notificationsDebugStore
-          .getPullRequests(this.props.repository, {
-            filterByComments:
-              this.state.selectedFlow?.type ===
-              TestNotificationType.PullRequestComment,
-            filterByReviews:
-              this.state.selectedFlow?.type ===
-              TestNotificationType.PullRequestReview,
-          })
-          .then(pullRequests => {
-            this.setState({
-              pullRequests,
-              selectedRows: [],
-              loading: false,
-            })
-          })
-        break
+    this.setState({ loading: true })
+    loadNotificationTestStep(
+      this.props.notificationsDebugStore,
+      this.props.repository,
+      selectedFlow,
+      stepResults
+    ).then(data => {
+      if (data !== null) {
+        this.setState(state => ({
+          pullRequests: data.pullRequests ?? state.pullRequests,
+          reviews: data.reviews ?? state.reviews,
+          comments: data.comments ?? state.comments,
+          selectedRows: [],
+          loading: false,
+        }))
       }
-      case TestNotificationStepKind.SelectPullRequestReview: {
-        this.setState({
-          loading: true,
-        })
-
-        const pullRequest = this.getPullRequest()
-
-        if (pullRequest === null) {
-          return
-        }
-
-        this.props.notificationsDebugStore
-          .getPullRequestReviews(
-            this.props.repository,
-            pullRequest.pullRequestNumber
-          )
-          .then(reviews => {
-            this.setState({
-              reviews,
-              selectedRows: [],
-              loading: false,
-            })
-          })
-        break
-      }
-      case TestNotificationStepKind.SelectPullRequestComment: {
-        this.setState({
-          loading: true,
-        })
-
-        const pullRequest = this.getPullRequest()
-
-        if (pullRequest === null) {
-          return
-        }
-
-        this.props.notificationsDebugStore
-          .getPullRequestComments(
-            this.props.repository,
-            pullRequest.pullRequestNumber
-          )
-          .then(comments => {
-            this.setState({
-              comments,
-              selectedRows: [],
-              loading: false,
-            })
-          })
-        break
-      }
-      default:
-        assertNever(nextStep, `Unknown step: ${nextStep}`)
-    }
-  }
-
-  private getPullRequest(): PullRequest | null {
-    const pullRequestResult = this.state.stepResults.get(
-      TestNotificationStepKind.SelectPullRequest
-    )
-
-    if (pullRequestResult === undefined) {
-      return null
-    }
-
-    return pullRequestResult.pullRequest
-  }
-
-  private getReview(): ValidNotificationPullRequestReview | null {
-    const reviewResult = this.state.stepResults.get(
-      TestNotificationStepKind.SelectPullRequestReview
-    )
-
-    if (reviewResult === undefined) {
-      return null
-    }
-
-    return reviewResult.review
-  }
-
-  private getCommentInfo() {
-    const commentResult = this.state.stepResults.get(
-      TestNotificationStepKind.SelectPullRequestComment
-    )
-
-    if (commentResult === undefined) {
-      return null
-    }
-
-    return {
-      comment: commentResult.comment,
-      isIssueComment: commentResult.isIssueComment,
-    }
+    })
   }
 
   private renderCurrentStep() {
@@ -760,41 +558,12 @@ export class TestNotifications extends React.Component<
   }
 
   private back() {
-    const { selectedFlow, stepResults } = this.state
-    if (selectedFlow === null) {
-      return
-    }
-
-    if (stepResults.size === 0) {
-      this.setState(
-        {
-          selectedFlow: null,
-          stepResults: new Map(),
-        },
-        () => {
-          this.prepareForNextStep()
-        }
-      )
-    }
-
-    const steps = selectedFlow.steps
-    const lastStep = steps.at(stepResults.size - 1)
-    if (lastStep === undefined) {
-      return
-    }
-
-    const newStepResults: Map<TestNotificationStepKind, any> = new Map(
-      stepResults
+    const next = backNotificationTest(
+      this.state.selectedFlow,
+      this.state.stepResults
     )
-    newStepResults.delete(lastStep)
-
-    this.setState(
-      {
-        stepResults: newStepResults as TestNotificationStepResultMap,
-      },
-      () => {
-        this.prepareForNextStep()
-      }
-    )
+    if (next !== null) {
+      this.setState(next, () => this.prepareForNextStep())
+    }
   }
 }

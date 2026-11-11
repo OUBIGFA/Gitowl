@@ -1,0 +1,167 @@
+{
+  "module": "github.com/egoist/mygo",
+  "version": "v0.8.3",
+  "revision": "5add3817c74bb7505d0b473bc5fb28abe2201b99",
+  "go": "1.27.3",
+  "license": "MIT",
+  "archive_sha256": "631fe8925fe19f0d67ea518060538b988319fd0677dd397df8e16498c4cd0777",
+  "patches": [
+    {
+      "path": "third_party/patches/mygo/installer-languages.patch",
+      "sha256": "dd1a7df8d47895daf0cc36479be9b947294b128d974266b56bf2ee7b0db8fe07",
+      "reason": "NSIS process and removal errors follow the selected English, Simplified Chinese or Traditional Chinese language. A real installed lifecycle exposed unchecked deletion leaving electron.exe while reporting success. Retry transient deletion locks for five seconds, report persistent failure, and retain registration until file removal succeeds. The original Desktop CLI hook still runs before removal; no application shutdown deadline or termination policy changes. Real compiled NSIS tests cover unlocked, temporary-lock and persistent-lock removal. Reviewed against v0.8.3; upstream still lacks these checks.",
+      "files": [
+        {
+          "path": "cmd/mygo/nsis.go",
+          "before": "1a666c780024f42d80b5659e251e519aa21a7727bfdff809c019add37b4b1adb",
+          "after": "cebb79c88f4d4332c2acd347d5c5ce48c02f016cf2ec2541f8ff546776347237"
+        },
+        {
+          "path": "cmd/mygo/nsis_test.go",
+          "before": "61ed3235953ccddf911899dc67ab20d9abd2f36f05fa7c1d083a3a9900b82929",
+          "after": "f760e27abfa321a9486db9ce49b694389dc3288ee37ccd869c67040f752798ac"
+        },
+        {
+          "path": "cmd/mygo/gitowl_installer_test.go",
+          "before": null,
+          "after": "44bd265547f70399bd67d6e08cb1029e80a6615b19222e36cbbef1440eab1811"
+        },
+        {
+          "path": "cmd/mygo/gitowl_uninstall_windows_test.go",
+          "before": null,
+          "after": "77e409036d99e10e81ebef8b352fc3bf65128b58cefb53d077857bb53794e3ee"
+        }
+      ]
+    },
+    {
+      "path": "third_party/patches/mygo/diff-context-menu.patch",
+      "sha256": "f6c3506cbe424075e72f146916ded06b90029326a85b8a78036475de69add43e",
+      "reason": "MyGo v0.8.3's inner diff editors own their context menus. Forward the existing editor context-menu extension to both DiffState sides so original expand/discard/options remain reachable without replacing native editing or retaining frame objects. Reviewed locked sideOptions/build/menu implementations; nil preserves upstream behavior. Covers split/unified and system/popover menus.",
+      "files": [
+        {
+          "path": "ui/editor/diffview.go",
+          "before": "277040316d8f20998b9e51d9043f821ca32eba35f32e10c229d355f834760f58",
+          "after": "6f002648425d61de21599633196584230daf079cd6641e3291ba597314cfbcf8"
+        },
+        {
+          "path": "ui/editor/diff_context_menu_test.go",
+          "before": null,
+          "after": "8cd362d842b572ce3811cc714b83a6a3c9df16f4bfb57a7709f77ccc1e96fc5b"
+        },
+        {
+          "path": "docs/ui/diff-viewer.md",
+          "before": "49a1a3d0fea72659976b729a2da6dab907bfc548eee160652eb3e9a1197ad95f",
+          "after": "52451ed364d681363ad08e64ff8a198e96e1da8054e944ca4983526a6167c923"
+        }
+      ]
+    },
+    {
+      "path": "third_party/patches/mygo/native-editing-role.patch",
+      "sha256": "49f54eb8caf80fc6d5ed43ea7f04965083fdaf1f928f3d33b0083812a94520e7",
+      "reason": "Windows Select All is an application action for repository lists, but native text focus must retain the original toolkit editing role. Expose only Window.SelectAll forwarding the existing performRole implementation. No editing algorithm, engine input behavior, web UI or synthetic keys are added; verified against v0.8.3 menu.go/content.go. Remove once upstream exposes equivalent role dispatch.",
+      "files": [
+        {
+          "path": "gitowl_editing.go",
+          "before": null,
+          "after": "8b020efdb2e03fb6d123d89c98dcd62d0efedbc900f5248f875b83634b630c82"
+        },
+        {
+          "path": "gitowl_editing_test.go",
+          "before": null,
+          "after": "64dfafc9a9b61d7a0667f7ad86ec7e736014350b4009ec64666ea0136562f2d3"
+        }
+      ]
+    },
+    {
+      "path": "third_party/patches/mygo/number-labels.patch",
+      "sha256": "7fb6d2a62edca32ec8bb065966851beccec06c68d29963c4174a5bcecddd05bb",
+      "reason": "The v0.8.3 NumberInput exposes hard-coded English Increase/Decrease accessibility actions in Chinese interfaces. Translate only those action labels for the two shipped Chinese locales, preserving the original control, parser, bounds and stepping. Covered by the production-control regression TestNativeNumberActionsFollowInterfaceLanguage; remove once upstream localizes these labels.",
+      "files": [
+        {
+          "path": "ui/number.go",
+          "before": "f1255340efdd1c752ffe7b1477a91fab64bc54b0e0372d79d78bf4e05dffa9b5",
+          "after": "0f02cedd8fd72ed7526be06d95720deec0044b0fd60fba5829e673b425739e98"
+        }
+      ]
+    },
+    {
+      "path": "third_party/patches/mygo/consumed-system-keys.patch",
+      "sha256": "7c1ca835db2fc96ba13450b128f6599ee2be7cf4dab8f1f335aaf0535cbda3e5",
+      "reason": "MyGo v0.8.3 opens Shift+F10 context menus but returns the key as unconsumed, while its Windows surface also ignores consumed named system keys. Report successful context-menu ownership and honor the existing SurfaceEvent consumption contract so Windows does not open a second main menu. Unconsumed Alt/F10 keep their native path. Covered by UI consumption and Windows dispatch regressions plus native desktop acceptance. Remove once upstream contains equivalent fixes.",
+      "files": [
+        {
+          "path": "ui/input.go",
+          "before": "c7fc6a27a9e5a58663a0a60c29274eef3cdc39c0fc9da27df63ee8438b38d7d9",
+          "after": "d3fa6ce9256e5cfb6ff7a2d48675584add406f15885e96c2c6331156bf4a5701"
+        },
+        {
+          "path": "internal/windows/surface.go",
+          "before": "81de18fd3d2a299abb27c38414093cc39bdba979c1a95d7fbe7279d901ac0a59",
+          "after": "28972038448c3395e19b85a76c62e88d83b4130491a6e7ed73983d013d56983b"
+        },
+        {
+          "path": "ui/gitowl_context_key_test.go",
+          "before": null,
+          "after": "f7e9116d327de4c61cbfb304e2e093214f63d4e35df9ab9bf162eb71eb4ec4e9"
+        },
+        {
+          "path": "internal/windows/gitowl_system_key_test.go",
+          "before": null,
+          "after": "590ecc99f47659df9affb7cc0e210f9404588dde6c1f93391bda17dc99b102d5"
+        }
+      ]
+    },
+    {
+      "path": "third_party/patches/mygo/locale-override.patch",
+      "sha256": "6025e892dcede6f1506e7dcc4168ebd9f8a6fb1d66ab5dee3d793641501c4c09",
+      "reason": "Expose a read-only LocaleOverride accessor over the existing locale authority so a native language selector can distinguish Follow system from an explicit choice resolving to the same display language. No second preference store or locale resolver is added. Covered by the existing locale harness for system, explicit and cleared choices. Remove when upstream provides an equivalent public getter.",
+      "files": [
+        {
+          "path": "gitowl_locale.go",
+          "before": null,
+          "after": "0d2fbfa7d5dfef9ee53ae40424b1f9a53c2c9ac690adf15e80b126136839df4c"
+        },
+        {
+          "path": "gitowl_locale_test.go",
+          "before": null,
+          "after": "93c5322f8241617a976fe165275bb3246aa03c09f63479f359532e8b5a9a5a68"
+        }
+      ]
+    },
+    {
+      "path": "third_party/patches/mygo/single-instance-framing.patch",
+      "sha256": "28b3485ae86ea79316b49bff2506afaa5d846ebaae9d624c7b53061eb40a32c3",
+      "reason": "MyGo v0.8.3 waits for EOF after receiving the complete single-instance JSON object. Windows AF_UNIX can delay write-side EOF, so the two-second read deadline discards valid CLI/deep-link launches. Decode one bounded JSON object as the message boundary; retain the size limit, deadline, schema, original event dispatch and sender protocol. Regression keeps the sender open, checks fragmented delivery, and runs original single-instance/identifier tests. Remove once upstream provides equivalent object framing.",
+      "files": [
+        {
+          "path": "single_instance.go",
+          "before": "ad92e9f8cd0c21a82367044c3542766216b87c0274a9539ba508b90a8f9c7814",
+          "after": "6fd7d8d652a69664a9040615755bbff802fda83173ac02fde02cfb61241f4dca"
+        },
+        {
+          "path": "gitowl_single_instance_test.go",
+          "before": null,
+          "after": "9461cd3afe4b31db4897a5fa3693ddd3747c49cf94cfe98eff654907f5932c73"
+        }
+      ]
+    },
+    {
+      "path": "third_party/patches/mygo/resource-hidden-directories.patch",
+      "sha256": "d77026aa405e1b42e73afc04e76075d9c60709d3edcc43fb218ef63aba898ece",
+      "reason": "MyGo v0.8.3 skips hidden directories while copying explicitly listed resources. The original Desktop runtime contains Copilot plugin manifests and Git ignore templates under .plugin/.github directories, so the fixed package must preserve those directories while continuing to omit hidden entries from the project's own resources tree. The regression covers both listed-resource preservation and the existing repository-resource exclusions; remove once upstream preserves listed hidden directories equivalently.",
+      "files": [
+        {
+          "path": "cmd/mygo/resources.go",
+          "before": "c37972df4db03483cab623ad610caef1e9883d6734312cbe3c8c012d98cfe442",
+          "after": "092dd73f03435dd0247232c0fe336dba394a5af271342f15a872feed84a7020b"
+        },
+        {
+          "path": "cmd/mygo/resources_test.go",
+          "before": "30bb606aef2a02c7c6a0c2a355fdf726e5b014f183c1e1cc67ad93dbf3063793",
+          "after": "c80f38609c7bc5540158f9a7457875f33c0fc1c2d5a69dd2fe8c23cf05d83669"
+        }
+      ]
+    }
+  ],
+  "update_policy": "Review latest official stable release before upgrades; remove each patch if the equivalent is provided upstream; rerun native, editor-menu and installer acceptance."
+}

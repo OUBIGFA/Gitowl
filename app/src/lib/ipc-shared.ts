@@ -1,3 +1,9 @@
+import type { AppMenuPresentationAction } from '../ui/app-menu-controller'
+import type {
+  NativeKernelRequest,
+  NativeKernelResponse,
+  NativeKernelSnapshot,
+} from '../native-kernel/protocol'
 import { IMenuItemState } from './menu-update'
 import { MenuIDs } from '../models/menu-ids'
 import { ISerializableMenuItem } from './menu-item'
@@ -18,6 +24,9 @@ import { NotificationCallback } from 'desktop-notifications'
 import { DesktopAliveEvent } from './stores/alive-store'
 import { CLIAction } from './cli-action'
 
+/** Initialization failed before the original renderer became ready. */
+type NativeKernelInitializationFailure = 'initialization'
+
 /**
  * Defines the simplex IPC channel names we use from the renderer
  * process along with their signatures. This type is used from both
@@ -25,6 +34,11 @@ import { CLIAction } from './cli-action'
  * the two over the untyped IPC framework.
  */
 export type RequestChannels = {
+  'native-kernel-request': (request: NativeKernelRequest) => void
+  'native-kernel-response': (response: NativeKernelResponse) => void
+  'native-kernel-state': (snapshot: NativeKernelSnapshot) => void
+  'native-kernel-presentation-action': (action: AppMenuPresentationAction) => void
+  'native-kernel-failure': (phase: NativeKernelInitializationFailure) => void
   'select-all-window-contents': () => void
   'dialog-did-open': () => void
   'update-menu-state': (

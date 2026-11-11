@@ -1,9 +1,9 @@
-import { TestMenuEvent } from '../../../main-process/menu'
+import type { TestMenuEvent } from '../../../main-process/menu/menu-event'
 import {
   isRepositoryWithGitHubRepository,
   Repository,
 } from '../../../models/repository'
-import { Dispatcher } from '../../dispatcher'
+import type { Dispatcher } from '../../dispatcher'
 import { assertNever } from '../../../lib/fatal-error'
 import {
   ExternalEditorError,
@@ -15,9 +15,9 @@ import { Banner, BannerType } from '../../../models/banner'
 import { PopupType } from '../../../models/popup'
 import { CloningRepository } from '../../../models/cloning-repository'
 import { generateDevReleaseSummary } from '../../../lib/release-notes'
-import { ReleaseNote } from '../../../models/release-notes'
+import type { ReleaseNote } from '../../../models/release-notes'
 import { getVersion } from '../app-proxy'
-import { Emoji } from '../../../lib/emoji'
+import type { Emoji } from '../../../lib/emoji'
 import { GitHubRepository } from '../../../models/github-repository'
 import { Account } from '../../../models/account'
 import { ShellError } from '../../../lib/shells/error'
@@ -28,6 +28,9 @@ import {
 } from '../../../models/status'
 import { DiffSelection, DiffSelectionType } from '../../../models/diff'
 
+/** Shared nonvisual test-menu controller: it creates original popup/banner
+ * requests only. Keep toolkit modules out of this import path; the native
+ * kernel loads it without mounting React or initializing a canvas. */
 export function showTestUI(
   name: TestMenuEvent,
   repository: Repository | CloningRepository | null,

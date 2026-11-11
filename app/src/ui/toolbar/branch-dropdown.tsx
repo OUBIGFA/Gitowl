@@ -26,7 +26,12 @@ import { dragAndDropManager } from '../../lib/drag-and-drop-manager'
 import { DragType } from '../../models/drag-drop'
 import { CICheckRunPopover } from '../check-runs/ci-check-run-popover'
 import { TooltipTarget } from '../lib/tooltip'
-import { BranchType, Branch } from '../../models/branch'
+import { Branch } from '../../models/branch'
+import {
+  deleteWorkspaceBranch,
+  checkoutWorkspaceBranchInWorktree,
+  checkoutWorkspacePRInWorktree,
+} from '../branches/branch-controller'
 import { PopupType } from '../../models/popup'
 import { generateBranchContextMenuItems } from '../branches/branch-list-item-context-menu'
 import { showContextualMenu } from '../../lib/menu-item'
@@ -408,45 +413,23 @@ export class BranchDropdown extends React.Component<IBranchDropdownProps> {
       return
     }
 
-    if (branch.type === BranchType.Remote) {
-      dispatcher.showPopup({
-        type: PopupType.DeleteRemoteBranch,
-        repository,
-        branch,
-      })
-      return
-    }
-
-    const aheadBehind = await dispatcher.getBranchAheadBehind(
-      repository,
-      branch
-    )
-    dispatcher.showPopup({
-      type: PopupType.DeleteBranch,
-      repository,
-      branch,
-      existsOnRemote: aheadBehind !== null,
-    })
+    await deleteWorkspaceBranch(dispatcher, repository, branch)
   }
 
   private onCheckoutInNewWorktree = (branch: Branch) => {
-    this.props.dispatcher.closeFoldout(FoldoutType.Branch)
-    this.props.dispatcher.showPopup({
-      type: PopupType.AddWorktree,
-      repository: this.props.repository,
-      initialBranchName: branch.name,
-      initialWorktreeName: `${this.props.repository.name}-${branch.nameWithoutRemote}`,
-    })
+    checkoutWorkspaceBranchInWorktree(
+      this.props.dispatcher,
+      this.props.repository,
+      branch
+    )
   }
 
   private onCheckoutPRInNewWorktree = (pullRequest: PullRequest) => {
-    this.props.dispatcher.closeFoldout(FoldoutType.Branch)
-    this.props.dispatcher.showPopup({
-      type: PopupType.AddWorktree,
-      repository: this.props.repository,
-      initialBranchName: pullRequest.head.ref,
-      initialWorktreeName: `${this.props.repository.name}-${pullRequest.pullRequestNumber}`,
-    })
+    checkoutWorkspacePRInWorktree(
+      this.props.dispatcher,
+      this.props.repository,
+      pullRequest
+    )
   }
 
   private onBadgeClick = () => {

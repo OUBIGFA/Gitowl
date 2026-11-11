@@ -1,0 +1,71 @@
+{
+  "image.mode": {
+    "en": "Image comparison",
+    "zh-Hans": "图片比较",
+    "zh-Hant": "圖片比較"
+  },
+  "image.twoUp": { "en": "2-up", "zh-Hans": "并排", "zh-Hant": "並排" },
+  "image.swipe": { "en": "Swipe", "zh-Hans": "滑动", "zh-Hant": "滑動" },
+  "image.onion": { "en": "Onion skin", "zh-Hans": "叠加", "zh-Hant": "疊加" },
+  "image.difference": {
+    "en": "Difference",
+    "zh-Hans": "差异",
+    "zh-Hant": "差異"
+  },
+  "image.natural": {
+    "en": "Natural pixels",
+    "zh-Hans": "原始像素",
+    "zh-Hant": "原始像素"
+  },
+  "image.sameBytes": {
+    "en": "No size difference",
+    "zh-Hans": "文件大小未变",
+    "zh-Hant": "檔案大小未變"
+  },
+  "image.byteChange": {
+    "en": "File size change (current / previous)",
+    "zh-Hans": "文件大小变化（当前／之前）",
+    "zh-Hant": "檔案大小變化（目前／之前）"
+  },
+  "image.previous": {
+    "en": "Before",
+    "zh-Hans": "修改前",
+    "zh-Hant": "修改前"
+  },
+  "image.current": { "en": "After", "zh-Hans": "修改后", "zh-Hant": "修改後" },
+  "image.swipePosition": {
+    "en": "Reveal previous",
+    "zh-Hans": "显示之前",
+    "zh-Hant": "顯示之前"
+  },
+  "image.opacity": {
+    "en": "Current opacity",
+    "zh-Hans": "当前透明度",
+    "zh-Hant": "目前透明度"
+  },
+  "image.preview": {
+    "en": "Image preview",
+    "zh-Hans": "图片预览",
+    "zh-Hant": "圖片預覽"
+  },
+  "image.loading": {
+    "en": "Loading image…",
+    "zh-Hans": "正在加载图片…",
+    "zh-Hant": "正在載入圖片…"
+  },
+  "image.computing": {
+    "en": "Computing difference…",
+    "zh-Hans": "正在计算差异…",
+    "zh-Hant": "正在計算差異…"
+  },
+  "image.failed": {
+    "en": "Image preview unavailable",
+    "zh-Hans": "图片无法预览",
+    "zh-Hant": "圖片無法預覽"
+  },
+  "image.empty": {
+    "en": "No image selected",
+    "zh-Hans": "未选择图片",
+    "zh-Hant": "未選擇圖片"
+  }
+}

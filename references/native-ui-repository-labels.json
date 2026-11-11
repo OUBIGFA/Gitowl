@@ -1,0 +1,682 @@
+{
+  "repositoryDialog.openCloneDetail": {
+    "en": "Download an existing remote repository to this computer.",
+    "zh-Hans": "将已有远端仓库下载到这台电脑。",
+    "zh-Hant": "將已有遠端儲存庫下載到這部電腦。"
+  },
+  "repositoryDialog.openCreateDetail": {
+    "en": "Initialize a local Git repository. Publish it when you are ready.",
+    "zh-Hans": "初始化本地 Git 仓库，需要上传时再发布。",
+    "zh-Hant": "初始化本地 Git 儲存庫，需要上傳時再發佈。"
+  },
+  "repositoryDialog.openAddDetail": {
+    "en": "Open a Git repository already on this computer, with or without a remote.",
+    "zh-Hans": "打开这台电脑上已有的 Git 仓库，有无远端均可。",
+    "zh-Hant": "開啟這部電腦上已有的 Git 儲存庫，有無遠端均可。"
+  },
+  "repositoryDialog.RenameBranch": {
+    "en": "Rename branch",
+    "zh-Hans": "重命名分支",
+    "zh-Hant": "重新命名分支"
+  },
+  "repositoryDialog.DeleteBranch": {
+    "en": "Delete branch",
+    "zh-Hans": "删除分支",
+    "zh-Hant": "刪除分支"
+  },
+  "repositoryDialog.DeleteRemoteBranch": {
+    "en": "Delete remote branch",
+    "zh-Hans": "删除远程分支",
+    "zh-Hant": "刪除遠端分支"
+  },
+  "repositoryDialog.CreateBranch": {
+    "en": "Create a branch",
+    "zh-Hans": "创建分支",
+    "zh-Hant": "建立分支"
+  },
+  "repositoryDialog.AddRepository": {
+    "en": "Add local repository",
+    "zh-Hans": "添加本地仓库",
+    "zh-Hant": "新增本機儲存庫"
+  },
+  "repositoryDialog.CreateRepository": {
+    "en": "Create a new repository",
+    "zh-Hans": "创建新仓库",
+    "zh-Hant": "建立新儲存庫"
+  },
+  "repositoryDialog.CloneRepository": {
+    "en": "Clone a repository",
+    "zh-Hans": "克隆仓库",
+    "zh-Hant": "複製儲存庫"
+  },
+  "repositoryDialog.PublishRepository": {
+    "en": "Publish repository",
+    "zh-Hans": "发布仓库",
+    "zh-Hant": "發佈儲存庫"
+  },
+  "repositoryDialog.RemoveRepository": {
+    "en": "Remove repository",
+    "zh-Hans": "移除仓库",
+    "zh-Hant": "移除儲存庫"
+  },
+  "repositoryDialog.CreateTag": {
+    "en": "Create a tag",
+    "zh-Hans": "创建标签",
+    "zh-Hant": "建立標籤"
+  },
+  "repositoryDialog.DeleteTag": {
+    "en": "Delete tag",
+    "zh-Hans": "删除标签",
+    "zh-Hant": "刪除標籤"
+  },
+  "repositoryDialog.ChangeRepositoryAlias": {
+    "en": "Repository alias",
+    "zh-Hans": "仓库别名",
+    "zh-Hant": "儲存庫別名"
+  },
+  "repositoryDialog.AddWorktree": {
+    "en": "Add worktree",
+    "zh-Hans": "添加工作树",
+    "zh-Hant": "新增工作樹"
+  },
+  "repositoryDialog.RenameWorktree": {
+    "en": "Rename worktree",
+    "zh-Hans": "重命名工作树",
+    "zh-Hant": "重新命名工作樹"
+  },
+  "repositoryDialog.DeleteWorktree": {
+    "en": "Delete worktree",
+    "zh-Hans": "删除工作树",
+    "zh-Hant": "刪除工作樹"
+  },
+  "repositoryDialog.DeleteWorktreeFailed": {
+    "en": "Delete worktree failed",
+    "zh-Hans": "删除工作树失败",
+    "zh-Hant": "刪除工作樹失敗"
+  },
+  "repositoryDialog.ChooseForkSettings": {
+    "en": "How are you planning to use this fork?",
+    "zh-Hans": "你打算如何使用此复刻仓库？",
+    "zh-Hant": "你打算如何使用此分叉儲存庫？"
+  },
+  "repositoryDialog.CreateFork": {
+    "en": "Do you want to fork this repository?",
+    "zh-Hans": "要复刻此仓库吗？",
+    "zh-Hant": "要分叉此儲存庫嗎？"
+  },
+  "repositoryDialog.UpstreamAlreadyExists": {
+    "en": "Upstream already exists",
+    "zh-Hans": "上游远程已存在",
+    "zh-Hant": "上游遠端已存在"
+  },
+  "repositoryDialog.DeleteBranchDescription": {
+    "en": "Delete this branch? This action cannot be undone.",
+    "zh-Hans": "删除此分支？此操作无法撤销。",
+    "zh-Hant": "刪除此分支？此操作無法復原。"
+  },
+  "repositoryDialog.DeleteRemoteBranchDescription": {
+    "en": "This branch does not exist locally. Deleting it cannot be undone and may impact others collaborating on this branch.",
+    "zh-Hans": "此分支不存在于本地。删除后无法撤销，并可能影响此分支上的其他协作者。",
+    "zh-Hant": "此分支不存在於本機。刪除後無法復原，並可能影響此分支上的其他協作者。"
+  },
+  "repositoryDialog.DeleteTagDescription": {
+    "en": "Are you sure you want to delete this tag?",
+    "zh-Hans": "确定要删除此标签吗？",
+    "zh-Hant": "確定要刪除此標籤嗎？"
+  },
+  "repositoryDialog.RemoveRepositoryDescription": {
+    "en": "Remove this repository from Gitowl? Files remain on disk unless you choose to move them to the trash.",
+    "zh-Hans": "从 Gitowl 移除此仓库？除非选择移至回收站，否则磁盘文件会保留。",
+    "zh-Hant": "從 Gitowl 移除此儲存庫？除非選擇移至垃圾桶，否則磁碟檔案會保留。"
+  },
+  "repositoryDialog.DeleteWorktreeDescription": {
+    "en": "Delete this worktree? If its folder is missing, only its repository registration will be removed.",
+    "zh-Hans": "删除此工作树？若文件夹已缺失，仅移除其仓库登记。",
+    "zh-Hant": "刪除此工作樹？若資料夾已遺失，僅移除其儲存庫登記。"
+  },
+  "repositoryDialog.DeleteWorktreeFailedDescription": {
+    "en": "Deletion failed. Forcefully delete this worktree? Cancelling restores the original worktree selection.",
+    "zh-Hans": "删除失败。要强制删除此工作树吗？取消将恢复原工作树选择。",
+    "zh-Hant": "刪除失敗。要強制刪除此工作樹嗎？取消將還原原工作樹選擇。"
+  },
+  "repositoryDialog.UpstreamAlreadyExistsDescription": {
+    "en": "This fork's upstream remote points elsewhere. Update it to the expected parent URL, or ignore this warning?",
+    "zh-Hans": "此复刻仓库的上游远程指向其他地址。更新为预期的父仓库地址，还是忽略此提示？",
+    "zh-Hant": "此分叉儲存庫的上游遠端指向其他位址。更新為預期的父儲存庫位址，還是忽略此提示？"
+  },
+  "repositoryDialog.CreateForkDescription": {
+    "en": "You do not have write access to this repository. Check with an administrator, or create a fork to continue.",
+    "zh-Hans": "你没有此仓库的写入权限。请联系管理员，或复刻仓库以继续。",
+    "zh-Hant": "你沒有此儲存庫的寫入權限。請聯絡管理員，或分叉儲存庫以繼續。"
+  },
+  "repositoryDialog.ChooseForkSettingsDescription": {
+    "en": "Choose the parent project to contribute upstream, or your own fork for your own purposes. This determines the default branch source.",
+    "zh-Hans": "选择父项目以向上游贡献，或选择自己的复刻仓库用于个人用途。这决定默认分支的来源。",
+    "zh-Hant": "選擇父專案以向上游貢獻，或選擇自己的分叉儲存庫用於個人用途。這決定預設分支的來源。"
+  },
+  "repositoryDialog.repositoryName": {
+    "en": "Repository",
+    "zh-Hans": "仓库",
+    "zh-Hant": "儲存庫"
+  },
+  "repositoryDialog.repositoryPath": {
+    "en": "Repository path",
+    "zh-Hans": "仓库路径",
+    "zh-Hant": "儲存庫路徑"
+  },
+  "repositoryDialog.name": {
+    "en": "Name",
+    "zh-Hans": "名称",
+    "zh-Hant": "名稱"
+  },
+  "repositoryDialog.path": {
+    "en": "Local path",
+    "zh-Hans": "本地路径",
+    "zh-Hant": "本機路徑"
+  },
+  "repositoryDialog.description": {
+    "en": "Description",
+    "zh-Hans": "说明",
+    "zh-Hant": "說明"
+  },
+  "repositoryDialog.branchName": {
+    "en": "Branch",
+    "zh-Hans": "分支",
+    "zh-Hant": "分支"
+  },
+  "repositoryDialog.remoteBranch": {
+    "en": "Remote branch",
+    "zh-Hans": "远程分支",
+    "zh-Hant": "遠端分支"
+  },
+  "repositoryDialog.includeRemote": {
+    "en": "Also delete this branch on the remote",
+    "zh-Hans": "同时删除远程上的此分支",
+    "zh-Hant": "同時刪除遠端上的此分支"
+  },
+  "repositoryDialog.startPoint": {
+    "en": "Create branch based on…",
+    "zh-Hans": "新分支基于…",
+    "zh-Hant": "新分支基於…"
+  },
+  "repositoryDialog.targetCommit": {
+    "en": "Starting commit",
+    "zh-Hans": "起始提交",
+    "zh-Hant": "起始提交"
+  },
+  "repositoryDialog.readme": {
+    "en": "Initialize this repository with a README",
+    "zh-Hans": "使用 README 初始化此仓库",
+    "zh-Hant": "使用 README 初始化此儲存庫"
+  },
+  "repositoryDialog.gitIgnore": {
+    "en": "Git ignore",
+    "zh-Hans": "Git 忽略规则",
+    "zh-Hant": "Git 忽略規則"
+  },
+  "repositoryDialog.license": {
+    "en": "License",
+    "zh-Hans": "许可证",
+    "zh-Hant": "授權條款"
+  },
+  "repositoryDialog.url": {
+    "en": "Repository URL or GitHub username/repository",
+    "zh-Hans": "仓库 URL 或 GitHub 用户名/仓库",
+    "zh-Hant": "儲存庫 URL 或 GitHub 使用者名稱/儲存庫"
+  },
+  "repositoryDialog.tab": {
+    "en": "Clone source",
+    "zh-Hans": "克隆来源",
+    "zh-Hant": "複製來源"
+  },
+  "repositoryDialog.account": {
+    "en": "Account",
+    "zh-Hans": "账户",
+    "zh-Hant": "帳戶"
+  },
+  "repositoryDialog.repository": {
+    "en": "Repository to clone",
+    "zh-Hans": "要克隆的仓库",
+    "zh-Hant": "要複製的儲存庫"
+  },
+  "repositoryDialog.filter": {
+    "en": "Filter repositories",
+    "zh-Hans": "筛选仓库",
+    "zh-Hant": "篩選儲存庫"
+  },
+  "repositoryDialog.private": {
+    "en": "Keep this code private",
+    "zh-Hans": "保持代码私有",
+    "zh-Hant": "保持程式碼私有"
+  },
+  "repositoryDialog.organization": {
+    "en": "Organization",
+    "zh-Hans": "组织",
+    "zh-Hant": "組織"
+  },
+  "repositoryDialog.deleteFromDisk": {
+    "en": "Also move this repository to the trash",
+    "zh-Hans": "同时将仓库移至回收站",
+    "zh-Hant": "同時將儲存庫移至垃圾桶"
+  },
+  "repositoryDialog.previousTags": {
+    "en": "Previous tags",
+    "zh-Hans": "已有标签",
+    "zh-Hant": "既有標籤"
+  },
+  "repositoryDialog.tagName": {
+    "en": "Tag",
+    "zh-Hans": "标签",
+    "zh-Hant": "標籤"
+  },
+  "repositoryDialog.alias": {
+    "en": "Alias",
+    "zh-Hans": "别名",
+    "zh-Hant": "別名"
+  },
+  "repositoryDialog.worktreeName": {
+    "en": "Worktree name",
+    "zh-Hans": "工作树名称",
+    "zh-Hant": "工作樹名稱"
+  },
+  "repositoryDialog.worktreePath": {
+    "en": "Worktree path",
+    "zh-Hans": "工作树路径",
+    "zh-Hant": "工作樹路徑"
+  },
+  "repositoryDialog.branch": {
+    "en": "Branch name (leave empty to use worktree name)",
+    "zh-Hans": "分支名称（留空使用工作树名称）",
+    "zh-Hant": "分支名稱（留空使用工作樹名稱）"
+  },
+  "repositoryDialog.branches": {
+    "en": "Existing branches",
+    "zh-Hans": "已有分支",
+    "zh-Hant": "既有分支"
+  },
+  "repositoryDialog.locked": {
+    "en": "Locked",
+    "zh-Hans": "已锁定",
+    "zh-Hant": "已鎖定"
+  },
+  "repositoryDialog.missing": {
+    "en": "Missing folder",
+    "zh-Hans": "文件夹已缺失",
+    "zh-Hant": "資料夾已遺失"
+  },
+  "repositoryDialog.doNotAskAgain": {
+    "en": "Do not show this message again",
+    "zh-Hans": "不再显示此提示",
+    "zh-Hant": "不再顯示此提示"
+  },
+  "repositoryDialog.failure": {
+    "en": "Error details",
+    "zh-Hans": "错误详情",
+    "zh-Hant": "錯誤詳細資訊"
+  },
+  "repositoryDialog.target": {
+    "en": "Contribution target",
+    "zh-Hans": "贡献目标",
+    "zh-Hant": "貢獻目標"
+  },
+  "repositoryDialog.parent": {
+    "en": "Parent repository",
+    "zh-Hans": "父仓库",
+    "zh-Hant": "父儲存庫"
+  },
+  "repositoryDialog.fork": {
+    "en": "Your fork",
+    "zh-Hans": "你的复刻仓库",
+    "zh-Hant": "你的分叉儲存庫"
+  },
+  "repositoryDialog.currentRemote": {
+    "en": "Current remote URL",
+    "zh-Hans": "当前远程 URL",
+    "zh-Hant": "目前遠端 URL"
+  },
+  "repositoryDialog.expectedRemote": {
+    "en": "Expected remote URL",
+    "zh-Hans": "预期远程 URL",
+    "zh-Hant": "預期遠端 URL"
+  },
+  "repositoryDialog.rename": {
+    "en": "Rename",
+    "zh-Hans": "重命名",
+    "zh-Hant": "重新命名"
+  },
+  "repositoryDialog.delete": {
+    "en": "Delete",
+    "zh-Hans": "删除",
+    "zh-Hant": "刪除"
+  },
+  "repositoryDialog.createBranch": {
+    "en": "Create branch",
+    "zh-Hans": "创建分支",
+    "zh-Hant": "建立分支"
+  },
+  "repositoryDialog.forkSettings": {
+    "en": "Fork behavior settings",
+    "zh-Hans": "复刻行为设置",
+    "zh-Hant": "分叉行為設定"
+  },
+  "repositoryDialog.addRepository": {
+    "en": "Add repository",
+    "zh-Hans": "添加仓库",
+    "zh-Hant": "新增儲存庫"
+  },
+  "repositoryDialog.trust": {
+    "en": "Trust directory owner and add exception",
+    "zh-Hans": "信任目录所有者并添加例外",
+    "zh-Hant": "信任目錄擁有者並新增例外"
+  },
+  "repositoryDialog.createHere": {
+    "en": "Create a repository here instead",
+    "zh-Hans": "改为在此创建仓库",
+    "zh-Hant": "改為在此建立儲存庫"
+  },
+  "repositoryDialog.createRepository": {
+    "en": "Create repository",
+    "zh-Hans": "创建仓库",
+    "zh-Hant": "建立儲存庫"
+  },
+  "repositoryDialog.load": {
+    "en": "Load defaults and choices",
+    "zh-Hans": "载入默认值与选项",
+    "zh-Hant": "載入預設值與選項"
+  },
+  "repositoryDialog.addInstead": {
+    "en": "Add this repository instead",
+    "zh-Hans": "改为添加此仓库",
+    "zh-Hant": "改為新增此儲存庫"
+  },
+  "repositoryDialog.refresh": {
+    "en": "Refresh repositories",
+    "zh-Hans": "刷新仓库",
+    "zh-Hant": "重新整理儲存庫"
+  },
+  "repositoryDialog.clone": {
+    "en": "Clone",
+    "zh-Hans": "克隆",
+    "zh-Hant": "複製"
+  },
+  "repositoryDialog.signIn": {
+    "en": "Sign in to GitHub.com",
+    "zh-Hans": "登录 GitHub.com",
+    "zh-Hant": "登入 GitHub.com"
+  },
+  "repositoryDialog.signInEnterprise": {
+    "en": "Sign in to GitHub Enterprise",
+    "zh-Hans": "登录 GitHub Enterprise",
+    "zh-Hant": "登入 GitHub Enterprise"
+  },
+  "repositoryDialog.signInToBrowse": {
+    "en": "Sign in to choose a repository, or use the URL tab to clone by address.",
+    "zh-Hans": "登录后选择仓库，或切换到 URL 标签，使用地址克隆。",
+    "zh-Hant": "登入後選擇儲存庫，或切換到 URL 標籤，使用位址複製。"
+  },
+  "repositoryDialog.publish": {
+    "en": "Publish repository",
+    "zh-Hans": "发布仓库",
+    "zh-Hant": "發佈儲存庫"
+  },
+  "repositoryDialog.remove": {
+    "en": "Remove",
+    "zh-Hans": "移除",
+    "zh-Hant": "移除"
+  },
+  "repositoryDialog.createTag": {
+    "en": "Create tag",
+    "zh-Hans": "创建标签",
+    "zh-Hant": "建立標籤"
+  },
+  "repositoryDialog.saveAlias": {
+    "en": "Save alias",
+    "zh-Hans": "保存别名",
+    "zh-Hant": "儲存別名"
+  },
+  "repositoryDialog.createWorktree": {
+    "en": "Create worktree",
+    "zh-Hans": "创建工作树",
+    "zh-Hant": "建立工作樹"
+  },
+  "repositoryDialog.forceDelete": {
+    "en": "Forcefully delete",
+    "zh-Hans": "强制删除",
+    "zh-Hant": "強制刪除"
+  },
+  "repositoryDialog.continue": {
+    "en": "Continue",
+    "zh-Hans": "继续",
+    "zh-Hant": "繼續"
+  },
+  "repositoryDialog.createFork": {
+    "en": "Fork this repository",
+    "zh-Hans": "复刻此仓库",
+    "zh-Hant": "分叉此儲存庫"
+  },
+  "repositoryDialog.manualFork": {
+    "en": "Create the fork manually on GitHub",
+    "zh-Hans": "在 GitHub 上手动复刻",
+    "zh-Hant": "在 GitHub 上手動分叉"
+  },
+  "repositoryDialog.update": {
+    "en": "Update",
+    "zh-Hans": "更新",
+    "zh-Hant": "更新"
+  },
+  "repositoryDialog.ignore": {
+    "en": "Ignore",
+    "zh-Hans": "忽略",
+    "zh-Hant": "忽略"
+  },
+  "repositoryDialog.renameRemoteWarning": {
+    "en": "Renaming this branch will not change its name on the remote.",
+    "zh-Hans": "重命名此分支不会更改远程上的分支名称。",
+    "zh-Hant": "重新命名此分支不會變更遠端上的分支名稱。"
+  },
+  "repositoryDialog.branchRemoteWarning": {
+    "en": "A branch with this name already exists on the remote.",
+    "zh-Hans": "远程上已存在同名分支。",
+    "zh-Hant": "遠端上已存在同名分支。"
+  },
+  "repositoryDialog.aliasWarning": {
+    "en": "This will not affect the original repository name on GitHub.",
+    "zh-Hans": "此操作不会影响 GitHub 上的原仓库名称。",
+    "zh-Hant": "此操作不會影響 GitHub 上的原儲存庫名稱。"
+  },
+  "repositoryDialog.DeleteMissingWorktree": {
+    "en": "Remove missing worktree",
+    "zh-Hans": "移除缺失的工作树",
+    "zh-Hant": "移除遺失的工作樹"
+  },
+  "repositoryDialog.CreateBranchDescription": {
+    "en": "Choose the default branch to start independent work, or the current branch to build on its work. Fork behavior settings determine the default branch source.",
+    "zh-Hans": "选择默认分支开展独立工作，或选择当前分支继续已有工作。复刻行为设置决定默认分支的来源。",
+    "zh-Hant": "選擇預設分支開展獨立工作，或選擇目前分支繼續既有工作。分叉行為設定決定預設分支的來源。"
+  },
+  "repositoryDialog.CreateBranchCommitDescription": {
+    "en": "Your new branch will be based on the selected commit.",
+    "zh-Hans": "新分支将基于所选提交。",
+    "zh-Hant": "新分支將基於所選提交。"
+  },
+  "repositoryDialog.CreateBranchUnbornDescription": {
+    "en": "Your current branch has no commits. Creating a new branch will rename the current branch.",
+    "zh-Hans": "当前分支尚无提交。创建新分支将重命名当前分支。",
+    "zh-Hant": "目前分支尚無提交。建立新分支將重新命名目前分支。"
+  },
+  "repositoryDialog.CreateBranchDetachedDescription": {
+    "en": "HEAD is detached. Your new branch will be based on the currently checked out commit.",
+    "zh-Hans": "HEAD 已分离。新分支将基于当前检出的提交。",
+    "zh-Hant": "HEAD 已分離。新分支將基於目前簽出的提交。"
+  },
+  "repositoryDialog.effectiveName": {
+    "en": "Will be created as (spaces and invalid characters replaced by hyphens)",
+    "zh-Hans": "将创建为（空格和无效字符替换为连字符）",
+    "zh-Hant": "將建立為（空格和無效字元替換為連字號）"
+  },
+  "repositoryDialog.readmeWarning": {
+    "en": "A README.md already exists here. Initializing with a README will overwrite it.",
+    "zh-Hans": "此目录已有 README.md。使用 README 初始化将覆盖此文件。",
+    "zh-Hant": "此目錄已有 README.md。使用 README 初始化將覆寫此檔案。"
+  },
+  "repositoryDialog.subfolderWarning": {
+    "en": "This directory is a subfolder of another Git repository. Consider using a submodule.",
+    "zh-Hans": "此目录是其他 Git 仓库的子目录。可考虑使用子模块。",
+    "zh-Hant": "此目錄是其他 Git 儲存庫的子目錄。可考慮使用子模組。"
+  },
+  "repositoryDialog.choose": {
+    "en": "Choose…",
+    "zh-Hans": "选择…",
+    "zh-Hant": "選擇…"
+  },
+  "repositoryDialog.checkInputs": {
+    "en": "Check inputs",
+    "zh-Hans": "检查输入",
+    "zh-Hant": "檢查輸入"
+  },
+  "repositoryDialog.cancel": {
+    "en": "Cancel",
+    "zh-Hans": "取消",
+    "zh-Hant": "取消"
+  },
+  "repositoryDialog.error.duplicateBranch": {
+    "en": "A branch with this name already exists.",
+    "zh-Hans": "已存在同名分支。",
+    "zh-Hant": "已存在同名分支。"
+  },
+  "repositoryDialog.error.nameRequired": {
+    "en": "Enter a name.",
+    "zh-Hans": "请输入名称。",
+    "zh-Hant": "請輸入名稱。"
+  },
+  "repositoryDialog.error.pathRequired": {
+    "en": "Enter a local path.",
+    "zh-Hans": "请输入本地路径。",
+    "zh-Hant": "請輸入本機路徑。"
+  },
+  "repositoryDialog.error.trustNotRequired": {
+    "en": "This repository does not need a safe-directory exception.",
+    "zh-Hans": "此仓库不需要安全目录例外。",
+    "zh-Hant": "此儲存庫不需要安全目錄例外。"
+  },
+  "repositoryDialog.error.notRepository": {
+    "en": "This directory does not appear to be a Git repository.",
+    "zh-Hans": "此目录似乎不是 Git 仓库。",
+    "zh-Hant": "此目錄似乎不是 Git 儲存庫。"
+  },
+  "repositoryDialog.error.bareRepository": {
+    "en": "Bare repositories are not currently supported.",
+    "zh-Hans": "目前不支持裸仓库。",
+    "zh-Hant": "目前不支援裸儲存庫。"
+  },
+  "repositoryDialog.error.unsafeRepository": {
+    "en": "Another user owns this repository. Explicitly trust its owner before adding an exception.",
+    "zh-Hans": "此仓库归其他用户所有。请先明确确认信任所有者，再添加例外。",
+    "zh-Hant": "此儲存庫歸其他使用者所有。請先明確確認信任擁有者，再新增例外。"
+  },
+  "repositoryDialog.error.nameAndPath": {
+    "en": "Enter a repository name and local path.",
+    "zh-Hans": "请输入仓库名称和本地路径。",
+    "zh-Hant": "請輸入儲存庫名稱和本機路徑。"
+  },
+  "repositoryDialog.error.unknownGitignore": {
+    "en": "This gitignore option is unavailable. Reload the options and select again.",
+    "zh-Hans": "此 Git 忽略选项不可用。请重新载入选项并选择。",
+    "zh-Hant": "此 Git 忽略選項無法使用。請重新載入選項並選擇。"
+  },
+  "repositoryDialog.error.unknownLicense": {
+    "en": "This license option is unavailable. Reload the options and select again.",
+    "zh-Hans": "此许可证选项不可用。请重新载入选项并选择。",
+    "zh-Hant": "此授權條款選項無法使用。請重新載入選項並選擇。"
+  },
+  "repositoryDialog.error.assistedBusy": {
+    "en": "Finish or cancel the assisted commit run before using this directory.",
+    "zh-Hans": "使用此目录前，请先完成或取消辅助提交任务。",
+    "zh-Hant": "使用此目錄前，請先完成或取消輔助提交工作。"
+  },
+  "repositoryDialog.error.existingRepository": {
+    "en": "This directory already contains a Git repository. Add it instead.",
+    "zh-Hans": "此目录已有 Git 仓库。请改为添加仓库。",
+    "zh-Hant": "此目錄已有 Git 儲存庫。請改為新增儲存庫。"
+  },
+  "repositoryDialog.error.directoryFailed": {
+    "en": "The directory could not be created. Check its path and permissions.",
+    "zh-Hans": "无法创建目录。请检查路径和权限。",
+    "zh-Hant": "無法建立目錄。請檢查路徑和權限。"
+  },
+  "repositoryDialog.error.accountRequired": {
+    "en": "Select a signed-in account.",
+    "zh-Hans": "请选择已登录的账户。",
+    "zh-Hant": "請選擇已登入的帳戶。"
+  },
+  "repositoryDialog.error.repositoryRequired": {
+    "en": "Select a repository for the current signed-in account.",
+    "zh-Hans": "请选择当前已登录账户的仓库。",
+    "zh-Hant": "請選擇目前已登入帳戶的儲存庫。"
+  },
+  "repositoryDialog.error.urlAndPath": {
+    "en": "Enter a repository URL and local path.",
+    "zh-Hans": "请输入仓库 URL 和本地路径。",
+    "zh-Hant": "請輸入儲存庫 URL 和本機路徑。"
+  },
+  "repositoryDialog.error.repositoryNotFound": {
+    "en": "Repository not found. Check your account, connection and URL.",
+    "zh-Hans": "找不到仓库。请检查账户、连接和 URL。",
+    "zh-Hant": "找不到儲存庫。請檢查帳戶、連線和 URL。"
+  },
+  "repositoryDialog.error.organizationUnavailable": {
+    "en": "The organization is no longer available for this account. Reload and select again.",
+    "zh-Hans": "此账户已无法选择该组织。请重新载入并选择。",
+    "zh-Hant": "此帳戶已無法選擇該組織。請重新載入並選擇。"
+  },
+  "repositoryDialog.error.tagTooLong": {
+    "en": "Tag names cannot exceed 245 characters.",
+    "zh-Hans": "标签名称不能超过 245 个字符。",
+    "zh-Hant": "標籤名稱不能超過 245 個字元。"
+  },
+  "repositoryDialog.error.duplicateTag": {
+    "en": "A tag with this name already exists.",
+    "zh-Hans": "已存在同名标签。",
+    "zh-Hant": "已存在同名標籤。"
+  },
+  "repositoryDialog.error.aliasRequired": {
+    "en": "Enter an alias.",
+    "zh-Hans": "请输入别名。",
+    "zh-Hant": "請輸入別名。"
+  },
+  "repositoryDialog.error.worktreeRequired": {
+    "en": "Enter a worktree name, path and branch.",
+    "zh-Hans": "请输入工作树名称、路径和分支。",
+    "zh-Hant": "請輸入工作樹名稱、路徑和分支。"
+  },
+  "repositoryDialog.error.worktreeUnchanged": {
+    "en": "Choose a different worktree name.",
+    "zh-Hans": "请选择不同的工作树名称。",
+    "zh-Hant": "請選擇不同的工作樹名稱。"
+  },
+  "repositoryDialog.error.repositoryUnavailable": {
+    "en": "The selected clone repository is no longer available. Refresh and select again.",
+    "zh-Hans": "所选克隆仓库已不可用。请刷新并重新选择。",
+    "zh-Hant": "所選複製儲存庫已無法使用。請重新整理並重新選擇。"
+  },
+  "repositoryDialog.error.pathUnreadable": {
+    "en": "Unable to read the path on disk. Check the path and try again.",
+    "zh-Hans": "无法读取磁盘路径。请检查路径后重试。",
+    "zh-Hant": "無法讀取磁碟路徑。請檢查路徑後重試。"
+  },
+  "repositoryDialog.error.appPath": {
+    "en": "The local path cannot end in .app on macOS. Choose a different folder name.",
+    "zh-Hans": "macOS 上的本地路径不能以 .app 结尾。请选择其他文件夹名称。",
+    "zh-Hant": "macOS 上的本機路徑不能以 .app 結尾。請選擇其他資料夾名稱。"
+  },
+  "repositoryDialog.error.folderNotEmpty": {
+    "en": "This folder contains files. Git can only clone into an empty folder.",
+    "zh-Hans": "此文件夹已有文件。Git 只能克隆到空文件夹。",
+    "zh-Hant": "此資料夾已有檔案。Git 只能複製到空資料夾。"
+  },
+  "repositoryDialog.error.fileExists": {
+    "en": "A file with this name already exists. Git can only clone into a folder.",
+    "zh-Hans": "已存在同名文件。Git 只能克隆到文件夹。",
+    "zh-Hant": "已存在同名檔案。Git 只能複製到資料夾。"
+  }
+}

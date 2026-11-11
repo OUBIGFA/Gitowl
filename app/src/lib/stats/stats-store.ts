@@ -48,6 +48,9 @@ import { parseModelKey } from '../copilot/byok'
 import { DefaultCopilotModel } from '../stores/copilot-store'
 import { getSystemNotificationsPermission } from '../notifications/notification-permission'
 import { TokenRefreshEvent } from '../credential-sessions'
+import { getHasOptedOutOfStats, StatsOptOutKey } from './stats-preference'
+
+export { getHasOptedOutOfStats } from './stats-preference'
 
 type PullRequestReviewStatFieldInfix =
   | 'Approved'
@@ -73,9 +76,6 @@ export const SamplesURL =
   'https://github.com/desktop/desktop/blob/development/docs/process/usage-data.md'
 
 const LastDailyStatsReportKey = 'last-daily-stats-report'
-
-/** The localStorage key for whether the user has opted out. */
-const StatsOptOutKey = 'stats-opt-out'
 
 /** Have we successfully sent the stats opt-in? */
 const HasSentOptInPingKey = 'has-sent-stats-opt-in-ping'
@@ -1532,12 +1532,4 @@ function timeTo(key: string): number | undefined {
   return endTime === null || endTime <= startTime
     ? -1
     : Math.round((endTime - startTime) / 1000)
-}
-
-/**
- * Return a value indicating whether the user has opted out of stats reporting
- * or not.
- */
-export function getHasOptedOutOfStats() {
-  return getBoolean(StatsOptOutKey)
 }

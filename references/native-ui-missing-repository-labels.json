@@ -1,0 +1,52 @@
+{
+  "missingRepository.missing": {
+    "en": "This repository cannot be found at its last location.",
+    "zh-Hans": "在上次的位置找不到此仓库。",
+    "zh-Hant": "在上次的位置找不到此儲存庫。"
+  },
+  "missingRepository.unsafe": {
+    "en": "This repository may be unsafe.",
+    "zh-Hans": "此仓库可能不安全。",
+    "zh-Hant": "此儲存庫可能不安全。"
+  },
+  "missingRepository.path": {
+    "en": "Repository location",
+    "zh-Hans": "仓库位置",
+    "zh-Hant": "儲存庫位置"
+  },
+  "missingRepository.trustNotice": {
+    "en": "Git detected that this directory belongs to another user. Untrusted repositories can execute files. Trust only if you know and trust the directory owner; this adds an exception for the detected directory only.",
+    "zh-Hans": "Git 检测到此目录属于其他用户。不可信的仓库可能执行其中的文件。仅在了解并信任目录所有者时选择信任；只会为检测到的这个目录添加例外。",
+    "zh-Hant": "Git 偵測到此目錄屬於其他使用者。不可信的儲存庫可能執行其中的檔案。僅在了解並信任目錄擁有者時選擇信任；只會為偵測到的這個目錄新增例外。"
+  },
+  "missingRepository.checking": {
+    "en": "Checking the repository location…",
+    "zh-Hans": "正在检查仓库位置…",
+    "zh-Hant": "正在檢查儲存庫位置…"
+  },
+  "missingRepository.locate": {
+    "en": "Locate…",
+    "zh-Hans": "定位…",
+    "zh-Hant": "定位…"
+  },
+  "missingRepository.clone": {
+    "en": "Clone again",
+    "zh-Hans": "重新克隆",
+    "zh-Hant": "重新複製"
+  },
+  "missingRepository.check": {
+    "en": "Check again",
+    "zh-Hans": "重新检查",
+    "zh-Hant": "重新檢查"
+  },
+  "missingRepository.trust": {
+    "en": "Trust repository",
+    "zh-Hans": "信任仓库",
+    "zh-Hant": "信任儲存庫"
+  },
+  "missingRepository.remove": {
+    "en": "Remove",
+    "zh-Hans": "移除",
+    "zh-Hant": "移除"
+  }
+}

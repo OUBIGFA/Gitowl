@@ -1,9 +1,10 @@
+import { showFilesToBeCommitted } from './show-files-to-be-committed'
+import { defaultCommitSummary } from './commit-policy'
 import * as React from 'react'
-import * as Path from 'path'
 
 import { Dispatcher } from '../dispatcher'
+import { generateChangesContextMenu } from './changes-menu-controller'
 import { IMenuItem } from '../../lib/menu-item'
-import { revealInFileManager } from '../../lib/app-shell'
 import { encodePathAsUrl } from '../../lib/path'
 import {
   WorkingDirectoryStatus,
@@ -24,23 +25,11 @@ import { Account } from '../../models/account'
 import { Author, UnknownAuthor } from '../../models/author'
 import { Checkbox, CheckboxValue } from '../lib/checkbox'
 import { CommitOptions, IFileListFilterState } from '../../lib/app-state'
-import {
-  isSafeFileExtension,
-  DefaultEditorLabel,
-  CopyFilePathLabel,
-  RevealInFileManagerLabel,
-  OpenWithDefaultProgramLabel,
-  CopyRelativeFilePathLabel,
-  CopySelectedPathsLabel,
-  CopySelectedRelativePathsLabel,
-} from '../lib/context-menu'
 import { CommitMessage } from './commit-message'
 import { ChangedFile } from './changed-file'
 import { IAutocompletionProvider } from '../autocompletion'
 import { showContextualMenu } from '../../lib/menu-item'
 import { arrayEquals } from '../../lib/equality'
-import { writeClipboardText } from '../main-process-proxy'
-import { basename } from 'path'
 import { Commit, ICommitContext } from '../../models/commit'
 import {
   RebaseConflictState,
@@ -56,7 +45,6 @@ import { hasWritePermission } from '../../models/github-repository'
 import { hasConflictedFiles } from '../../lib/status'
 import { createObservableRef } from '../lib/observable-ref'
 import { Popup, PopupType } from '../../models/popup'
-import { EOL } from 'os'
 import { RepoRulesInfo } from '../../models/repo-rules'
 import { IAheadBehind } from '../../models/branch'
 import { StashDiffViewerId } from '../stashing'
@@ -100,8 +88,6 @@ const StashIcon: OcticonSymbolVariant = {
       '.004.043v9a.214.214 0 0 1-.214.214h-9a.216.216 0 0 1-.043-.004H4.015z',
   ],
 }
-
-const GitIgnoreFileName = '.gitignore'
 
 interface IFilterChangesListProps {
   readonly repository: Repository
@@ -538,19 +524,6 @@ export class FilterChangesList extends React.Component<
     }
   }
 
-  private getDiscardChangesMenuItemLabel = (files: ReadonlyArray<string>) => {
-    const label =
-      files.length === 1
-        ? __DARWIN__
-          ? `Discard Changes`
-          : `Discard changes`
-        : __DARWIN__
-        ? `Discard ${files.length} Selected Changes`
-        : `Discard ${files.length} selected changes`
-
-    return this.props.askForConfirmationOnDiscardChanges ? `${label}…` : label
-  }
-
   private onContextMenu = (event: React.MouseEvent<any>) => {
     event.preventDefault()
 
@@ -588,271 +561,12 @@ export class FilterChangesList extends React.Component<
     showContextualMenu(items)
   }
 
-  private getDiscardChangesMenuItem = (
-    paths: ReadonlyArray<string>
-  ): IMenuItem => {
-    return {
-      label: this.getDiscardChangesMenuItemLabel(paths),
-      action: () => this.onDiscardChanges(paths),
-    }
-  }
-
-  private getCopyPathMenuItem = (
-    file: WorkingDirectoryFileChange
-  ): IMenuItem => {
-    return {
-      label: CopyFilePathLabel,
-      action: () => {
-        const fullPath = Path.join(this.props.repository.path, file.path)
-        writeClipboardText(fullPath)
-      },
-    }
-  }
-
-  private getCopyRelativePathMenuItem = (
-    file: WorkingDirectoryFileChange
-  ): IMenuItem => {
-    return {
-      label: CopyRelativeFilePathLabel,
-      action: () => writeClipboardText(Path.normalize(file.path)),
-    }
-  }
-
-  private getCopySelectedPathsMenuItem = (
-    files: WorkingDirectoryFileChange[]
-  ): IMenuItem => {
-    return {
-      label: CopySelectedPathsLabel,
-      action: () => {
-        const fullPaths = files.map(file =>
-          Path.join(this.props.repository.path, file.path)
-        )
-        writeClipboardText(fullPaths.join(EOL))
-      },
-    }
-  }
-
-  private getCopySelectedRelativePathsMenuItem = (
-    files: WorkingDirectoryFileChange[]
-  ): IMenuItem => {
-    return {
-      label: CopySelectedRelativePathsLabel,
-      action: () => {
-        const paths = files.map(file => Path.normalize(file.path))
-        writeClipboardText(paths.join(EOL))
-      },
-    }
-  }
-
-  private getRevealInFileManagerMenuItem = (
-    file: WorkingDirectoryFileChange
-  ): IMenuItem => {
-    return {
-      label: RevealInFileManagerLabel,
-      action: () => revealInFileManager(this.props.repository, file.path),
-      enabled: file.status.kind !== AppFileStatusKind.Deleted,
-    }
-  }
-
-  private getOpenInExternalEditorMenuItem = (
-    file: WorkingDirectoryFileChange,
-    enabled: boolean
-  ): IMenuItem => {
-    const { externalEditorLabel } = this.props
-
-    const openInExternalEditor = externalEditorLabel
-      ? `Open in ${externalEditorLabel}`
-      : DefaultEditorLabel
-
-    return {
-      label: openInExternalEditor,
-      action: () => {
-        this.props.onOpenItemInExternalEditor(file.path)
-      },
-      enabled,
-    }
-  }
-
-  private getDefaultContextMenu(
-    file: WorkingDirectoryFileChange
-  ): ReadonlyArray<IMenuItem> {
-    const { id, path, status } = file
-
-    const extension = Path.extname(path)
-    const isSafeExtension = isSafeFileExtension(extension)
-
-    const { workingDirectory, selectedFileIDs } = this.props
-
-    const selectedFiles = new Array<WorkingDirectoryFileChange>()
-    const paths = new Array<string>()
-    const extensions = new Set<string>()
-
-    const addItemToArray = (fileID: string) => {
-      const newFile = workingDirectory.findFileWithID(fileID)
-      if (newFile) {
-        selectedFiles.push(newFile)
-        paths.push(newFile.path)
-
-        const extension = Path.extname(newFile.path)
-        if (extension.length) {
-          extensions.add(extension)
-        }
-      }
-    }
-
-    if (selectedFileIDs.includes(id)) {
-      // user has selected a file inside an existing selection
-      // -> context menu entries should be applied to all selected files
-      selectedFileIDs.forEach(addItemToArray)
-    } else {
-      // this is outside their previous selection
-      // -> context menu entries should be applied to just this file
-      addItemToArray(id)
-    }
-
-    const items: IMenuItem[] = [
-      this.getDiscardChangesMenuItem(paths),
-      { type: 'separator' },
-    ]
-    if (paths.length === 1) {
-      const enabled = Path.basename(path) !== GitIgnoreFileName
-      items.push({
-        label: __DARWIN__
-          ? 'Ignore File (Add to .gitignore)'
-          : 'Ignore file (add to .gitignore)',
-        action: () => this.props.onIgnoreFile(path),
-        enabled,
-      })
-
-      // Even on Windows, the path separator is '/' for git operations so cannot
-      // use Path.sep
-      const pathComponents = path.split('/').slice(0, -1)
-      if (pathComponents.length > 0) {
-        const submenu = pathComponents.map((_, index) => {
-          const label = `/${pathComponents
-            .slice(0, pathComponents.length - index)
-            .join('/')}`
-          return {
-            label,
-            action: () => this.props.onIgnoreFile(label),
-          }
-        })
-
-        items.push({
-          label: __DARWIN__
-            ? 'Ignore Folder (Add to .gitignore)'
-            : 'Ignore folder (add to .gitignore)',
-          submenu,
-          enabled,
-        })
-      }
-    } else if (paths.length > 1) {
-      items.push({
-        label: __DARWIN__
-          ? `Ignore ${paths.length} Selected Files (Add to .gitignore)`
-          : `Ignore ${paths.length} selected files (add to .gitignore)`,
-        action: () => {
-          // Filter out any .gitignores that happens to be selected, ignoring
-          // those doesn't make sense.
-          this.props.onIgnoreFile(
-            paths.filter(path => Path.basename(path) !== GitIgnoreFileName)
-          )
-        },
-        // Enable this action as long as there's something selected which isn't
-        // a .gitignore file.
-        enabled: paths.some(path => Path.basename(path) !== GitIgnoreFileName),
-      })
-    }
-    // Five menu items should be enough for everyone
-    Array.from(extensions)
-      .slice(0, 5)
-      .forEach(extension => {
-        items.push({
-          label: __DARWIN__
-            ? `Ignore All ${extension} Files (Add to .gitignore)`
-            : `Ignore all ${extension} files (add to .gitignore)`,
-          action: () => this.props.onIgnorePattern(`*${extension}`),
-        })
-      })
-
-    if (paths.length > 1) {
-      items.push(
-        { type: 'separator' },
-        {
-          label: __DARWIN__
-            ? 'Include Selected Files'
-            : 'Include selected files',
-          action: () => {
-            selectedFiles.map(file => this.props.onIncludeChanged(file, true))
-          },
-        },
-        {
-          label: __DARWIN__
-            ? 'Exclude Selected Files'
-            : 'Exclude selected files',
-          action: () => {
-            selectedFiles.map(file => this.props.onIncludeChanged(file, false))
-          },
-        },
-        { type: 'separator' },
-        this.getCopySelectedPathsMenuItem(selectedFiles),
-        this.getCopySelectedRelativePathsMenuItem(selectedFiles)
-      )
-    } else {
-      items.push(
-        { type: 'separator' },
-        this.getCopyPathMenuItem(file),
-        this.getCopyRelativePathMenuItem(file)
-      )
-    }
-
-    const enabled = status.kind !== AppFileStatusKind.Deleted
-    items.push(
-      { type: 'separator' },
-      this.getRevealInFileManagerMenuItem(file),
-      this.getOpenInExternalEditorMenuItem(file, enabled),
-      {
-        label: OpenWithDefaultProgramLabel,
-        action: () => this.props.onOpenItem(path),
-        enabled: enabled && isSafeExtension,
-      }
+  private getFileContextMenu(file: WorkingDirectoryFileChange) {
+    return generateChangesContextMenu(
+      { ...this.props, onDiscard: this.onDiscardChanges },
+      file,
+      this.props.rebaseConflictState !== null
     )
-
-    return items
-  }
-
-  private getRebaseContextMenu(
-    file: WorkingDirectoryFileChange
-  ): ReadonlyArray<IMenuItem> {
-    const { path, status } = file
-
-    const extension = Path.extname(path)
-    const isSafeExtension = isSafeFileExtension(extension)
-
-    const items = new Array<IMenuItem>()
-
-    if (file.status.kind === AppFileStatusKind.Untracked) {
-      items.push(this.getDiscardChangesMenuItem([file.path]), {
-        type: 'separator',
-      })
-    }
-
-    const enabled = status.kind !== AppFileStatusKind.Deleted
-
-    items.push(
-      this.getCopyPathMenuItem(file),
-      this.getCopyRelativePathMenuItem(file),
-      { type: 'separator' },
-      this.getRevealInFileManagerMenuItem(file),
-      this.getOpenInExternalEditorMenuItem(file, enabled),
-      {
-        label: OpenWithDefaultProgramLabel,
-        action: () => this.props.onOpenItem(path),
-        enabled: enabled && isSafeExtension,
-      }
-    )
-
-    return items
   }
 
   private onItemContextMenu = (
@@ -867,10 +581,7 @@ export class FilterChangesList extends React.Component<
 
     event.preventDefault()
 
-    const items =
-      this.props.rebaseConflictState === null
-        ? this.getDefaultContextMenu(file)
-        : this.getRebaseContextMenu(file)
+    const items = this.getFileContextMenu(file)
 
     showContextualMenu(items)
   }
@@ -879,26 +590,7 @@ export class FilterChangesList extends React.Component<
     files: ReadonlyArray<WorkingDirectoryFileChange>,
     prepopulateCommitSummary: boolean
   ) {
-    if (!prepopulateCommitSummary) {
-      return 'Summary (required)'
-    }
-
-    const firstFile = files[0]
-    const fileName = basename(firstFile.path)
-
-    switch (firstFile.status.kind) {
-      case AppFileStatusKind.New:
-      case AppFileStatusKind.Untracked:
-        return `Create ${fileName}`
-      case AppFileStatusKind.Deleted:
-        return `Delete ${fileName}`
-      default:
-        // TODO:
-        // this doesn't feel like a great message for AppFileStatus.Copied or
-        // AppFileStatus.Renamed but without more insight (and whether this
-        // affects other parts of the flow) we can just default to this for now
-        return `Update ${fileName}`
-    }
+    return defaultCommitSummary(files, prepopulateCommitSummary)
   }
 
   private onScroll = (scrollTop: number, _clientHeight: number) => {
@@ -1308,21 +1000,7 @@ export class FilterChangesList extends React.Component<
   }
 
   private showFilesToBeCommitted = () => {
-    this.props.dispatcher.incrementMetric(
-      'adjustedFiltersForHiddenChangesCount'
-    )
-    // Clear all filters first to ensure all files are visible
-    this.clearFilter()
-    this.props.dispatcher.setFilterExcludedFiles(this.props.repository, false)
-    this.props.dispatcher.setFilterNewFiles(this.props.repository, false)
-    this.props.dispatcher.setFilterModifiedFiles(this.props.repository, false)
-    this.props.dispatcher.setFilterDeletedFiles(this.props.repository, false)
-
-    // Then apply only the "Included in commit" filter to show only files being committed
-    this.props.dispatcher.setIncludedChangesInCommitFilter(
-      this.props.repository,
-      true
-    )
+    showFilesToBeCommitted(this.props.dispatcher, this.props.repository)
   }
 
   private onTextBoxRef = (component: TextBox | null) => {

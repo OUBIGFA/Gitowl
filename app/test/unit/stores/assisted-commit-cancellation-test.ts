@@ -13,7 +13,10 @@ import {
 import assert from 'node:assert'
 import { DiffSelectionType, DiffType } from '../../../src/models/diff'
 import { PopupType } from '../../../src/models/popup'
-import { withRepositoryGitOperation } from '../../../src/lib/git/repository-operation'
+import {
+  isRepositoryGitPaused,
+  withRepositoryGitOperation,
+} from '../../../src/lib/git/repository-operation'
 import { writeFileSync } from 'fs'
 import { getWorkingDirectoryDiff } from '../../../src/lib/git/diff'
 
@@ -114,40 +117,57 @@ describe('AppStore assisted commit cancellation', () => {
     })
   }
 
-  it('cancels reader draining without waiting behind its own acquired lease', async t => {
-    const source = await seed(t, { file: 'before\n' })
-    await writeFile(join(source.path, 'file'), 'selected\n')
-    const h = await createAssistedCommitRunHarness(t)
-    const repository = await h.register(source)
-    const entered = deferred<void>()
-    const finish = deferred<void>()
-    const reader = withRepositoryGitOperation(
-      repository.path,
-      'read',
-      async () => {
-        entered.resolve()
-        await finish.promise
+  it(
+    'cancels reader draining without waiting behind its own acquired lease',
+    { timeout: 60000 },
+    async t => {
+      const source = await seed(t, { file: 'before\n' })
+      await writeFile(join(source.path, 'file'), 'selected\n')
+      const h = await createAssistedCommitRunHarness(t)
+      const repository = await h.register(source)
+      const entered = deferred<void>()
+      const finish = deferred<void>()
+      const reader = withRepositoryGitOperation(
+        repository.path,
+        'read',
+        async () => {
+          entered.resolve()
+          await finish.promise
+        }
+      )
+      await entered.promise
+      const operation = h.dispatcher.createCopilotAssistedCommits(
+        repository,
+        h.request(repository)
+      )
+      try {
+        // The lease is installed before its acquisition waits for this reader.
+        // A fixed delay can cancel preparation without reaching that boundary.
+        const deadline = Date.now() + 30000
+        while (!isRepositoryGitPaused(repository.path)) {
+          assert.ok(
+            Date.now() < deadline,
+            'lease did not begin reader draining'
+          )
+          await new Promise(resolve => setTimeout(resolve, 10))
+        }
+        h.cancel(repository)
+        finish.resolve()
+        await reader
+        // Cancellation still certifies real Git inputs. Await that contract;
+        // the test timeout guards deadlock without imposing an I/O speed race.
+        assert.strictEqual((await operation).kind, 'cancelled')
+        assert.strictEqual(h.state(repository).isCommitting, false)
+        assert.strictEqual(h.propose.mock.callCount(), 0)
+        assert.strictEqual(isRepositoryGitPaused(repository.path), false)
+      } finally {
+        h.cancel(repository)
+        finish.resolve()
+        await reader
+        await operation
       }
-    )
-    await entered.promise
-    const operation = h.dispatcher.createCopilotAssistedCommits(
-      repository,
-      h.request(repository)
-    )
-    await new Promise(resolve => setTimeout(resolve, 100))
-    h.cancel(repository)
-    finish.resolve()
-    await reader
-    const outcome = await Promise.race([
-      operation.then(result => result.kind),
-      new Promise<string>(resolve =>
-        setTimeout(() => resolve('pending'), 2000)
-      ),
-    ])
-    assert.strictEqual(outcome, 'cancelled')
-    assert.strictEqual(h.state(repository).isCommitting, false)
-    assert.strictEqual(h.propose.mock.callCount(), 0)
-  })
+    }
+  )
 
   it('fences uncaptured cancellation after awaited HEAD verification, not only before it', async t => {
     const { h, repository, current } = await partialSelectionFixture(t, 1)

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Ref } from './ref'
 import { LinkButton } from './link-button'
-import { unlink } from 'fs/promises'
+import { deleteGitAuthorConfigLock } from './git-author-configuration'
 
 interface IConfigLockFileExistsProps {
   /**
@@ -25,14 +25,10 @@ interface IConfigLockFileExistsProps {
 export class ConfigLockFileExists extends React.Component<IConfigLockFileExistsProps> {
   private onDeleteLockFile = async () => {
     try {
-      await unlink(this.props.lockFilePath)
-    } catch (e) {
-      // We don't care about failure to unlink due to the
-      // lock file not existing any more
-      if (e.code !== 'ENOENT') {
-        this.props.onError(e)
-        return
-      }
+      await deleteGitAuthorConfigLock(this.props.lockFilePath)
+    } catch (error) {
+      this.props.onError(error)
+      return
     }
 
     this.props.onLockFileDeleted()

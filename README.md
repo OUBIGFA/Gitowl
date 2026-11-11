@@ -1,13 +1,14 @@
 # Gitowl
 
-Gitowl is a public derivative of [GitHub Desktop](https://github.com/desktop/desktop), built as the foundation for a MyGo based desktop client. The repository starts from the upstream `development` baseline and keeps the upstream application, test suite, build entry points, and feature entry points available for comparison while the UI migration proceeds.
+Gitowl is a public derivative of [GitHub Desktop](https://github.com/desktop/desktop). The migration replaces the frontend with MyGo native UI while directly reusing the original Desktop application kernel, stores, dispatcher, credential lifecycle, Git operations, platform integrations, and recovery workflows. Feature and behavior parity is mandatory; a smaller independently coordinated Git backend is not the product.
 
 ## Current repository state
 
 - The default branch is `main`.
 - The upstream source revision is `a95e13a7429f4e7f9e45d7b38a68bc1a3eb972f7`.
-- The MyGo UI migration is planned and must be verified feature by feature.
-- Same-source fork findings and implementation tradeoffs are recorded in [the source evaluation](third_party/fork-evaluation.md). The [feature declaration inventory](references/upstream-features.json) tracks 311 menu, popup, banner, foldout, preferences, repository-tab, IPC, deep-link, and recovery declarations; it does not certify runtime feature parity.
+- The MyGo launcher now connects only to the original Desktop Electron kernel. Both frontends use the shared [Desktop runtime assembly](app/src/ui/app-runtime.ts), and [presentation commands](app/src/native-kernel/desktop-presenter.ts) forward to its original Dispatcher. The native pipe and a bounded popup/recovery adapter are implemented and exercised against real Git; the full native frontend and all interaction contracts remain incomplete.
+- The fixed Windows installer is not accepted or delivered yet. `npm run build:native` must not be used to label the existing subset prototype as a full replacement; see [the build and acceptance boundaries](references/native-installer.md).
+- Same-source fork findings and implementation tradeoffs are recorded in [the source evaluation](third_party/fork-evaluation.md). The [feature declaration inventory](references/upstream-features.json) tracks 315 menu, popup, banner, foldout, preferences, repository-tab, IPC, deep-link, and recovery declarations; it does not certify runtime feature parity.
 - A passing repository hygiene check does not mean that the desktop application has passed a build or runtime acceptance test.
 
 ## Development

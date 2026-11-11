@@ -1,4 +1,9 @@
 import * as React from 'react'
+import { PopupType } from '../../models/popup'
+import {
+  stashAndRetryOperation,
+  dismissLocalChangesOperation,
+} from '../../native-kernel/operation-dialogs'
 import {
   Dialog,
   DialogContent,
@@ -11,7 +16,6 @@ import { RetryAction, RetryActionType } from '../../models/retry-actions'
 import { Dispatcher } from '../dispatcher'
 import { PathText } from '../lib/path-text'
 import { assertNever } from '../../lib/fatal-error'
-import { PopupType } from '../../models/popup'
 
 interface ILocalChangesOverwrittenDialogProps {
   readonly repository: Repository
@@ -152,16 +156,17 @@ export class LocalChangesOverwrittenDialog extends React.Component<
     // We know that there's no stash for the current branch so we can safely
     // tell createStashForCurrentBranch not to show a confirmation dialog which
     // would disrupt the async flow (since you can't await a dialog).
-    const createdStash = await dispatcher.createStashForCurrentBranch(
-      repository,
-      false
+    await stashAndRetryOperation(
+      dispatcher,
+      {
+        type: PopupType.LocalChangesOverwritten,
+        repository,
+        retryAction,
+        files: this.props.files,
+      },
+      false,
+      this.props.onDismissed
     )
-
-    this.props.onDismissed()
-
-    if (createdStash) {
-      await dispatcher.performRetry(retryAction)
-    }
   }
 
   /**
@@ -169,13 +174,16 @@ export class LocalChangesOverwrittenDialog extends React.Component<
    */
   private onDismissPopup = async () => {
     const { dispatcher, retryAction, onDismissed } = this.props
-    // default dismiss handler , closes the popup via onPopupDismissedFn
-    onDismissed()
-
-    // Rebase flow is interrupted, user aborting due to unstashed changes, close outer multi commit operation popup
-    if (retryAction.type === RetryActionType.Rebase) {
-      dispatcher.closePopup(PopupType.MultiCommitOperation)
-    }
+    dismissLocalChangesOperation(
+      dispatcher,
+      {
+        type: PopupType.LocalChangesOverwritten,
+        repository: this.props.repository,
+        retryAction,
+        files: this.props.files,
+      },
+      onDismissed
+    )
   }
 
   /**

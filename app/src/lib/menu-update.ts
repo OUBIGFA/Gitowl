@@ -424,7 +424,8 @@ function getRepositoryMenuBuilder(state: IAppState): MenuStateBuilder {
   return menuStateBuilder
 }
 
-function getMenuState(state: IAppState): Map<MenuIDs, IMenuItemState> {
+/** Shared live policy for native projection/admission as well as IPC updates. */
+export function getMenuState(state: IAppState): Map<MenuIDs, IMenuItemState> {
   if (state.currentPopup) {
     return getAllMenusDisabledBuilder().state
   }

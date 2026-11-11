@@ -1,0 +1,48 @@
+diff --git a/gitowl_editing.go b/gitowl_editing.go
+new file mode 100644
+--- /dev/null
++++ b/gitowl_editing.go
+@@ -0,0 +1,10 @@
++package mygo
++
++// SelectAll invokes the standard editing role on this window's current focus.
++// An application whose Select All also selects non-text domain objects can
++// handle those first and delegate the text fallback here. It is the same
++// native content command as RoleSelectAll, not a synthetic key or a webview.
++// This finite adapter can be removed when upstream exposes role dispatch.
++func (w *Window) SelectAll() {
++	onMain(func() { performRole(RoleSelectAll, w) })
++}
+diff --git a/gitowl_editing_test.go b/gitowl_editing_test.go
+new file mode 100644
+--- /dev/null
++++ b/gitowl_editing_test.go
+@@ -0,0 +1,28 @@
++//go:build !js
++
++package mygo
++
++import (
++	"testing"
++
++	"github.com/egoist/mygo/internal/platform"
++	"github.com/egoist/mygo/ui"
++)
++
++func TestGitowlSelectAllUsesNativeEditingRole(t *testing.T) {
++	value := "Original native text"
++	w, fw, s := contentWindow(t, func(c *ui.Context) {
++		ui.TextInput(c, &value).AutoFocus().Width(240)
++	})
++	onMain(func() {
++		w.SelectAll()
++		s.Send(platform.SurfaceEvent{Kind: platform.TextInput, Text: "replacement"})
++		s.Frame()
++	})
++	if value != "replacement" {
++		t.Fatalf("Select All did not edit native focus: %q", value)
++	}
++	if len(fw.Scripts()) != 0 {
++		t.Fatal("native editing reached web content")
++	}
++}

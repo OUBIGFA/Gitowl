@@ -4,47 +4,8 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import * as Path from 'path'
 import { App } from './app'
-import { API } from '../lib/api'
-import { installAuthenticatedImageTokenHandler } from '../lib/authenticated-image-token-handler'
-import {
-  Dispatcher,
-  externalEditorErrorHandler,
-  openShellErrorHandler,
-  mergeConflictHandler,
-  lfsAttributeMismatchHandler,
-  defaultErrorHandler,
-  missingRepositoryHandler,
-  backgroundTaskHandler,
-  pushNeedsPullHandler,
-  upstreamAlreadyExistsHandler,
-  rebaseConflictsHandler,
-  localChangesOverwrittenHandler,
-  refusedWorkflowUpdate,
-  samlReauthRequired,
-  insufficientGitHubRepoPermissions,
-  discardChangesHandler,
-  secretScanningPushProtectionErrorHandler,
-} from './dispatcher'
-import {
-  AppStore,
-  GitHubUserStore,
-  CloningRepositoriesStore,
-  CopilotStore,
-  IssuesStore,
-  SignInStore,
-  RepositoriesStore,
-  TokenStore,
-  AccountsStore,
-  PullRequestStore,
-} from '../lib/stores'
-import { GitHubUserDatabase } from '../lib/databases'
+import { getAppRuntime } from './app-runtime'
 import { SelectionType, IAppState } from '../lib/app-state'
-import { StatsDatabase, StatsStore } from '../lib/stats'
-import {
-  IssuesDatabase,
-  RepositoriesDatabase,
-  PullRequestDatabase,
-} from '../lib/databases'
 import { shellNeedsPatching, updateEnvironmentForProcess } from '../lib/shell'
 import { installDevGlobals } from './install-globals'
 import { reportUncaughtException, sendErrorReport } from './main-process-proxy'
@@ -53,31 +14,17 @@ import {
   enableSourceMaps,
   withSourceMappedStack,
 } from '../lib/source-map-support'
-import { UiActivityMonitor } from './lib/ui-activity-monitor'
-import { RepositoryStateCache } from '../lib/stores/repository-state-cache'
-import { ApiRepositoriesStore } from '../lib/stores/api-repositories-store'
-import { CommitStatusStore } from '../lib/stores/commit-status-store'
-import { PullRequestCoordinator } from '../lib/stores/pull-request-coordinator'
 
 import { sendNonFatalException } from '../lib/helpers/non-fatal-exception'
 import { enableUnhandledRejectionReporting } from '../lib/feature-flag'
-import { AheadBehindStore } from '../lib/stores/ahead-behind-store'
 import {
   ApplicationTheme,
   supportsSystemThemeChanges,
 } from './lib/application-theme'
-import { trampolineUIHelper } from '../lib/trampoline/trampoline-ui-helper'
-import { AliveStore } from '../lib/stores/alive-store'
-import { NotificationsStore } from '../lib/stores/notifications-store'
 import * as ipcRenderer from '../lib/ipc-renderer'
 import { migrateRendererGUID } from '../lib/get-renderer-guid'
 import { initializeRendererNotificationHandler } from '../lib/notifications/notification-handler'
 import { Grid } from 'react-virtualized'
-import { NotificationsDebugStore } from '../lib/stores/notifications-debug-store'
-import { trampolineServer } from '../lib/trampoline/trampoline-server'
-import { TrampolineCommandIdentifier } from '../lib/trampoline/trampoline-command'
-import { createAskpassTrampolineHandler } from '../lib/trampoline/trampoline-askpass-handler'
-import { createCredentialHelperTrampolineHandler } from '../lib/trampoline/trampoline-credential-helper'
 
 if (__DEV__) {
   installDevGlobals()
@@ -247,123 +194,26 @@ window.addEventListener('unhandledrejection', ev => {
   }
 })
 
-const gitHubUserStore = new GitHubUserStore(
-  new GitHubUserDatabase('GitHubUserDatabase')
-)
-const cloningRepositoriesStore = new CloningRepositoriesStore()
-const issuesStore = new IssuesStore(new IssuesDatabase('IssuesDatabase'))
-const statsStore = new StatsStore(
-  new StatsDatabase('StatsDatabase'),
-  new UiActivityMonitor()
-)
-
-const accountsStore = new AccountsStore(localStorage, TokenStore)
-API.setTokenProvider(accountsStore.resolveToken)
-API.onTokenInvalidated(accountsStore.handleTokenInvalidated)
-installAuthenticatedImageTokenHandler(accountsStore.resolveToken)
-
-const signInStore = new SignInStore(accountsStore)
-
-trampolineServer.registerCommandHandler(
-  TrampolineCommandIdentifier.AskPass,
-  createAskpassTrampolineHandler(accountsStore)
-)
-
-const repositoriesStore = new RepositoriesStore(
-  new RepositoriesDatabase('Database')
-)
-
-trampolineServer.registerCommandHandler(
-  TrampolineCommandIdentifier.CredentialHelper,
-  createCredentialHelperTrampolineHandler(accountsStore, repositoriesStore)
-)
-
-const pullRequestStore = new PullRequestStore(
-  new PullRequestDatabase('PullRequestDatabase'),
-  repositoriesStore
-)
-
-const pullRequestCoordinator = new PullRequestCoordinator(
-  pullRequestStore,
-  repositoriesStore
-)
-
-const repositoryStateManager = new RepositoryStateCache(statsStore)
-
-const apiRepositoriesStore = new ApiRepositoriesStore(accountsStore)
-
-const commitStatusStore = new CommitStatusStore(accountsStore)
-const aheadBehindStore = new AheadBehindStore()
-
-const aliveStore = new AliveStore(accountsStore)
-
-const copilotStore = new CopilotStore(accountsStore)
-
-const notificationsStore = new NotificationsStore(
-  accountsStore,
-  aliveStore,
-  pullRequestCoordinator,
-  statsStore,
-  repositoriesStore
-)
-
-const notificationsDebugStore = new NotificationsDebugStore(
-  accountsStore,
-  notificationsStore,
-  pullRequestCoordinator
-)
-
-const appStore = new AppStore(
-  gitHubUserStore,
-  cloningRepositoriesStore,
-  issuesStore,
-  statsStore,
-  signInStore,
-  accountsStore,
-  repositoriesStore,
-  pullRequestCoordinator,
+const {
+  appStore,
+  dispatcher,
   repositoryStateManager,
-  apiRepositoriesStore,
+  issuesStore,
+  gitHubUserStore,
+  aheadBehindStore,
   notificationsStore,
-  copilotStore
-)
+  notificationsDebugStore,
+} = getAppRuntime()
 
 appStore.onDidUpdate(state => {
   currentState = state
 })
-
-const dispatcher = new Dispatcher(
-  appStore,
-  repositoryStateManager,
-  statsStore,
-  commitStatusStore
-)
-
-dispatcher.registerErrorHandler(defaultErrorHandler)
-dispatcher.registerErrorHandler(upstreamAlreadyExistsHandler)
-dispatcher.registerErrorHandler(externalEditorErrorHandler)
-dispatcher.registerErrorHandler(openShellErrorHandler)
-dispatcher.registerErrorHandler(mergeConflictHandler)
-dispatcher.registerErrorHandler(lfsAttributeMismatchHandler)
-dispatcher.registerErrorHandler(insufficientGitHubRepoPermissions)
-dispatcher.registerErrorHandler(pushNeedsPullHandler)
-dispatcher.registerErrorHandler(samlReauthRequired)
-dispatcher.registerErrorHandler(backgroundTaskHandler)
-dispatcher.registerErrorHandler(missingRepositoryHandler)
-dispatcher.registerErrorHandler(localChangesOverwrittenHandler)
-dispatcher.registerErrorHandler(rebaseConflictsHandler)
-dispatcher.registerErrorHandler(refusedWorkflowUpdate)
-dispatcher.registerErrorHandler(discardChangesHandler)
-dispatcher.registerErrorHandler(secretScanningPushProtectionErrorHandler)
 
 document.body.classList.add(`platform-${process.platform}`)
 
 dispatcher.initializeAppFocusState()
 
 initializeRendererNotificationHandler(notificationsStore)
-
-// The trampoline UI helper needs a reference to the dispatcher before it's used
-trampolineUIHelper.setDispatcher(dispatcher)
 
 ipcRenderer.on('focus', () => {
   const { selectedState } = appStore.getState()

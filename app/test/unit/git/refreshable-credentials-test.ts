@@ -1,3 +1,4 @@
+import { listenOnLoopback } from '../../helpers/http-server'
 import { describe, it, TestContext } from 'node:test'
 import assert from 'node:assert/strict'
 import { createServer, IncomingMessage, ServerResponse } from 'http'
@@ -125,7 +126,7 @@ async function serveRepositories(
     await onAuthenticatedRequest()
     await runReceivePack(root, req, res)
   })
-  await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
+  await listenOnLoopback(server)
   t.after(() => new Promise(resolve => server.close(resolve)))
   return (server.address() as AddressInfo).port
 }

@@ -674,7 +674,9 @@ export function emit(name: MenuEvent): ClickHandler {
         ? focusedWindow
         : BrowserWindow.getAllWindows()[0]
     if (window !== undefined) {
-      if (!window.isVisible()) {
+      // The MyGo owner is the only visible window in native mode. A menu
+      // event must not accidentally show the hidden original Electron host.
+      if (!window.isVisible() && process.env.GITOWL_NATIVE_CORE !== '1') {
         window.show()
       }
       ipcWebContents.send(window.webContents, 'menu-event', name)

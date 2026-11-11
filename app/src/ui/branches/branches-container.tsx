@@ -28,7 +28,7 @@ import {
   renderDefaultBranch,
 } from './branch-renderer'
 import { IMatches } from '../../lib/fuzzy-find'
-import { startTimer } from '../lib/timing'
+import { checkoutWorkspaceBranch } from './branch-controller'
 import { dragAndDropManager } from '../../lib/drag-and-drop-manager'
 import { DragType, DropTargetType } from '../../models/drag-drop'
 import {
@@ -433,10 +433,7 @@ export class BranchesContainer extends React.Component<
 
   private onBranchItemClick = (branch: Branch) => {
     const { repository, dispatcher } = this.props
-    dispatcher.closeFoldout(FoldoutType.Branch)
-
-    const timer = startTimer('checkout branch from list', repository)
-    dispatcher.checkoutBranch(repository, branch).then(() => timer.done())
+    checkoutWorkspaceBranch(dispatcher, repository, branch)
   }
 
   private onBranchSelectionChanged = (selectedBranch: Branch | null) => {

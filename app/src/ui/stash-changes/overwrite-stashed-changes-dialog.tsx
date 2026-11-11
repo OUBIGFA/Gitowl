@@ -1,11 +1,12 @@
 import * as React from 'react'
+import { overwriteStashOperation } from '../../native-kernel/operation-dialogs'
+import { PopupType } from '../../models/popup'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { Repository } from '../../models/repository'
 import { Branch } from '../../models/branch'
 import { Dispatcher } from '../dispatcher'
 import { Row } from '../lib/row'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { UncommittedChangesStrategy } from '../../models/uncommitted-changes-strategy'
 
 interface IOverwriteStashProps {
   readonly dispatcher: Dispatcher
@@ -63,12 +64,11 @@ export class OverwriteStash extends React.Component<
     this.setState({ isLoading: true })
 
     try {
-      if (branchToCheckout !== null) {
-        const strategy = UncommittedChangesStrategy.StashOnCurrentBranch
-        await dispatcher.checkoutBranch(repository, branchToCheckout, strategy)
-      } else {
-        await dispatcher.createStashForCurrentBranch(repository, false)
-      }
+      await overwriteStashOperation(dispatcher, {
+        type: PopupType.ConfirmOverwriteStash,
+        repository,
+        branchToCheckout,
+      })
     } finally {
       this.setState({ isLoading: false })
     }

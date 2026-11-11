@@ -3,7 +3,7 @@ import {
   getRepositoryAccountIdentity,
 } from '../../models/repository'
 import { Account, isSameAccount } from '../../models/account'
-import { IMenuItem } from '../../lib/menu-item'
+import { WorkspaceMenuItem as IMenuItem } from '../lib/workspace-menu'
 import { Repositoryish } from './group-repositories'
 import { writeClipboardText } from '../main-process-proxy'
 import {
@@ -53,36 +53,51 @@ export const generateRepositoryListContextMenu = (
     ...buildRepositorySettingsMenuItems(config),
     {
       label: __DARWIN__ ? 'Copy Repo Name' : 'Copy repo name',
+      labelKey: 'workspace.copyRepoName',
       action: () => writeClipboardText(repository.name),
     },
     {
       label: __DARWIN__ ? 'Copy Repo Path' : 'Copy repo path',
+      labelKey: 'workspace.copyRepoPath',
       action: () => writeClipboardText(repository.path),
     },
     { type: 'separator' },
     {
       label: 'View on GitHub',
+      labelKey: 'workspace.viewRepository',
       action: () => config.onViewOnGitHub(repository),
       enabled: github,
     },
     {
       label: openInShell,
+      labelKey: config.shellLabel
+        ? 'workspace.openNamed'
+        : 'workspace.openShell',
+      labelData: config.shellLabel ? [config.shellLabel] : [],
       action: () => config.onOpenInShell(repository),
       enabled: !missing,
     },
     {
       label: RevealInFileManagerLabel,
+      labelKey: 'workspace.reveal',
       action: () => config.onShowRepository(repository),
       enabled: !missing,
     },
     {
       label: openInExternalEditor,
+      labelKey: config.externalEditorLabel
+        ? 'workspace.openNamed'
+        : 'workspace.openEditor',
+      labelData: config.externalEditorLabel ? [config.externalEditorLabel] : [],
       action: () => config.onOpenInExternalEditor(repository),
       enabled: !missing,
     },
     { type: 'separator' },
     {
       label: config.askForConfirmationOnRemoveRepository ? 'Remove…' : 'Remove',
+      labelKey: config.askForConfirmationOnRemoveRepository
+        ? 'workspace.removeRepositoryConfirm'
+        : 'workspace.removeRepository',
       action: () => config.onRemoveRepository(repository),
     },
   ]
@@ -103,6 +118,10 @@ const buildAliasMenuItems = (
   const items: Array<IMenuItem> = [
     {
       label: __DARWIN__ ? `${verb} Alias` : `${verb} alias`,
+      labelKey:
+        repository.alias == null
+          ? 'workspace.createAlias'
+          : 'workspace.changeAlias',
       action: () => config.onChangeRepositoryAlias(repository),
     },
   ]
@@ -110,6 +129,7 @@ const buildAliasMenuItems = (
   if (repository.alias !== null) {
     items.push({
       label: __DARWIN__ ? 'Remove Alias' : 'Remove alias',
+      labelKey: 'workspace.removeAlias',
       action: () => config.onRemoveRepositoryAlias(repository),
     })
   }
@@ -135,6 +155,7 @@ const buildWorktreeMenuItems = (
   if (onShowWorktrees !== undefined) {
     items.push({
       label: __DARWIN__ ? 'Show Worktrees' : 'Show worktrees',
+      labelKey: 'workspace.showWorktrees',
       action: () => onShowWorktrees(repository),
     })
   }
@@ -142,6 +163,7 @@ const buildWorktreeMenuItems = (
   if (onCreateWorktree !== undefined) {
     items.push({
       label: __DARWIN__ ? 'New Worktree…' : 'New worktree…',
+      labelKey: 'workspace.newWorktree',
       action: () => onCreateWorktree(repository),
     })
   }
@@ -187,6 +209,8 @@ const buildAccountMenuItems = (
   if (signedOut) {
     submenu.push({
       label: `@${assigned.login} (Signed out)`,
+      labelKey: 'workspace.signedOutAccount',
+      labelData: [assigned.login],
       type: 'checkbox',
       checked: true,
       enabled: false,
@@ -197,6 +221,8 @@ const buildAccountMenuItems = (
     const checked = isSameAccount(account, assigned)
     submenu.push({
       label: `@${account.login}`,
+      labelKey: 'workspace.accountLogin',
+      labelData: [account.login],
       type: 'checkbox',
       checked,
       action: checked
@@ -205,7 +231,9 @@ const buildAccountMenuItems = (
     })
   }
 
-  return [{ label: 'Account', submenu }]
+  return [
+    { label: 'Account', labelKey: 'workspace.repositoryAccount', submenu },
+  ]
 }
 
 const buildRepositorySettingsMenuItems = (
@@ -220,6 +248,7 @@ const buildRepositorySettingsMenuItems = (
   return [
     {
       label: __DARWIN__ ? 'Repository Settings…' : 'Repository settings…',
+      labelKey: 'workspace.repositorySettings',
       action: () => config.onShowRepositorySettings(repository),
     },
   ]

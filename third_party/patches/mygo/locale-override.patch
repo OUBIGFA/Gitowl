@@ -1,0 +1,46 @@
+diff --git a/gitowl_locale.go b/gitowl_locale.go
+new file mode 100644
+--- /dev/null
++++ b/gitowl_locale.go
+@@ -0,0 +1,13 @@
++package mygo
++
++// LocaleOverride returns the normalized language chosen by SetLocale, a saved
++// preference or MYGO_LOCALE. An empty string means follow the user's system
++// languages. Unlike Locale it does not resolve that choice to a displayed tag.
++func (a *Application) LocaleOverride() string {
++	// Initialize through the existing locale authority, including its main
++	// thread loading rules, rather than reading the persistence file again.
++	a.shownLocale()
++	locales.mu.Lock()
++	defer locales.mu.Unlock()
++	return locales.override
++}
+diff --git a/gitowl_locale_test.go b/gitowl_locale_test.go
+new file mode 100644
+--- /dev/null
++++ b/gitowl_locale_test.go
+@@ -0,0 +1,23 @@
++//go:build !js
++
++package mygo
++
++import "testing"
++
++// Equal displayed languages must not erase the distinction between a system
++// preference and an explicit choice in the application's language picker.
++func TestGitowlLocaleOverride(t *testing.T) {
++	localeTest(t, []string{"en", "zh-Hans"}, "zh-CN")
++	onMain(func() { App.SetLocale("") })
++	if got := App.LocaleOverride(); got != "" || App.Locale() != "zh-Hans" {
++		t.Fatalf("system: override=%q shown=%q", got, App.Locale())
++	}
++	onMain(func() { App.SetLocale("zh-Hans-CN") })
++	if got := App.LocaleOverride(); got != "zh-Hans-CN" || App.Locale() != "zh-Hans" {
++		t.Fatalf("explicit: override=%q shown=%q", got, App.Locale())
++	}
++	onMain(func() { App.SetLocale("") })
++	if got := App.LocaleOverride(); got != "" {
++		t.Fatalf("cleared: override=%q", got)
++	}
++}

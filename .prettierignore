@@ -1,5 +1,12 @@
 out/
 dist/
+.local/
+.impeccable/
+**/output/
+**/_temp/
+/docs/
+**/.agents/
+**/.claude/
 vendor/
 tslint-rules/*.js
 npm-debug.log

@@ -1,0 +1,82 @@
+{
+  "scope": "development-only design guidance and tools; not application runtime dependencies",
+  "impeccable": {
+    "source": "https://github.com/pbakaus/impeccable",
+    "revision": "c3bb418ee38ee49a6b999b7752c1368f3123a2bd",
+    "npmVersion": "4.8.0",
+    "engineVersion": "0.1.18",
+    "engineSha256": "8f61e96b0c97001546a824d79b44f46b423b560f3eb1a0cc44a8695a1b395d9f",
+    "license": "Apache-2.0",
+    "usedCommands": [
+      "context --target app/native/view.go",
+      "surface-brief read app/native/view.go",
+      "surface-brief write app/native/view.go <confirmed-brief>"
+    ],
+    "reviewMethod": "Native visual/source review using Operate, redesign and craft-floor guidance. The HTML/CSS detector is not applicable to MyGo; no empty scan is represented as a pass.",
+    "sourceFiles": [
+      {
+        "path": "skill/SKILL.src.md",
+        "blob": "8dc9d5d2433ae7bc7dce8bc6e3198afcf7463ebc",
+        "sha256": "1066082e8e88e75504330887f2885ba08d917789b75f073818dca287dc335adf"
+      },
+      {
+        "path": "skill/reference/init.md",
+        "blob": "9192d5112f8c801c6c88138c21f2be52889d4214",
+        "sha256": "6ad0d86d367d94bd9e6c331356d2c2632e6e6dda3194478b1b2d84a8f69514a8"
+      },
+      {
+        "path": "skill/reference/new-work.md",
+        "blob": "2cc134557cec31cdda1f8ac418d794480c229736",
+        "sha256": "362f55e9f3b202c9acce802dd31b909d67942076dd4e3b06ff1de298b04fdb9f"
+      },
+      {
+        "path": "skill/reference/mode-operate.md",
+        "blob": "833775ba85f03bf65a4c1b23e39192f7653414e6",
+        "sha256": "7a52dd7a94ee75f6ae89542c86a1b6e1d306812b16e0d9dbf12d4acad44d148b"
+      },
+      {
+        "path": "skill/reference/craft-floor.md",
+        "blob": "3331f4845d00756869e48edc0277ba8bc8e5826e",
+        "sha256": "086e731940b72db13d9693b575db377a7b102729a56da5c79a21461635695c87"
+      },
+      {
+        "path": "skill/reference/critique.md",
+        "blob": "03acd2f77a484abb736fd4f8230bc3bc78503565",
+        "sha256": "f2ece6380e378ab644d0508adf10e213eb2d6e241e3d7339727fb8e61cd2d39b"
+      },
+      {
+        "path": "skill/reference/audit.native.md",
+        "sha256": "152f2523b4961f84ebd0cc7ea6fbf4e4300e9e1d26e82bd2bb5b6eb2d95bd9d8"
+      },
+      {
+        "path": "skill/agents/impeccable-finish-reviewer.md",
+        "blob": "41dfe375a4d465006c1a97915790edadb7b5b674",
+        "sha256": "13a381109a55165f05152aac59e4be10eb447e71ac03f9ea858579daace9e7e2"
+      }
+    ]
+  },
+  "unslop": {
+    "source": "https://github.com/heydamir/unslop",
+    "revision": "a6f121eee5f29c2f74976b75456feae8b66afb3a",
+    "author": "Damir Sokolovsky (@heydamir)",
+    "license": "CC-BY-4.0",
+    "use": "Signs/tokens and nine-pass visual review; no snapshot/story scripts executed and no HTML copied into the native product.",
+    "sourceFiles": [
+      {
+        "path": "skills/unslop/SKILL.md",
+        "blob": "9a1c49e2e5062082024ee5f2a65fbdc554b05cd6",
+        "sha256": "9e49b2ff7643fa09729e8665890a18f6bfa58a82e6fcbba330da38136ccdc393"
+      },
+      {
+        "path": "skills/unslop/references/signs.md",
+        "blob": "e9bae0369394d56ed080ef8a7e3d15bd4ec70a7f",
+        "sha256": "6250d3c222c2aaa4ef4f31557d99d249e5be86d8720cd1157df14798caf1c8c4"
+      },
+      {
+        "path": "skills/unslop/references/tokens.md",
+        "blob": "431cdc3f68650819274b22b91df9764d8f0a64d6",
+        "sha256": "988b754612b3e2d42d87b1bbaca0b4a61f3e07a2b2eef782d3614e8fdb6db5b0"
+      }
+    ]
+  }
+}

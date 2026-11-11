@@ -7,7 +7,15 @@ import { Repository } from '../models/repository'
 import { Button } from './lib/button'
 import { Row } from './lib/row'
 import { LinkButton } from './lib/link-button'
-import { addSafeDirectory, getRepositoryType } from '../lib/git'
+import {
+  inspectMissingRepository,
+  trustMissingRepository,
+  missingRepositoryCloneURL,
+  checkMissingRepository,
+  removeMissingRepository,
+  locateMissingRepository,
+  cloneMissingRepository,
+} from './missing-repository-controller'
 import { Ref } from './lib/ref'
 import { Loading } from './lib/loading'
 
@@ -38,13 +46,11 @@ export class MissingRepository extends React.Component<
     const { repository } = this.props
 
     try {
-      if (unsafePath) {
-        await addSafeDirectory(unsafePath)
-        const type = await getRepositoryType(repository.path)
-        if (type.kind !== 'unsafe') {
-          this.checkAgain()
-        }
-      }
+      await trustMissingRepository(
+        this.props.dispatcher,
+        repository,
+        unsafePath
+      )
     } catch (error) {
       this.props.dispatcher.postError(error)
     } finally {
@@ -64,7 +70,7 @@ export class MissingRepository extends React.Component<
 
   private updateUnsafePathState = async () => {
     const { path } = this.props.repository
-    const type = await getRepositoryType(path)
+    const type = await inspectMissingRepository(this.props.repository)
     if (path === this.props.repository.path) {
       this.setState({
         isPathUnsafe: type.kind === 'unsafe',
@@ -153,40 +159,21 @@ export class MissingRepository extends React.Component<
   }
 
   private canCloneAgain() {
-    const gitHubRepository = this.props.repository.gitHubRepository
-    return gitHubRepository && gitHubRepository.cloneURL
+    return missingRepositoryCloneURL(this.props.repository)
   }
 
   private checkAgain = () => {
-    this.props.dispatcher.refreshRepository(this.props.repository)
+    checkMissingRepository(this.props.dispatcher, this.props.repository)
   }
 
   private remove = () => {
-    this.props.dispatcher.removeRepository(this.props.repository, false)
+    removeMissingRepository(this.props.dispatcher, this.props.repository)
   }
 
   private locate = () => {
-    this.props.dispatcher.relocateRepository(this.props.repository)
+    locateMissingRepository(this.props.dispatcher, this.props.repository)
   }
 
-  private cloneAgain = async () => {
-    const gitHubRepository = this.props.repository.gitHubRepository
-    if (!gitHubRepository) {
-      return
-    }
-
-    const cloneURL = gitHubRepository.cloneURL
-    if (!cloneURL) {
-      return
-    }
-
-    try {
-      await this.props.dispatcher.cloneAgain(
-        cloneURL,
-        this.props.repository.path
-      )
-    } catch (error) {
-      this.props.dispatcher.postError(error)
-    }
-  }
+  private cloneAgain = () =>
+    cloneMissingRepository(this.props.dispatcher, this.props.repository)
 }

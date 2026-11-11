@@ -20,6 +20,11 @@ describe('IPC channel contract', () => {
     : never
 
   const expectedRequestChannels = [
+    'native-kernel-request',
+    'native-kernel-response',
+    'native-kernel-state',
+    'native-kernel-presentation-action',
+    'native-kernel-failure',
     'select-all-window-contents',
     'dialog-did-open',
     'update-menu-state',

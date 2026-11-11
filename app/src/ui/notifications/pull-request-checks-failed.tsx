@@ -7,13 +7,12 @@ import { Dispatcher } from '../dispatcher'
 import { CICheckRunList } from '../check-runs/ci-check-run-list'
 import {
   IRefCheck,
-  getLatestPRWorkflowRunsLogsForCheckRun,
-  getCheckRunActionsWorkflowRuns,
   isFailure,
   getCheckRunStepURL,
 } from '../../lib/ci-checks/ci-checks'
 import { Account } from '../../models/account'
-import { API, IAPIWorkflowJobStep } from '../../lib/api'
+import { IAPIWorkflowJobStep } from '../../lib/api'
+import { loadDialogCheckLogs } from '../lib/auxiliary-dialog-actions'
 import { getAccountForRepository } from '../../lib/get-account-for-repository'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
@@ -328,58 +327,17 @@ export class PullRequestChecksFailed extends React.Component<
 
   private async loadCheckRunLogs() {
     const { pullRequest, repository } = this.props
-    const gitHubRepository = getNonForkGitHubRepository(repository)
     const loadId = ++this.checkRunsLoadId
-    const originalChecks = this.props.checks.map(check => ({
-      ...check,
-      actionJobSteps: undefined,
-      actionsWorkflow: undefined,
-    }))
-    this.setState({ checks: originalChecks, loadingActionWorkflows: true })
-
-    const account = getAccountForRepository(this.props.accounts, repository)
-
-    if (account === null) {
-      this.setState({ loadingActionWorkflows: false })
-      return
-    }
-
-    const api = API.fromAccount(account)
-
-    /*
-      Until we retrieve the actions workflows, we don't know if a check run has
-      action logs to output, thus, we want to show loading until then. However,
-      once the workflows have been retrieved and since the logs retrieval and
-      parsing can be noticeably time consuming. We go ahead and flip a flag so
-      that we know we can go ahead and display the checkrun `output` content if
-      a check run does not have action logs to retrieve/parse.
-    */
-    const checkRunsWithActionsUrls = await getCheckRunActionsWorkflowRuns(
-      account,
-      gitHubRepository.owner.login,
-      gitHubRepository.name,
-      pullRequest.head.ref,
-      originalChecks
+    await loadDialogCheckLogs(
+      this.props.accounts,
+      repository,
+      pullRequest,
+      this.props.checks,
+      () => this.checkRunsLoadCancelled || loadId !== this.checkRunsLoadId,
+      (checks, loadingActionWorkflows) => {
+        this.setState({ checks, loadingActionWorkflows })
+      }
     )
-
-    if (this.checkRunsLoadCancelled || loadId !== this.checkRunsLoadId) {
-      return
-    }
-
-    this.setState({ checks: checkRunsWithActionsUrls })
-
-    const checks = await getLatestPRWorkflowRunsLogsForCheckRun(
-      api,
-      gitHubRepository.owner.login,
-      gitHubRepository.name,
-      checkRunsWithActionsUrls
-    )
-
-    if (this.checkRunsLoadCancelled || loadId !== this.checkRunsLoadId) {
-      return
-    }
-
-    this.setState({ checks, loadingActionWorkflows: false })
   }
 
   private onCheckRunClick = (checkRun: IRefCheck): void => {

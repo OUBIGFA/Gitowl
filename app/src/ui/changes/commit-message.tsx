@@ -1,4 +1,9 @@
+import {
+  copilotAssistedCommitAvailable,
+  hasCommitRuleFailure,
+} from './commit-policy'
 import * as React from 'react'
+import { commitDialogContext } from '../../native-kernel/operation-dialogs'
 import classNames from 'classnames'
 import {
   AutocompletingTextArea,
@@ -74,7 +79,6 @@ import { isDotCom } from '../../lib/endpoint-capabilities'
 import { WorkingDirectoryFileChange } from '../../models/status'
 import {
   enableCommitMessageGeneration,
-  enableCopilotAssistedCommit,
   enableCopilotSdkCommitMessageGeneration,
   enableHooksEnvironment,
 } from '../../lib/feature-flag'
@@ -331,22 +335,14 @@ interface ICommitMessageState {
 }
 
 function isCopilotAssistedCommitAvailable(props: ICommitMessageProps) {
-  const account = getAccountForCommitMessageGeneration(
-    props.accounts,
-    props.repository
-  )
-
-  return (
-    enableCopilotAssistedCommit() &&
-    props.onCreateCopilotAssistedCommits !== undefined &&
-    props.onCommitModeChanged !== undefined &&
-    props.commitMode !== undefined &&
-    props.commitToAmend === null &&
-    !props.repository.isTutorialRepository &&
-    account !== undefined &&
-    account.token.length > 0 &&
-    enableCopilotSdkCommitMessageGeneration(account)
-  )
+  return copilotAssistedCommitAvailable({
+    repository: props.repository,
+    accounts: props.accounts,
+    amending: props.commitToAmend !== null,
+    hasCreateAction: props.onCreateCopilotAssistedCommits !== undefined,
+    hasModeAction: props.onCommitModeChanged !== undefined,
+    hasMode: props.commitMode !== undefined,
+  })
 }
 
 function findCommitMessageAutoCompleteProvider(
@@ -909,8 +905,6 @@ export class CommitMessage extends React.Component<
   }
 
   private async createCommit(options?: ICreateCommitOptions) {
-    const { description } = this.state.commitMessage
-
     if (!this.isManualCommitButtonEnabled()) {
       return
     }
@@ -931,16 +925,12 @@ export class CommitMessage extends React.Component<
       }
     }
 
-    const trailers = this.getCoAuthorTrailers()
-
-    const commitContext: ICommitContext = {
-      summary: this.summaryOrPlaceholder,
-      description,
-      trailers,
-      amend: this.props.commitToAmend !== null,
-      messageGeneratedByCopilot:
-        this.state.commitMessage.generatedByCopilot ?? false,
-    }
+    const commitContext = commitDialogContext(
+      { ...this.state.commitMessage, summary: this.summaryOrPlaceholder },
+      this.props.coAuthors,
+      this.isCoAuthorInputEnabled,
+      this.props.commitToAmend !== null
+    )
 
     if (
       options?.warnFilesNotVisible !== false &&
@@ -989,22 +979,16 @@ export class CommitMessage extends React.Component<
    * Whether the user will be prevented from pushing this commit due to a repo rule failure.
    */
   private hasRepoRuleFailure(checkCommitMessage: boolean = true): boolean {
-    const { aheadBehind, repoRulesInfo } = this.props
-
-    if (!this.state.repoRulesEnabled) {
-      return false
-    }
-
-    return (
-      repoRulesInfo.basicCommitWarning === true ||
-      repoRulesInfo.signedCommitsRequired === true ||
-      repoRulesInfo.pullRequestRequired === true ||
-      (checkCommitMessage &&
-        this.state.repoRuleCommitMessageFailures.status === 'fail') ||
-      this.state.repoRuleCommitAuthorFailures.status === 'fail' ||
-      (aheadBehind === null &&
-        (repoRulesInfo.creationRestricted === true ||
-          this.state.repoRuleBranchNameFailures.status === 'fail'))
+    return hasCommitRuleFailure(
+      {
+        enabled: this.state.repoRulesEnabled,
+        info: this.props.repoRulesInfo,
+        message: this.state.repoRuleCommitMessageFailures.status,
+        author: this.state.repoRuleCommitAuthorFailures.status,
+        branch: this.state.repoRuleBranchNameFailures.status,
+        aheadBehind: this.props.aheadBehind,
+      },
+      checkCommitMessage
     )
   }
 

@@ -1,3 +1,4 @@
+import { listenOnLoopback } from '../helpers/http-server'
 import assert from 'node:assert/strict'
 import { it, TestContext } from 'node:test'
 import { createServer } from 'http'
@@ -111,7 +112,7 @@ it('passes a fractional Desktop token lifetime through native runtime validation
     response.writeHead(401, { 'Content-Type': 'application/json' })
     response.end(JSON.stringify({ message: 'Test credentials rejected' }))
   })
-  await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
+  await listenOnLoopback(server)
   t.after(() => new Promise<void>(resolve => server.close(() => resolve())))
   const address = server.address()
   assert.ok(address !== null && typeof address !== 'string')

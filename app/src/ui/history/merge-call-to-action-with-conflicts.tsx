@@ -16,6 +16,10 @@ import {
   MultiCommitOperationKind,
   isIdMultiCommitOperation,
 } from '../../models/multi-commit-operation'
+import {
+  compareOperationDisabled,
+  dispatchCompareOperation,
+} from './compare-operation-controller'
 import { RebasePreview } from '../../models/rebase'
 
 interface IMergeCallToActionWithConflictsProps {
@@ -75,20 +79,11 @@ export class MergeCallToActionWithConflicts extends React.Component<
   }
 
   private isUpdateBranchDisabled(): boolean {
-    if (this.commitCount <= 0) {
-      return true
-    }
-
-    const { selectedOperation, rebasePreview } = this.state
-    if (selectedOperation === MultiCommitOperationKind.Rebase) {
-      return (
-        rebasePreview === null || rebasePreview.kind !== ComputedAction.Clean
-      )
-    }
-
-    return (
-      this.props.mergeStatus != null &&
-      this.props.mergeStatus.kind === ComputedAction.Invalid
+    return compareOperationDisabled(
+      this.state.selectedOperation,
+      this.state.rebasePreview,
+      this.props.mergeStatus,
+      this.props.commitsBehind
     )
   }
 
@@ -144,39 +139,14 @@ export class MergeCallToActionWithConflicts extends React.Component<
       mergeStatus,
     } = this.props
 
-    if (operation === MultiCommitOperationKind.Rebase) {
-      const commits =
-        this.state.rebasePreview !== null &&
-        this.state.rebasePreview.kind === ComputedAction.Clean
-          ? this.state.rebasePreview.commitsAhead
-          : []
-      return dispatcher.startRebase(
-        repository,
-        comparisonBranch,
-        currentBranch,
-        commits
-      )
-    }
-
-    const isSquash = operation === MultiCommitOperationKind.Squash
-    dispatcher.initializeMultiCommitOperation(
+    return dispatchCompareOperation(
+      dispatcher,
       repository,
-      {
-        kind: MultiCommitOperationKind.Merge,
-        isSquash,
-        sourceBranch: comparisonBranch,
-      },
+      operation,
       currentBranch,
-      [],
-      currentBranch.tip.sha
-    )
-    dispatcher.incrementMetric('mergesInitiatedFromComparison')
-
-    return dispatcher.mergeBranch(
-      repository,
       comparisonBranch,
       mergeStatus,
-      isSquash
+      this.state.rebasePreview
     )
   }
 

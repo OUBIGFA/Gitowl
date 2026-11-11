@@ -29,6 +29,14 @@ async function findTestFilesIn(paths) {
 
 const fileArgs = process.argv.slice(2).filter(a => !a.startsWith('--'))
 const switchArgs = process.argv.slice(2).filter(a => a.startsWith('--'))
+// Real Git/SDK tests launch their own subprocesses. Bound file concurrency so
+// a full run does not exhaust per-test deadlines through process contention.
+if (!switchArgs.some(a => a.startsWith('--test-concurrency'))) {
+  switchArgs.push('--test-concurrency=4')
+}
+if (!switchArgs.some(a => a.startsWith('--test-timeout'))) {
+  switchArgs.push('--test-timeout=600000')
+}
 
 const projectRoot = join(import.meta.dirname, '..')
 const files =

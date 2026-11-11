@@ -6,16 +6,11 @@ import {
   DefaultDialogFooter,
 } from '../dialog'
 import { Dispatcher } from '../dispatcher'
-import {
-  RepositoryWithGitHubRepository,
-  isRepositoryWithForkedGitHubRepository,
-} from '../../models/repository'
+import { RepositoryWithGitHubRepository } from '../../models/repository'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { sendNonFatalException } from '../../lib/helpers/non-fatal-exception'
 import { Account } from '../../models/account'
-import { API } from '../../lib/api'
+import { createRepositoryFork } from '../lib/repository-fork'
 import { LinkButton } from '../lib/link-button'
-import { PopupType } from '../../models/popup'
 
 interface ICreateForkDialogProps {
   readonly dispatcher: Dispatcher
@@ -45,33 +40,16 @@ export class CreateForkDialog extends React.Component<
    */
   private onSubmit = async () => {
     this.setState({ loading: true })
-    const { gitHubRepository } = this.props.repository
-    const api = API.fromAccount(this.props.account)
-    try {
-      const fork = await api.forkRepository(
-        gitHubRepository.owner.login,
-        gitHubRepository.name
-      )
-      this.props.dispatcher.incrementMetric('forksCreated')
-      const updatedRepository =
-        await this.props.dispatcher.convertRepositoryToFork(
-          this.props.repository,
-          fork
-        )
-      this.setState({ loading: false })
-      this.props.onDismissed()
-
-      if (isRepositoryWithForkedGitHubRepository(updatedRepository)) {
-        this.props.dispatcher.showPopup({
-          type: PopupType.ChooseForkSettings,
-          repository: updatedRepository,
-        })
-      }
-    } catch (e) {
-      log.error(`Fork creation through API failed (${e})`)
-      sendNonFatalException('forkCreation', e)
-      this.setState({ error: e, loading: false })
-    }
+    await createRepositoryFork(
+      this.props.dispatcher,
+      this.props.repository,
+      this.props.account,
+      () => {
+        this.setState({ loading: false })
+        this.props.onDismissed()
+      },
+      error => this.setState({ error, loading: false })
+    )
   }
 
   public render() {

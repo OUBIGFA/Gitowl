@@ -20,6 +20,8 @@ interface IBaseMenuItem {
   readonly enabled: boolean
   readonly visible: boolean
   readonly label: string
+  /** Built-in behavior is presentation metadata; callbacks never cross IPC. */
+  readonly role?: string
 }
 
 /**
@@ -196,6 +198,7 @@ function menuItemFromElectronMenuItem(menuItem: Electron.MenuItem): MenuItem {
   const enabled = menuItem.enabled
   const visible = menuItem.visible
   const label = menuItem.label
+  const role = menuItem.role || undefined
   const checked = menuItem.checked
   const accelerator = getAccelerator(menuItem)
   const accessKey = getAccessKey(menuItem.label)
@@ -209,6 +212,7 @@ function menuItemFromElectronMenuItem(menuItem: Electron.MenuItem): MenuItem {
         id,
         type: 'menuItem',
         label,
+        role,
         enabled,
         visible,
         accelerator,
@@ -222,6 +226,7 @@ function menuItemFromElectronMenuItem(menuItem: Electron.MenuItem): MenuItem {
         id,
         type: 'submenuItem',
         label,
+        role,
         enabled,
         visible,
         menu,
@@ -232,6 +237,7 @@ function menuItemFromElectronMenuItem(menuItem: Electron.MenuItem): MenuItem {
         id,
         type: 'checkbox',
         label,
+        role,
         enabled,
         visible,
         accelerator,
@@ -243,6 +249,7 @@ function menuItemFromElectronMenuItem(menuItem: Electron.MenuItem): MenuItem {
         id,
         type: 'radio',
         label,
+        role,
         enabled,
         visible,
         accelerator,

@@ -1,10 +1,15 @@
 import * as React from 'react'
+import {
+  endOperationFlow,
+  confirmAbortOperation,
+  returnToConflictsOperation,
+} from '../../native-kernel/operation-dialogs'
 import { assertNever } from '../../lib/fatal-error'
 import { sendNonFatalException } from '../../lib/helpers/non-fatal-exception'
 import { Repository } from '../../models/repository'
 import { WorkingDirectoryStatus } from '../../models/status'
 import { Dispatcher } from '../dispatcher'
-import { getResolvedFiles, getConflictedFiles } from '../../lib/status'
+import { getConflictedFiles } from '../../lib/status'
 import { ConflictState, IMultiCommitOperationState } from '../../lib/app-state'
 import { Branch } from '../../models/branch'
 import { MultiCommitOperationStepKind } from '../../models/multi-commit-operation'
@@ -97,8 +102,7 @@ export abstract class BaseMultiCommitOperation extends React.Component<IMultiCom
   }
 
   protected onFlowEnded = () => {
-    this.props.dispatcher.closePopup(PopupType.MultiCommitOperation)
-    this.props.dispatcher.endMultiCommitOperation(this.props.repository)
+    endOperationFlow(this.props)
   }
 
   /**
@@ -170,8 +174,8 @@ export abstract class BaseMultiCommitOperation extends React.Component<IMultiCom
   }
 
   private onConfirmingAbort = async (): Promise<void> => {
-    const { repository, dispatcher, workingDirectory, state } = this.props
-    const { userHasResolvedConflicts, step } = state
+    const { state } = this.props
+    const { step } = state
 
     if (
       step.kind !== MultiCommitOperationStepKind.ShowConflicts &&
@@ -182,46 +186,17 @@ export abstract class BaseMultiCommitOperation extends React.Component<IMultiCom
       return
     }
 
-    const { conflictState } = step
-    const resolvedConflicts = getResolvedFiles(
-      workingDirectory,
-      conflictState.manualResolutions
-    )
-
-    if (userHasResolvedConflicts || resolvedConflicts.length > 0) {
-      dispatcher.setMultiCommitOperationStep(repository, {
-        kind: MultiCommitOperationStepKind.ConfirmAbort,
-        conflictState,
-        returnToStepKind: step.kind,
-      })
-      return
-    }
-
-    return this.onAbort()
+    return confirmAbortOperation(this.props, this.onAbort)
   }
 
   private moveToConflictState = () => {
-    const { dispatcher, repository, state } = this.props
+    const { state } = this.props
     const { step } = state
     if (step.kind !== MultiCommitOperationStepKind.ConfirmAbort) {
       this.endFlowInvalidState()
       return
     }
-
-    const { conflictState, returnToStepKind } = step
-    // Honor the step the user was on when they entered ConfirmAbort so
-    // that returning from "Abort" doesn't strand an in-flight Copilot
-    // resolution by routing them to ShowCopilotConflicts before the
-    // result has landed in state.
-    const stepKind =
-      returnToStepKind ??
-      (state.useCopilotConflictResolution
-        ? MultiCommitOperationStepKind.ShowCopilotConflicts
-        : MultiCommitOperationStepKind.ShowConflicts)
-    return dispatcher.setMultiCommitOperationStep(repository, {
-      kind: stepKind,
-      conflictState,
-    })
+    return returnToConflictsOperation(this.props)
   }
 
   private setConflictsHaveBeenResolved = () => {

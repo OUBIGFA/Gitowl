@@ -9,6 +9,7 @@ const config: webpack.Configuration = {
 }
 
 const mainConfig = merge({}, common.main, config)
+const nativeKernelConfig = merge({}, common.nativeKernel, config)
 const cliConfig = merge({}, common.cli, config)
 const highlighterConfig = merge({}, common.highlighter, config)
 
@@ -90,6 +91,7 @@ const crashConfig = merge({}, common.crash, config, {
 export default [
   mainConfig,
   rendererConfig,
+  nativeKernelConfig,
   crashConfig,
   cliConfig,
   highlighterConfig,

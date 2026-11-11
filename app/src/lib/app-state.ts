@@ -1,4 +1,9 @@
 import type {
+  ConfiguredProvider,
+  EnabledProviderModel,
+  ProviderModelSelection,
+} from './commit-generation/provider-types'
+import type {
   CopilotModelsByAccount,
   CopilotModelSelectionsByAccount,
   CopilotQuotaSnapshotsByAccount,
@@ -446,6 +451,14 @@ export interface IAppState {
    * the user has not configured any custom providers.
    */
   readonly byokProviders: ReadonlyArray<IBYOKProvider>
+  /** Explicit native increment; upstream account/Copilot stores remain authorities. No credentials. */
+  readonly commitGeneration?: {
+    readonly providers: ReadonlyArray<ConfiguredProvider>
+    readonly enabledModels: ReadonlyArray<EnabledProviderModel>
+    readonly selection: ProviderModelSelection | null
+    readonly source: 'copilot' | 'custom'
+    readonly language: string
+  }
 }
 
 export enum FoldoutType {

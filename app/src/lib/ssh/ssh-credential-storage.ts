@@ -1,4 +1,4 @@
-import { TokenStore } from '../stores'
+import { TokenStore } from '../stores/token-store'
 
 const appName = __DEV__ ? 'GitHub Desktop Dev' : 'GitHub Desktop'
 

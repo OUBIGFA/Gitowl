@@ -1,3 +1,5 @@
+import { GitConfigLocation } from './settings-controller'
+export { GitConfigLocation } from './settings-controller'
 import * as React from 'react'
 import { DialogContent } from '../dialog'
 import { Account } from '../../models/account'
@@ -20,11 +22,6 @@ interface IGitConfigProps {
   readonly onGitConfigLocationChanged: (value: GitConfigLocation) => void
   readonly onNameChanged: (name: string) => void
   readonly onEmailChanged: (email: string) => void
-}
-
-export enum GitConfigLocation {
-  Global = 'Global',
-  Local = 'Local',
 }
 
 /** A view for creating or modifying the repository's gitignore file */

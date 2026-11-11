@@ -1,0 +1,250 @@
+{
+  "schemaVersion": 2,
+  "electron": {
+    "package": "electron",
+    "version": "44.9.1",
+    "lockfile": "package-lock.json",
+    "lockKey": "node_modules/electron",
+    "source": "https://github.com/electron/electron/releases/download/v44.9.1/electron-v44.9.1-win32-x64.zip",
+    "integrity": "sha512-x/tECFFDa2OFNjMObFH0EGKWrCnFZPOR1wP2iMIVt0STecGl8FmDXdaiaryY0kf8mtw9kSLP2yK8dfdaWkfDmw==",
+    "role": "original Desktop kernel host",
+    "platform": "win32-x64",
+    "archiveSha256": "41bd7900bd42d0f49110a81617876137041fbbf473466920248ddb076349ef91",
+    "checksumsSource": "https://github.com/electron/electron/releases/download/v44.9.1/SHASUMS256.txt",
+    "checksumsSha256": "3abbb83b04f0765942d9a512b652fda89505087c60f38cf4d4b5ee2e6ec69b31",
+    "executableSha256": "1432afee01d6a788f11cb6649efd271923e1e490beef688c24d31f47965013aa",
+    "distTreeSha256": "fe4ca6a88ac109c4739d2eb3d9d16b2631efc0622ffc33c9ce0cd97b9dce11c7",
+    "distFileCount": 73,
+    "license": "MIT and Chromium bundled third-party notices",
+    "licenses": [
+      {
+        "path": "third_party/licenses/native/electron-LICENSE",
+        "runtimePath": "LICENSE",
+        "sha256": "5154e165bd6c2cc0cfbcd8916498c7abab0497923bafcd5cb07673fe8480087d"
+      },
+      {
+        "runtimePath": "LICENSES.chromium.html",
+        "sha256": "e6e6b1f9cb0f32235412be113de7716333e88121f9159a0ea0ff3be652021af7",
+        "parts": [
+          {
+            "path": "third_party/licenses/native/electron-Chromium-notices-1.html",
+            "sha256": "b5887c0d54cbf46a1e52d097f9e8b0a3a2f7d0cb682cd6fc8e2f14ec6952a499"
+          },
+          {
+            "path": "third_party/licenses/native/electron-Chromium-notices-2.html",
+            "sha256": "2cb8d26877c8feac67d7d510fbb5447a97484d42b06492249c157558c7fce32a"
+          },
+          {
+            "path": "third_party/licenses/native/electron-Chromium-notices-3.html",
+            "sha256": "373203f727b72b1c02fd3858214ea8b164559b8554a426a0461190f711a280e0"
+          }
+        ]
+      }
+    ]
+  },
+  "bundledInputs": [
+    {
+      "package": "dugite",
+      "version": "3.3.2",
+      "lockfile": "app/package-lock.json",
+      "lockKey": "node_modules/dugite",
+      "source": "https://registry.npmjs.org/dugite/-/dugite-3.3.2.tgz",
+      "integrity": "sha512-deO3178Y8uQ0y4Es5eD31PST78nyWskfqLDi+Za5UBHYvdlMMwuFirwShgCuX+8aT3B1BZ6xlr4Bb8j0eq4Bag==",
+      "path": "app/node_modules/dugite/git",
+      "treeSha256": "1dd63e8bd4da78575226d9b6451947a0f0db35163a6654baf11523d4550b904c",
+      "fileCount": 375
+    },
+    {
+      "package": "@github/copilot-sdk-win32-x64",
+      "version": "1.0.27-preview.1",
+      "lockfile": "app/package-lock.json",
+      "lockKey": "node_modules/@github/copilot-sdk-win32-x64",
+      "source": "https://registry.npmjs.org/@github/copilot-sdk-win32-x64/-/copilot-sdk-win32-x64-1.0.27-preview.1.tgz",
+      "integrity": "sha512-YaItpumZwGmq1kgVscVNmO0W401tSJ7JRC5hW8QIynDwgQzADuc9GnrOn8kNQdvPVM8jOfd+H30UUQ9ZE8/7xQ==",
+      "path": "app/node_modules/@github/copilot-sdk-win32-x64",
+      "treeSha256": "6095af2b8a4233aab175e90e5430ae703311ee0a4905a45ed2bfe06c11aca9cc",
+      "fileCount": 87
+    },
+    {
+      "package": "@koromix/koffi-win32-x64",
+      "version": "3.2.1",
+      "lockfile": "app/package-lock.json",
+      "lockKey": "node_modules/@koromix/koffi-win32-x64",
+      "source": "https://registry.npmjs.org/@koromix/koffi-win32-x64/-/koffi-win32-x64-3.2.1.tgz",
+      "integrity": "sha512-ZmZNiBO6bkOSh3QNzgfvb1cMY0yMobn6ZQrSMqbAce21qyYL8niIbyipz9N/PIRDciGhsV0wUxnZsxIO+yWsHQ==",
+      "path": "app/node_modules/@koromix/koffi-win32-x64",
+      "treeSha256": "620ea097403355289a684d1cec6471a1f329d5dafebc752429c58624e8aa9150",
+      "fileCount": 5
+    },
+    {
+      "package": "desktop-trampoline",
+      "version": "0.9.12",
+      "lockfile": "app/package-lock.json",
+      "lockKey": "node_modules/desktop-trampoline",
+      "source": "file:../vendor/desktop-trampoline",
+      "integrity": null,
+      "path": "app/node_modules/desktop-trampoline/build/Release/desktop-askpass-trampoline.exe",
+      "sha256": "0ce5daeabf5c9b9f9ee4e672bb32a227293d64ac19ecff1102ac4086a27d0800"
+    },
+    {
+      "package": "desktop-trampoline",
+      "version": "0.9.12",
+      "lockfile": "app/package-lock.json",
+      "lockKey": "node_modules/desktop-trampoline",
+      "source": "file:../vendor/desktop-trampoline",
+      "integrity": null,
+      "path": "app/node_modules/desktop-trampoline/build/Release/desktop-credential-helper-trampoline.exe",
+      "sha256": "7883be280795346362a018c34b62c61c497d55ad3925b44f06e12d70989930fa"
+    },
+    {
+      "package": "process-proxy",
+      "version": "0.6.0",
+      "lockfile": "package-lock.json",
+      "lockKey": "node_modules/process-proxy",
+      "source": "https://registry.npmjs.org/process-proxy/-/process-proxy-0.6.0.tgz",
+      "integrity": "sha512-Ic7sU/XQQBJ1mdd8zLcrPakUdg5RrKmJKk3BV+5sLzbVhQRdQxOrG1ycA0dHeGr1TwFWHg37xArYiLEOiBx9kA==",
+      "path": "node_modules/process-proxy/bin/process-proxy-win32-x64.exe",
+      "sha256": "ae99f7e9b2d64e6b525023c195ea78da5425e534c4633f08b4a9c5f3e59f509a"
+    },
+    {
+      "package": "printenvz",
+      "version": "1.0.0",
+      "lockfile": "package-lock.json",
+      "lockKey": "node_modules/printenvz",
+      "source": "file:vendor/printenvz",
+      "integrity": null,
+      "path": "node_modules/printenvz/build/Release/printenvz.exe",
+      "sha256": "5e91a8719807210a2f3a5ebe9c72c5385252f9f53887e0a3e78900d965ecc6c7"
+    }
+  ],
+  "packaging": {
+    "previewReady": false,
+    "originalCore": "desktop/desktop",
+    "presentationComplete": false,
+    "channel": "research-preview",
+    "blockers": [
+      "Original Windows cli.js/static github.bat still target GitHubDesktop.exe, not the MyGo launcher; CLI/deep-link acceptance is pending.",
+      "Gitowl OAuth/updates/protocol registration and original native frontend acceptance are not complete."
+    ]
+  },
+  "node": {
+    "role": "build-tool-only",
+    "version": "24.22.1",
+    "source": "https://nodejs.org/dist/v24.22.1/node-v24.22.1-win-x64.zip",
+    "executableSha256": "d702daa815eabbff763c7d3808e235cf031cf2ca70211b56847bc72f51e240e5",
+    "archiveSha256": "d2046d28c2c3dcd211ac5145c0bf30e2047ef9dfb306693c8c6e2eccd8b95fa5",
+    "license": "MIT and bundled third-party notices",
+    "licenseSha256": "ed34dd8e3f0a78dbaf00d0444ce8e285b015b765379c2e17880455f70370f8e9"
+  },
+  "git": {
+    "dugiteVersion": "3.3.2",
+    "archive": {
+      "name": "dugite-native-v2.56.0-a44aeca-windows-x64.tar.gz",
+      "url": "https://github.com/desktop/dugite-native/releases/download/v2.56.0-2/dugite-native-v2.56.0-a44aeca-windows-x64.tar.gz",
+      "checksum": "f1e17876337d7be143e5d51976da36643d65528125cfbc14d57f171de0fd5f14"
+    },
+    "executableSha256": "20d0dde30a65afb6e5810a883700a94dcd77fbf3b44b32868d45bf7c9b30137c",
+    "source": "https://github.com/desktop/dugite-native",
+    "license": "GPL-2.0 and bundled third-party notices",
+    "licenseSha256": "454649ddc02b5cc098513cea28db6592b45ac0a906386287c4d48cf8dbde651c"
+  },
+  "goModules": [
+    {
+      "module": "github.com/ebitengine/purego",
+      "version": "v0.11.1",
+      "source": "https://pkg.go.dev/github.com/ebitengine/purego@v0.11.1",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/github.com_ebitengine_purego-LICENSE",
+          "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1"
+        }
+      ]
+    },
+    {
+      "module": "github.com/egoist/mygo",
+      "version": "v0.8.3",
+      "source": "https://pkg.go.dev/github.com/egoist/mygo@v0.8.3",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/github.com_egoist_mygo-LICENSE",
+          "sha256": "f0b56f4ab53beb6e18c5e155219c2e2b6000b5475c0ae3ddb3af3894fd9349b4"
+        }
+      ]
+    },
+    {
+      "module": "github.com/go-text/typesetting",
+      "version": "v0.3.5",
+      "source": "https://pkg.go.dev/github.com/go-text/typesetting@v0.3.5",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/github.com_go-text_typesetting-LICENSE",
+          "sha256": "6b1bf94c77d7faa0ce94f8745595bfaf4c404f8b3873f5c2ce55ca15f8e44eca"
+        }
+      ]
+    },
+    {
+      "module": "golang.org/x/image",
+      "version": "v0.46.0",
+      "source": "https://pkg.go.dev/golang.org/x/image@v0.46.0",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/golang.org_x_image-LICENSE",
+          "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+        },
+        {
+          "path": "third_party/licenses/native/golang.org_x_image-PATENTS",
+          "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+        }
+      ]
+    },
+    {
+      "module": "golang.org/x/net",
+      "version": "v0.59.0",
+      "source": "https://pkg.go.dev/golang.org/x/net@v0.59.0",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/golang.org_x_net-LICENSE",
+          "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+        },
+        {
+          "path": "third_party/licenses/native/golang.org_x_net-PATENTS",
+          "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+        }
+      ]
+    },
+    {
+      "module": "golang.org/x/text",
+      "version": "v0.43.0",
+      "source": "https://pkg.go.dev/golang.org/x/text@v0.43.0",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/golang.org_x_text-LICENSE",
+          "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+        },
+        {
+          "path": "third_party/licenses/native/golang.org_x_text-PATENTS",
+          "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+        }
+      ]
+    }
+  ],
+  "npmLicenses": "Generated by the existing script/licenses/update-license-dump.ts allowlist and bundled in licenses/npm-licenses.json.",
+  "lockfiles": [
+    {
+      "path": "package-lock.json",
+      "sha256": "59eedaf9199df76e6b9535ced2f743d9b9233d8361e36747a4c1bb2dd42cbfcb"
+    },
+    {
+      "path": "app/package-lock.json",
+      "sha256": "ad08a58c6ac34041998dd3ae73ecfa5953c8b6082e2321c13a3721db35fb0de6"
+    },
+    {
+      "path": "app/native/go.mod",
+      "sha256": "005fd433266336a662d282cc5a01c0366ca2c506713793511de7f8ba0b87a463"
+    },
+    {
+      "path": "app/native/go.sum",
+      "sha256": "019ac5e1d8a1210b3fe2d8169014445aa818b7a73894f02de6b64d2df3577e2b"
+    }
+  ]
+}

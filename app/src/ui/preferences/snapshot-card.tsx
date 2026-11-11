@@ -13,27 +13,18 @@ import { TooltippedContent } from '../lib/tooltipped-content'
 import { TooltipDirection } from '../lib/tooltip'
 import { formatNumber } from '../../lib/format-number'
 import { getNumberFormatPreference } from '../../models/formatting-preferences'
-
-const snapshotDisplayNames: Record<string, string> = {
-  chat: 'Chat messages',
-  completions: 'Code completions',
-  premium_interactions: 'Premium requests',
-  session: 'Session limits',
-  weekly: 'Weekly limits',
-}
-
-const tokenBasedSnapshotDisplayNames: Record<string, string> = {
-  premium_interactions: 'AI credits',
-}
-
-const quotaKeys = ['chat', 'completions', 'premium_interactions']
-const rateLimitKeys = ['session', 'weekly']
-
-export interface ICategorizedSnapshot {
-  readonly key: string
-  readonly displayName: string
-  readonly snapshot: ICopilotQuotaSnapshot
-}
+import {
+  ICategorizedSnapshot,
+  hasTokenBasedBilling,
+  getUsedPercentage,
+  getVisibleQuotaSnapshots,
+  getVisibleRateLimitSnapshots,
+} from './snapshot-card-data'
+export {
+  ICategorizedSnapshot,
+  getVisibleQuotaSnapshots,
+  getVisibleRateLimitSnapshots,
+} from './snapshot-card-data'
 
 interface ISnapshotCardProps {
   readonly account: Account
@@ -57,41 +48,6 @@ function getAccountAvatarUser(account: Account): IAvatarUser {
     avatarURL: account.avatarURL,
     endpoint: account.endpoint,
   }
-}
-
-function hasTokenBasedBilling(snapshots: CopilotQuotaSnapshots): boolean {
-  for (const snapshot of snapshots.values()) {
-    if (snapshot.tokenBasedBilling) {
-      return true
-    }
-  }
-
-  return false
-}
-
-function getSnapshotDisplayName(
-  key: string,
-  tokenBasedBilling: boolean
-): string {
-  if (tokenBasedBilling) {
-    const displayName = tokenBasedSnapshotDisplayNames[key]
-    if (displayName !== undefined) {
-      return displayName
-    }
-  }
-
-  return snapshotDisplayNames[key] ?? key
-}
-
-function getUsedPercentage(snapshot: ICopilotQuotaSnapshot): number {
-  if (snapshot.isUnlimitedEntitlement) {
-    return 0
-  }
-
-  return Math.max(
-    0,
-    Math.min(100, Math.round(100 - snapshot.remainingPercentage))
-  )
 }
 
 function formatAiCreditValue(credits: number): string {
@@ -170,71 +126,6 @@ function formatResetText(resetDate: string): string | null {
 
   const days = Math.ceil(hours / 24)
   return `resets in ${days} ${pluralize(days, 'day')}`
-}
-
-function isQuotaVisible(snapshot: ICopilotQuotaSnapshot): boolean {
-  return snapshot.isUnlimitedEntitlement || snapshot.entitlementRequests > 0
-}
-
-function isRateLimitVisible(snapshot: ICopilotQuotaSnapshot): boolean {
-  return !snapshot.isUnlimitedEntitlement && snapshot.remainingPercentage < 100
-}
-
-function getCategorizedSnapshot(
-  key: string,
-  snapshot: ICopilotQuotaSnapshot,
-  tokenBasedBilling: boolean
-): ICategorizedSnapshot {
-  return {
-    key,
-    displayName: getSnapshotDisplayName(key, tokenBasedBilling),
-    snapshot,
-  }
-}
-
-export function getVisibleQuotaSnapshots(
-  snapshots: CopilotQuotaSnapshots,
-  tokenBasedBilling: boolean
-): ReadonlyArray<ICategorizedSnapshot> {
-  const visibleSnapshots = new Array<ICategorizedSnapshot>()
-  const premiumInteractions = snapshots.get('premium_interactions')
-  const hasActivePremiumInteractions =
-    premiumInteractions !== undefined && isQuotaVisible(premiumInteractions)
-
-  for (const key of quotaKeys) {
-    const snapshot = snapshots.get(key)
-    if (snapshot === undefined || !isQuotaVisible(snapshot)) {
-      continue
-    }
-
-    if (tokenBasedBilling && key === 'chat' && hasActivePremiumInteractions) {
-      continue
-    }
-
-    visibleSnapshots.push(
-      getCategorizedSnapshot(key, snapshot, tokenBasedBilling)
-    )
-  }
-
-  return visibleSnapshots
-}
-
-export function getVisibleRateLimitSnapshots(
-  snapshots: CopilotQuotaSnapshots,
-  tokenBasedBilling: boolean
-): ReadonlyArray<ICategorizedSnapshot> {
-  const visibleSnapshots = new Array<ICategorizedSnapshot>()
-
-  for (const key of rateLimitKeys) {
-    const snapshot = snapshots.get(key)
-    if (snapshot !== undefined && isRateLimitVisible(snapshot)) {
-      visibleSnapshots.push(
-        getCategorizedSnapshot(key, snapshot, tokenBasedBilling)
-      )
-    }
-  }
-
-  return visibleSnapshots
 }
 
 function QuotaProgressBar({ snapshot }: IQuotaProgressBarProps) {

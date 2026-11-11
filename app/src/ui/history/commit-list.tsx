@@ -8,9 +8,9 @@ import { arrayEquals } from '../../lib/equality'
 import { DragData, DragType } from '../../models/drag-drop'
 import classNames from 'classnames'
 import memoizeOne from 'memoize-one'
-import { IMenuItem, showContextualMenu } from '../../lib/menu-item'
-import { getDotComAPIEndpoint } from '../../lib/api'
-import { writeClipboardText } from '../main-process-proxy'
+import { showContextualMenu } from '../../lib/menu-item'
+import { planWorkspaceCommitInsertion } from './history-workspace-controller'
+import { generateCommitContextMenu } from './commit-menu-controller'
 import { RowIndexPath } from '../lib/list/list-row-index-path'
 import { assertNever } from '../../lib/fatal-error'
 import { CommitDragElement } from '../drag-elements/commit-drag-element'
@@ -718,248 +718,18 @@ export class CommitList extends React.Component<
       return
     }
 
-    let items: IMenuItem[] = []
-    if (this.props.selectedSHAs.length > 1) {
-      items = this.getContextMenuMultipleCommits(commit)
-    } else {
-      items = this.getContextMenuForSingleCommit(row, commit)
-    }
-
-    showContextualMenu(items)
-  }
-
-  private getContextMenuForSingleCommit(
-    row: number,
-    commit: Commit
-  ): IMenuItem[] {
-    const isLocal = this.isLocalCommit(commit.sha)
-
-    const canBeUndone =
-      this.props.canUndoCommits === true && isLocal && row === 0
-    const canBeAmended = this.props.canAmendCommits === true && row === 0
-    // The user can reset to any commit up to the first non-local one (included).
-    // They cannot reset to the most recent commit... because they're already
-    // in it.
-    const isResettableCommit =
-      row > 0 && row <= this.props.localCommitSHAs.length
-    const canBeResetTo =
-      this.props.canResetToCommits === true && isResettableCommit
-    const canBeCheckedOut = row > 0 //Cannot checkout the current commit
-
-    let viewOnGitHubLabel = 'View on GitHub'
-    const gitHubRepository = this.props.gitHubRepository
-
-    if (
-      gitHubRepository &&
-      gitHubRepository.endpoint !== getDotComAPIEndpoint()
-    ) {
-      viewOnGitHubLabel = 'View on GitHub Enterprise'
-    }
-
-    const items: IMenuItem[] = []
-
-    if (canBeAmended) {
-      items.push({
-        label: __DARWIN__ ? 'Amend Commit…' : 'Amend commit…',
-        action: () => this.props.onAmendCommit?.(commit, isLocal),
-      })
-    }
-
-    if (canBeUndone) {
-      items.push({
-        label: __DARWIN__ ? 'Undo Commit…' : 'Undo commit…',
-        action: () => {
-          if (this.props.onUndoCommit) {
-            this.props.onUndoCommit(commit)
-          }
-        },
-        enabled: this.props.onUndoCommit !== undefined,
-      })
-    }
-
-    items.push({
-      label: __DARWIN__ ? 'Reset to Commit…' : 'Reset to commit…',
-      action: () => {
-        if (this.props.onResetToCommit) {
-          this.props.onResetToCommit(commit)
-        }
-      },
-      enabled: canBeResetTo && this.props.onResetToCommit !== undefined,
-    })
-
-    items.push({
-      label: __DARWIN__ ? 'Checkout Commit' : 'Checkout commit',
-      action: () => {
-        this.props.onCheckoutCommit?.(commit)
-      },
-      enabled: canBeCheckedOut && this.props.onCheckoutCommit !== undefined,
-    })
-
-    items.push({
-      label: __DARWIN__ ? 'Reorder Commit' : 'Reorder commit',
-      action: () => {
-        this.props.onKeyboardReorder?.([commit])
-      },
-      enabled: this.canReorder(),
-    })
-
-    items.push(
-      {
-        label: __DARWIN__
-          ? 'Revert Changes in Commit'
-          : 'Revert changes in commit',
-        action: () => {
-          if (this.props.onRevertCommit) {
-            this.props.onRevertCommit(commit)
-          }
-        },
-        enabled: this.props.onRevertCommit !== undefined,
-      },
-      { type: 'separator' },
-      {
-        label: __DARWIN__
-          ? 'Create Branch from Commit'
-          : 'Create branch from commit',
-        action: () => {
-          if (this.props.onCreateBranch) {
-            this.props.onCreateBranch(commit)
-          }
-        },
-      },
-      {
-        label: 'Create Tag…',
-        action: () => this.props.onCreateTag?.(commit.sha),
-        enabled: this.props.onCreateTag !== undefined,
-      }
-    )
-
-    const deleteTagsMenuItem = this.getDeleteTagsMenuItem(commit)
-
-    if (deleteTagsMenuItem !== null) {
-      items.push(
+    showContextualMenu(
+      generateCommitContextMenu(
         {
-          type: 'separator',
+          ...this.props,
+          onSquash:
+            this.props.onSquash === undefined ? undefined : this.onSquash,
         },
-        deleteTagsMenuItem
+        row,
+        commit,
+        this.selectedCommits
       )
-    }
-    const darwinTagsLabel = commit.tags.length > 1 ? 'Copy Tags' : 'Copy Tag'
-    const windowTagsLabel = commit.tags.length > 1 ? 'Copy tags' : 'Copy tag'
-    items.push(
-      {
-        label: __DARWIN__ ? 'Cherry-pick Commit…' : 'Cherry-pick commit…',
-        action: () => this.props.onCherryPick?.(this.selectedCommits),
-        enabled: this.canCherryPick(),
-      },
-      { type: 'separator' },
-      {
-        label: 'Copy SHA',
-        action: () => writeClipboardText(commit.sha),
-      },
-      {
-        label: __DARWIN__ ? darwinTagsLabel : windowTagsLabel,
-        action: () => writeClipboardText(commit.tags.join(' ')),
-        enabled: commit.tags.length > 0,
-      },
-      {
-        label: viewOnGitHubLabel,
-        action: () => this.props.onViewCommitOnGitHub?.(commit.sha),
-        enabled: !isLocal && !!gitHubRepository,
-      }
     )
-
-    return items
-  }
-
-  private canCherryPick(): boolean {
-    const { onCherryPick, isMultiCommitOperationInProgress } = this.props
-    return (
-      onCherryPick !== undefined &&
-      isMultiCommitOperationInProgress === false &&
-      this.props.isAssistedCommitRepositoryLocked !== true
-    )
-  }
-
-  private canReorder = () =>
-    this.props.onKeyboardReorder !== undefined &&
-    this.props.disableReordering === false &&
-    this.props.isMultiCommitOperationInProgress === false &&
-    this.props.isAssistedCommitRepositoryLocked !== true
-
-  private canSquash(): boolean {
-    const { onSquash, disableSquashing, isMultiCommitOperationInProgress } =
-      this.props
-    return (
-      onSquash !== undefined &&
-      disableSquashing === false &&
-      isMultiCommitOperationInProgress === false &&
-      this.props.isAssistedCommitRepositoryLocked !== true
-    )
-  }
-
-  private getDeleteTagsMenuItem(commit: Commit): IMenuItem | null {
-    const { onDeleteTag } = this.props
-    const unpushedTags = this.getUnpushedTags(commit)
-
-    if (
-      onDeleteTag === undefined ||
-      unpushedTags === undefined ||
-      commit.tags.length === 0
-    ) {
-      return null
-    }
-
-    if (commit.tags.length === 1) {
-      const tagName = commit.tags[0]
-
-      return {
-        label: `Delete tag ${tagName}`,
-        action: () => onDeleteTag(tagName),
-        enabled: unpushedTags.includes(tagName),
-      }
-    }
-
-    // Convert tags to a Set to avoid O(n^2)
-    const unpushedTagsSet = new Set(unpushedTags)
-
-    return {
-      label: 'Delete tag…',
-      submenu: commit.tags.map(tagName => {
-        return {
-          label: tagName,
-          action: () => onDeleteTag(tagName),
-          enabled: unpushedTagsSet.has(tagName),
-        }
-      }),
-    }
-  }
-
-  private getContextMenuMultipleCommits(commit: Commit): IMenuItem[] {
-    const count = this.props.selectedSHAs.length
-
-    return [
-      {
-        label: __DARWIN__
-          ? `Cherry-pick ${count} Commits…`
-          : `Cherry-pick ${count} commits…`,
-        action: () => this.props.onCherryPick?.(this.selectedCommits),
-        enabled: this.canCherryPick(),
-      },
-      {
-        label: __DARWIN__
-          ? `Squash ${count} Commits…`
-          : `Squash ${count} commits…`,
-        action: () => this.onSquash(this.selectedCommits, commit, true),
-        enabled: this.canSquash(),
-      },
-      {
-        label: __DARWIN__
-          ? `Reorder ${count} Commits…`
-          : `Reorder ${count} commits…`,
-        action: () => this.props.onKeyboardReorder?.(this.selectedCommits),
-        enabled: this.canReorder(),
-      },
-    ]
   }
 
   private onKeyboardInsertionIndexPathChanged = (indexPath: RowIndexPath) => {
@@ -981,69 +751,20 @@ export class CommitList extends React.Component<
       return
     }
 
-    // The base commit index will be in row - 1, because row is the position
-    // where the new item should be inserted, and commits have a reverse order
-    // (newer commits are in lower row values) in the list.
-    const baseCommitIndex = row === 0 ? null : row - 1
-
-    if (
-      this.props.commitSHAs.length === 0 ||
-      (baseCommitIndex !== null &&
-        baseCommitIndex > this.props.commitSHAs.length)
-    ) {
-      return
-    }
-
-    const baseCommitSHA =
-      baseCommitIndex === null ? null : this.props.commitSHAs[baseCommitIndex]
-    const baseCommit =
-      baseCommitSHA !== null ? this.props.commitLookup.get(baseCommitSHA) : null
-
-    const commitIndexes = data.commits
-      .filter((v): v is Commit => v !== null && v !== undefined)
-      .map(v => this.props.commitSHAs.findIndex(sha => sha === v.sha))
-      .sort() // Required to check if they're contiguous
-
-    // Check if values in commit indexes are contiguous
-    const commitsAreContiguous = commitIndexes.every((value, i, array) => {
-      return i === array.length - 1 || value === array[i + 1] - 1
-    })
-
-    // If commits are contiguous and they are dropped in a position contained
-    // among those indexes, ignore the drop.
-    if (commitsAreContiguous) {
-      const firstDroppedCommitIndex = commitIndexes[0]
-
-      // Commits are dropped right above themselves if
-      // 1. The base commit index is null (meaning, it was dropped at the top
-      //    of the commit list) and the index of the first dropped commit is 0.
-      // 2. The base commit index is the index right above the first dropped.
-      const commitsDroppedRightAboveThemselves =
-        (baseCommitIndex === null && firstDroppedCommitIndex === 0) ||
-        baseCommitIndex === firstDroppedCommitIndex - 1
-
-      // Commits are dropped within themselves if there is a base commit index
-      // and it's in the list of commit indexes.
-      const commitsDroppedWithinThemselves =
-        baseCommitIndex !== null &&
-        commitIndexes.indexOf(baseCommitIndex) !== -1
-
-      if (
-        commitsDroppedRightAboveThemselves ||
-        commitsDroppedWithinThemselves
-      ) {
-        return
-      }
-    }
-
-    const allIndexes = commitIndexes.concat(
-      baseCommitIndex !== null ? [baseCommitIndex] : []
+    const plan = planWorkspaceCommitInsertion(
+      this.props.commitSHAs,
+      row,
+      data.commits
+        .filter((v): v is Commit => v !== null && v !== undefined)
+        .map(c => c.sha)
     )
-
+    if (plan === null) return
+    const baseCommit =
+      plan.baseSHA === null ? null : this.props.commitLookup.get(plan.baseSHA)
     this.props.onDropCommitInsertion(
       baseCommit ?? null,
       data.commits,
-      this.getLastRetainedCommitRef(allIndexes)
+      plan.lastRetainedCommitRef
     )
   }
 }

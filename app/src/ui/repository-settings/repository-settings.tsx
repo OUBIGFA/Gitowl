@@ -1,3 +1,8 @@
+import {
+  RepositorySettingsTab,
+  saveRepositorySettings,
+} from './settings-controller'
+export { RepositorySettingsTab } from './settings-controller'
 import * as React from 'react'
 import { TabBar, TabBarType } from '../tab-bar'
 import { Remote } from './remote'
@@ -28,7 +33,7 @@ import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
 import { Select } from '../lib/select'
 
-interface IRepositorySettingsProps {
+export interface IRepositorySettingsProps {
   readonly initialSelectedTab?: RepositorySettingsTab
   readonly dispatcher: Dispatcher
   readonly remote: IRemote | null
@@ -38,14 +43,7 @@ interface IRepositorySettingsProps {
   readonly onDismissed: () => void
 }
 
-export enum RepositorySettingsTab {
-  Remote = 0,
-  IgnoredFiles,
-  GitConfig,
-  ForkSettings,
-}
-
-interface IRepositorySettingsState {
+export interface IRepositorySettingsState {
   readonly selectedTab: RepositorySettingsTab
   readonly remote: IRemote | null
   readonly ignoreText: string | null
@@ -347,131 +345,10 @@ export class RepositorySettings extends React.Component<
     this.props.dispatcher.openInBrowser('https://git-scm.com/docs/gitignore')
   }
 
-  private onSubmit = async () => {
-    this.setState({ disabled: true, errors: undefined })
-    const errors = new Array<JSX.Element | string>()
-    // Changing the account replaces the repository, and setting the remote
-    // URL must refresh the GitHub association for the replacement.
-    let repository = this.props.repository
-
-    if (
-      repository.gitHubRepository !== null &&
-      this.state.selectedLogin !== undefined &&
-      this.state.selectedLogin !== repository.login
-    ) {
-      try {
-        repository = await this.props.dispatcher.updateRepositoryAccount(
-          repository,
-          this.state.selectedLogin
-        )
-      } catch (e) {
-        errors.push(`Failed saving the repository account: ${e}`)
-      }
-    }
-
-    if (this.state.remote && this.props.remote) {
-      const trimmedUrl = this.state.remote.url.trim()
-
-      if (trimmedUrl !== this.props.remote.url) {
-        try {
-          await this.props.dispatcher.setRemoteURL(
-            repository,
-            this.props.remote.name,
-            trimmedUrl
-          )
-        } catch (e) {
-          log.error(
-            `RepositorySettings: unable to set remote URL at ${this.props.repository.path}`,
-            e
-          )
-          errors.push(`Failed setting the remote URL: ${e}`)
-        }
-      }
-    }
-
-    if (this.state.ignoreTextHasChanged && this.state.ignoreText !== null) {
-      try {
-        await this.props.dispatcher.saveGitIgnore(
-          this.props.repository,
-          this.state.ignoreText
-        )
-      } catch (e) {
-        log.error(
-          `RepositorySettings: unable to save gitignore at ${this.props.repository.path}`,
-          e
-        )
-        errors.push(`Failed saving the .gitignore file: ${e}`)
-      }
-    }
-
-    // only update this if it will be different from what we have stored
-    if (
-      this.state.forkContributionTarget !==
-      this.props.repository.workflowPreferences.forkContributionTarget
-    ) {
-      await this.props.dispatcher.updateRepositoryWorkflowPreferences(
-        this.props.repository,
-        {
-          ...this.props.repository.workflowPreferences,
-          forkContributionTarget: this.state.forkContributionTarget,
-        }
-      )
-    }
-
-    let shouldRefreshAuthor = false
-    const gitLocationChanged =
-      this.state.gitConfigLocation !== this.state.initialGitConfigLocation
-
-    try {
-      if (
-        gitLocationChanged &&
-        this.state.gitConfigLocation === GitConfigLocation.Global
-      ) {
-        // If it's now configured to use the global config, just delete the local
-        // user info in this repository.
-        shouldRefreshAuthor = true
-        await this.props.dispatcher.updateRepositoryCommitter(
-          this.props.repository,
-          null,
-          null
-        )
-      } else if (this.state.gitConfigLocation === GitConfigLocation.Local) {
-        // Otherwise, update the local name and email if needed
-        const name =
-          this.state.committerName !== this.state.initialCommitterName
-            ? this.state.committerName
-            : undefined
-        const email =
-          this.state.committerEmail !== this.state.initialCommitterEmail
-            ? this.state.committerEmail
-            : undefined
-        if (name !== undefined || email !== undefined) {
-          shouldRefreshAuthor = true
-          await this.props.dispatcher.updateRepositoryCommitter(
-            this.props.repository,
-            name,
-            email
-          )
-        }
-      }
-    } catch (error) {
-      log.error(
-        `RepositorySettings: unable to update Git identity at ${this.props.repository.path}`,
-        error
-      )
-      errors.push(`Failed updating Git identity: ${error}`)
-    }
-
-    if (shouldRefreshAuthor) {
-      this.props.dispatcher.refreshAuthor(this.props.repository)
-    }
-
-    if (!errors.length) {
-      this.props.onDismissed()
-    } else {
-      this.setState({ disabled: false, errors })
-    }
-  }
+  private onSubmit = () =>
+    saveRepositorySettings(this.props, this.state, change =>
+      this.setState(state => ({ ...state, ...change }))
+    )
 
   private onRemoteUrlChanged = (url: string) => {
     const remote = this.props.remote

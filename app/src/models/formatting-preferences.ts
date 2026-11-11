@@ -1,8 +1,12 @@
 import { format } from 'date-fns'
 import { enableFormattingPreferences } from '../lib/feature-flag'
 
+// A native Git process has no renderer locale hash. Use the same unknown-country
+// defaults as Electron without a country code; do not manufacture a Location.
 const localeCountryCode =
-  new URL(location.href).hash.match(/lc=([A-Z]{2})/)?.[1] ?? null
+  typeof location === 'undefined'
+    ? null
+    : new URL(location.href).hash.match(/lc=([A-Z]{2})/)?.[1] ?? null
 
 /**
  * Countries that predominantly use 12-hour time format.

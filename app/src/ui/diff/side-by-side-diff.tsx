@@ -66,6 +66,7 @@ import {
   DiffExpansionKind,
   expandWholeTextDiff,
 } from './text-diff-expansion'
+import { generateDiffExpansionMenuItem } from './diff-menu-controller'
 import { IMenuItem } from '../../lib/menu-item'
 import { DiffContentsWarning } from './diff-contents-warning'
 import { findDOMNode } from 'react-dom'
@@ -1473,26 +1474,13 @@ export class SideBySideDiff extends React.Component<
   }
 
   private buildExpandMenuItem(): IMenuItem | null {
-    const { diff } = this.state
-    if (!this.canExpandDiff()) {
-      return null
-    }
-
-    return this.diffToRestore === null
-      ? {
-          label: __DARWIN__ ? 'Expand Whole File' : 'Expand whole file',
-          action: this.onExpandWholeFile,
-          // If there is only one hunk that can't be expanded, disable this item
-          enabled:
-            diff.hunks.length !== 1 ||
-            diff.hunks[0].expansionType !== DiffHunkExpansionType.None,
-        }
-      : {
-          label: __DARWIN__
-            ? 'Collapse Expanded Lines'
-            : 'Collapse expanded lines',
-          action: this.onCollapseExpandedLines,
-        }
+    return generateDiffExpansionMenuItem(
+      this.state.diff,
+      this.canExpandDiff(),
+      this.diffToRestore !== null,
+      this.onExpandWholeFile,
+      this.onCollapseExpandedLines
+    )
   }
 
   private onExpandWholeFile = () => {

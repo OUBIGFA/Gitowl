@@ -1,6 +1,6 @@
 import * as Path from 'path'
 
-import { IMenuItem } from '../../lib/menu-item'
+import { WorkspaceMenuItem as IMenuItem } from '../lib/workspace-menu'
 import { writeClipboardText } from '../main-process-proxy'
 import { isRepositoryAffectedByAssistedCommit } from '../../lib/git/repository-operation'
 
@@ -24,6 +24,7 @@ export function generateWorktreeContextMenuItems(
 
   if (onRenameWorktree !== undefined) {
     items.push({
+      labelKey: 'workspace.rename',
       label: 'Rename…',
       action: () => onRenameWorktree(path),
       enabled: canMutate,
@@ -31,11 +32,13 @@ export function generateWorktreeContextMenuItems(
   }
 
   items.push({
+    labelKey: 'workspace.copyWorktree',
     label: __DARWIN__ ? 'Copy Worktree Name' : 'Copy worktree name',
     action: () => writeClipboardText(name),
   })
 
   items.push({
+    labelKey: 'workspace.copyWorktreePath',
     label: __DARWIN__ ? 'Copy Worktree Path' : 'Copy worktree path',
     action: () => writeClipboardText(path),
   })
@@ -44,6 +47,7 @@ export function generateWorktreeContextMenuItems(
 
   if (onRemoveWorktree !== undefined) {
     items.push({
+      labelKey: 'workspace.delete',
       label: 'Delete…',
       action: () => onRemoveWorktree(path),
       enabled: canMutate,

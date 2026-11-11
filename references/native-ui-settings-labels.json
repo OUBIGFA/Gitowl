@@ -1,0 +1,934 @@
+{
+  "settings.group.copilotAccount": { "en": "Account and access", "zh-Hans": "账户与访问", "zh-Hant": "帳戶與存取" },
+  "settings.group.interface": { "en": "Interface", "zh-Hans": "界面", "zh-Hant": "介面" },
+  "settings.group.formatting": { "en": "Dates and numbers", "zh-Hans": "日期与数字", "zh-Hant": "日期與數字" },
+  "settings.group.author": { "en": "Commit author", "zh-Hans": "提交作者", "zh-Hant": "提交作者" },
+  "settings.group.hooks": { "en": "Git hooks", "zh-Hans": "Git 钩子", "zh-Hant": "Git 掛鉤" },
+  "settings.group.generation": { "en": "Commit messages", "zh-Hans": "提交说明", "zh-Hant": "提交說明" },
+  "settings.group.removal": { "en": "Removing and discarding", "zh-Hans": "删除与丢弃", "zh-Hant": "刪除與捨棄" },
+  "settings.group.changes": { "en": "Commits and branches", "zh-Hans": "提交与分支", "zh-Hant": "提交與分支" },
+  "settings.group.authentication": { "en": "Authentication", "zh-Hans": "身份验证", "zh-Hant": "身分驗證" },
+  "settings.group.application": { "en": "Application", "zh-Hans": "应用行为", "zh-Hant": "應用程式行為" },
+  "settings.notificationsDenied": { "en": "System notification permission is denied. Enable it in Notification Settings.", "zh-Hans": "系统未允许显示通知。请在系统通知设置中启用。", "zh-Hant": "系統未允許顯示通知。請在系統通知設定中啟用。" },
+  "settings.notificationsConfigure": { "en": "Check that system notifications are enabled for Gitowl.", "zh-Hans": "请确认系统已允许 Gitowl 显示通知。", "zh-Hant": "請確認系統已允許 Gitowl 顯示通知。" },
+  "settings.notificationGrant": { "en": "Grant notification permission", "zh-Hans": "允许显示通知", "zh-Hant": "允許顯示通知" },
+  "settings.notificationSettings": { "en": "Open system notification settings", "zh-Hans": "打开系统通知设置", "zh-Hant": "開啟系統通知設定" },
+  "settings.noExternalEditor": { "en": "No built-in editor selected", "zh-Hans": "未选择内置编辑器", "zh-Hant": "未選擇內建編輯器" },
+  "settings.title.Preferences": {
+    "en": "Settings",
+    "zh-Hans": "设置",
+    "zh-Hant": "設定"
+  },
+  "settings.title.RepositorySettings": {
+    "en": "Repository settings",
+    "zh-Hans": "仓库设置",
+    "zh-Hant": "儲存庫設定"
+  },
+  "settings.title.EditCopilotBYOKProvider": {
+    "en": "Custom provider",
+    "zh-Hans": "自定义供应商",
+    "zh-Hant": "自訂供應商"
+  },
+  "settings.title.EditCopilotBYOKModel": {
+    "en": "Custom model",
+    "zh-Hans": "自定义模型",
+    "zh-Hant": "自訂模型"
+  },
+  "settings.title.CopilotUserSettings": {
+    "en": "Copilot settings",
+    "zh-Hans": "Copilot 设置",
+    "zh-Hant": "Copilot 設定"
+  },
+  "settings.title.CopilotCustomProviders": {
+    "en": "Custom providers",
+    "zh-Hans": "自定义供应商",
+    "zh-Hant": "自訂供應商"
+  },
+  "settings.title.ConfirmDeleteCopilotBYOKProvider": {
+    "en": "Delete custom provider?",
+    "zh-Hans": "删除自定义供应商？",
+    "zh-Hant": "刪除自訂供應商？"
+  },
+  "settings.tab": {
+    "en": "Section",
+    "zh-Hans": "设置分区",
+    "zh-Hant": "設定區段"
+  },
+  "settings.account": { "en": "Account", "zh-Hans": "账户", "zh-Hant": "帳戶" },
+  "settings.selectedExternalEditor": {
+    "en": "External editor",
+    "zh-Hans": "外部编辑器",
+    "zh-Hant": "外部編輯器"
+  },
+  "settings.selectedShell": {
+    "en": "Shell",
+    "zh-Hans": "终端",
+    "zh-Hant": "終端機"
+  },
+  "settings.useCustomEditor": {
+    "en": "Use a custom editor",
+    "zh-Hans": "使用自定义编辑器",
+    "zh-Hant": "使用自訂編輯器"
+  },
+  "settings.customEditorPath": {
+    "en": "Editor executable path",
+    "zh-Hans": "编辑器可执行文件路径",
+    "zh-Hant": "編輯器執行檔路徑"
+  },
+  "settings.customEditorArguments": {
+    "en": "Editor arguments (%TARGET_PATH% is the target)",
+    "zh-Hans": "编辑器参数（%TARGET_PATH% 为目标路径）",
+    "zh-Hant": "編輯器引數（%TARGET_PATH% 為目標路徑）"
+  },
+  "settings.customEditorBundleID": {
+    "en": "Editor bundle ID",
+    "zh-Hans": "编辑器 Bundle ID",
+    "zh-Hant": "編輯器 Bundle ID"
+  },
+  "settings.useCustomShell": {
+    "en": "Use a custom shell",
+    "zh-Hans": "使用自定义终端",
+    "zh-Hant": "使用自訂終端機"
+  },
+  "settings.customShellPath": {
+    "en": "Shell executable path",
+    "zh-Hans": "终端可执行文件路径",
+    "zh-Hant": "終端機執行檔路徑"
+  },
+  "settings.customShellArguments": {
+    "en": "Shell arguments (%TARGET_PATH% is the target)",
+    "zh-Hans": "终端参数（%TARGET_PATH% 为目标路径）",
+    "zh-Hant": "終端機引數（%TARGET_PATH% 為目標路徑）"
+  },
+  "settings.customShellBundleID": {
+    "en": "Shell bundle ID",
+    "zh-Hans": "终端 Bundle ID",
+    "zh-Hant": "終端機 Bundle ID"
+  },
+  "settings.copilotAppPath": {
+    "en": "Copilot application path",
+    "zh-Hans": "Copilot 应用路径",
+    "zh-Hant": "Copilot 應用程式路徑"
+  },
+  "settings.generationSource": {
+    "en": "Commit generator",
+    "zh-Hans": "提交说明生成来源",
+    "zh-Hant": "提交說明產生來源"
+  },
+  "settings.generationModel": {
+    "en": "Enabled custom model",
+    "zh-Hans": "已启用的自定义模型",
+    "zh-Hant": "已啟用的自訂模型"
+  },
+  "settings.generationLanguage": {
+    "en": "Generated commit language (independent of interface)",
+    "zh-Hans": "生成提交说明的语言（独立于界面）",
+    "zh-Hant": "產生提交說明的語言（獨立於介面）"
+  },
+  "settings.committerName": {
+    "en": "Git author name",
+    "zh-Hans": "Git 作者姓名",
+    "zh-Hant": "Git 作者姓名"
+  },
+  "settings.committerEmail": {
+    "en": "Git author email",
+    "zh-Hans": "Git 作者邮箱",
+    "zh-Hant": "Git 作者電子郵件"
+  },
+  "settings.defaultBranch": {
+    "en": "Default branch for new repositories",
+    "zh-Hans": "新仓库的默认分支",
+    "zh-Hant": "新儲存庫的預設分支"
+  },
+  "settings.enableGitHookEnv": {
+    "en": "Run Git hooks with the configured environment",
+    "zh-Hans": "使用配置的环境运行 Git 钩子",
+    "zh-Hant": "使用設定的環境執行 Git 掛鉤"
+  },
+  "settings.cacheGitHookEnv": {
+    "en": "Cache the Git hook environment",
+    "zh-Hans": "缓存 Git 钩子环境",
+    "zh-Hant": "快取 Git 掛鉤環境"
+  },
+  "settings.selectedGitHookEnvShell": {
+    "en": "Git hook environment shell",
+    "zh-Hans": "Git 钩子环境终端",
+    "zh-Hant": "Git 掛鉤環境終端機"
+  },
+  "settings.theme": {
+    "en": "Appearance",
+    "zh-Hans": "外观主题",
+    "zh-Hant": "外觀主題"
+  },
+  "settings.tabSize": {
+    "en": "Diff tab width",
+    "zh-Hans": "差异视图制表符宽度",
+    "zh-Hant": "差異檢視定位字元寬度"
+  },
+  "settings.alwaysShowWorktreeList": {
+    "en": "Always show worktrees",
+    "zh-Hans": "始终显示工作树列表",
+    "zh-Hant": "永遠顯示工作樹清單"
+  },
+  "settings.dateFormat": {
+    "en": "Date format",
+    "zh-Hans": "日期格式",
+    "zh-Hant": "日期格式"
+  },
+  "settings.timeFormat": {
+    "en": "Time format",
+    "zh-Hans": "时间格式",
+    "zh-Hant": "時間格式"
+  },
+  "settings.numberFormat": {
+    "en": "Number separators",
+    "zh-Hans": "数字分隔符",
+    "zh-Hant": "數字分隔符號"
+  },
+  "settings.preferAbsoluteDates": {
+    "en": "Prefer absolute dates",
+    "zh-Hans": "优先显示绝对日期",
+    "zh-Hant": "優先顯示絕對日期"
+  },
+  "settings.notificationsEnabled": {
+    "en": "Enable notifications",
+    "zh-Hans": "启用通知",
+    "zh-Hant": "啟用通知"
+  },
+  "settings.useWindowsOpenSSH": {
+    "en": "Use Windows OpenSSH",
+    "zh-Hans": "使用 Windows OpenSSH",
+    "zh-Hant": "使用 Windows OpenSSH"
+  },
+  "settings.showCommitLengthWarning": {
+    "en": "Warn when a commit summary is too long",
+    "zh-Hans": "提交摘要过长时警告",
+    "zh-Hant": "提交摘要過長時警告"
+  },
+  "settings.optOutOfUsageTracking": {
+    "en": "Opt out of usage reporting",
+    "zh-Hans": "退出使用情况报告",
+    "zh-Hant": "退出使用情況回報"
+  },
+  "settings.useExternalCredentialHelper": {
+    "en": "Use an external credential helper",
+    "zh-Hans": "使用外部凭据助手",
+    "zh-Hant": "使用外部認證助手"
+  },
+  "settings.repositoryIndicatorsEnabled": {
+    "en": "Show repository indicators",
+    "zh-Hans": "显示仓库状态标记",
+    "zh-Hant": "顯示儲存庫狀態標記"
+  },
+  "settings.confirmRepositoryRemoval": {
+    "en": "Confirm repository removal",
+    "zh-Hans": "移除仓库前确认",
+    "zh-Hant": "移除儲存庫前確認"
+  },
+  "settings.confirmDiscardChanges": {
+    "en": "Confirm discarding changes",
+    "zh-Hans": "丢弃改动前确认",
+    "zh-Hant": "捨棄變更前確認"
+  },
+  "settings.confirmDiscardChangesPermanently": {
+    "en": "Confirm permanent discard",
+    "zh-Hans": "永久丢弃改动前确认",
+    "zh-Hant": "永久捨棄變更前確認"
+  },
+  "settings.confirmDiscardStash": {
+    "en": "Confirm discarding a stash",
+    "zh-Hans": "丢弃暂存改动前确认",
+    "zh-Hant": "捨棄暫存變更前確認"
+  },
+  "settings.confirmCheckoutCommit": {
+    "en": "Confirm checking out a commit",
+    "zh-Hans": "检出提交前确认",
+    "zh-Hant": "取出提交前確認"
+  },
+  "settings.confirmForcePush": {
+    "en": "Confirm force push",
+    "zh-Hans": "强制推送前确认",
+    "zh-Hant": "強制推送前確認"
+  },
+  "settings.confirmUndoCommit": {
+    "en": "Confirm undoing a commit",
+    "zh-Hans": "撤销提交前确认",
+    "zh-Hant": "復原提交前確認"
+  },
+  "settings.askForConfirmationOnCommitFilteredChanges": {
+    "en": "Confirm committing filtered changes",
+    "zh-Hans": "提交已过滤的改动前确认",
+    "zh-Hant": "提交已篩選的變更前確認"
+  },
+  "settings.confirmCommitMessageOverride": {
+    "en": "Confirm replacing the commit message",
+    "zh-Hans": "替换提交说明前确认",
+    "zh-Hant": "取代提交說明前確認"
+  },
+  "settings.confirmWorktreeRemoval": {
+    "en": "Confirm worktree removal",
+    "zh-Hans": "移除工作树前确认",
+    "zh-Hant": "移除工作樹前確認"
+  },
+  "settings.uncommittedChangesStrategy": {
+    "en": "Uncommitted changes when switching branches",
+    "zh-Hans": "切换分支时处理未提交改动",
+    "zh-Hant": "切換分支時處理未提交變更"
+  },
+  "settings.underlineLinks": {
+    "en": "Underline links",
+    "zh-Hans": "为链接显示下划线",
+    "zh-Hant": "為連結顯示底線"
+  },
+  "settings.showDiffCheckMarks": {
+    "en": "Show diff check marks",
+    "zh-Hans": "显示差异勾选标记",
+    "zh-Hant": "顯示差異勾選標記"
+  },
+  "settings.alwaysUseCopilotForConflictResolution": {
+    "en": "Always use Copilot when conflicts are detected",
+    "zh-Hans": "检测到冲突时始终使用 Copilot",
+    "zh-Hant": "偵測到衝突時永遠使用 Copilot"
+  },
+  "settings.remoteURL": {
+    "en": "Remote URL",
+    "zh-Hans": "远端地址",
+    "zh-Hant": "遠端網址"
+  },
+  "settings.alias": {
+    "en": "Repository alias",
+    "zh-Hans": "仓库别名",
+    "zh-Hant": "儲存庫別名"
+  },
+  "settings.signedOutAccount": {
+    "en": "Assigned account is signed out (unchanged until explicitly reassigned)",
+    "zh-Hans": "已分配账户已退出登录（明确重选前保留分配）",
+    "zh-Hant": "已指派帳戶已登出（明確重選前保留指派）"
+  },
+  "settings.repositoryLogin": {
+    "en": "Repository authentication account (not Git author)",
+    "zh-Hans": "仓库认证账户（不是 Git 作者）",
+    "zh-Hant": "儲存庫認證帳戶（不是 Git 作者）"
+  },
+  "settings.ignoreText": {
+    "en": "Root .gitignore",
+    "zh-Hans": "根目录 .gitignore",
+    "zh-Hant": "根目錄 .gitignore"
+  },
+  "settings.gitConfigLocation": {
+    "en": "Git identity configuration",
+    "zh-Hans": "Git 身份配置位置",
+    "zh-Hant": "Git 身分設定位置"
+  },
+  "settings.forkContributionTarget": {
+    "en": "Fork contribution target",
+    "zh-Hans": "派生仓库贡献目标",
+    "zh-Hant": "分支儲存庫貢獻目標"
+  },
+  "settings.name": {
+    "en": "Display name",
+    "zh-Hans": "显示名称",
+    "zh-Hant": "顯示名稱"
+  },
+  "settings.type": {
+    "en": "Copilot BYOK provider type",
+    "zh-Hans": "Copilot BYOK 供应商类型",
+    "zh-Hant": "Copilot BYOK 供應商類型"
+  },
+  "settings.format": {
+    "en": "Official SDK protocol",
+    "zh-Hans": "官方 SDK 协议",
+    "zh-Hant": "官方 SDK 協定"
+  },
+  "settings.baseUrl": {
+    "en": "API base URL",
+    "zh-Hans": "API 基础地址",
+    "zh-Hant": "API 基礎網址"
+  },
+  "settings.wireApi": {
+    "en": "OpenAI API format",
+    "zh-Hans": "OpenAI API 格式",
+    "zh-Hant": "OpenAI API 格式"
+  },
+  "settings.azureApiVersion": {
+    "en": "Azure API version (Copilot BYOK)",
+    "zh-Hans": "Azure API 版本（Copilot BYOK）",
+    "zh-Hant": "Azure API 版本（Copilot BYOK）"
+  },
+  "settings.authKind": {
+    "en": "Authentication",
+    "zh-Hans": "认证方式",
+    "zh-Hant": "認證方式"
+  },
+  "settings.requestTimeoutSeconds": {
+    "en": "Request timeout in seconds (blank uses default)",
+    "zh-Hans": "请求超时秒数（留空使用默认值）",
+    "zh-Hant": "請求逾時秒數（留空使用預設值）"
+  },
+  "settings.secret": {
+    "en": "New credential (blank keeps the existing credential)",
+    "zh-Hans": "新凭据（留空保留原凭据）",
+    "zh-Hant": "新認證資料（留空保留原認證資料）"
+  },
+  "settings.model": {
+    "en": "Model to edit",
+    "zh-Hans": "要编辑的模型",
+    "zh-Hant": "要編輯的模型"
+  },
+  "settings.modelID": {
+    "en": "Exact model or deployment identifier",
+    "zh-Hans": "精确模型或部署标识",
+    "zh-Hant": "精確模型或部署識別碼"
+  },
+  "settings.modelName": {
+    "en": "Model display name",
+    "zh-Hans": "模型显示名称",
+    "zh-Hant": "模型顯示名稱"
+  },
+  "settings.reasoningEffort": {
+    "en": "Reasoning effort",
+    "zh-Hans": "推理强度",
+    "zh-Hant": "推理強度"
+  },
+  "settings.usage": {
+    "en": "Copilot usage",
+    "zh-Hans": "Copilot 用量",
+    "zh-Hant": "Copilot 用量"
+  },
+  "settings.commit-message-generation": {
+    "en": "Commit message model",
+    "zh-Hans": "提交说明模型",
+    "zh-Hant": "提交說明模型"
+  },
+  "settings.conflict-resolution": {
+    "en": "Conflict resolution model",
+    "zh-Hans": "冲突解决模型",
+    "zh-Hant": "衝突解決模型"
+  },
+  "settings.provider": {
+    "en": "Provider",
+    "zh-Hans": "供应商",
+    "zh-Hant": "供應商"
+  },
+  "settings.modelEnabled": {
+    "en": "Enable model",
+    "zh-Hans": "启用模型",
+    "zh-Hant": "啟用模型"
+  },
+  "settings.modelAvailable": {
+    "en": "Available model",
+    "zh-Hans": "可用模型",
+    "zh-Hant": "可用模型"
+  },
+  "settings.modelUnavailable": {
+    "en": "Unavailable model — select another explicitly",
+    "zh-Hans": "模型不可用，请明确重选",
+    "zh-Hant": "模型無法使用，請明確重選"
+  },
+  "settings.deployments": {
+    "en": "Azure deployment identifiers (one per line; new ones are disabled)",
+    "zh-Hans": "Azure 部署标识（每行一个，新模型默认不启用）",
+    "zh-Hant": "Azure 部署識別碼（每行一個，新模型預設不啟用）"
+  },
+  "settings.saveDeployments": {
+    "en": "Save deployments",
+    "zh-Hans": "保存部署列表",
+    "zh-Hant": "儲存部署清單"
+  },
+  "settings.busy": {
+    "en": "Saving or loading…",
+    "zh-Hans": "正在保存或加载…",
+    "zh-Hant": "正在儲存或載入…"
+  },
+  "settings.load": {
+    "en": "Load settings",
+    "zh-Hans": "加载设置",
+    "zh-Hant": "載入設定"
+  },
+  "settings.change": {
+    "en": "Apply form changes",
+    "zh-Hans": "更新表单",
+    "zh-Hant": "更新表單"
+  },
+  "settings.save": { "en": "Save", "zh-Hans": "保存", "zh-Hant": "儲存" },
+  "settings.cancel": { "en": "Cancel", "zh-Hans": "取消", "zh-Hant": "取消" },
+  "settings.done": { "en": "Done", "zh-Hans": "完成", "zh-Hant": "完成" },
+  "settings.delete": {
+    "en": "Delete provider",
+    "zh-Hans": "删除供应商",
+    "zh-Hant": "刪除供應商"
+  },
+  "settings.signIn": {
+    "en": "Sign in to GitHub.com",
+    "zh-Hans": "登录 GitHub.com",
+    "zh-Hant": "登入 GitHub.com"
+  },
+  "settings.enterpriseSignIn": {
+    "en": "Sign in to GitHub Enterprise",
+    "zh-Hans": "登录 GitHub Enterprise",
+    "zh-Hant": "登入 GitHub Enterprise"
+  },
+  "settings.signOut": {
+    "en": "Sign out",
+    "zh-Hans": "退出登录",
+    "zh-Hant": "登出"
+  },
+  "settings.copilotSettings": {
+    "en": "Configure Copilot models",
+    "zh-Hans": "配置 Copilot 模型",
+    "zh-Hant": "設定 Copilot 模型"
+  },
+  "settings.customProviders": {
+    "en": "Configure custom providers",
+    "zh-Hans": "配置自定义供应商",
+    "zh-Hant": "設定自訂供應商"
+  },
+  "settings.copilotPlans": {
+    "en": "Copilot plans",
+    "zh-Hans": "Copilot 套餐",
+    "zh-Hant": "Copilot 方案"
+  },
+  "settings.copilotFeatures": {
+    "en": "Copilot feature settings",
+    "zh-Hans": "Copilot 功能设置",
+    "zh-Hant": "Copilot 功能設定"
+  },
+  "settings.editGlobalGitConfig": {
+    "en": "Edit global Git config",
+    "zh-Hans": "编辑全局 Git 配置",
+    "zh-Hant": "編輯全域 Git 設定"
+  },
+  "settings.unlockGit": {
+    "en": "Delete the confirmed Git config lock",
+    "zh-Hans": "删除已确认的 Git 配置锁",
+    "zh-Hant": "刪除已確認的 Git 設定鎖"
+  },
+  "settings.publish": {
+    "en": "Publish repository",
+    "zh-Hans": "发布仓库",
+    "zh-Hant": "發佈儲存庫"
+  },
+  "settings.ignoreExamples": {
+    "en": "Gitignore documentation",
+    "zh-Hans": "Gitignore 文档",
+    "zh-Hant": "Gitignore 文件"
+  },
+  "settings.addModel": {
+    "en": "Add model",
+    "zh-Hans": "添加模型",
+    "zh-Hant": "新增模型"
+  },
+  "settings.editModel": {
+    "en": "Edit model",
+    "zh-Hans": "编辑模型",
+    "zh-Hant": "編輯模型"
+  },
+  "settings.removeModel": {
+    "en": "Remove model",
+    "zh-Hans": "移除模型",
+    "zh-Hant": "移除模型"
+  },
+  "settings.refreshCopilot": {
+    "en": "Refresh Copilot models and usage",
+    "zh-Hans": "刷新 Copilot 模型与用量",
+    "zh-Hant": "重新整理 Copilot 模型與用量"
+  },
+  "settings.customInstructions": {
+    "en": "Custom instruction documentation",
+    "zh-Hans": "自定义指令文档",
+    "zh-Hant": "自訂指令文件"
+  },
+  "settings.generationHelp": {
+    "en": "Commit generation documentation",
+    "zh-Hans": "提交说明生成文档",
+    "zh-Hant": "提交說明產生文件"
+  },
+  "settings.addProvider": {
+    "en": "Add Copilot BYOK provider",
+    "zh-Hans": "添加 Copilot BYOK 供应商",
+    "zh-Hant": "新增 Copilot BYOK 供應商"
+  },
+  "settings.addSDKProvider": {
+    "en": "Add official SDK provider",
+    "zh-Hans": "添加官方 SDK 供应商",
+    "zh-Hant": "新增官方 SDK 供應商"
+  },
+  "settings.editProvider": {
+    "en": "Edit or rename provider",
+    "zh-Hans": "编辑或重命名供应商",
+    "zh-Hant": "編輯或重新命名供應商"
+  },
+  "settings.deleteProvider": {
+    "en": "Delete provider…",
+    "zh-Hans": "删除供应商…",
+    "zh-Hant": "刪除供應商…"
+  },
+  "settings.refreshModels": {
+    "en": "Fetch models",
+    "zh-Hans": "拉取模型",
+    "zh-Hant": "取得模型"
+  },
+  "settings.option.accounts": {
+    "en": "Accounts",
+    "zh-Hans": "账户",
+    "zh-Hant": "帳戶"
+  },
+  "settings.option.integrations": {
+    "en": "Integrations",
+    "zh-Hans": "集成",
+    "zh-Hant": "整合"
+  },
+  "settings.option.copilot": {
+    "en": "GitHub Copilot",
+    "zh-Hans": "GitHub Copilot",
+    "zh-Hant": "GitHub Copilot"
+  },
+  "settings.option.git": { "en": "Git", "zh-Hans": "Git", "zh-Hant": "Git" },
+  "settings.option.appearance": {
+    "en": "Appearance",
+    "zh-Hans": "外观",
+    "zh-Hant": "外觀"
+  },
+  "settings.option.notifications": {
+    "en": "Notifications",
+    "zh-Hans": "通知",
+    "zh-Hant": "通知"
+  },
+  "settings.option.prompts": {
+    "en": "Confirmations",
+    "zh-Hans": "确认提示",
+    "zh-Hant": "確認提示"
+  },
+  "settings.option.advanced": {
+    "en": "Advanced",
+    "zh-Hans": "高级",
+    "zh-Hant": "進階"
+  },
+  "settings.option.accessibility": {
+    "en": "Accessibility",
+    "zh-Hans": "辅助功能",
+    "zh-Hant": "輔助使用"
+  },
+  "settings.option.custom": {
+    "en": "Custom provider",
+    "zh-Hans": "自定义供应商",
+    "zh-Hant": "自訂供應商"
+  },
+  "settings.option.auto": {
+    "en": "No explicit language override",
+    "zh-Hans": "不指定语言覆盖",
+    "zh-Hant": "不指定語言覆寫"
+  },
+  "settings.option.en": {
+    "en": "English",
+    "zh-Hans": "英语",
+    "zh-Hant": "英語"
+  },
+  "settings.option.zh-Hans": {
+    "en": "Simplified Chinese",
+    "zh-Hans": "简体中文",
+    "zh-Hant": "簡體中文"
+  },
+  "settings.option.zh-Hant": {
+    "en": "Traditional Chinese",
+    "zh-Hans": "繁体中文",
+    "zh-Hant": "繁體中文"
+  },
+  "settings.option.chooseModel": {
+    "en": "Select a model explicitly",
+    "zh-Hans": "请明确选择模型",
+    "zh-Hant": "請明確選擇模型"
+  },
+  "settings.option.chooseAccount": {
+    "en": "Select an account",
+    "zh-Hans": "选择账户",
+    "zh-Hant": "選擇帳戶"
+  },
+  "settings.option.chooseProvider": {
+    "en": "Select a provider",
+    "zh-Hans": "选择供应商",
+    "zh-Hant": "選擇供應商"
+  },
+  "settings.option.light": {
+    "en": "Light",
+    "zh-Hans": "浅色",
+    "zh-Hant": "淺色"
+  },
+  "settings.option.dark": {
+    "en": "Dark",
+    "zh-Hans": "深色",
+    "zh-Hant": "深色"
+  },
+  "settings.option.system": {
+    "en": "Follow system",
+    "zh-Hans": "跟随系统",
+    "zh-Hant": "跟隨系統"
+  },
+  "settings.option.AskForConfirmation": {
+    "en": "Ask before switching",
+    "zh-Hans": "切换前询问",
+    "zh-Hant": "切換前詢問"
+  },
+  "settings.option.StashOnCurrentBranch": {
+    "en": "Stash on the current branch",
+    "zh-Hans": "暂存到当前分支",
+    "zh-Hant": "暫存至目前分支"
+  },
+  "settings.option.MoveToNewBranch": {
+    "en": "Move changes to the new branch",
+    "zh-Hans": "将改动带到新分支",
+    "zh-Hant": "將變更帶至新分支"
+  },
+  "settings.option.remote": {
+    "en": "Remote and alias",
+    "zh-Hans": "远端与别名",
+    "zh-Hant": "遠端與別名"
+  },
+  "settings.option.ignoredFiles": {
+    "en": "Ignored files",
+    "zh-Hans": "忽略文件",
+    "zh-Hant": "忽略檔案"
+  },
+  "settings.option.gitConfig": {
+    "en": "Git identity",
+    "zh-Hans": "Git 身份",
+    "zh-Hant": "Git 身分"
+  },
+  "settings.option.forkSettings": {
+    "en": "Fork behavior",
+    "zh-Hans": "派生仓库行为",
+    "zh-Hant": "分支儲存庫行為"
+  },
+  "settings.option.unassigned": {
+    "en": "None (unassigned)",
+    "zh-Hans": "无（未分配）",
+    "zh-Hant": "無（未指派）"
+  },
+  "settings.option.Global": {
+    "en": "Use global Git config",
+    "zh-Hans": "使用全局 Git 配置",
+    "zh-Hant": "使用全域 Git 設定"
+  },
+  "settings.option.Local": {
+    "en": "Use local Git config",
+    "zh-Hans": "使用本地 Git 配置",
+    "zh-Hant": "使用本機 Git 設定"
+  },
+  "settings.option.parent": {
+    "en": "Contribute to the parent repository",
+    "zh-Hans": "向父仓库贡献",
+    "zh-Hant": "向父儲存庫貢獻"
+  },
+  "settings.option.self": {
+    "en": "Contribute to this fork",
+    "zh-Hans": "向当前派生仓库贡献",
+    "zh-Hant": "向目前分支儲存庫貢獻"
+  },
+  "settings.option.openai": {
+    "en": "OpenAI-compatible",
+    "zh-Hans": "OpenAI 兼容",
+    "zh-Hant": "OpenAI 相容"
+  },
+  "settings.option.azure": {
+    "en": "Azure",
+    "zh-Hans": "Azure",
+    "zh-Hant": "Azure"
+  },
+  "settings.option.anthropic": {
+    "en": "Anthropic",
+    "zh-Hans": "Anthropic",
+    "zh-Hant": "Anthropic"
+  },
+  "settings.option.completions": {
+    "en": "Chat completions",
+    "zh-Hans": "聊天补全",
+    "zh-Hant": "聊天補全"
+  },
+  "settings.option.responses": {
+    "en": "Responses",
+    "zh-Hans": "响应接口",
+    "zh-Hant": "回應介面"
+  },
+  "settings.option.apiKey": {
+    "en": "API key",
+    "zh-Hans": "API 密钥",
+    "zh-Hant": "API 金鑰"
+  },
+  "settings.option.bearer": {
+    "en": "Bearer token",
+    "zh-Hans": "Bearer 令牌",
+    "zh-Hant": "Bearer 權杖"
+  },
+  "settings.option.none": {
+    "en": "No authentication",
+    "zh-Hans": "无需认证",
+    "zh-Hant": "無需認證"
+  },
+  "settings.option.defaultReasoning": {
+    "en": "Provider default",
+    "zh-Hans": "供应商默认值",
+    "zh-Hant": "供應商預設值"
+  },
+  "settings.error.invalidAuthor": {
+    "en": "The Git author name contains invalid characters.",
+    "zh-Hans": "Git 作者姓名包含无效字符。",
+    "zh-Hant": "Git 作者姓名包含無效字元。"
+  },
+  "settings.error.invalidCopilotPath": {
+    "en": "Choose the Copilot application or executable.",
+    "zh-Hans": "请选择 Copilot 应用或可执行文件。",
+    "zh-Hant": "請選擇 Copilot 應用程式或執行檔。"
+  },
+  "settings.error.repositorySaveFailed": {
+    "en": "Some repository settings could not be saved. Review the fields and retry.",
+    "zh-Hans": "部分仓库设置未能保存。请检查字段并重试。",
+    "zh-Hant": "部分儲存庫設定無法儲存。請檢查欄位並重試。"
+  },
+  "settings.error.failed": {
+    "en": "The settings operation failed. Review the fields and retry.",
+    "zh-Hans": "设置操作失败。请检查字段并重试。",
+    "zh-Hant": "設定操作失敗。請檢查欄位並重試。"
+  },
+  "settings.error.invalid-configuration": {
+    "en": "The provider configuration is invalid.",
+    "zh-Hans": "供应商配置无效。",
+    "zh-Hant": "供應商設定無效。"
+  },
+  "settings.error.unsupported-auth": {
+    "en": "This protocol does not support this authentication mode.",
+    "zh-Hans": "此协议不支持此认证方式。",
+    "zh-Hant": "此協定不支援此認證方式。"
+  },
+  "settings.error.secret-required": {
+    "en": "Enter a credential for this provider, authentication mode and origin.",
+    "zh-Hans": "请为此供应商、认证方式和来源输入凭据。",
+    "zh-Hant": "請為此供應商、認證方式和來源輸入認證資料。"
+  },
+  "settings.error.provider-not-found": {
+    "en": "The provider no longer exists.",
+    "zh-Hans": "供应商已不存在。",
+    "zh-Hant": "供應商已不存在。"
+  },
+  "settings.error.model-not-found": {
+    "en": "The model no longer exists.",
+    "zh-Hans": "模型已不存在。",
+    "zh-Hant": "模型已不存在。"
+  },
+  "settings.error.invalid-selection": {
+    "en": "Select an explicitly enabled, available model.",
+    "zh-Hans": "请选择已明确启用且可用的模型。",
+    "zh-Hant": "請選擇已明確啟用且可用的模型。"
+  },
+  "settings.error.storage-corrupt": {
+    "en": "The saved provider configuration is damaged or unsupported.",
+    "zh-Hans": "已保存的供应商配置损坏或不受支持。",
+    "zh-Hant": "已儲存的供應商設定損壞或不受支援。"
+  },
+  "settings.error.storage-unavailable": {
+    "en": "Provider storage is unavailable. No configuration was saved.",
+    "zh-Hans": "供应商存储不可用。配置未保存。",
+    "zh-Hant": "供應商儲存空間無法使用。設定未儲存。"
+  },
+  "settings.error.secret-storage-failed": {
+    "en": "The OS credential store could not complete the operation.",
+    "zh-Hans": "操作系统凭据存储未能完成操作。",
+    "zh-Hant": "作業系統認證儲存區無法完成操作。"
+  },
+  "settings.error.discovery-unsupported": {
+    "en": "Enter Azure deployment identifiers explicitly; inference catalogs are not deployment discovery.",
+    "zh-Hans": "请明确输入 Azure 部署标识；推理目录不是部署发现。",
+    "zh-Hant": "請明確輸入 Azure 部署識別碼；推論目錄不是部署探索。"
+  },
+  "settings.error.request-failed": {
+    "en": "The provider request failed.",
+    "zh-Hans": "供应商请求失败。",
+    "zh-Hant": "供應商請求失敗。"
+  },
+  "settings.error.cancelled": {
+    "en": "The provider request was cancelled.",
+    "zh-Hans": "供应商请求已取消。",
+    "zh-Hant": "供應商請求已取消。"
+  },
+  "settings.error.timeout": {
+    "en": "The provider request timed out.",
+    "zh-Hans": "供应商请求超时。",
+    "zh-Hant": "供應商請求逾時。"
+  },
+  "settings.error.invalid-response": {
+    "en": "The provider did not return a complete text response.",
+    "zh-Hans": "供应商未返回完整文本响应。",
+    "zh-Hant": "供應商未傳回完整文字回應。"
+  },
+  "settings.error.truncated-response": {
+    "en": "The provider stopped before completing the response.",
+    "zh-Hans": "供应商在响应完成前停止。",
+    "zh-Hant": "供應商在回應完成前停止。"
+  },
+  "settings.error.refused-response": {
+    "en": "The provider refused the request.",
+    "zh-Hans": "供应商拒绝了请求。",
+    "zh-Hant": "供應商拒絕了請求。"
+  },
+  "settings.error.tool-response": {
+    "en": "The provider returned a tool call instead of text.",
+    "zh-Hans": "供应商返回了工具调用而非文本。",
+    "zh-Hant": "供應商傳回工具呼叫而非文字。"
+  },
+  "settings.error.stale-request": {
+    "en": "The generation settings or draft changed. Review and generate again.",
+    "zh-Hans": "生成设置或草稿已改变。请审阅后重新生成。",
+    "zh-Hant": "產生設定或草稿已改變。請審閱後重新產生。"
+  },
+  "settings.error.unexpected-origin": {
+    "en": "The SDK request targeted an unexpected origin.",
+    "zh-Hans": "SDK 请求指向了非预期来源。",
+    "zh-Hant": "SDK 請求指向了非預期來源。"
+  },
+  "settings.option.chooseAuthentication": {
+    "en": "Choose an authentication mode",
+    "zh-Hans": "选择认证方式",
+    "zh-Hant": "選擇驗證方式"
+  },
+  "settings.option.openai-responses": {
+    "en": "OpenAI Responses API",
+    "zh-Hans": "OpenAI 响应 API",
+    "zh-Hant": "OpenAI 回應 API"
+  },
+  "settings.option.openai-chat": {
+    "en": "OpenAI Chat Completions API",
+    "zh-Hans": "OpenAI 聊天补全 API",
+    "zh-Hant": "OpenAI 聊天補全 API"
+  },
+  "settings.option.anthropic-messages": {
+    "en": "Anthropic Messages API",
+    "zh-Hans": "Anthropic 消息 API",
+    "zh-Hant": "Anthropic 訊息 API"
+  },
+  "settings.option.gemini": {
+    "en": "Gemini Developer API",
+    "zh-Hans": "Gemini 开发者 API",
+    "zh-Hant": "Gemini 開發者 API"
+  },
+  "settings.option.azure-openai-v1": {
+    "en": "Azure OpenAI v1 API",
+    "zh-Hans": "Azure OpenAI v1 API",
+    "zh-Hant": "Azure OpenAI v1 API"
+  },
+  "settings.option.ollama": {
+    "en": "Ollama API",
+    "zh-Hans": "Ollama API",
+    "zh-Hant": "Ollama API"
+  },
+  "settings.option.low": { "en": "Low", "zh-Hans": "低", "zh-Hant": "低" },
+  "settings.option.medium": {
+    "en": "Medium",
+    "zh-Hans": "中",
+    "zh-Hant": "中"
+  },
+  "settings.option.high": { "en": "High", "zh-Hans": "高", "zh-Hant": "高" },
+  "settings.option.xhigh": {
+    "en": "Extra high",
+    "zh-Hans": "极高",
+    "zh-Hant": "極高"
+  }
+}

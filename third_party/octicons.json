@@ -1,0 +1,3677 @@
+{
+  "package": "@primer/octicons",
+  "version": "19.28.1",
+  "source": "https://registry.npmjs.org/@primer/octicons/-/octicons-19.28.1.tgz",
+  "integrity": "sha512-pwSilXmgNrbVF2bChkh4zZtUyb4Vr4niYhA9PhUdtjVz86A2iwA/YjjopHS0suT+I7niUZJEepEpmSC7kARKNQ==",
+  "license": "MIT",
+  "licenseFile": "third_party/licenses/native/primer-octicons-LICENSE",
+  "licenseSha256": "da259c8bd0de62713ccdcf88910aebca810644f98c2c912bad814fc79ea778df",
+  "role": "original upstream development icon preview, rendered with MyGo ui.Icon",
+  "icons": [
+    {
+      "id": "accessibility-16",
+      "path": "app/native/octicons/accessibility-16.svg",
+      "sha256": "bde4bbd41a3482020c0aa31292a42852c33d88b86aa00c11b86a6cc8164d20e6"
+    },
+    {
+      "id": "accessibility-24",
+      "path": "app/native/octicons/accessibility-24.svg",
+      "sha256": "5333372ce1cbeccb4e41abb2cb53948dbca37d952cf703032e33d722596fcee6"
+    },
+    {
+      "id": "accessibility-inset-16",
+      "path": "app/native/octicons/accessibility-inset-16.svg",
+      "sha256": "bf190933d3683b7addebdacc9ff681d1e24a162503e2fe2a36e7f7a6b0b9c946"
+    },
+    {
+      "id": "accessibility-inset-24",
+      "path": "app/native/octicons/accessibility-inset-24.svg",
+      "sha256": "3830c655dd306c28e41e4dd539e38d610835e27e359f6ee2a80bfbf6378a7472"
+    },
+    {
+      "id": "agent-16",
+      "path": "app/native/octicons/agent-16.svg",
+      "sha256": "e78d15b88ece17c522f34954566f765e0a780778cef9ddd2b2b2f3c724d86f37"
+    },
+    {
+      "id": "agent-24",
+      "path": "app/native/octicons/agent-24.svg",
+      "sha256": "3bbded6865d85cebc6a2e85151cc4ef2fad90880c6ed65688dc0f64ca05248dd"
+    },
+    {
+      "id": "ai-model-16",
+      "path": "app/native/octicons/ai-model-16.svg",
+      "sha256": "1f5e9474c4bab1200b3c9b0ac69f6551926cfe6ad02a451e8728838fd90744b0"
+    },
+    {
+      "id": "ai-model-24",
+      "path": "app/native/octicons/ai-model-24.svg",
+      "sha256": "90c1fca0e92289dd81747d6fe7b19a7d19ae5ae3e5198558c0178e99f7a843b1"
+    },
+    {
+      "id": "alert-16",
+      "path": "app/native/octicons/alert-16.svg",
+      "sha256": "32919054bf2d0856ca77c474b49137701766da94a701a1f1a4fb063aae9610ea"
+    },
+    {
+      "id": "alert-24",
+      "path": "app/native/octicons/alert-24.svg",
+      "sha256": "4c15971e759fb426accf77279cd4fffdfea9744dc200124cc9019e499d6c0424"
+    },
+    {
+      "id": "alert-fill-12",
+      "path": "app/native/octicons/alert-fill-12.svg",
+      "sha256": "1541f05f1625e9f132486b4098f63f22c452fd670862baba03662076a2bcc59c"
+    },
+    {
+      "id": "alert-fill-16",
+      "path": "app/native/octicons/alert-fill-16.svg",
+      "sha256": "0d2647a7d1d17279873b8c58e5d83bafdc4a5cf47dc8a674bc414542d044935b"
+    },
+    {
+      "id": "alert-fill-24",
+      "path": "app/native/octicons/alert-fill-24.svg",
+      "sha256": "26949876b14a5e739e5df0728a39859247abf703129930faf591d39bfe9820c3"
+    },
+    {
+      "id": "apps-16",
+      "path": "app/native/octicons/apps-16.svg",
+      "sha256": "eb67df06ce8b374f1c4d576f76b6058ce987c3e9666b2fd74e3ddfca76e7d8de"
+    },
+    {
+      "id": "apps-24",
+      "path": "app/native/octicons/apps-24.svg",
+      "sha256": "55afe7d26b6c96a35cccd46643ea264960482d042af9e6790c17638efae3d0d9"
+    },
+    {
+      "id": "archive-16",
+      "path": "app/native/octicons/archive-16.svg",
+      "sha256": "5f1354343b47387c086e358e2f435868e5e03f68721e522212c7c78f18866c8e"
+    },
+    {
+      "id": "archive-24",
+      "path": "app/native/octicons/archive-24.svg",
+      "sha256": "e5077cf0b1daf236c19ff6f31c3fbf2fb5f35c74864703a2758ad750583901b2"
+    },
+    {
+      "id": "arrow-both-16",
+      "path": "app/native/octicons/arrow-both-16.svg",
+      "sha256": "636b4da724dc721d70dbb4766ee0584aa855e1ac4d9405ffbb0739197b6fe6db"
+    },
+    {
+      "id": "arrow-both-24",
+      "path": "app/native/octicons/arrow-both-24.svg",
+      "sha256": "0ddef925c990b6a7c87ad423aa136d35d80ed190026825dea22472960e8a8d5c"
+    },
+    {
+      "id": "arrow-down-16",
+      "path": "app/native/octicons/arrow-down-16.svg",
+      "sha256": "1182ecaf24b95d99d8d94411e3e60e8c7e7fd1d3ce301cff661ea68de57f42de"
+    },
+    {
+      "id": "arrow-down-24",
+      "path": "app/native/octicons/arrow-down-24.svg",
+      "sha256": "8a4e7a72e2d586428288d492b7c2b1bcdeca907aa4490dd8d248daebf43656ca"
+    },
+    {
+      "id": "arrow-down-left-16",
+      "path": "app/native/octicons/arrow-down-left-16.svg",
+      "sha256": "c8cc728c5ea3461a8234b0f29ea54a2afd691209e8180c857fedc7881f524efa"
+    },
+    {
+      "id": "arrow-down-left-24",
+      "path": "app/native/octicons/arrow-down-left-24.svg",
+      "sha256": "aa751d9babd6e4bf1a703348be46b1e61429611a94561a40ed7e5145255be429"
+    },
+    {
+      "id": "arrow-down-right-16",
+      "path": "app/native/octicons/arrow-down-right-16.svg",
+      "sha256": "7e7a85a37d60130053fa3ebb9de632bd3403e84bca3ee170676d59f7c4b92a3f"
+    },
+    {
+      "id": "arrow-down-right-24",
+      "path": "app/native/octicons/arrow-down-right-24.svg",
+      "sha256": "186da7bb2c909de3218b42005b855d3dcc8be5e124db52f53ba268a1f75c1232"
+    },
+    {
+      "id": "arrow-left-16",
+      "path": "app/native/octicons/arrow-left-16.svg",
+      "sha256": "1960ff2552c4133cb1839c389fb595b86f5c6d20cefbc8f9a5f24de816c9ddd0"
+    },
+    {
+      "id": "arrow-left-24",
+      "path": "app/native/octicons/arrow-left-24.svg",
+      "sha256": "ca4612c5d08c3bfa48c7cc62cd952a53090f41b724c1cbb0780aa5dedc6f5b6f"
+    },
+    {
+      "id": "arrow-right-16",
+      "path": "app/native/octicons/arrow-right-16.svg",
+      "sha256": "a1f687122417c38a382435c208d96776e7b9361b89aa114d1249fc487fff8838"
+    },
+    {
+      "id": "arrow-right-24",
+      "path": "app/native/octicons/arrow-right-24.svg",
+      "sha256": "286a45cee9c87adb2010cd38cf93f7b73679d578873c1f1a00b0d130386a6eec"
+    },
+    {
+      "id": "arrow-switch-16",
+      "path": "app/native/octicons/arrow-switch-16.svg",
+      "sha256": "b8e450617daf6693e13aac12dcd793e79fbdf656fdca9f98d35b3b7362203fda"
+    },
+    {
+      "id": "arrow-switch-24",
+      "path": "app/native/octicons/arrow-switch-24.svg",
+      "sha256": "656c6ad713953e478172bd66754d0f9b1b4ef4adf95796c147f06972b7543730"
+    },
+    {
+      "id": "arrow-up-16",
+      "path": "app/native/octicons/arrow-up-16.svg",
+      "sha256": "2cfb5fce8eae1d12d6fd4fbe64fb77baea1ff356b8951fcad45610a58c921729"
+    },
+    {
+      "id": "arrow-up-24",
+      "path": "app/native/octicons/arrow-up-24.svg",
+      "sha256": "6adf98dcf6c497d2a2c106280d4a91d2df7c1c72e1c70aea53ddfc7f07d29409"
+    },
+    {
+      "id": "arrow-up-left-16",
+      "path": "app/native/octicons/arrow-up-left-16.svg",
+      "sha256": "132eb314e620cb85a06fff93239c7702f0ce451193bcae8ce02b9e89d70386ba"
+    },
+    {
+      "id": "arrow-up-left-24",
+      "path": "app/native/octicons/arrow-up-left-24.svg",
+      "sha256": "f8c076920173bc326a9e60fffc56aaacbe07aeda7aa7cc29c7aa8cd7657cee59"
+    },
+    {
+      "id": "arrow-up-right-16",
+      "path": "app/native/octicons/arrow-up-right-16.svg",
+      "sha256": "0ed64661e5335804808bfc490545f7133d49e20baa0dbba0e7d48a19c2c7e166"
+    },
+    {
+      "id": "arrow-up-right-24",
+      "path": "app/native/octicons/arrow-up-right-24.svg",
+      "sha256": "e8f21df4d18391cc5ae6ef749f881684a44b1263c176b6d0c3b0cf67d1e8296c"
+    },
+    {
+      "id": "beaker-16",
+      "path": "app/native/octicons/beaker-16.svg",
+      "sha256": "fcebe663048c5b9c9c014f3d4576095b02d6e2af45995bf9aed5a3f1288d5d5e"
+    },
+    {
+      "id": "beaker-24",
+      "path": "app/native/octicons/beaker-24.svg",
+      "sha256": "67a8e3f6bd91324fa63408ce19d1b04bf3e6d1317e887bad8172d1b0f38e2bc9"
+    },
+    {
+      "id": "bell-16",
+      "path": "app/native/octicons/bell-16.svg",
+      "sha256": "be8c6f7119500995fb40880fab1f9a6b4a106a898126cea63906bdd22244bf84"
+    },
+    {
+      "id": "bell-24",
+      "path": "app/native/octicons/bell-24.svg",
+      "sha256": "eafc4e89c138e9426d718921f864eb8b0674e804f93f7cd55ad0c8c1980ede9c"
+    },
+    {
+      "id": "bell-fill-16",
+      "path": "app/native/octicons/bell-fill-16.svg",
+      "sha256": "addca61a145acb066a17ab917770dc885828a9d049edf6fb8ab01a19d17e7f7e"
+    },
+    {
+      "id": "bell-fill-24",
+      "path": "app/native/octicons/bell-fill-24.svg",
+      "sha256": "0becc9de549af718d943439232dd4f98146962ddb4c77ab03783e5e7d1600aad"
+    },
+    {
+      "id": "bell-slash-16",
+      "path": "app/native/octicons/bell-slash-16.svg",
+      "sha256": "c384762bafd219af9b9e40be2cf327fe40ba4a0e84e1e42c874ba9a32d1e0fdf"
+    },
+    {
+      "id": "bell-slash-24",
+      "path": "app/native/octicons/bell-slash-24.svg",
+      "sha256": "e1fff754ebc6c87a1c1bbd767b915c8b9b7fe7fe77d42600990add19fe292a21"
+    },
+    {
+      "id": "blocked-16",
+      "path": "app/native/octicons/blocked-16.svg",
+      "sha256": "10cf2f1bd22527023bb4910fd2cb1f2115c4cede888aea9ab04ad30e03e58216"
+    },
+    {
+      "id": "blocked-24",
+      "path": "app/native/octicons/blocked-24.svg",
+      "sha256": "b3fc1f0b43abafabba04a5137403e8687db0da0c5995080bbad620a37599b641"
+    },
+    {
+      "id": "bold-16",
+      "path": "app/native/octicons/bold-16.svg",
+      "sha256": "adfe870b61a39d4973b7a69e6b3c31db8935b7325ed40772335a111fb2874403"
+    },
+    {
+      "id": "bold-24",
+      "path": "app/native/octicons/bold-24.svg",
+      "sha256": "a3f9f816dd3226264a43b31c1b4e03966492ea560bdd6219a45878e9ed4f76fb"
+    },
+    {
+      "id": "book-16",
+      "path": "app/native/octicons/book-16.svg",
+      "sha256": "eb260b9736df5b419b7896647693c970043347a01e518a685f9d7a308cde11c0"
+    },
+    {
+      "id": "book-24",
+      "path": "app/native/octicons/book-24.svg",
+      "sha256": "faec632be68418bbb6f05e94d5d9982df809ef52723d3217c80c398e10c83ca7"
+    },
+    {
+      "id": "book-locked-16",
+      "path": "app/native/octicons/book-locked-16.svg",
+      "sha256": "36b6f0c2805c7caadc844e81e30f6e98404bc72ed5c5b8746b06c342e96f49cc"
+    },
+    {
+      "id": "bookmark-16",
+      "path": "app/native/octicons/bookmark-16.svg",
+      "sha256": "f04213bd17a3fd2f1b1a5a2be07ff92ff8c6afb4d681674123635a9b1701851c"
+    },
+    {
+      "id": "bookmark-24",
+      "path": "app/native/octicons/bookmark-24.svg",
+      "sha256": "7bd792e9e7b9fe0dff9420f7eccea2ea7ed9d6c8e4db631248dbe6bc2eb66d57"
+    },
+    {
+      "id": "bookmark-fill-24",
+      "path": "app/native/octicons/bookmark-fill-24.svg",
+      "sha256": "6b5d8ec07ab88297053b967368bd5a00dfe37dce8e575724362ee9f4cf91bc5a"
+    },
+    {
+      "id": "bookmark-filled-16",
+      "path": "app/native/octicons/bookmark-filled-16.svg",
+      "sha256": "2a3dfc18e1a4fc09374579830c394ea5ea66a3172a91a663f37cb7841c7e55f7"
+    },
+    {
+      "id": "bookmark-slash-16",
+      "path": "app/native/octicons/bookmark-slash-16.svg",
+      "sha256": "9240ffe25d39d88a5448bb6092c6b2369e23dade78f3149f4e06ceb9476c6d1c"
+    },
+    {
+      "id": "bookmark-slash-24",
+      "path": "app/native/octicons/bookmark-slash-24.svg",
+      "sha256": "95fc0cf58a3d8251fe3ee41df9678ae99b494c023d8f17b2964ec0b675019564"
+    },
+    {
+      "id": "bookmark-slash-fill-16",
+      "path": "app/native/octicons/bookmark-slash-fill-16.svg",
+      "sha256": "3ca8c23be68545a9465e855ebe8978889cae0e7afe1458273c0690b3140a0d6d"
+    },
+    {
+      "id": "bookmark-slash-fill-24",
+      "path": "app/native/octicons/bookmark-slash-fill-24.svg",
+      "sha256": "151c580ea709e8796fb592308204e68975376e45d0faab97b88f73d0699cc123"
+    },
+    {
+      "id": "boolean-off-16",
+      "path": "app/native/octicons/boolean-off-16.svg",
+      "sha256": "ce73b3fa64ecd62360463e7a147b1ce61b378b51e23096b87d4410208bcb1e80"
+    },
+    {
+      "id": "boolean-off-24",
+      "path": "app/native/octicons/boolean-off-24.svg",
+      "sha256": "05c0a40eabb8ae5777fdc78112ef04a44c14acc397cddde95854b1294f932d9c"
+    },
+    {
+      "id": "boolean-on-16",
+      "path": "app/native/octicons/boolean-on-16.svg",
+      "sha256": "468184b289fb2e348f31f19bbae6ebb70cae95e34c98762d3f393d2b1ce7bba2"
+    },
+    {
+      "id": "boolean-on-24",
+      "path": "app/native/octicons/boolean-on-24.svg",
+      "sha256": "2f0c7d591402443855de159d55d123800546ab2154bacc19aa56bbbc23e14632"
+    },
+    {
+      "id": "briefcase-16",
+      "path": "app/native/octicons/briefcase-16.svg",
+      "sha256": "b056d9d77f65340f441df333aa9ee50d02c59b0fc0914cb02797f6d9b8955773"
+    },
+    {
+      "id": "briefcase-24",
+      "path": "app/native/octicons/briefcase-24.svg",
+      "sha256": "9553eaf390995cd734101b62943a7e47f4c6e28a9fc2e4966c4215294bafdb0b"
+    },
+    {
+      "id": "broadcast-16",
+      "path": "app/native/octicons/broadcast-16.svg",
+      "sha256": "a376322d637d2fdf94f1ab49c380656997ea33560561df249560384f51f0c4ab"
+    },
+    {
+      "id": "broadcast-24",
+      "path": "app/native/octicons/broadcast-24.svg",
+      "sha256": "d591a56bcb2e6351d56937ee03ab88c6cce5c5ec48ac001d3cad72eb305b3866"
+    },
+    {
+      "id": "browser-16",
+      "path": "app/native/octicons/browser-16.svg",
+      "sha256": "374baf23e9961f412a11e323fe7a3782497923406e4580f3c0978c5cfb797351"
+    },
+    {
+      "id": "browser-24",
+      "path": "app/native/octicons/browser-24.svg",
+      "sha256": "82f6d8159ca63d8009c6509c3bc154e283793d7669bf53a7b1937e1b4243bfbf"
+    },
+    {
+      "id": "bug-16",
+      "path": "app/native/octicons/bug-16.svg",
+      "sha256": "bb68da7ea99fe5a10e9ff9aa3f3fdcfab72f33c92f2c6f5a88e00d0988c32a78"
+    },
+    {
+      "id": "bug-24",
+      "path": "app/native/octicons/bug-24.svg",
+      "sha256": "be69049c0a3dd41fb2430b6599602873790616d4d843c90360d588203d7fdcef"
+    },
+    {
+      "id": "cache-16",
+      "path": "app/native/octicons/cache-16.svg",
+      "sha256": "ea58c4f3dea573b09f79829b06325e5d9e7c080c2b82f7ed634f0921d0aa813d"
+    },
+    {
+      "id": "cache-24",
+      "path": "app/native/octicons/cache-24.svg",
+      "sha256": "68fe7897dcc9ce9b2cda142b70a1f5fe78e296625fffaa3a567f420a6d5b4eb9"
+    },
+    {
+      "id": "calendar-16",
+      "path": "app/native/octicons/calendar-16.svg",
+      "sha256": "9f4ba4532eb84e24ee15a138b8adf8d2bc3d48b5819df52158adc72607c287b9"
+    },
+    {
+      "id": "calendar-24",
+      "path": "app/native/octicons/calendar-24.svg",
+      "sha256": "3ac0ad31d858374c961adb9c9c93dda7cd23d5c6fe0467c870421f5d9ea13248"
+    },
+    {
+      "id": "check-16",
+      "path": "app/native/octicons/check-16.svg",
+      "sha256": "03c83ce9419c3098e1056902f05f8c22336a51c7c8fcf90b66156b48c429fbef"
+    },
+    {
+      "id": "check-24",
+      "path": "app/native/octicons/check-24.svg",
+      "sha256": "ecbd7e95a2915f370400e6c4ee94bc178a8435533c22486d105692014089f3ed"
+    },
+    {
+      "id": "check-circle-16",
+      "path": "app/native/octicons/check-circle-16.svg",
+      "sha256": "579962336aa28b1f312ec515d316633ca12d92ba4f6c50f755c2411b9be3112a"
+    },
+    {
+      "id": "check-circle-24",
+      "path": "app/native/octicons/check-circle-24.svg",
+      "sha256": "363c6d6d518a99f6793876a45fcd03c4d03b62663fc0125f43016513f2f7742d"
+    },
+    {
+      "id": "check-circle-fill-12",
+      "path": "app/native/octicons/check-circle-fill-12.svg",
+      "sha256": "9ba67b5b8f2a42c695f9a51c0d10e4a4d02222590b2b3ffdb1fa119a98a55668"
+    },
+    {
+      "id": "check-circle-fill-16",
+      "path": "app/native/octicons/check-circle-fill-16.svg",
+      "sha256": "b5eabd429e7f18ea84dc1b814dc82214d5012dbf35689717fdabddeb9695cf3c"
+    },
+    {
+      "id": "check-circle-fill-24",
+      "path": "app/native/octicons/check-circle-fill-24.svg",
+      "sha256": "ef9bfbc17cb2e72730e4364b4ee6406ad02dc3890199db89cfbbc938baa53bd2"
+    },
+    {
+      "id": "checkbox-16",
+      "path": "app/native/octicons/checkbox-16.svg",
+      "sha256": "790487a818e0d7d7493ec95149af82f04bb7dc7a0770204d7dd3d4267d33b417"
+    },
+    {
+      "id": "checkbox-24",
+      "path": "app/native/octicons/checkbox-24.svg",
+      "sha256": "66372dafa5f97a275ad15b8a65554a4ec9cf068385dbed985b17230cd5494576"
+    },
+    {
+      "id": "checkbox-fill-16",
+      "path": "app/native/octicons/checkbox-fill-16.svg",
+      "sha256": "2efc04a2dda78e5a7201a676024606117b69e12117197d49f8394d43a4455905"
+    },
+    {
+      "id": "checkbox-fill-24",
+      "path": "app/native/octicons/checkbox-fill-24.svg",
+      "sha256": "abb6f8ecb561617d99e121b1deffb25e0cd9b7a12572d72dba683036f88b1f49"
+    },
+    {
+      "id": "checklist-16",
+      "path": "app/native/octicons/checklist-16.svg",
+      "sha256": "27e941f4e4a5405a9693a8cd3322554404ac95748a06cf059c2abfef964f8633"
+    },
+    {
+      "id": "checklist-24",
+      "path": "app/native/octicons/checklist-24.svg",
+      "sha256": "7583f35a015212a8fd906a9b8c535fe6749c1d4793e1c2efcd2dd4ab0ccd8f41"
+    },
+    {
+      "id": "chevron-down-12",
+      "path": "app/native/octicons/chevron-down-12.svg",
+      "sha256": "be87ea985312b1bb4cb1bf6a56481a2dd4f44606542d01bea25d218dc1bcc44b"
+    },
+    {
+      "id": "chevron-down-16",
+      "path": "app/native/octicons/chevron-down-16.svg",
+      "sha256": "8d65c8c02e1bdb3fbc9887ba41174d2482805f6210e3fbf0fd28181086d5c7b6"
+    },
+    {
+      "id": "chevron-down-24",
+      "path": "app/native/octicons/chevron-down-24.svg",
+      "sha256": "1da70af62c124e5016115b1b47990c7b793d1f287495d9a777576f5775da9a4a"
+    },
+    {
+      "id": "chevron-left-12",
+      "path": "app/native/octicons/chevron-left-12.svg",
+      "sha256": "346754db7bcd514b1b1cec2430bab5ff870e3067c25abe1cda8436d22283cd3b"
+    },
+    {
+      "id": "chevron-left-16",
+      "path": "app/native/octicons/chevron-left-16.svg",
+      "sha256": "80451e623292db336a54e04db0901a205a501b7ec886d4b79ea7ce8a53d37d94"
+    },
+    {
+      "id": "chevron-left-24",
+      "path": "app/native/octicons/chevron-left-24.svg",
+      "sha256": "0990d8ea78264c824c5f24f470c82f9024cadb5737060bb6e7ba9d6936bd086e"
+    },
+    {
+      "id": "chevron-right-12",
+      "path": "app/native/octicons/chevron-right-12.svg",
+      "sha256": "37d6d4968238740d61c5f9c665948336f59537054bc77d870e2b25fe2ad03166"
+    },
+    {
+      "id": "chevron-right-16",
+      "path": "app/native/octicons/chevron-right-16.svg",
+      "sha256": "2c1e6fe5281f25add8237832dfc59ebf69dfb76dc04469998be458614ca4996a"
+    },
+    {
+      "id": "chevron-right-24",
+      "path": "app/native/octicons/chevron-right-24.svg",
+      "sha256": "e5b508e21801803dca7bcfbaf9695df0b8dcb4250d92e7082fb9a2f8254ca256"
+    },
+    {
+      "id": "chevron-up-12",
+      "path": "app/native/octicons/chevron-up-12.svg",
+      "sha256": "2c5f52569c6d480b224777e2b567defd02b2ebd4ab584e5c8f5e6256baa13d43"
+    },
+    {
+      "id": "chevron-up-16",
+      "path": "app/native/octicons/chevron-up-16.svg",
+      "sha256": "042dcd1c53fc9a15b47385656e902a827f09807862f611b41774c85f858c52d9"
+    },
+    {
+      "id": "chevron-up-24",
+      "path": "app/native/octicons/chevron-up-24.svg",
+      "sha256": "c7c1abe3cc17e965adb588ea15efc648c3d23fca1f781d0a3f3f1882945f7c04"
+    },
+    {
+      "id": "circle-16",
+      "path": "app/native/octicons/circle-16.svg",
+      "sha256": "b96d6509ac75b9eeedebfc0691f5f1a190f69e2beddddab5e2c9f3a95cd2d8ee"
+    },
+    {
+      "id": "circle-24",
+      "path": "app/native/octicons/circle-24.svg",
+      "sha256": "1b0fb1003e8725c4201b93082bdb78ea098a3f5384333b56a30ae7efece01151"
+    },
+    {
+      "id": "circle-slash-16",
+      "path": "app/native/octicons/circle-slash-16.svg",
+      "sha256": "e90dcd60c671ad225be51915a2001749e536da5987996d11bef65c220a1058a9"
+    },
+    {
+      "id": "circle-slash-24",
+      "path": "app/native/octicons/circle-slash-24.svg",
+      "sha256": "bff84a630648e5a46ad3c9594042ba622d88ce1a644f7defac4a3a92eb91df40"
+    },
+    {
+      "id": "clock-16",
+      "path": "app/native/octicons/clock-16.svg",
+      "sha256": "30ab1cd4a01f2dffbed4eb0cff9907c16504362845c4d0da80afb29f1ba2df3d"
+    },
+    {
+      "id": "clock-24",
+      "path": "app/native/octicons/clock-24.svg",
+      "sha256": "755c14b88bab2db4bb613557bfda57ba990b9d255f11f138ace7a15fef52cc8b"
+    },
+    {
+      "id": "clock-fill-16",
+      "path": "app/native/octicons/clock-fill-16.svg",
+      "sha256": "31b2cf6fcac4d8e58eb3a83d7ef248b30a4776d96e88e1d644d591a0f8ea447a"
+    },
+    {
+      "id": "clock-fill-24",
+      "path": "app/native/octicons/clock-fill-24.svg",
+      "sha256": "8974c1a985b8701fce6a7969c97f9c799464ed9319a0275042efa7399a712f44"
+    },
+    {
+      "id": "cloud-16",
+      "path": "app/native/octicons/cloud-16.svg",
+      "sha256": "7d0141b43b5a9ef8a9d534ecdd48fb41024aea33aa68a594a8db7f7d6ede7757"
+    },
+    {
+      "id": "cloud-24",
+      "path": "app/native/octicons/cloud-24.svg",
+      "sha256": "1908fee50962d7115c979cd8511199607b0ce882980edcaff51cf3a0373e0cb7"
+    },
+    {
+      "id": "cloud-offline-16",
+      "path": "app/native/octicons/cloud-offline-16.svg",
+      "sha256": "4ef4608408189490958c16bf7ec206b9e91713787d3ae3ba8aef17f29e29e730"
+    },
+    {
+      "id": "cloud-offline-24",
+      "path": "app/native/octicons/cloud-offline-24.svg",
+      "sha256": "970347405bbce07cdcd087fa90d5e1e3dd2626857ef771267ec8ca0efd5057ab"
+    },
+    {
+      "id": "code-16",
+      "path": "app/native/octicons/code-16.svg",
+      "sha256": "5ce3080af3a604a85079d9567dd8bfca2d68a7e49d91a753a25402a2e2489733"
+    },
+    {
+      "id": "code-24",
+      "path": "app/native/octicons/code-24.svg",
+      "sha256": "c2cfb6a87bb814e85c18dac35ea75472ecc8dc1f02bd7e7adc4a4a4e8ef62bd0"
+    },
+    {
+      "id": "code-of-conduct-16",
+      "path": "app/native/octicons/code-of-conduct-16.svg",
+      "sha256": "2d7fc8ddc571b2dee04399380f9bc66916a0b659675f7953ef6fd75043cbaf39"
+    },
+    {
+      "id": "code-of-conduct-24",
+      "path": "app/native/octicons/code-of-conduct-24.svg",
+      "sha256": "ff9c30c2bc50b1d0b089a84e94e00ca5557fa575f5bf1200a3ead62642ef1bc8"
+    },
+    {
+      "id": "code-review-16",
+      "path": "app/native/octicons/code-review-16.svg",
+      "sha256": "614f2b730be2cc0a071117c3949ea1e058fdc2619740875f3e314180bcb0af6d"
+    },
+    {
+      "id": "code-review-24",
+      "path": "app/native/octicons/code-review-24.svg",
+      "sha256": "9443dc8cf16e45fd74cb64d5d3c7fb39b0925d24f5d22ce07afc61c442e2da66"
+    },
+    {
+      "id": "code-square-16",
+      "path": "app/native/octicons/code-square-16.svg",
+      "sha256": "da418601283c84c805fa1ef3daaf2a26b0ec0330799f38c4389041e197fae1fc"
+    },
+    {
+      "id": "code-square-24",
+      "path": "app/native/octicons/code-square-24.svg",
+      "sha256": "c9b67a694f043386bbb125ad5dc4662d57f67b3d350b9ba9ab1f3bde9cd5c142"
+    },
+    {
+      "id": "codescan-16",
+      "path": "app/native/octicons/codescan-16.svg",
+      "sha256": "44aa6b716d684ccdc9d9b5324eadbb9b39543e64c057051215779a039eb0df0a"
+    },
+    {
+      "id": "codescan-24",
+      "path": "app/native/octicons/codescan-24.svg",
+      "sha256": "03f601e1e89bb527b56fb2c2010e37d3767f27eecd1184fd001846cba31b6a8c"
+    },
+    {
+      "id": "codescan-checkmark-16",
+      "path": "app/native/octicons/codescan-checkmark-16.svg",
+      "sha256": "5eb5154147d376d37cb2968b7dfd5b4aeee35455dea280a3c13c15bca2096f86"
+    },
+    {
+      "id": "codescan-checkmark-24",
+      "path": "app/native/octicons/codescan-checkmark-24.svg",
+      "sha256": "afe8959d2e8a3767c9a89a757b15dd79f294712fb347204ea6a8328b7e27704e"
+    },
+    {
+      "id": "codespaces-16",
+      "path": "app/native/octicons/codespaces-16.svg",
+      "sha256": "a69123bba56199627455f5e5a0fea697e39b2e1cb3ad5ce4d97db533a1391105"
+    },
+    {
+      "id": "codespaces-24",
+      "path": "app/native/octicons/codespaces-24.svg",
+      "sha256": "47a81ac7e782a1e9d905d8df7b92a8d5b1a3cf2772cb1f8ff12e1c7cf2958aa1"
+    },
+    {
+      "id": "columns-16",
+      "path": "app/native/octicons/columns-16.svg",
+      "sha256": "bc6bcbfe456f2cc781fb978f6acffe80c37e1a634541316ca367c281131dc8ab"
+    },
+    {
+      "id": "columns-24",
+      "path": "app/native/octicons/columns-24.svg",
+      "sha256": "4640b257becaa91bd2cacd3b66b61f5965be85428a02038eb9e974672dd96ef7"
+    },
+    {
+      "id": "command-palette-16",
+      "path": "app/native/octicons/command-palette-16.svg",
+      "sha256": "efb7dc7b7ec7c3ba9aeac5063f26d444d389cebaf343703639e38c5181692ddc"
+    },
+    {
+      "id": "command-palette-24",
+      "path": "app/native/octicons/command-palette-24.svg",
+      "sha256": "7ea6be8b51fd75a8f584912fc7303b3ed05eca48eb6acc59a2866d6fb021888b"
+    },
+    {
+      "id": "comment-16",
+      "path": "app/native/octicons/comment-16.svg",
+      "sha256": "1543da650f7940803ac965d976785d69170b88f9ce945e345cdaae7d2cf355c2"
+    },
+    {
+      "id": "comment-24",
+      "path": "app/native/octicons/comment-24.svg",
+      "sha256": "2d112d009458234494fed499f678f79b6a512d051994e944384959e182a220e7"
+    },
+    {
+      "id": "comment-ai-16",
+      "path": "app/native/octicons/comment-ai-16.svg",
+      "sha256": "e8cabf2abc8b97e62e1eb802b49878600a6623f25d75a61c1f376d49a99a6bdf"
+    },
+    {
+      "id": "comment-ai-24",
+      "path": "app/native/octicons/comment-ai-24.svg",
+      "sha256": "045e0139d7d59dde79d6f4609a40356403d9fefe2344aabecfdbf5979a0c4d9e"
+    },
+    {
+      "id": "comment-discussion-16",
+      "path": "app/native/octicons/comment-discussion-16.svg",
+      "sha256": "57ad74f91ab15d412624770cebd8f15e1df8421f7aab06f5e1a79c36502eeee7"
+    },
+    {
+      "id": "comment-discussion-24",
+      "path": "app/native/octicons/comment-discussion-24.svg",
+      "sha256": "65243c9d01f174cf429cf75021f524e297c75385aa13b4981b4d72a61ae34092"
+    },
+    {
+      "id": "comment-locked-16",
+      "path": "app/native/octicons/comment-locked-16.svg",
+      "sha256": "c8ca1deceba4873ef57b4afa4fde0a30d5d090f4bb10c1294baa25411956bb99"
+    },
+    {
+      "id": "compose-16",
+      "path": "app/native/octicons/compose-16.svg",
+      "sha256": "ac419dd40b6c3c03bae3d2a1d918c340786a1d4bc6bcc4c927d24c9b6dfbde8d"
+    },
+    {
+      "id": "compose-24",
+      "path": "app/native/octicons/compose-24.svg",
+      "sha256": "00c64b89c640c1266876bfec36f59ebfa0acb70e8ead9f8fb0ce3d510579992e"
+    },
+    {
+      "id": "container-16",
+      "path": "app/native/octicons/container-16.svg",
+      "sha256": "96b8e2dac935f246f21c3e57225e86735e12c57dc6e59c13c3efa96b99eb430c"
+    },
+    {
+      "id": "container-24",
+      "path": "app/native/octicons/container-24.svg",
+      "sha256": "6c2fc884c0df342036950f7504416a4d6ab9d73fbb70512d1c4fddb511da9f8e"
+    },
+    {
+      "id": "copilot-16",
+      "path": "app/native/octicons/copilot-16.svg",
+      "sha256": "b5bfc7d50d1ec20a03e696f27fae38faa5376dcce0d6f2c49f25b3462d2a8e9b"
+    },
+    {
+      "id": "copilot-24",
+      "path": "app/native/octicons/copilot-24.svg",
+      "sha256": "eeafb3c2f333e04ccf7d031ae215f7adafaed4c6352556b0bf79496e048bcdd7"
+    },
+    {
+      "id": "copilot-48",
+      "path": "app/native/octicons/copilot-48.svg",
+      "sha256": "d94b7a94a4c23816b02285f53eca6386429b67522271483fa0f18ab3596617dc"
+    },
+    {
+      "id": "copilot-96",
+      "path": "app/native/octicons/copilot-96.svg",
+      "sha256": "7278b4cf7e491143c95cdf1327db4f6535b288d97075a9a1cb1b9d82da5f1ba5"
+    },
+    {
+      "id": "copilot-error-16",
+      "path": "app/native/octicons/copilot-error-16.svg",
+      "sha256": "bf2cb3d4346e56eb290e4e14773ae47fb30408f7291235153790911fd4bbf344"
+    },
+    {
+      "id": "copilot-warning-16",
+      "path": "app/native/octicons/copilot-warning-16.svg",
+      "sha256": "e94f1265f4193f758e3521b0850d01d08e0206dd40a69b54d3e947208fba30df"
+    },
+    {
+      "id": "copy-16",
+      "path": "app/native/octicons/copy-16.svg",
+      "sha256": "1cd9f5bac41bedd0f295f981f47f49427d7e64c3ba1c40f8d93d94602f84f7b8"
+    },
+    {
+      "id": "copy-24",
+      "path": "app/native/octicons/copy-24.svg",
+      "sha256": "b87dcfaa61a4e25223a69958263d4597a382b34addf0ea828dbed4eab3af6e4c"
+    },
+    {
+      "id": "cpu-16",
+      "path": "app/native/octicons/cpu-16.svg",
+      "sha256": "2015c78ac8551f0f01fc1decc1097062ef07778fb1be8c4466818261732e192e"
+    },
+    {
+      "id": "cpu-24",
+      "path": "app/native/octicons/cpu-24.svg",
+      "sha256": "49c60eae306db705d777aee433caf1d1827fd034697665f252fdd2bcbe195615"
+    },
+    {
+      "id": "credit-card-16",
+      "path": "app/native/octicons/credit-card-16.svg",
+      "sha256": "394b37a10631ad50d52f4ea8a3942eed822d4801bc9b019fcaca24d4b3b47725"
+    },
+    {
+      "id": "credit-card-24",
+      "path": "app/native/octicons/credit-card-24.svg",
+      "sha256": "9a8b7a45af11c8b3dd35eddc76524c8ff3ce7f13b174251cc6cd590fbd4327ef"
+    },
+    {
+      "id": "cross-reference-16",
+      "path": "app/native/octicons/cross-reference-16.svg",
+      "sha256": "29d2342431bceeb5aef2c5fb809384fe3f5e3eb596f1be542aec007d67ff8946"
+    },
+    {
+      "id": "cross-reference-24",
+      "path": "app/native/octicons/cross-reference-24.svg",
+      "sha256": "b05fc7464d1586d206a38950219151369b981bb1e231b1d8a0737a52a592c127"
+    },
+    {
+      "id": "crosshairs-16",
+      "path": "app/native/octicons/crosshairs-16.svg",
+      "sha256": "24c52b828d445738bbc23916b27cbe2f6e7c3832a7fbe93a64fc5faeb3c9fb30"
+    },
+    {
+      "id": "crosshairs-24",
+      "path": "app/native/octicons/crosshairs-24.svg",
+      "sha256": "8a536d352c99f48fbb038c85632ce356a53210864075ec42e4b89f7289d49527"
+    },
+    {
+      "id": "dash-16",
+      "path": "app/native/octicons/dash-16.svg",
+      "sha256": "c8b6f8b9816df6f27459d1ab0a90a0d2e641d47d8270b6615d651281c090239e"
+    },
+    {
+      "id": "dash-24",
+      "path": "app/native/octicons/dash-24.svg",
+      "sha256": "ee36d4c35c9c54c212c644709a0077dd3aa3ee93ce420ba67761df8804051f16"
+    },
+    {
+      "id": "database-16",
+      "path": "app/native/octicons/database-16.svg",
+      "sha256": "b27122951c543842dfe9be9490ff76b0b7dbaad5794f7362eb907dc7def4b89c"
+    },
+    {
+      "id": "database-24",
+      "path": "app/native/octicons/database-24.svg",
+      "sha256": "e465bdaa495b0756adbb264cfde5275c6aad0626828a4c413307708a059e59ea"
+    },
+    {
+      "id": "dependabot-16",
+      "path": "app/native/octicons/dependabot-16.svg",
+      "sha256": "515cc75240e29b1d23718decf94a1f60b09caaa2afb408384a82bdc0e96882cd"
+    },
+    {
+      "id": "dependabot-24",
+      "path": "app/native/octicons/dependabot-24.svg",
+      "sha256": "e454406d1b14d1cd0ef264f26800ea5a02841b687c5280a0cb8a26c6999f864f"
+    },
+    {
+      "id": "desktop-download-16",
+      "path": "app/native/octicons/desktop-download-16.svg",
+      "sha256": "f2c099064063ffd64b980de06468b32bb372182bcb856568ff2cee9cff3c82a0"
+    },
+    {
+      "id": "desktop-download-24",
+      "path": "app/native/octicons/desktop-download-24.svg",
+      "sha256": "7f1591d124803355ceb4efbb04ef259d8f96a38c229fcffbeea5798c04eea60e"
+    },
+    {
+      "id": "device-camera-16",
+      "path": "app/native/octicons/device-camera-16.svg",
+      "sha256": "09e2fd4458b5d5c09c755acb001e8e34a49f74674cdd4fe70e22ddc9e128c541"
+    },
+    {
+      "id": "device-camera-24",
+      "path": "app/native/octicons/device-camera-24.svg",
+      "sha256": "b47077b0cdebe995420d05e024b7dd27e2f9eaf23b0547a3581794c9da711206"
+    },
+    {
+      "id": "device-camera-video-16",
+      "path": "app/native/octicons/device-camera-video-16.svg",
+      "sha256": "83c10c2bfbd19feade176ebb2272f99f165827a9889578fc01bd509735e51d84"
+    },
+    {
+      "id": "device-camera-video-24",
+      "path": "app/native/octicons/device-camera-video-24.svg",
+      "sha256": "f6161afb7826309b17bc3636cbc2ce4c8680f0007a63b9112aa442039032e155"
+    },
+    {
+      "id": "device-desktop-16",
+      "path": "app/native/octicons/device-desktop-16.svg",
+      "sha256": "189a55270363a39df86cfc28a3c88528c600725cc9bb9223b9b5937d6dd9c496"
+    },
+    {
+      "id": "device-desktop-24",
+      "path": "app/native/octicons/device-desktop-24.svg",
+      "sha256": "969c2a9d651df49a9900dea4a31914c2bbd131c008111b5756cbbaf55d7a23da"
+    },
+    {
+      "id": "device-mobile-16",
+      "path": "app/native/octicons/device-mobile-16.svg",
+      "sha256": "5b109d0f6e960f5590f40455baf20262c48e1110d3b90472bb70a279c4edd01f"
+    },
+    {
+      "id": "device-mobile-24",
+      "path": "app/native/octicons/device-mobile-24.svg",
+      "sha256": "c8eb4c79015ba7c15ac4dff18b15d30a995417b2817abd472cdac3cea29dbcce"
+    },
+    {
+      "id": "devices-16",
+      "path": "app/native/octicons/devices-16.svg",
+      "sha256": "47da3b815d6de73959f7064b27b7608d09d7c0e0c2ac15fbeca4f0866043390d"
+    },
+    {
+      "id": "devices-24",
+      "path": "app/native/octicons/devices-24.svg",
+      "sha256": "4b3bf250e71cb4e0989bee94180032f035cd3b385c5064eabac354a9f77517c8"
+    },
+    {
+      "id": "diamond-16",
+      "path": "app/native/octicons/diamond-16.svg",
+      "sha256": "bd2cac15cc5a64310612c91ed413fefb9aa04ae9bbfe8b24041f946c451f0701"
+    },
+    {
+      "id": "diamond-24",
+      "path": "app/native/octicons/diamond-24.svg",
+      "sha256": "52c1967f412fbb3e232bb6d40f708d04b7faaaadd585f8df7da7f8f76f2a0090"
+    },
+    {
+      "id": "dice-16",
+      "path": "app/native/octicons/dice-16.svg",
+      "sha256": "eea0eced80f5970aa09e9d33d355345db1284324ce99a09eeebb5f4ad2b1ce8f"
+    },
+    {
+      "id": "dice-24",
+      "path": "app/native/octicons/dice-24.svg",
+      "sha256": "0c1cc7455137658ffa3a8a6e26798ab2610824e43edc819e3d729a7d3ebcbcae"
+    },
+    {
+      "id": "diff-16",
+      "path": "app/native/octicons/diff-16.svg",
+      "sha256": "7893bd8d8974707fc355024bf27177dc8c4a43761c5f19383003dfd60b19d6b2"
+    },
+    {
+      "id": "diff-24",
+      "path": "app/native/octicons/diff-24.svg",
+      "sha256": "3583d96dba0a80dadaf69f1afa9a12cb27ccf4b611446830251149353dda6274"
+    },
+    {
+      "id": "diff-added-16",
+      "path": "app/native/octicons/diff-added-16.svg",
+      "sha256": "ad69e333340b0f79dfa2bb8a78e32d48c12572354916ccc66c79a870af75b4ff"
+    },
+    {
+      "id": "diff-added-24",
+      "path": "app/native/octicons/diff-added-24.svg",
+      "sha256": "eb91168ae2082f79fee481ffcc8b486f991ce0edb9cbfbbc170883b7c5b130d8"
+    },
+    {
+      "id": "diff-ignored-16",
+      "path": "app/native/octicons/diff-ignored-16.svg",
+      "sha256": "cede03cd005ec9c07274decc6fa14f588aeefaa92b9950bd85006f220700fdf0"
+    },
+    {
+      "id": "diff-ignored-24",
+      "path": "app/native/octicons/diff-ignored-24.svg",
+      "sha256": "97268b6916291a05f47cd80f4812180878c6525ef9cf7d6d26cbe15ec63d992a"
+    },
+    {
+      "id": "diff-modified-16",
+      "path": "app/native/octicons/diff-modified-16.svg",
+      "sha256": "79d0fcb53c4db26d476735da980fdf44990e37c71b73e2564363788fc49cc131"
+    },
+    {
+      "id": "diff-modified-24",
+      "path": "app/native/octicons/diff-modified-24.svg",
+      "sha256": "bfe8b3cbf61cc35647edafefc7f01b339eea01e04b9b041c886ffedf2f213675"
+    },
+    {
+      "id": "diff-removed-16",
+      "path": "app/native/octicons/diff-removed-16.svg",
+      "sha256": "05ca83f2e9f3bf70ade3d9ffe2d6868da4eb655bdaaab478300e484d8ca71752"
+    },
+    {
+      "id": "diff-removed-24",
+      "path": "app/native/octicons/diff-removed-24.svg",
+      "sha256": "78a4734184d83aa8b5c7eb1e2ec121d3986a39c9a49f91140a323ac7680bb006"
+    },
+    {
+      "id": "diff-renamed-16",
+      "path": "app/native/octicons/diff-renamed-16.svg",
+      "sha256": "337d54b5c4055bdac8cb2b018e8bd107722eb14d893085605414a9dcd80e250c"
+    },
+    {
+      "id": "diff-renamed-24",
+      "path": "app/native/octicons/diff-renamed-24.svg",
+      "sha256": "a861e69b6d438bff43f784e54df18e4c4192f30b7681a608c057c8b9a5aa21ca"
+    },
+    {
+      "id": "discussion-closed-16",
+      "path": "app/native/octicons/discussion-closed-16.svg",
+      "sha256": "e59e0dcce0994f975e3689dd35d3885ea36f97cb5bf251a47d8b9711ee5bda44"
+    },
+    {
+      "id": "discussion-closed-24",
+      "path": "app/native/octicons/discussion-closed-24.svg",
+      "sha256": "1b537c3cb71422c85d319a76c53af94768c8d38b6a95b5b4c7cddb7c9a605abd"
+    },
+    {
+      "id": "discussion-duplicate-16",
+      "path": "app/native/octicons/discussion-duplicate-16.svg",
+      "sha256": "d9709023274d875cdbaf50bc43482d60404cfdb6f1190c585e04924c5f6baa60"
+    },
+    {
+      "id": "discussion-duplicate-24",
+      "path": "app/native/octicons/discussion-duplicate-24.svg",
+      "sha256": "28163f85eb6396a56800e973f394856186c36db51d8a82962e0f94084c2538e8"
+    },
+    {
+      "id": "discussion-outdated-16",
+      "path": "app/native/octicons/discussion-outdated-16.svg",
+      "sha256": "858222e28891251f7fa1a5141f393e9fcd081e45824794f05a4bb95692442a9d"
+    },
+    {
+      "id": "discussion-outdated-24",
+      "path": "app/native/octicons/discussion-outdated-24.svg",
+      "sha256": "2bf755981bd01ba8e2825d0b5b649bc0dd0ef17afef9290358d98f2315c8f671"
+    },
+    {
+      "id": "dot-16",
+      "path": "app/native/octicons/dot-16.svg",
+      "sha256": "70d33e8de611756c5f2f473637189936149a98cbb2519ed8e441dec0a4c0403a"
+    },
+    {
+      "id": "dot-24",
+      "path": "app/native/octicons/dot-24.svg",
+      "sha256": "4f5276e4222faa357da522295e862c37905e607f4fc0730c0087301bf521b7c7"
+    },
+    {
+      "id": "dot-fill-16",
+      "path": "app/native/octicons/dot-fill-16.svg",
+      "sha256": "a78731cbd7803e25a2b59ad3eabc409b2f105f810114ef38d112d871ae570bb4"
+    },
+    {
+      "id": "dot-fill-24",
+      "path": "app/native/octicons/dot-fill-24.svg",
+      "sha256": "3a1e7b3a963ef86dd9d76b82bbd4b300d4dacd4631176da95acfeaf2f568c4e9"
+    },
+    {
+      "id": "download-16",
+      "path": "app/native/octicons/download-16.svg",
+      "sha256": "19a0cc3cbe8f8838cddc6cf705998adea1f030a01166cea065950a67fd145445"
+    },
+    {
+      "id": "download-24",
+      "path": "app/native/octicons/download-24.svg",
+      "sha256": "7f98f1d539a1438436dcd292fe31c5907d3127697eb385725882af6e5d58e3a4"
+    },
+    {
+      "id": "duplicate-16",
+      "path": "app/native/octicons/duplicate-16.svg",
+      "sha256": "d3f6151ebd5e57b0656892bfcd9083b38e84b46c45ba71c9bdc5ce792ebd5caf"
+    },
+    {
+      "id": "duplicate-24",
+      "path": "app/native/octicons/duplicate-24.svg",
+      "sha256": "31d633671e04ab4aee91d6b23aabcb7e7bc280e77dec4347a8310dfe0838d2c9"
+    },
+    {
+      "id": "ellipsis-16",
+      "path": "app/native/octicons/ellipsis-16.svg",
+      "sha256": "64620629e95631524eeafc82249411b3effc1cbb331dca00bf1eaa0f7173a41a"
+    },
+    {
+      "id": "ellipsis-24",
+      "path": "app/native/octicons/ellipsis-24.svg",
+      "sha256": "21369967d9d36fef7ec47cd68d19e1c77bc0d15b7e2526db300da0d689cff720"
+    },
+    {
+      "id": "exclamation-16",
+      "path": "app/native/octicons/exclamation-16.svg",
+      "sha256": "fa7e606b41fce8a9f493eba472d111fd89d4f3e8019470f7cb62354e18003b05"
+    },
+    {
+      "id": "exclamation-24",
+      "path": "app/native/octicons/exclamation-24.svg",
+      "sha256": "78dfef2122603ef7bb9e57a552915ddc0c36e3f434a8d3dc59f2e2c94c33eeb6"
+    },
+    {
+      "id": "eye-16",
+      "path": "app/native/octicons/eye-16.svg",
+      "sha256": "8bc58c21926b5ce4a5679314f4288e5f1304299cd3a02785b4f8e4938ab5dea8"
+    },
+    {
+      "id": "eye-24",
+      "path": "app/native/octicons/eye-24.svg",
+      "sha256": "12a81b855bb764c06af468f0912b54b122751e9a37481923b1dcb2523dbdecff"
+    },
+    {
+      "id": "eye-closed-16",
+      "path": "app/native/octicons/eye-closed-16.svg",
+      "sha256": "c7216c787bb908e0716122f0244a16bd137e62d29a3d0aa469c473934f672040"
+    },
+    {
+      "id": "eye-closed-24",
+      "path": "app/native/octicons/eye-closed-24.svg",
+      "sha256": "7e515722bd9512dd4279a3e289bbad591ce3d89c5264057a74129652f663c77d"
+    },
+    {
+      "id": "feed-discussion-16",
+      "path": "app/native/octicons/feed-discussion-16.svg",
+      "sha256": "cb341ed440a9798dfd01397da39448a5d9e8d36a771c9feda1ae8a87649157b7"
+    },
+    {
+      "id": "feed-forked-16",
+      "path": "app/native/octicons/feed-forked-16.svg",
+      "sha256": "1e4f95248693e9be633c6c0e68a2f352eafd7135605dc160d6703231f2c59524"
+    },
+    {
+      "id": "feed-heart-16",
+      "path": "app/native/octicons/feed-heart-16.svg",
+      "sha256": "9bf2e59a9fa709ad1c85707ee3159d204ec888dc452700c81e43a4dbbec41e72"
+    },
+    {
+      "id": "feed-issue-closed-16",
+      "path": "app/native/octicons/feed-issue-closed-16.svg",
+      "sha256": "6b541445f0d41ddb2b78932303a08d705deff4605c1d2068055bb89a62cea9f4"
+    },
+    {
+      "id": "feed-issue-draft-16",
+      "path": "app/native/octicons/feed-issue-draft-16.svg",
+      "sha256": "dbc2ab061a20e4014b3648f46549916a95d9de946f745c52637c37d65fbf05cc"
+    },
+    {
+      "id": "feed-issue-open-16",
+      "path": "app/native/octicons/feed-issue-open-16.svg",
+      "sha256": "b88228fbb7edd4f6f57e4475801301736bd0c9ffad0b56dad5eb39f07e8d1f4e"
+    },
+    {
+      "id": "feed-issue-reopen-16",
+      "path": "app/native/octicons/feed-issue-reopen-16.svg",
+      "sha256": "7d8618ea1dff348671a40e58bdf62859cdd2b5f9bb04beae076df145a199927b"
+    },
+    {
+      "id": "feed-merged-16",
+      "path": "app/native/octicons/feed-merged-16.svg",
+      "sha256": "3838e1017d09f3b2e2c58ce97010bf70d82f41607b9635684bb1b8974c67a237"
+    },
+    {
+      "id": "feed-person-16",
+      "path": "app/native/octicons/feed-person-16.svg",
+      "sha256": "05186534f2b4c54b496a5dba488f039716f34117602614e71fc90cfe37eac8d7"
+    },
+    {
+      "id": "feed-plus-16",
+      "path": "app/native/octicons/feed-plus-16.svg",
+      "sha256": "0255c3a195907bd4ece1ea67523f01f1a712786042742d6b09d56b9f9c7c9421"
+    },
+    {
+      "id": "feed-public-16",
+      "path": "app/native/octicons/feed-public-16.svg",
+      "sha256": "0132a2b51037a8884cc816c0d45cfaf5a9e5f2cbae2605cac9cc4dd6ff855031"
+    },
+    {
+      "id": "feed-pull-request-closed-16",
+      "path": "app/native/octicons/feed-pull-request-closed-16.svg",
+      "sha256": "7a5a9932c9590a39107b3d5f468ad57180eb9774a573c13a9c95aaa2fce98c4a"
+    },
+    {
+      "id": "feed-pull-request-draft-16",
+      "path": "app/native/octicons/feed-pull-request-draft-16.svg",
+      "sha256": "30a7892a4227b260688d3c36497bbc9adedd84d74f81f8455433a955448f3b29"
+    },
+    {
+      "id": "feed-pull-request-open-16",
+      "path": "app/native/octicons/feed-pull-request-open-16.svg",
+      "sha256": "3eb2e4024157614aa70010980f0c8f6a3ff5c3c3cbc770d43cac2e6bb76b9ebe"
+    },
+    {
+      "id": "feed-repo-16",
+      "path": "app/native/octicons/feed-repo-16.svg",
+      "sha256": "b5871b621a119abe60ceff3fc728b7460e95231ebae86b891ac5083f6e82cdad"
+    },
+    {
+      "id": "feed-rocket-16",
+      "path": "app/native/octicons/feed-rocket-16.svg",
+      "sha256": "ba1ec1afbefdf94458bb008d78a723b7205c53d040c6c1a32a2cf784dd79a1f1"
+    },
+    {
+      "id": "feed-star-16",
+      "path": "app/native/octicons/feed-star-16.svg",
+      "sha256": "07f543d1bc03b4e261591f0d5edbab97e51177e910d787173ccedd2da37c5031"
+    },
+    {
+      "id": "feed-tag-16",
+      "path": "app/native/octicons/feed-tag-16.svg",
+      "sha256": "423f74aab1d05533fa7a0d99d242fa9c601a59f32be012b87df1d6dfa8fcb819"
+    },
+    {
+      "id": "feed-trophy-16",
+      "path": "app/native/octicons/feed-trophy-16.svg",
+      "sha256": "83fe7c4eba9133687aa9d66930b7d0227e6870fe8c35d3a896209f410db372c4"
+    },
+    {
+      "id": "file-16",
+      "path": "app/native/octicons/file-16.svg",
+      "sha256": "2ad2fa8e3cd76c55cdd255ea84d9e2ef162b0045a3cbce8e9cfbc12a5179aade"
+    },
+    {
+      "id": "file-24",
+      "path": "app/native/octicons/file-24.svg",
+      "sha256": "0695058f3f8d91a772b97ed7fe4b0e4b62664f9a40602f85eaf21b7c922f394f"
+    },
+    {
+      "id": "file-added-16",
+      "path": "app/native/octicons/file-added-16.svg",
+      "sha256": "77522280604ed7716eb46e7707a6f4709350703e55f4754f2a8e3db5a438c227"
+    },
+    {
+      "id": "file-added-24",
+      "path": "app/native/octicons/file-added-24.svg",
+      "sha256": "ca954d85f6453dceae31ff65e328d6c138218883e5e585d340e21c120248010d"
+    },
+    {
+      "id": "file-badge-16",
+      "path": "app/native/octicons/file-badge-16.svg",
+      "sha256": "e29edff2e3281c58cc4914903f44d1abbf5efe577d4618948dd025bfce1101ba"
+    },
+    {
+      "id": "file-badge-24",
+      "path": "app/native/octicons/file-badge-24.svg",
+      "sha256": "fdd2ffde5ed162ecb522945d1c32a6ec48c9b66aecf508cb881bd72fb15a4022"
+    },
+    {
+      "id": "file-binary-16",
+      "path": "app/native/octicons/file-binary-16.svg",
+      "sha256": "e2b4478ea3298b37ba0e8a51467ca39a25da73dbfdcc224baf48fedc00138fff"
+    },
+    {
+      "id": "file-binary-24",
+      "path": "app/native/octicons/file-binary-24.svg",
+      "sha256": "ae1a8f480ca3ee10495f188e8004d13132fad63c3dfc4c1f89e2669d6e07d556"
+    },
+    {
+      "id": "file-check-16",
+      "path": "app/native/octicons/file-check-16.svg",
+      "sha256": "a6b017db997ba1cea474789df904374a8fca156bc3eedaa4c560ff4cb1f5679a"
+    },
+    {
+      "id": "file-check-24",
+      "path": "app/native/octicons/file-check-24.svg",
+      "sha256": "e2890573e7b0cfd3d5b123296d38465e8de85876de3f28ce9b3e97ce719b9519"
+    },
+    {
+      "id": "file-code-16",
+      "path": "app/native/octicons/file-code-16.svg",
+      "sha256": "13679d77c7843da4d234a1c84a048f4da33897ce26831ac56594c242419debd3"
+    },
+    {
+      "id": "file-code-24",
+      "path": "app/native/octicons/file-code-24.svg",
+      "sha256": "be2b71148f27c23bcfdccec1fec2ad843d1bcbe588dd479a73e248b9cedd24ad"
+    },
+    {
+      "id": "file-diff-16",
+      "path": "app/native/octicons/file-diff-16.svg",
+      "sha256": "eec523b8cbb0e37be3a83c170c78227b2c38714646cd4e03eec5f7f1205e79fa"
+    },
+    {
+      "id": "file-diff-24",
+      "path": "app/native/octicons/file-diff-24.svg",
+      "sha256": "7f9974b0ab6bdaf945f88c903f218c08621a20f2ce01775b05a2716b97b8fdad"
+    },
+    {
+      "id": "file-directory-16",
+      "path": "app/native/octicons/file-directory-16.svg",
+      "sha256": "616bddedf3c2fcae7e1b025342df8255822356fd26d30499730eaccd2f217403"
+    },
+    {
+      "id": "file-directory-24",
+      "path": "app/native/octicons/file-directory-24.svg",
+      "sha256": "a67e0c8bf64c61b7179006495be26a050fd88803fcafeeeec2c2961b8547a759"
+    },
+    {
+      "id": "file-directory-fill-16",
+      "path": "app/native/octicons/file-directory-fill-16.svg",
+      "sha256": "5a18253d6e70419cf6ff6dcdc15a5ba626b2cbe0a38d432175addc3cdc8af26b"
+    },
+    {
+      "id": "file-directory-fill-24",
+      "path": "app/native/octicons/file-directory-fill-24.svg",
+      "sha256": "563d8dfee27eaf835797823011217ad0526d2d91baa400aa3e4541aa360cdefc"
+    },
+    {
+      "id": "file-directory-open-fill-16",
+      "path": "app/native/octicons/file-directory-open-fill-16.svg",
+      "sha256": "6583bedf49653774f90a7ad187e7ded172759a2a70e31736d8c1f734a7744312"
+    },
+    {
+      "id": "file-directory-open-fill-24",
+      "path": "app/native/octicons/file-directory-open-fill-24.svg",
+      "sha256": "67992552cd5ad633020b5085f71b8541b5ede3a766bd6b4af16f0cb0d76f2f75"
+    },
+    {
+      "id": "file-directory-symlink-16",
+      "path": "app/native/octicons/file-directory-symlink-16.svg",
+      "sha256": "616323e66f790bd684967fdffc25455b0a1ad3a7832c64c374fea002c7ae6b58"
+    },
+    {
+      "id": "file-directory-symlink-24",
+      "path": "app/native/octicons/file-directory-symlink-24.svg",
+      "sha256": "a43a1bdac773c0546730aca66d6e247208557c3ccb7cbb389c0416b428559024"
+    },
+    {
+      "id": "file-media-16",
+      "path": "app/native/octicons/file-media-16.svg",
+      "sha256": "089045e16cb36e16460d642d99bbe088c9a7d727445096b9dd7c0524ac85e966"
+    },
+    {
+      "id": "file-media-24",
+      "path": "app/native/octicons/file-media-24.svg",
+      "sha256": "db48a58c24012786067403988360b7c5f714617d7ea58b1e08fe1f983342549c"
+    },
+    {
+      "id": "file-moved-16",
+      "path": "app/native/octicons/file-moved-16.svg",
+      "sha256": "e2cedeb5ba420bcd3604a9cef5115a3d9d3de1bb60aa2ebdd5b84f1b4ab075cb"
+    },
+    {
+      "id": "file-moved-24",
+      "path": "app/native/octicons/file-moved-24.svg",
+      "sha256": "290e41f7fccf5d8047d9cfcfce4fb5bdfb60c81d8d90bf801cc4c6390fc068d6"
+    },
+    {
+      "id": "file-removed-16",
+      "path": "app/native/octicons/file-removed-16.svg",
+      "sha256": "209ea10c5c6410007e6ee852baca77dc7fb0faf3d20286a50d07e8fbb2c37cc8"
+    },
+    {
+      "id": "file-removed-24",
+      "path": "app/native/octicons/file-removed-24.svg",
+      "sha256": "68a13acccca245d8ae80a285af00157bdb6339e4c6ce8b985aaa05f8117102af"
+    },
+    {
+      "id": "file-submodule-16",
+      "path": "app/native/octicons/file-submodule-16.svg",
+      "sha256": "555b609061b67c96111aa65629731302db41e4a79f1963835e5b4e99dd690477"
+    },
+    {
+      "id": "file-submodule-24",
+      "path": "app/native/octicons/file-submodule-24.svg",
+      "sha256": "847995a92c1e60053e0076cb5919fe47a0adea2143a90aa4a5b0c81117e58ec1"
+    },
+    {
+      "id": "file-symlink-file-16",
+      "path": "app/native/octicons/file-symlink-file-16.svg",
+      "sha256": "bc4cad3c8359e49b4fccd3bfcf144edc710d0fb8b2a175abed173521a025ad8f"
+    },
+    {
+      "id": "file-symlink-file-24",
+      "path": "app/native/octicons/file-symlink-file-24.svg",
+      "sha256": "5b9d95b190afa089e0f70b822bdd5ee7c273501729830f49df7ed5b965933fdc"
+    },
+    {
+      "id": "file-zip-16",
+      "path": "app/native/octicons/file-zip-16.svg",
+      "sha256": "3ce5f6aa0126549cc4aac055de3f0dd7621f91571551f7204818ffcbe13464b3"
+    },
+    {
+      "id": "file-zip-24",
+      "path": "app/native/octicons/file-zip-24.svg",
+      "sha256": "f673e687290bfb25baff2742e54fb96718990a6cb6b8c4e3a23023b031bd50bd"
+    },
+    {
+      "id": "filter-16",
+      "path": "app/native/octicons/filter-16.svg",
+      "sha256": "77b43ffe4c1e5b95b668fe878381d62a2a7b9f576e86068493bef5df454caf92"
+    },
+    {
+      "id": "filter-24",
+      "path": "app/native/octicons/filter-24.svg",
+      "sha256": "a1d0b58482f83b28903acd1e6f01ec2dab4b3b842eae7b2d6d6c1c483e911955"
+    },
+    {
+      "id": "filter-remove-16",
+      "path": "app/native/octicons/filter-remove-16.svg",
+      "sha256": "d08754bf6994d2635da1f2704d82f1031312573c4e5be65bbc101db065ccc212"
+    },
+    {
+      "id": "filter-remove-24",
+      "path": "app/native/octicons/filter-remove-24.svg",
+      "sha256": "ac377654ebb196ace4e403ea2736e594801fb334adbd37a9e7d354182c68398c"
+    },
+    {
+      "id": "fiscal-host-16",
+      "path": "app/native/octicons/fiscal-host-16.svg",
+      "sha256": "d769cf334bfec833b51cdfc0a8177144fbb6845da1760f892b5795e52dfd50ac"
+    },
+    {
+      "id": "fiscal-host-24",
+      "path": "app/native/octicons/fiscal-host-24.svg",
+      "sha256": "79b9112da4d91a365da95eb1c82ef2318d6d9af7a02e5df8c37b5c766467d2ec"
+    },
+    {
+      "id": "flag-16",
+      "path": "app/native/octicons/flag-16.svg",
+      "sha256": "84b585ae79369ce506b1d6659be463bacd86e8578077999abfa61f260ddb3318"
+    },
+    {
+      "id": "flag-24",
+      "path": "app/native/octicons/flag-24.svg",
+      "sha256": "fe1a3a47bf10748799ce48e376d356f9f9a1f0c1adc36e5402ae8d3d2ea989c8"
+    },
+    {
+      "id": "flame-16",
+      "path": "app/native/octicons/flame-16.svg",
+      "sha256": "11493f4068f289f8c82ba110c64b515e4491bddd65927a7260a489fad28dac99"
+    },
+    {
+      "id": "flame-24",
+      "path": "app/native/octicons/flame-24.svg",
+      "sha256": "af0a6885bcc8a59ffd37627c2d56609ea7a1e450620a28788198ddd975faed4c"
+    },
+    {
+      "id": "flowchart-16",
+      "path": "app/native/octicons/flowchart-16.svg",
+      "sha256": "7d9ff78d5a2186dfdb292705688b48b26e1bcba2583f7565df2fbe2f321bc697"
+    },
+    {
+      "id": "flowchart-24",
+      "path": "app/native/octicons/flowchart-24.svg",
+      "sha256": "2f8fad94bd598b3610c37a2dec48103e2fa2a220620598eab9474751994fe35a"
+    },
+    {
+      "id": "focus-center-16",
+      "path": "app/native/octicons/focus-center-16.svg",
+      "sha256": "c4935e246f06dfa3036d7e5d5a78912bf49f99403d80137f397cf54d8b8e8dfa"
+    },
+    {
+      "id": "focus-center-24",
+      "path": "app/native/octicons/focus-center-24.svg",
+      "sha256": "9264f97513f5c859e3cb9e4d723ab9415145181685b37ed7c4571992b0325d1c"
+    },
+    {
+      "id": "fold-16",
+      "path": "app/native/octicons/fold-16.svg",
+      "sha256": "eaaed18725b04c505ecb4ca3798778371df564642a160dedee1c79839b8a9cc2"
+    },
+    {
+      "id": "fold-24",
+      "path": "app/native/octicons/fold-24.svg",
+      "sha256": "c70ee89dbea5be78995667d2ab1fdc2e8c960d672c5dbc20505d6a5e7f988f49"
+    },
+    {
+      "id": "fold-down-16",
+      "path": "app/native/octicons/fold-down-16.svg",
+      "sha256": "5eb4f942213f0431fc4bac170794be380e5bb0f0409fd8f11dd170850d251f00"
+    },
+    {
+      "id": "fold-down-24",
+      "path": "app/native/octicons/fold-down-24.svg",
+      "sha256": "748b3bd298159eec22afdfccf1c1e19478086217911453991056ee6be3be813b"
+    },
+    {
+      "id": "fold-up-16",
+      "path": "app/native/octicons/fold-up-16.svg",
+      "sha256": "543b8236e85d6417d49ab8a07f8e25e898d3ab1c6efc489b6edda0c4d71283d9"
+    },
+    {
+      "id": "fold-up-24",
+      "path": "app/native/octicons/fold-up-24.svg",
+      "sha256": "d5dd689d4098ea5a491afc1f1e9150114889fc55f17667df6aa19eb078c3500f"
+    },
+    {
+      "id": "gear-16",
+      "path": "app/native/octicons/gear-16.svg",
+      "sha256": "f25378e59fd21d6f0bef66fc452828ef73aecc2794c17feb2cb999dc7095dcaa"
+    },
+    {
+      "id": "gear-24",
+      "path": "app/native/octicons/gear-24.svg",
+      "sha256": "5c79dd670cfd69936d79e0746fca364f8f7ad084fbcd1aae06139e5c6fe1a6ca"
+    },
+    {
+      "id": "gift-16",
+      "path": "app/native/octicons/gift-16.svg",
+      "sha256": "511af6d11f28c89f096e2c93589b8be04f36131e5eac4055c1e8dac3bcfca91c"
+    },
+    {
+      "id": "gift-24",
+      "path": "app/native/octicons/gift-24.svg",
+      "sha256": "32011981e83e6bdd73fa3ca9e1f9dd49439b2930929ac9255c2eb0e5f105129e"
+    },
+    {
+      "id": "git-branch-16",
+      "path": "app/native/octicons/git-branch-16.svg",
+      "sha256": "84ae1a58865c941edbd1c648c8910aa69db3f9a84e8574fcea8526f64be2928e"
+    },
+    {
+      "id": "git-branch-24",
+      "path": "app/native/octicons/git-branch-24.svg",
+      "sha256": "76b97dde63b49eaa91978209f31f09c829cd690959fbcd7bbafdf96fa0a81474"
+    },
+    {
+      "id": "git-branch-check-16",
+      "path": "app/native/octicons/git-branch-check-16.svg",
+      "sha256": "a3c1683aebde6fa22a0382da12f1c83d60bd776e1081a6f0e6d1988d4fb68ddd"
+    },
+    {
+      "id": "git-branch-check-24",
+      "path": "app/native/octicons/git-branch-check-24.svg",
+      "sha256": "ed8f5f3bc02c9c2174aa89247a2922d9d3e7b15ecf53c3c644135ef7f0f47df8"
+    },
+    {
+      "id": "git-commit-16",
+      "path": "app/native/octicons/git-commit-16.svg",
+      "sha256": "03e3073f180936046de0108f041211839eacdf5c7044ca9c6e47ce7ac9499e4b"
+    },
+    {
+      "id": "git-commit-24",
+      "path": "app/native/octicons/git-commit-24.svg",
+      "sha256": "35251798b3d357eb900021cef0f394fbcec2b99fdf0513a7409e0a1ca45e3171"
+    },
+    {
+      "id": "git-compare-16",
+      "path": "app/native/octicons/git-compare-16.svg",
+      "sha256": "a737c98aca16f641533e3fff0b682a534c421fc99a330c69fc13794cdcc4412d"
+    },
+    {
+      "id": "git-compare-24",
+      "path": "app/native/octicons/git-compare-24.svg",
+      "sha256": "52a17f9607a67562b9352a8c43f02b8cb3972d5dd523b4634f063a53c2b6edca"
+    },
+    {
+      "id": "git-merge-16",
+      "path": "app/native/octicons/git-merge-16.svg",
+      "sha256": "c0970443ad1cf4e1801d2c7536f016ed922892debbee837def01d2f6a47ac419"
+    },
+    {
+      "id": "git-merge-24",
+      "path": "app/native/octicons/git-merge-24.svg",
+      "sha256": "ad343714ab0d930a5efd68498adcbe6617b871224f881f6d11734f894334c689"
+    },
+    {
+      "id": "git-merge-queue-16",
+      "path": "app/native/octicons/git-merge-queue-16.svg",
+      "sha256": "65425bdd16bff7a3dc952d904f2c55c3e688015d271167139d11323dbf5c9792"
+    },
+    {
+      "id": "git-merge-queue-24",
+      "path": "app/native/octicons/git-merge-queue-24.svg",
+      "sha256": "8bc000e3b1179209c6f7a449cfe4b361a1579347ece39e5ef2cf2377bde6290e"
+    },
+    {
+      "id": "git-pull-request-16",
+      "path": "app/native/octicons/git-pull-request-16.svg",
+      "sha256": "d9363b57e81ae8444a934b20453169239af3a4836bb603f28f0997aecd61bdda"
+    },
+    {
+      "id": "git-pull-request-24",
+      "path": "app/native/octicons/git-pull-request-24.svg",
+      "sha256": "a56ba81845813fb1b2480985082d8484cc485a7db7e7ae07b0f9b1c8fe85e8a7"
+    },
+    {
+      "id": "git-pull-request-closed-16",
+      "path": "app/native/octicons/git-pull-request-closed-16.svg",
+      "sha256": "63973e09c713aba40601107978e636cf8027958b0588923ef7f31cb8138af95a"
+    },
+    {
+      "id": "git-pull-request-closed-24",
+      "path": "app/native/octicons/git-pull-request-closed-24.svg",
+      "sha256": "274625799d76e94eb89ef2b367dcb57b97e268dd83654afab6760565f9c73c49"
+    },
+    {
+      "id": "git-pull-request-draft-16",
+      "path": "app/native/octicons/git-pull-request-draft-16.svg",
+      "sha256": "f9b529fdf8a554bd45b11bce0238db55289536255718adf0e0285ec48393a32d"
+    },
+    {
+      "id": "git-pull-request-draft-24",
+      "path": "app/native/octicons/git-pull-request-draft-24.svg",
+      "sha256": "b89633ee9b1e43dfdf93d270b1267568c4b0ae4ebae630ea9f177cbdcd5af605"
+    },
+    {
+      "id": "git-pull-request-locked-16",
+      "path": "app/native/octicons/git-pull-request-locked-16.svg",
+      "sha256": "ae7cf6f739ebb44f5634887bdc71e8a06ab1b9d0d95425322c779a81d66e6e34"
+    },
+    {
+      "id": "globe-16",
+      "path": "app/native/octicons/globe-16.svg",
+      "sha256": "0b30f112b30ddbc27a9db7f7ac8010c5be5473fd42275baa1d325b00c7283787"
+    },
+    {
+      "id": "globe-24",
+      "path": "app/native/octicons/globe-24.svg",
+      "sha256": "7f6c2d4eecd913c1e86603fd42aef90ec34b6c32e9510f5689ddfd9c347fe311"
+    },
+    {
+      "id": "goal-16",
+      "path": "app/native/octicons/goal-16.svg",
+      "sha256": "595d9f1205c8e7ecf2c5f1728fec0e40455a07fbc751389bcf61f19cc1027df9"
+    },
+    {
+      "id": "goal-24",
+      "path": "app/native/octicons/goal-24.svg",
+      "sha256": "c00a2b14f327c84b3f675edc11fd8611f00080cb882b3a035414ac0424afa9ad"
+    },
+    {
+      "id": "grabber-16",
+      "path": "app/native/octicons/grabber-16.svg",
+      "sha256": "c344489e71def01deda34b3465bdac5167b03f34357ad3e8357c77cdb3d0002d"
+    },
+    {
+      "id": "grabber-24",
+      "path": "app/native/octicons/grabber-24.svg",
+      "sha256": "dcee4472d64743a46343b1d284c52a150a6d8a524015ab78fac50d0d1cad98ab"
+    },
+    {
+      "id": "graph-16",
+      "path": "app/native/octicons/graph-16.svg",
+      "sha256": "aee77970f944ffda3b38ea1daaac14d857d5df70d3a00a90c052f8fabdd248f5"
+    },
+    {
+      "id": "graph-24",
+      "path": "app/native/octicons/graph-24.svg",
+      "sha256": "536b32ff4f0f473d0c1af351997935ee03d2fe2f7ea65fe1abd17d5b2c5f4c78"
+    },
+    {
+      "id": "graph-bar-horizontal-16",
+      "path": "app/native/octicons/graph-bar-horizontal-16.svg",
+      "sha256": "97d2614752e306c7423ce1c786224247527c5e4260b4d9d6b0f785e20e5d5138"
+    },
+    {
+      "id": "graph-bar-horizontal-24",
+      "path": "app/native/octicons/graph-bar-horizontal-24.svg",
+      "sha256": "98ec16d02e0ab7d8fdce77e01b608812d3ba8228db9dcf138e1ff6059877f38a"
+    },
+    {
+      "id": "graph-bar-vertical-16",
+      "path": "app/native/octicons/graph-bar-vertical-16.svg",
+      "sha256": "4363d3e8a3696d3828cde63f8fa9c621265b17b3a2f6a03a328f31e0bef827e5"
+    },
+    {
+      "id": "graph-bar-vertical-24",
+      "path": "app/native/octicons/graph-bar-vertical-24.svg",
+      "sha256": "6c6aa8b803204ccd2d3c68ba59269c06c0060afa20c0586ec34e9e2d18fc137b"
+    },
+    {
+      "id": "hash-16",
+      "path": "app/native/octicons/hash-16.svg",
+      "sha256": "de80d3be62497ac83e45e61a43565a36855279ec75554e7b4f347a152e82aabc"
+    },
+    {
+      "id": "hash-24",
+      "path": "app/native/octicons/hash-24.svg",
+      "sha256": "2273d5de53c286d6b7d957449db20cac58c95b8fc109d337f297a69150f797b8"
+    },
+    {
+      "id": "heading-16",
+      "path": "app/native/octicons/heading-16.svg",
+      "sha256": "3e632744c41db396f3bff072b72540586475125a682e65b8ff4b97054604c982"
+    },
+    {
+      "id": "heading-24",
+      "path": "app/native/octicons/heading-24.svg",
+      "sha256": "cde13981f762beff847f53d2c810f59cbb834daf79be9b54cce49d6ef5c407b5"
+    },
+    {
+      "id": "heart-16",
+      "path": "app/native/octicons/heart-16.svg",
+      "sha256": "903fe8a9c58d5789ccfa4b46274e5ed172261b2a88c5df109784e125449220a2"
+    },
+    {
+      "id": "heart-24",
+      "path": "app/native/octicons/heart-24.svg",
+      "sha256": "d0b487fa93d1d157c71bd5a65f739f98fd46743879194bb9d90fc5281e17fa7b"
+    },
+    {
+      "id": "heart-fill-16",
+      "path": "app/native/octicons/heart-fill-16.svg",
+      "sha256": "e03afb59f2286229624c05fbb94ecb2a8664b482941fc134fb31877f4c3feb4e"
+    },
+    {
+      "id": "heart-fill-24",
+      "path": "app/native/octicons/heart-fill-24.svg",
+      "sha256": "0397b9b5db5aeb9c6ad5686a5b1177f67e35fd4124620b9ae03fd400a488dfd9"
+    },
+    {
+      "id": "history-16",
+      "path": "app/native/octicons/history-16.svg",
+      "sha256": "a3bfaab1589fffe6ee67f883261560d57f3e11b1da17857fa1b5fe0f2471aa96"
+    },
+    {
+      "id": "history-24",
+      "path": "app/native/octicons/history-24.svg",
+      "sha256": "e068a0f8601446a53bc97e30622fd05111e8b2a3800f35f24cd30d0f74c47aa4"
+    },
+    {
+      "id": "home-16",
+      "path": "app/native/octicons/home-16.svg",
+      "sha256": "6b2f04e773e98ec3ea94f94b8a6673cf1c3deb74f1484dd2b150d3013bdaeb58"
+    },
+    {
+      "id": "home-24",
+      "path": "app/native/octicons/home-24.svg",
+      "sha256": "71df38cff4adc8c7718649b879d361a9eef25a7039504c3cd5a007d5a7bb7bde"
+    },
+    {
+      "id": "home-fill-16",
+      "path": "app/native/octicons/home-fill-16.svg",
+      "sha256": "75da238efca8c7c61daa5eee8ba7bd178b5a30323c1845f525c3de9adf152c60"
+    },
+    {
+      "id": "home-fill-24",
+      "path": "app/native/octicons/home-fill-24.svg",
+      "sha256": "62caab507e1877b5133d04589a65d822640bb7cdfc1c2f17bcb7428711be8a1e"
+    },
+    {
+      "id": "horizontal-rule-16",
+      "path": "app/native/octicons/horizontal-rule-16.svg",
+      "sha256": "4fdc71afbed1435570c91ee085d2baafb2946dff1c07a9df08e7b662073de5a7"
+    },
+    {
+      "id": "horizontal-rule-24",
+      "path": "app/native/octicons/horizontal-rule-24.svg",
+      "sha256": "0242ad12a28f713be9fa319f6f0b63891e3717f5d42e7c912aea4e995f89e6df"
+    },
+    {
+      "id": "hourglass-16",
+      "path": "app/native/octicons/hourglass-16.svg",
+      "sha256": "fd0f93df4a1a74f2852cc8b4608d5f98e8c8cf0e14c4a6e659df4e7b598ab15f"
+    },
+    {
+      "id": "hourglass-24",
+      "path": "app/native/octicons/hourglass-24.svg",
+      "sha256": "86df92c076c1673e55ab6d291c13f7e2c60f5ba52e797b801630fd9ab7bfb6bf"
+    },
+    {
+      "id": "hubot-16",
+      "path": "app/native/octicons/hubot-16.svg",
+      "sha256": "ea3db6844baac3101ec1261651dd0110e6655d20fcd336b365f2af0753774cb5"
+    },
+    {
+      "id": "hubot-24",
+      "path": "app/native/octicons/hubot-24.svg",
+      "sha256": "52b52a0088a3bdbc514a23213469d77de343d72cba063c14d40b04e59fc9a69d"
+    },
+    {
+      "id": "id-badge-16",
+      "path": "app/native/octicons/id-badge-16.svg",
+      "sha256": "80996c890550d6525c931dfc30f1c4441d785be76dd47127839760590627c517"
+    },
+    {
+      "id": "id-badge-24",
+      "path": "app/native/octicons/id-badge-24.svg",
+      "sha256": "e2507d7285a4660f10e189aa35a7ed789bb2be71b7a2baa72e647dd7b10d249f"
+    },
+    {
+      "id": "image-16",
+      "path": "app/native/octicons/image-16.svg",
+      "sha256": "089045e16cb36e16460d642d99bbe088c9a7d727445096b9dd7c0524ac85e966"
+    },
+    {
+      "id": "image-24",
+      "path": "app/native/octicons/image-24.svg",
+      "sha256": "9230fe926b7c027ab1be060977855b2bc0276b760dee144df64972d3fc83aa61"
+    },
+    {
+      "id": "inbox-16",
+      "path": "app/native/octicons/inbox-16.svg",
+      "sha256": "401576a5adb1fe4e3b0f06d409fbeb35efc15ebf6f3a7b9ee9ca2d8187677c9f"
+    },
+    {
+      "id": "inbox-24",
+      "path": "app/native/octicons/inbox-24.svg",
+      "sha256": "eee10e53175e590ffc5f037a65fe80974de75080df6e02e129a9df1cc92355b5"
+    },
+    {
+      "id": "inbox-fill-16",
+      "path": "app/native/octicons/inbox-fill-16.svg",
+      "sha256": "b4486f453c6dd6dc9f3f9c8899380ab41db8859347fc474ba1a81171fb7b5431"
+    },
+    {
+      "id": "inbox-fill-24",
+      "path": "app/native/octicons/inbox-fill-24.svg",
+      "sha256": "a58f3febf01c9385e1483549ac56934157f4a1f496a446f54d80fe36dbf912a8"
+    },
+    {
+      "id": "infinity-16",
+      "path": "app/native/octicons/infinity-16.svg",
+      "sha256": "dd6e054121bbb54bf43b70cad127e8e967d4cf5dd57bf84492804bf1e1771c2f"
+    },
+    {
+      "id": "infinity-24",
+      "path": "app/native/octicons/infinity-24.svg",
+      "sha256": "7a84689de29e7c8bbe4dd5a4b39bc907671d76208acec4f27266eb216b899aee"
+    },
+    {
+      "id": "info-16",
+      "path": "app/native/octicons/info-16.svg",
+      "sha256": "dcac4886d4f30f13ef6db160ee011aa5d78f6a462ea7f3cdb68ef07e9c80e49f"
+    },
+    {
+      "id": "info-24",
+      "path": "app/native/octicons/info-24.svg",
+      "sha256": "7e990fa74cc8a031a6408a3125bed3aad78839a87d5efda8e9e2882052e597c6"
+    },
+    {
+      "id": "issue-closed-16",
+      "path": "app/native/octicons/issue-closed-16.svg",
+      "sha256": "f07c75b6c4e90385ade0cd4a1f27c179a5d4090f01ec412807790fcaa05c1955"
+    },
+    {
+      "id": "issue-closed-24",
+      "path": "app/native/octicons/issue-closed-24.svg",
+      "sha256": "363c6d6d518a99f6793876a45fcd03c4d03b62663fc0125f43016513f2f7742d"
+    },
+    {
+      "id": "issue-draft-16",
+      "path": "app/native/octicons/issue-draft-16.svg",
+      "sha256": "92bd8900461b2f7d9bfa9a087ca4d9fdab5cb5afd2a00553e8eb8349ecb3fd11"
+    },
+    {
+      "id": "issue-draft-24",
+      "path": "app/native/octicons/issue-draft-24.svg",
+      "sha256": "28c10412e5f1897bb5e10e266f88c2d0ebf5ea2c86d8d25daa6985b9b9a85c82"
+    },
+    {
+      "id": "issue-locked-16",
+      "path": "app/native/octicons/issue-locked-16.svg",
+      "sha256": "152108786f8ac2bd4393a3eac7df1bf067087b0ce2fd9960dc132d60cfaa4822"
+    },
+    {
+      "id": "issue-opened-16",
+      "path": "app/native/octicons/issue-opened-16.svg",
+      "sha256": "1657cea22810a7bf42e061aa5b896f8fd25b948e961423cb219a4e7238829fd6"
+    },
+    {
+      "id": "issue-opened-24",
+      "path": "app/native/octicons/issue-opened-24.svg",
+      "sha256": "11481e51af155e6ea622b4ef3081a48cc90547da04bf3866152e719a817f6613"
+    },
+    {
+      "id": "issue-reopened-16",
+      "path": "app/native/octicons/issue-reopened-16.svg",
+      "sha256": "61ca5e83c5f1b3ddb9733723bd63dc5c4be1e7d9df3ab30b5e77ccb514959292"
+    },
+    {
+      "id": "issue-reopened-24",
+      "path": "app/native/octicons/issue-reopened-24.svg",
+      "sha256": "e6487986f56238fa7c83e7b8a1c66e81fab67048ba6c4bce3c1e45d5a61935b3"
+    },
+    {
+      "id": "issue-tracked-by-16",
+      "path": "app/native/octicons/issue-tracked-by-16.svg",
+      "sha256": "c3bc70f3b8dd42d4c0c679139802c93fedbd3cdb9e2edc45afa032642e83ba14"
+    },
+    {
+      "id": "issue-tracked-by-24",
+      "path": "app/native/octicons/issue-tracked-by-24.svg",
+      "sha256": "8990ec4bc6e8dde49dd0ad7f40f632a5bd59cac8850010023891b602bf8c6325"
+    },
+    {
+      "id": "issue-tracks-16",
+      "path": "app/native/octicons/issue-tracks-16.svg",
+      "sha256": "3c202ccf1a866193287bea0c5b6048a5b57eac9c58d690181732ebc7853088a9"
+    },
+    {
+      "id": "issue-tracks-24",
+      "path": "app/native/octicons/issue-tracks-24.svg",
+      "sha256": "8fbcb670d9ac621e14a4ac9619570b497b29d234422dd5c1419bcd426c66e110"
+    },
+    {
+      "id": "italic-16",
+      "path": "app/native/octicons/italic-16.svg",
+      "sha256": "fb5b894ec69f0e6e5964460e92b497e6deed42656d0423860c9b28fc7f45eb50"
+    },
+    {
+      "id": "italic-24",
+      "path": "app/native/octicons/italic-24.svg",
+      "sha256": "f5488211e315f324980e16bb8ac079bb2d8f6ebe38725bde6ce74e29280ab28a"
+    },
+    {
+      "id": "iterations-16",
+      "path": "app/native/octicons/iterations-16.svg",
+      "sha256": "14cdbe9676403699f0f951ca7ab445f3b1e3fbcee75201443610be2b0fa77cef"
+    },
+    {
+      "id": "iterations-24",
+      "path": "app/native/octicons/iterations-24.svg",
+      "sha256": "5ac920e6e7f16739f783ecb41c9637c964d4a401fd34250c463718cb5eb2ad71"
+    },
+    {
+      "id": "kebab-horizontal-16",
+      "path": "app/native/octicons/kebab-horizontal-16.svg",
+      "sha256": "399cb0df0e3866709f80c2b15308ae89b67da64fc8cf9c30810c39008b23baf8"
+    },
+    {
+      "id": "kebab-horizontal-24",
+      "path": "app/native/octicons/kebab-horizontal-24.svg",
+      "sha256": "e3188cce35921bf2e201b853241f568d7a092cc581a969b7ea4cff32ed1628f0"
+    },
+    {
+      "id": "key-16",
+      "path": "app/native/octicons/key-16.svg",
+      "sha256": "5ee09b1c59a6e845331d53c0c6c91ba867c189a0da5c4811fba1972ee85aa305"
+    },
+    {
+      "id": "key-24",
+      "path": "app/native/octicons/key-24.svg",
+      "sha256": "610b6fad1416943d6e3f51d9ec516bcf798a6182223d1ff3cdb344e1596bb652"
+    },
+    {
+      "id": "key-asterisk-16",
+      "path": "app/native/octicons/key-asterisk-16.svg",
+      "sha256": "9a9ddf582ef1a5c8cb20f6b74606acac96c54327f06b8182c2aa707797d20d20"
+    },
+    {
+      "id": "key-asterisk-24",
+      "path": "app/native/octicons/key-asterisk-24.svg",
+      "sha256": "e36e8c7f6c7f9bd7ff55c4f6a7e3183aeaa18bc29e7ff21f297c954cb7ce4cfd"
+    },
+    {
+      "id": "law-16",
+      "path": "app/native/octicons/law-16.svg",
+      "sha256": "ea0ce2e40ce1c5691e8685760e2e31cefb7cd11bfcf4cc2703a76c7246645477"
+    },
+    {
+      "id": "law-24",
+      "path": "app/native/octicons/law-24.svg",
+      "sha256": "e6eb4dc25f171ce2cef83ef2690b01dc748fbb5f29d90f36011b44f60ea7415e"
+    },
+    {
+      "id": "light-bulb-16",
+      "path": "app/native/octicons/light-bulb-16.svg",
+      "sha256": "b11257b0a6e8a96c2e3983abd4bca2d75ddb6e6e473df56ecc5386399894d5cf"
+    },
+    {
+      "id": "light-bulb-24",
+      "path": "app/native/octicons/light-bulb-24.svg",
+      "sha256": "0e213f3efcd5d7af1c6b5e022e09c6f742cf88a40d56b384c4d7d177f6d8a6b0"
+    },
+    {
+      "id": "link-16",
+      "path": "app/native/octicons/link-16.svg",
+      "sha256": "274b31dce5c70009c7e7fc59ae217dd4cbc3015d713c99724b9b4e2b4d845bf8"
+    },
+    {
+      "id": "link-24",
+      "path": "app/native/octicons/link-24.svg",
+      "sha256": "944b03b22114af91f91c144a43c26bb0c7ac4ed77984dde4b84e903dc944b6ae"
+    },
+    {
+      "id": "link-external-16",
+      "path": "app/native/octicons/link-external-16.svg",
+      "sha256": "aa2d43d7c29fe4082781811a463b7bda4c08befdfe365a47d170002ab49ad0a5"
+    },
+    {
+      "id": "link-external-24",
+      "path": "app/native/octicons/link-external-24.svg",
+      "sha256": "ad89b192654f305a0500e6c0109b585bd9f1ca1df49571fd063f15eb5acf0085"
+    },
+    {
+      "id": "list-ordered-16",
+      "path": "app/native/octicons/list-ordered-16.svg",
+      "sha256": "3b6a780b9a7ee01788fe791d5ac5ef274ddd022a01e5b9b3565c5a188c49b1b1"
+    },
+    {
+      "id": "list-ordered-24",
+      "path": "app/native/octicons/list-ordered-24.svg",
+      "sha256": "758f865a960cea10a16a9aa8417776a4b1330e47ee1f37cac5a5a34a876d4c78"
+    },
+    {
+      "id": "list-unordered-16",
+      "path": "app/native/octicons/list-unordered-16.svg",
+      "sha256": "46ff0a54b1b23a166e30ba46b96c646aa31c81c857949d8a2858a545dd92fa7f"
+    },
+    {
+      "id": "list-unordered-24",
+      "path": "app/native/octicons/list-unordered-24.svg",
+      "sha256": "0d8c6935be38bf0d07d3239ca5d564765fefcad9549eb0e87eeefc506de22741"
+    },
+    {
+      "id": "location-16",
+      "path": "app/native/octicons/location-16.svg",
+      "sha256": "57403a197bc97772423f6d2941800bd258830fca205b2c9560d1417cb54867e0"
+    },
+    {
+      "id": "location-24",
+      "path": "app/native/octicons/location-24.svg",
+      "sha256": "43574e25d97d625a750a4f7ad6e9256ebc0350aeb19ea93490685803b7eaf53c"
+    },
+    {
+      "id": "lock-16",
+      "path": "app/native/octicons/lock-16.svg",
+      "sha256": "84dd3ef91514e77ae109b718b8ab009d55ba1d2b262c6f20164ac01d49a05581"
+    },
+    {
+      "id": "lock-24",
+      "path": "app/native/octicons/lock-24.svg",
+      "sha256": "36d106d0ebd12fbe74110b6166f90081a8c8eba1c86bab58db5c6b2b6838b9b7"
+    },
+    {
+      "id": "lockup-github-16",
+      "path": "app/native/octicons/lockup-github-16.svg",
+      "sha256": "f91fa233b80e9058f3fc4cf118df350a1014bd7a8ecf268f80de1871be63f05a"
+    },
+    {
+      "id": "lockup-github-24",
+      "path": "app/native/octicons/lockup-github-24.svg",
+      "sha256": "3ed205cea211f0c9d6144fdd76367bf29468ba4a72a63969d65eeb64271bae5b"
+    },
+    {
+      "id": "log-16",
+      "path": "app/native/octicons/log-16.svg",
+      "sha256": "83dc72c3c03f34de45f02d3f66c759fe80d65c185774d0404869f7dce21bd32b"
+    },
+    {
+      "id": "log-24",
+      "path": "app/native/octicons/log-24.svg",
+      "sha256": "b60e21101f11f3b37d08865a49a1f8b23e7397bf6dbe4b97a2212aa456630087"
+    },
+    {
+      "id": "logo-gist-16",
+      "path": "app/native/octicons/logo-gist-16.svg",
+      "sha256": "723c21ac694cf9dc4d770fdc7194f45db6c26323017e22fa7773b0553058ab8c"
+    },
+    {
+      "id": "logo-gist-24",
+      "path": "app/native/octicons/logo-gist-24.svg",
+      "sha256": "f3f447c65a84661b59189ccaa22d562d14ae63eb00b49b64687b67cd08cd1ebc"
+    },
+    {
+      "id": "logo-github-16",
+      "path": "app/native/octicons/logo-github-16.svg",
+      "sha256": "eb6ab88af5f1019b097020b675232b9b17729377e89b70e139c672cd3e5682e4"
+    },
+    {
+      "id": "logo-github-24",
+      "path": "app/native/octicons/logo-github-24.svg",
+      "sha256": "4698970e975674893de126294dd348c48a180c2ef72384be67aa564ae0de5a42"
+    },
+    {
+      "id": "loop-16",
+      "path": "app/native/octicons/loop-16.svg",
+      "sha256": "08848c2ce429048c7f38aa8413c0cdbfdc3df821a1196288b0552a8c6b9344b9"
+    },
+    {
+      "id": "loop-24",
+      "path": "app/native/octicons/loop-24.svg",
+      "sha256": "9f2e6cf4f653cad3ccb721e6e72ccb350abd0c0991950d07c65dcb80f909ca7d"
+    },
+    {
+      "id": "mail-16",
+      "path": "app/native/octicons/mail-16.svg",
+      "sha256": "3fe294a21dc9eb547c877034588c0d94b2c9ba68b4793eac321bfe3222689e70"
+    },
+    {
+      "id": "mail-24",
+      "path": "app/native/octicons/mail-24.svg",
+      "sha256": "154b8504426c7b6d3d4e10542ccfc61f38807b8bf3b1565aedc2bda1c354dc8e"
+    },
+    {
+      "id": "mark-github-16",
+      "path": "app/native/octicons/mark-github-16.svg",
+      "sha256": "7421820090b50ac79d7c2bf7c951a433d7098a8a9c474809207bdd45f62d9d46"
+    },
+    {
+      "id": "mark-github-24",
+      "path": "app/native/octicons/mark-github-24.svg",
+      "sha256": "bce494189797623c34e39a41c2c38a132bdca23ce4e6ac06b70116ed7e91ce26"
+    },
+    {
+      "id": "markdown-16",
+      "path": "app/native/octicons/markdown-16.svg",
+      "sha256": "e5d6b9bf161cd24bc4c5231dff4441b44fec4131db3a6a90b4e22b51c5bbcd70"
+    },
+    {
+      "id": "markdown-24",
+      "path": "app/native/octicons/markdown-24.svg",
+      "sha256": "81e3a564dea485f1b13505f8d1d8e5fc6abd0eb8f614856718d7e133a7a6b80c"
+    },
+    {
+      "id": "maximize-16",
+      "path": "app/native/octicons/maximize-16.svg",
+      "sha256": "c4ca8165f7b74900954777d6b1b484d0945fafe450e0d83e2f7494433efbecb6"
+    },
+    {
+      "id": "maximize-24",
+      "path": "app/native/octicons/maximize-24.svg",
+      "sha256": "84f37d8a9389e430e603f8197fdd47651135dca3f44fdc0dbbf577ccbea766a6"
+    },
+    {
+      "id": "mcp-16",
+      "path": "app/native/octicons/mcp-16.svg",
+      "sha256": "9ed75eebb8fad93c1327e8cbdab1c8fb1539c5856979d4bd770631dad555d7ad"
+    },
+    {
+      "id": "mcp-24",
+      "path": "app/native/octicons/mcp-24.svg",
+      "sha256": "6f870f1098922c95bf562674e33df2182301b2bb05589de4780c83436b8a11f6"
+    },
+    {
+      "id": "megaphone-16",
+      "path": "app/native/octicons/megaphone-16.svg",
+      "sha256": "a6e72bffd71cc2ec6105411904aaeef174fb8c6446918749b5fc531e725c3ffe"
+    },
+    {
+      "id": "megaphone-24",
+      "path": "app/native/octicons/megaphone-24.svg",
+      "sha256": "be39ab0804a3b298cf78a2ae01a0d1a0e74d5e46745f5f64d4300cdb8e32bd2f"
+    },
+    {
+      "id": "mention-16",
+      "path": "app/native/octicons/mention-16.svg",
+      "sha256": "ae03d7fa6658b7d3fdf4c44fe6d0c7faf08b4b4532695e981f7ce5886ec302f2"
+    },
+    {
+      "id": "mention-24",
+      "path": "app/native/octicons/mention-24.svg",
+      "sha256": "045afec5391718c29bd30f407e73efad792fc04d06aba2ef940e8da9810dc1eb"
+    },
+    {
+      "id": "meter-16",
+      "path": "app/native/octicons/meter-16.svg",
+      "sha256": "679061c083ab8191467906771ed044a8c35b27f8448d9f83272f11a76c5ec3dc"
+    },
+    {
+      "id": "meter-24",
+      "path": "app/native/octicons/meter-24.svg",
+      "sha256": "066a4cac24c31cd6c184344c55a5a3c158264557a8702c627314e7320c5fc0db"
+    },
+    {
+      "id": "milestone-16",
+      "path": "app/native/octicons/milestone-16.svg",
+      "sha256": "ccdfa18143e7c92986341fd514e570717c9a96ac318e82153d66807829104d76"
+    },
+    {
+      "id": "milestone-24",
+      "path": "app/native/octicons/milestone-24.svg",
+      "sha256": "d4d3bd5d1dc623cec4703e2cd280ceedcf625024977c5f1fc29bd66fe4c8df6a"
+    },
+    {
+      "id": "minimize-16",
+      "path": "app/native/octicons/minimize-16.svg",
+      "sha256": "ff6052e98413c546a735b4981403ef05b783f996bd1fdcba893d55bf4694090d"
+    },
+    {
+      "id": "minimize-24",
+      "path": "app/native/octicons/minimize-24.svg",
+      "sha256": "4cb0dcfa94698bbb84dae4351cdeb992d3c315e66a622bb5a15665572e91f8e6"
+    },
+    {
+      "id": "mirror-16",
+      "path": "app/native/octicons/mirror-16.svg",
+      "sha256": "9ed249e2ecbf9c9372f1901b8cf8b6a1a22b07fe7a52bb8a870d4c2a216c77da"
+    },
+    {
+      "id": "mirror-24",
+      "path": "app/native/octicons/mirror-24.svg",
+      "sha256": "acdd2cb8dd54536a222641440fdc5f81ea8f9da73dc5555d940dc448143229fb"
+    },
+    {
+      "id": "moon-16",
+      "path": "app/native/octicons/moon-16.svg",
+      "sha256": "031e5c4fd0e037b526a66f73a844d76ab7a9350435b4041757ae44da25531768"
+    },
+    {
+      "id": "moon-24",
+      "path": "app/native/octicons/moon-24.svg",
+      "sha256": "b4beb31e380ff87f2705ece3b850ea71401e285274d21090c4f8817a07163eff"
+    },
+    {
+      "id": "mortar-board-16",
+      "path": "app/native/octicons/mortar-board-16.svg",
+      "sha256": "9fe82d874b6cf70ae7554ef6da89f24408691d261cc96537686233a8721fadcb"
+    },
+    {
+      "id": "mortar-board-24",
+      "path": "app/native/octicons/mortar-board-24.svg",
+      "sha256": "2654d11a4c24c159ec31e09d7cc0e93a2c18770359ba2fb2f4eb0206051b0247"
+    },
+    {
+      "id": "move-to-bottom-16",
+      "path": "app/native/octicons/move-to-bottom-16.svg",
+      "sha256": "4de8190131f1d4a83fe2776df0d3380d3acd38866ee4db62aec6e7310e71a818"
+    },
+    {
+      "id": "move-to-bottom-24",
+      "path": "app/native/octicons/move-to-bottom-24.svg",
+      "sha256": "97e313b95c04dc97f3239700d53e73872b8b25e784d9e4b39315b113d2fab090"
+    },
+    {
+      "id": "move-to-end-16",
+      "path": "app/native/octicons/move-to-end-16.svg",
+      "sha256": "73ede5c1e8389a3bbe6470f2ba46885350a093ba24a6c13b252c77ab018f1caf"
+    },
+    {
+      "id": "move-to-end-24",
+      "path": "app/native/octicons/move-to-end-24.svg",
+      "sha256": "ba3dcf2aea17f743082d7a6b196ed1a43df62ff3eb00a1322d342823047ff69d"
+    },
+    {
+      "id": "move-to-start-16",
+      "path": "app/native/octicons/move-to-start-16.svg",
+      "sha256": "7a847d6926e93d1f27a85bb484f7e7cb407bd7ecb6115a09bd87e2206dca3a7b"
+    },
+    {
+      "id": "move-to-start-24",
+      "path": "app/native/octicons/move-to-start-24.svg",
+      "sha256": "97396f311ad57fd4bae6573ce5efad3f9527ca0cd56f993adb352fee4ca23acd"
+    },
+    {
+      "id": "move-to-top-16",
+      "path": "app/native/octicons/move-to-top-16.svg",
+      "sha256": "d40f1f2a0dd371148f7396cbb6e0cf3225dbe41b79b1d2a14f0edfd600e0399b"
+    },
+    {
+      "id": "move-to-top-24",
+      "path": "app/native/octicons/move-to-top-24.svg",
+      "sha256": "3618e8f448f013c6675e0cd7ff842bd1e51106adb92c68be1d50a265b9fa619f"
+    },
+    {
+      "id": "multi-select-16",
+      "path": "app/native/octicons/multi-select-16.svg",
+      "sha256": "cedc0c30273ba9e6ac3cec3d60ddb7bd9513f433a1bdf420f407e541ebec9954"
+    },
+    {
+      "id": "multi-select-24",
+      "path": "app/native/octicons/multi-select-24.svg",
+      "sha256": "86cfecbeed7db0f59d1dee73ff78b23fca7e6d83c54bacdd6e072f87cb46cf21"
+    },
+    {
+      "id": "mute-16",
+      "path": "app/native/octicons/mute-16.svg",
+      "sha256": "7dcfc8396a11d3ae1e755b861121812878aec276d3fbcbbd70d71703e5282f51"
+    },
+    {
+      "id": "mute-24",
+      "path": "app/native/octicons/mute-24.svg",
+      "sha256": "d9227582207c1c282240080365eccb310d7d20d48f28808fe5d73e40d9d6ed95"
+    },
+    {
+      "id": "no-entry-16",
+      "path": "app/native/octicons/no-entry-16.svg",
+      "sha256": "908b7c7970d22c55ea42a0082aeea2f5ac2d5efc7eb493cd0bc115d4a67783bb"
+    },
+    {
+      "id": "no-entry-24",
+      "path": "app/native/octicons/no-entry-24.svg",
+      "sha256": "0eb294e5435e31425f1c8d36e429599ae83b91506ee458f9b8729f9e124b612c"
+    },
+    {
+      "id": "no-entry-fill-12",
+      "path": "app/native/octicons/no-entry-fill-12.svg",
+      "sha256": "ce1207d3e1dcee865addd1b7be18eab3ccd4218686419672a98cc32b977f490a"
+    },
+    {
+      "id": "node-16",
+      "path": "app/native/octicons/node-16.svg",
+      "sha256": "5a77757c4d5e603c2967180bfc8edd48a3c8c259c46b4af0c58154f1f3458e5e"
+    },
+    {
+      "id": "node-24",
+      "path": "app/native/octicons/node-24.svg",
+      "sha256": "37f4189f6439379b83c84c634eb9e32390aab7aba15eb2243855bbc21c3ebe4c"
+    },
+    {
+      "id": "north-star-16",
+      "path": "app/native/octicons/north-star-16.svg",
+      "sha256": "5b083b54a31ec412ed0ebddf5ba579c10e3d70f95a81a43bbfaea142d80b8bf7"
+    },
+    {
+      "id": "north-star-24",
+      "path": "app/native/octicons/north-star-24.svg",
+      "sha256": "9bf9c9e1adcf79f442efba5a216063518150274c59b993236d65183faff72ddb"
+    },
+    {
+      "id": "note-16",
+      "path": "app/native/octicons/note-16.svg",
+      "sha256": "14f6efda2e1dbcdd9b9ab8bf42cbf621f876f67b735be13293461b017b631a06"
+    },
+    {
+      "id": "note-24",
+      "path": "app/native/octicons/note-24.svg",
+      "sha256": "77abcbc5e188dcb4e1317ae5f9c7829374786eff5d1d61cce76e2dd01735574f"
+    },
+    {
+      "id": "number-16",
+      "path": "app/native/octicons/number-16.svg",
+      "sha256": "7e3e3ea6096beb4393ad0c98bb06c39290a36401666ba1d8ba60ca3f3a32ee01"
+    },
+    {
+      "id": "number-24",
+      "path": "app/native/octicons/number-24.svg",
+      "sha256": "265d549a08d02c67e80d575595a8b89292a10dc0cea217c4e725ba1ed6c0def5"
+    },
+    {
+      "id": "organization-16",
+      "path": "app/native/octicons/organization-16.svg",
+      "sha256": "0d3fe3ac9325f8b91f61229df3fce4141096c2d06a5d41eaca4526764dfb2962"
+    },
+    {
+      "id": "organization-24",
+      "path": "app/native/octicons/organization-24.svg",
+      "sha256": "37a2ebcd5c8534a3f71f495478b44fe267e7674112d713db92caa8ff9efdc186"
+    },
+    {
+      "id": "package-16",
+      "path": "app/native/octicons/package-16.svg",
+      "sha256": "d2754cb4b9ba6ed4c91f58d1f844c6a7d3188857aa67c323c9dea6c9662c8331"
+    },
+    {
+      "id": "package-24",
+      "path": "app/native/octicons/package-24.svg",
+      "sha256": "ce411bf2b166bf93ac5bbee6ae620291f86ff1f3e8e59538ba5e4cb257b80014"
+    },
+    {
+      "id": "package-dependencies-16",
+      "path": "app/native/octicons/package-dependencies-16.svg",
+      "sha256": "3e92355a3c84cb6bd6dd55e294771b020758199f4082e3d666b3ccedb6666a4c"
+    },
+    {
+      "id": "package-dependencies-24",
+      "path": "app/native/octicons/package-dependencies-24.svg",
+      "sha256": "e3ffd3eedca113d30b605b9c5ced68a3fa0435df220bf0f70db8cc128aff8b5e"
+    },
+    {
+      "id": "package-dependents-16",
+      "path": "app/native/octicons/package-dependents-16.svg",
+      "sha256": "562346806d55d90b5e8baba57fb85e02bc5a7eb95b515cf73583e75a34b62369"
+    },
+    {
+      "id": "package-dependents-24",
+      "path": "app/native/octicons/package-dependents-24.svg",
+      "sha256": "76d31c7b7ea82000581f47422b67a7add66cfe7f3da7011ff9c4e475e393d182"
+    },
+    {
+      "id": "paintbrush-16",
+      "path": "app/native/octicons/paintbrush-16.svg",
+      "sha256": "9086803e3684455ca1ddd416119f97ac91f643a33e58e844431ecfbad6ce7e80"
+    },
+    {
+      "id": "paintbrush-24",
+      "path": "app/native/octicons/paintbrush-24.svg",
+      "sha256": "8b7a81cea230f4dedd1bc497ebbb36531f8d8c4f494177412ff1d6e65c2b291f"
+    },
+    {
+      "id": "paper-airplane-16",
+      "path": "app/native/octicons/paper-airplane-16.svg",
+      "sha256": "d9346e4f99b87ee4dffa4cf5e88c6bcf206616ecace164a433ae5f8808be1d96"
+    },
+    {
+      "id": "paper-airplane-24",
+      "path": "app/native/octicons/paper-airplane-24.svg",
+      "sha256": "d1e743a8287d20aa9ec6325b088c1e8c4a17f3bea911d826a58532a20a8dba45"
+    },
+    {
+      "id": "paperclip-16",
+      "path": "app/native/octicons/paperclip-16.svg",
+      "sha256": "e4a733e259e8c632abc6589ca53845e6e7098720fb0af023158786798169488e"
+    },
+    {
+      "id": "paperclip-24",
+      "path": "app/native/octicons/paperclip-24.svg",
+      "sha256": "4e7494b7aa4bbaa6200ab96d23e569f7aa6de23d6e4bd4fb74224910a08da106"
+    },
+    {
+      "id": "passkey-fill-16",
+      "path": "app/native/octicons/passkey-fill-16.svg",
+      "sha256": "fc9979ee51dc2c845707c11f95a63f75b6f2fbfc5712878899ef95d802f2f0d7"
+    },
+    {
+      "id": "passkey-fill-24",
+      "path": "app/native/octicons/passkey-fill-24.svg",
+      "sha256": "27d314339739b90939372f0d7e0da387ed540c6b81ef416ecf3d42f2b6efd3c0"
+    },
+    {
+      "id": "paste-16",
+      "path": "app/native/octicons/paste-16.svg",
+      "sha256": "a52d684c33bd7a6c51a8378c8f7f862e786b5dd0a19e7ffb256b21a0f5090d74"
+    },
+    {
+      "id": "paste-24",
+      "path": "app/native/octicons/paste-24.svg",
+      "sha256": "d3e23525eec2807f96209bc5fb683e8118e584322b774afa6dfc3676ea1eb739"
+    },
+    {
+      "id": "pause-16",
+      "path": "app/native/octicons/pause-16.svg",
+      "sha256": "9cdac15a51c1f535f647891267e44188a74758f7203534822ad7e143aafa4c09"
+    },
+    {
+      "id": "pause-24",
+      "path": "app/native/octicons/pause-24.svg",
+      "sha256": "fceccf67c927321daa8a7ada974d45d0948c76556c25d43f35c33eea60e60a20"
+    },
+    {
+      "id": "pencil-16",
+      "path": "app/native/octicons/pencil-16.svg",
+      "sha256": "ccd73e107bd241feeed9239ccb3f65dc2fe5f1922d7f89f0231e76318227ed90"
+    },
+    {
+      "id": "pencil-24",
+      "path": "app/native/octicons/pencil-24.svg",
+      "sha256": "53e481e4e4e04cb187e12d866ff090906e6553d90e94c4388d3ee12b0285dfe8"
+    },
+    {
+      "id": "pencil-ai-16",
+      "path": "app/native/octicons/pencil-ai-16.svg",
+      "sha256": "9b878bf434ae2f160c0ea4d91b458a4d61210e2944b1f9f1e2d0584a675930ce"
+    },
+    {
+      "id": "pencil-ai-24",
+      "path": "app/native/octicons/pencil-ai-24.svg",
+      "sha256": "e9335d2197c79b4dc292035cfa7875d7f8436dbf78e8f8155b1caef49439b4a9"
+    },
+    {
+      "id": "people-16",
+      "path": "app/native/octicons/people-16.svg",
+      "sha256": "89734ebcab9dcae9709d527518892d2d45ef31a3738782356059d6c99f02498b"
+    },
+    {
+      "id": "people-24",
+      "path": "app/native/octicons/people-24.svg",
+      "sha256": "b6ed35168cd4aa7e7497ec5b83ab86ea4b368896485538c7f2e5078cb2a1b72d"
+    },
+    {
+      "id": "person-16",
+      "path": "app/native/octicons/person-16.svg",
+      "sha256": "fdd5990a60fea988f1ad19583b2b2a9701b902863a27cac8b7630fe119541a06"
+    },
+    {
+      "id": "person-24",
+      "path": "app/native/octicons/person-24.svg",
+      "sha256": "6e89dde4c4522a3a5fdb3670d8778ac2f35a36f12810ff9065115f52471d0ac7"
+    },
+    {
+      "id": "person-add-16",
+      "path": "app/native/octicons/person-add-16.svg",
+      "sha256": "2f7cdacf2ff5f29e496eb8ecbe880f8f60ba5a29ad766192ece5026cc78b5275"
+    },
+    {
+      "id": "person-add-24",
+      "path": "app/native/octicons/person-add-24.svg",
+      "sha256": "1fde513198623d664c96938d80d6946e576a9d29c155cfd4ce47fa1489bcae1f"
+    },
+    {
+      "id": "person-fill-16",
+      "path": "app/native/octicons/person-fill-16.svg",
+      "sha256": "84355303ddae4d5fb934cd164b801a92c6cdeaf8ae2691b8a91a96017b6bf761"
+    },
+    {
+      "id": "person-fill-24",
+      "path": "app/native/octicons/person-fill-24.svg",
+      "sha256": "e7f7a7549ecc87552284bc94b34482dbf6cbbb78d673115d3481cf67c76fe7d9"
+    },
+    {
+      "id": "pin-16",
+      "path": "app/native/octicons/pin-16.svg",
+      "sha256": "9e941bf98d502e618f435457fd86a11a8d2e6dcb1ae0f74d7a65a1f81915616b"
+    },
+    {
+      "id": "pin-24",
+      "path": "app/native/octicons/pin-24.svg",
+      "sha256": "a66c774afd36fc5cc5175ae87fb35b909e9e9b43569ae7a41414a380188434cf"
+    },
+    {
+      "id": "pin-slash-16",
+      "path": "app/native/octicons/pin-slash-16.svg",
+      "sha256": "6d77a51a50fece694670ba40b8d61539d2ea01688d5d4cfa6e5d46033ba85bb4"
+    },
+    {
+      "id": "pin-slash-24",
+      "path": "app/native/octicons/pin-slash-24.svg",
+      "sha256": "80ac6b8182eee6b6164e1d8561da9fd81bc5fc471cd0c61b6e6f42d8d5b7c3d9"
+    },
+    {
+      "id": "pivot-column-16",
+      "path": "app/native/octicons/pivot-column-16.svg",
+      "sha256": "ba40790fa0537bf909f00b652353a6ae1ee79569113e6d8539b87433bec7da4c"
+    },
+    {
+      "id": "pivot-column-24",
+      "path": "app/native/octicons/pivot-column-24.svg",
+      "sha256": "b823b2efeea024ca775b568a70f86d3eac4eac4c90a1046726039da4abfb28bc"
+    },
+    {
+      "id": "play-16",
+      "path": "app/native/octicons/play-16.svg",
+      "sha256": "ebc8a95d58dd1847b2f2d17a27937d01517514c43cb27ea4ec96432b4b71551d"
+    },
+    {
+      "id": "play-24",
+      "path": "app/native/octicons/play-24.svg",
+      "sha256": "36f4854da5672c120a075fdc1160ad60a62297028b5dce838c15b55e6434fa6e"
+    },
+    {
+      "id": "plug-16",
+      "path": "app/native/octicons/plug-16.svg",
+      "sha256": "e9cd6fa13912cacdc9842c8fccd977dcde9c2adbecca119254e12f3d9d226989"
+    },
+    {
+      "id": "plug-24",
+      "path": "app/native/octicons/plug-24.svg",
+      "sha256": "ddb6aac70d0b73b35f22d0437dbc19177e023b91eda1983bf3229cd8d18dec3b"
+    },
+    {
+      "id": "plus-16",
+      "path": "app/native/octicons/plus-16.svg",
+      "sha256": "3d88857e85cd21f522e2238e9e01a2023c630c3037627485a5e513d1b8205b9a"
+    },
+    {
+      "id": "plus-24",
+      "path": "app/native/octicons/plus-24.svg",
+      "sha256": "11c176ef79a3eaba1d9e0bd746142adcc1a306e647323201cff65af8dfcfa7fa"
+    },
+    {
+      "id": "plus-circle-16",
+      "path": "app/native/octicons/plus-circle-16.svg",
+      "sha256": "d544c62f93d3fef4a7eb599cfeb56a0e629dc9971d9673fbba810ea3b9f5dd0e"
+    },
+    {
+      "id": "plus-circle-24",
+      "path": "app/native/octicons/plus-circle-24.svg",
+      "sha256": "03e53c419fecc37d919397967440f54a1da12afac0fbfeefd87c21cd0932566c"
+    },
+    {
+      "id": "project-16",
+      "path": "app/native/octicons/project-16.svg",
+      "sha256": "60db9ae2b31e5bb1f849671b37c7e9586b6ec27bb33a59752124b9c705eb5288"
+    },
+    {
+      "id": "project-24",
+      "path": "app/native/octicons/project-24.svg",
+      "sha256": "b232ac9f372734d4a165e89c6b7bd298a79f8af0e6db788f4a07d92217749270"
+    },
+    {
+      "id": "project-roadmap-16",
+      "path": "app/native/octicons/project-roadmap-16.svg",
+      "sha256": "6c857e217c6b30271b9e083027d2865cb8156caa8cdf25e681c24b2db305cdc0"
+    },
+    {
+      "id": "project-roadmap-24",
+      "path": "app/native/octicons/project-roadmap-24.svg",
+      "sha256": "68764ee297bfb8d1e553e32ade2a8801629baeead0d6dbf169bdf38e6f9d8ba1"
+    },
+    {
+      "id": "project-symlink-16",
+      "path": "app/native/octicons/project-symlink-16.svg",
+      "sha256": "79760ca4ab1e249e6556bf6dede8a6f10851c26a1e4a2c188eb9007c6436eec9"
+    },
+    {
+      "id": "project-symlink-24",
+      "path": "app/native/octicons/project-symlink-24.svg",
+      "sha256": "5d80bda3dec60c508b0eaf1693adbcf266cb39d4b3b089fa527f083a2cd4bd30"
+    },
+    {
+      "id": "project-template-16",
+      "path": "app/native/octicons/project-template-16.svg",
+      "sha256": "285255460a0a11a81066b3a2303a034dc0b34a2a5977f464df143e8f7cfca8cb"
+    },
+    {
+      "id": "project-template-24",
+      "path": "app/native/octicons/project-template-24.svg",
+      "sha256": "a8b813eedb3123fef525fb9d933933d2a9e24f7800569e6e56755c67b2ecbb5a"
+    },
+    {
+      "id": "pulse-16",
+      "path": "app/native/octicons/pulse-16.svg",
+      "sha256": "6d8d2c13ae94cc9e96742b11a06e0ea5f4b2e77b7448a13ebe7a90a03515662c"
+    },
+    {
+      "id": "pulse-24",
+      "path": "app/native/octicons/pulse-24.svg",
+      "sha256": "1c638a9d5d5b58579a302d901ea8887ebb3bbb8f2f239e2be1dfd6b70ba31628"
+    },
+    {
+      "id": "question-16",
+      "path": "app/native/octicons/question-16.svg",
+      "sha256": "d642c9eff69e724bbcbf568d4107f1dd3150f02b6c2c19a016709a37ec81a9dc"
+    },
+    {
+      "id": "question-24",
+      "path": "app/native/octicons/question-24.svg",
+      "sha256": "b8a7456ac13a17eea4ff6cf42c44f1a28565afc55b701e1534b42afb2f57c39a"
+    },
+    {
+      "id": "quote-16",
+      "path": "app/native/octicons/quote-16.svg",
+      "sha256": "c83030dd53e1b4b44c0115822af0c27953296a814a6f4073973334aa5a904c26"
+    },
+    {
+      "id": "quote-24",
+      "path": "app/native/octicons/quote-24.svg",
+      "sha256": "c07911c29401b5c2d7c96440df406ed3a1aa94cfb0d18d03c3f1b136c4a441e5"
+    },
+    {
+      "id": "read-16",
+      "path": "app/native/octicons/read-16.svg",
+      "sha256": "e0f0fa6c6cdf09405aba7ef56395f6699a79ec9cd958eb116def53d10b75d171"
+    },
+    {
+      "id": "read-24",
+      "path": "app/native/octicons/read-24.svg",
+      "sha256": "be992b551e558bfc413fa8a338d759b89793733d9ac16c49002a4ce543afa631"
+    },
+    {
+      "id": "redo-16",
+      "path": "app/native/octicons/redo-16.svg",
+      "sha256": "c1ec11da8e5c07216a0166701f661f8a97deed8cffc38d6900239c2b38c8d625"
+    },
+    {
+      "id": "redo-24",
+      "path": "app/native/octicons/redo-24.svg",
+      "sha256": "4b11d6783d97072da25540eed504fe1a1d24b8e6dd374f525a6c589dbc0b93b5"
+    },
+    {
+      "id": "rel-file-path-16",
+      "path": "app/native/octicons/rel-file-path-16.svg",
+      "sha256": "05814e64b23e880c49ef3fcf5a1fdf9b65e20c3d64118d1307dd7194b0519f19"
+    },
+    {
+      "id": "rel-file-path-24",
+      "path": "app/native/octicons/rel-file-path-24.svg",
+      "sha256": "8f3d1435145dd35da9fdfd010d35461a824f4b03ff25abe2dfd725a782e1056e"
+    },
+    {
+      "id": "reply-16",
+      "path": "app/native/octicons/reply-16.svg",
+      "sha256": "8c77d310b63ccb185c2de5a83b9247443beb9b417a28abde20fcc32f801ac503"
+    },
+    {
+      "id": "reply-24",
+      "path": "app/native/octicons/reply-24.svg",
+      "sha256": "413e3329aa40ff8018d3b6348c4f2c5d77f6a5c5bf039dbd207633a2cddb6493"
+    },
+    {
+      "id": "repo-16",
+      "path": "app/native/octicons/repo-16.svg",
+      "sha256": "1cead1e4797c614164f36368eb475be17e8df842f777823ecc7da9c211542ad6"
+    },
+    {
+      "id": "repo-24",
+      "path": "app/native/octicons/repo-24.svg",
+      "sha256": "bf41bc2b304e5a763566f3955ff1557d7deffef9c200a610de29dd03d588d78b"
+    },
+    {
+      "id": "repo-clone-16",
+      "path": "app/native/octicons/repo-clone-16.svg",
+      "sha256": "29bc9e60d17ba1b0711820f846f4eff87d8055dd80ab46c33cb23558c0816a6c"
+    },
+    {
+      "id": "repo-clone-24",
+      "path": "app/native/octicons/repo-clone-24.svg",
+      "sha256": "28116fbccfa4a2f5a86d6dee83d4fbf339616372ae2df4834aba66cf322b39a0"
+    },
+    {
+      "id": "repo-delete-24",
+      "path": "app/native/octicons/repo-delete-24.svg",
+      "sha256": "6f77b9f93597ac93dd3378f476fbd44083885ff3981e224cb8bc57b7640c8b31"
+    },
+    {
+      "id": "repo-deleted-16",
+      "path": "app/native/octicons/repo-deleted-16.svg",
+      "sha256": "c9a960b99dac5244bf8d895b48c6f4c1d8b89d8105bbbd879230117a8c08fcc0"
+    },
+    {
+      "id": "repo-forked-16",
+      "path": "app/native/octicons/repo-forked-16.svg",
+      "sha256": "ea62e08956f1bff77863417f2d6c866297f06f60294fab042c3596032b0a4bdd"
+    },
+    {
+      "id": "repo-forked-24",
+      "path": "app/native/octicons/repo-forked-24.svg",
+      "sha256": "048ea700e5c5f8854226f3c3d2cd1cac4b26c9b0a6c7a26c6ac9021254ba4c29"
+    },
+    {
+      "id": "repo-forked-locked-16",
+      "path": "app/native/octicons/repo-forked-locked-16.svg",
+      "sha256": "e3d8b27060d821c1288b28023dad82bdc1a05c05e57c729fa4408c6ad424b374"
+    },
+    {
+      "id": "repo-forked-locked-24",
+      "path": "app/native/octicons/repo-forked-locked-24.svg",
+      "sha256": "ea8894c609130b55f653a56cbda3fee94df4d4d5c1dcb2df3c4c8fbd2c0e7d14"
+    },
+    {
+      "id": "repo-locked-16",
+      "path": "app/native/octicons/repo-locked-16.svg",
+      "sha256": "3e4a0397e436610ca2ede19a2bb00468f9e2ceea8aa18896376213d34c69de57"
+    },
+    {
+      "id": "repo-locked-24",
+      "path": "app/native/octicons/repo-locked-24.svg",
+      "sha256": "7c46019b4dd2ddec0b06e0543bed6089567ae169d8dfa35c9eb238d8ea77111b"
+    },
+    {
+      "id": "repo-pull-16",
+      "path": "app/native/octicons/repo-pull-16.svg",
+      "sha256": "c6b7564762cbe67879dfafe9990bf1af64e1c160d7180dd19d909c250c983ffa"
+    },
+    {
+      "id": "repo-pull-24",
+      "path": "app/native/octicons/repo-pull-24.svg",
+      "sha256": "0c16bd359df8a370fbb6888d43b531aa1b4d9d9959600cb1053d1e97599ac4d8"
+    },
+    {
+      "id": "repo-push-16",
+      "path": "app/native/octicons/repo-push-16.svg",
+      "sha256": "c54a95d9698857d3b3e02fff43e90636ceb32701bd20efdb75c2f2f136c34702"
+    },
+    {
+      "id": "repo-push-24",
+      "path": "app/native/octicons/repo-push-24.svg",
+      "sha256": "0b8a1b59fbd3640a45716eb147d7b0ac90eb8f3e6736cdaa0cf1e65154718f98"
+    },
+    {
+      "id": "repo-template-16",
+      "path": "app/native/octicons/repo-template-16.svg",
+      "sha256": "6bd7fdc4d436de5ed7f871246f27986167a22ae85efc3a206a29c5e24fe56f83"
+    },
+    {
+      "id": "repo-template-24",
+      "path": "app/native/octicons/repo-template-24.svg",
+      "sha256": "073c9b389c7428d9bef9c7374d3555e4b37c7313f3ec499731062a5ca0cb21be"
+    },
+    {
+      "id": "report-16",
+      "path": "app/native/octicons/report-16.svg",
+      "sha256": "f0e44518e82c06d77ec11b5c3320f655c25ceba11c692843efa8b5fd4c70206d"
+    },
+    {
+      "id": "report-24",
+      "path": "app/native/octicons/report-24.svg",
+      "sha256": "7fade985c6105909755b47bc0a89653dabedc3772810739dd565da12e928966d"
+    },
+    {
+      "id": "rocket-16",
+      "path": "app/native/octicons/rocket-16.svg",
+      "sha256": "52db0059e0df4638bbe6153250f9f002981bcb15cc6a80c50d59b1b67e7d0954"
+    },
+    {
+      "id": "rocket-24",
+      "path": "app/native/octicons/rocket-24.svg",
+      "sha256": "dadd9ed148fdd66b044dd32290b56708cc9ac0abe81dfe8e0769d5874323b86b"
+    },
+    {
+      "id": "rows-16",
+      "path": "app/native/octicons/rows-16.svg",
+      "sha256": "49230995f640a0a6b480d0bc57bf4cfcbf3e8721655694bc227accb8ecb386f3"
+    },
+    {
+      "id": "rows-24",
+      "path": "app/native/octicons/rows-24.svg",
+      "sha256": "16be153054205373c84cf14b943e4282c570664bfc52a54c95ad0884972a10c8"
+    },
+    {
+      "id": "rss-16",
+      "path": "app/native/octicons/rss-16.svg",
+      "sha256": "36f8abe4bbf668ad715e6f56bac4356c0899bdf51c5c0f2bbf0b2b8fc023f99c"
+    },
+    {
+      "id": "rss-24",
+      "path": "app/native/octicons/rss-24.svg",
+      "sha256": "50dc64834399b8e603af11000d1622d133aefc2ac4271055321b4f91540184d3"
+    },
+    {
+      "id": "ruby-16",
+      "path": "app/native/octicons/ruby-16.svg",
+      "sha256": "22cf8bed9b8b618ebfaaaac97dedc65dbd717ab0df88e12112a08b4265f325cf"
+    },
+    {
+      "id": "ruby-24",
+      "path": "app/native/octicons/ruby-24.svg",
+      "sha256": "834e363d8618105d14fc7b423d58f0795bd92361ffc83921dd776afb66a9731f"
+    },
+    {
+      "id": "sandbox-16",
+      "path": "app/native/octicons/sandbox-16.svg",
+      "sha256": "55c447e6df110e27c482c29f3959f317de15fd2f45ea949026c3a39ff1b65ccb"
+    },
+    {
+      "id": "screen-full-16",
+      "path": "app/native/octicons/screen-full-16.svg",
+      "sha256": "801d436b0d938395b752795ce2a42eec1ea49e517d5ecd59f2bef50716274d1b"
+    },
+    {
+      "id": "screen-full-24",
+      "path": "app/native/octicons/screen-full-24.svg",
+      "sha256": "50fb8db1be8980d037aed15ce08da8656c7961323c313af4868b96204a84a3ef"
+    },
+    {
+      "id": "screen-normal-16",
+      "path": "app/native/octicons/screen-normal-16.svg",
+      "sha256": "da4f27dacf1734dcc9396384229af3874cbdab35fd44ddf868931992d9074ecb"
+    },
+    {
+      "id": "screen-normal-24",
+      "path": "app/native/octicons/screen-normal-24.svg",
+      "sha256": "09a673fb6c3ff293888cddf2d4270901cdf7f0bfd4bc100bc2068158dc314226"
+    },
+    {
+      "id": "search-16",
+      "path": "app/native/octicons/search-16.svg",
+      "sha256": "af6571e5813e8c35feb5d94e6a1906a82ad30841f675956764af1f7205d6f4b8"
+    },
+    {
+      "id": "search-24",
+      "path": "app/native/octicons/search-24.svg",
+      "sha256": "801a7165df20c9d3e5de20cc571c8809161d576f574db5980a53980c0d240d4b"
+    },
+    {
+      "id": "server-16",
+      "path": "app/native/octicons/server-16.svg",
+      "sha256": "7d3546b47a0b0dee7f594b368200932e654e1791fb3622bb6d06d8b7d7ee1a7f"
+    },
+    {
+      "id": "server-24",
+      "path": "app/native/octicons/server-24.svg",
+      "sha256": "63eebb66ac124930750bc94982c3b0afe7e3a09d81d5e000757d401a63d2af3b"
+    },
+    {
+      "id": "share-16",
+      "path": "app/native/octicons/share-16.svg",
+      "sha256": "57a11ca880e0a2f1120c74355398c78bc8396fbbeb3b9a0006d1c084213ee15e"
+    },
+    {
+      "id": "share-24",
+      "path": "app/native/octicons/share-24.svg",
+      "sha256": "3c9682fce19ab8ab53a416563bcb69f3442c1b6899151c9595baaa421d266b23"
+    },
+    {
+      "id": "share-android-16",
+      "path": "app/native/octicons/share-android-16.svg",
+      "sha256": "2b98a4c95c8259412b108ba71089e2a5878aa87730cbbedea609a488c2602606"
+    },
+    {
+      "id": "share-android-24",
+      "path": "app/native/octicons/share-android-24.svg",
+      "sha256": "7485583c4b52f134b798dff296d4b4906a46612bea06285ba450492ef619e944"
+    },
+    {
+      "id": "shield-16",
+      "path": "app/native/octicons/shield-16.svg",
+      "sha256": "9a7cd50763dee1456848e0e5bafa07f12f34c3fecd3dad1b3553318971e54504"
+    },
+    {
+      "id": "shield-24",
+      "path": "app/native/octicons/shield-24.svg",
+      "sha256": "612d7092bcc6b12771612f463117a30bd7ce92e0d8f7f07ef4c8edf0c168e62b"
+    },
+    {
+      "id": "shield-check-16",
+      "path": "app/native/octicons/shield-check-16.svg",
+      "sha256": "d7bcac8b3396f80c674ed453a80fce894a7e3d65a032041f9164694aa23938c6"
+    },
+    {
+      "id": "shield-check-24",
+      "path": "app/native/octicons/shield-check-24.svg",
+      "sha256": "c3d8431670df464574184292e9c9a4c211b9bbd60639b8d2d5248aa493af9fa3"
+    },
+    {
+      "id": "shield-lock-16",
+      "path": "app/native/octicons/shield-lock-16.svg",
+      "sha256": "9ab3f4fdee031e9b4508ae8e0f7aba27e4d324c37eb9c35801f49a3c4ab64641"
+    },
+    {
+      "id": "shield-lock-24",
+      "path": "app/native/octicons/shield-lock-24.svg",
+      "sha256": "96a29f5de62e0cc19a7b620ed5b868acba4e7c61140b64f28c54cd3d8d87dad1"
+    },
+    {
+      "id": "shield-slash-16",
+      "path": "app/native/octicons/shield-slash-16.svg",
+      "sha256": "0b9330ef9b20a0675ff34c9bf79c079e94fa20d251204bc8944af393f921afda"
+    },
+    {
+      "id": "shield-slash-24",
+      "path": "app/native/octicons/shield-slash-24.svg",
+      "sha256": "2692d4316c118e30fd12d15ff43d14270fdd1d2961cb409f1e06adee3339866b"
+    },
+    {
+      "id": "shield-x-16",
+      "path": "app/native/octicons/shield-x-16.svg",
+      "sha256": "a1702f28f35b95535f78b26a030fa02540974d3a5432034ba71030b343969218"
+    },
+    {
+      "id": "shield-x-24",
+      "path": "app/native/octicons/shield-x-24.svg",
+      "sha256": "da68f8c2984b0ebe25d57c3683ff38cadca57c921b05d7a2aaf8dc0745ed30c2"
+    },
+    {
+      "id": "sidebar-collapse-16",
+      "path": "app/native/octicons/sidebar-collapse-16.svg",
+      "sha256": "98fd2bbb1f65db5b305fa5cd42196c6f354092ca42390aa0e946e557089c9292"
+    },
+    {
+      "id": "sidebar-collapse-24",
+      "path": "app/native/octicons/sidebar-collapse-24.svg",
+      "sha256": "2c8d7b384d7bcdb6675d8ea2587b92e1144dc5b5fc20465a06501382366ed719"
+    },
+    {
+      "id": "sidebar-expand-16",
+      "path": "app/native/octicons/sidebar-expand-16.svg",
+      "sha256": "c8ca7e9af1d7736995203d2c44af6faed4023761fd6b3f117a0489a7369cc1c9"
+    },
+    {
+      "id": "sidebar-expand-24",
+      "path": "app/native/octicons/sidebar-expand-24.svg",
+      "sha256": "46cd213dc1a12c9b896f5f097b2e75e4de6a363baac594ca46e5095e640befcc"
+    },
+    {
+      "id": "sign-in-16",
+      "path": "app/native/octicons/sign-in-16.svg",
+      "sha256": "a664c82872c5397216611fd3761b6a3b9279e4bc67b5a1d0aa355b1da8b0211a"
+    },
+    {
+      "id": "sign-in-24",
+      "path": "app/native/octicons/sign-in-24.svg",
+      "sha256": "d8b1c644d1c0ee5784fa10478571b6a041d60a404197a35a2cd6a0e14bd50a7d"
+    },
+    {
+      "id": "sign-out-16",
+      "path": "app/native/octicons/sign-out-16.svg",
+      "sha256": "06841599472db48cfea46dbfc8daf512a3da5eb6ca6edad2a6bb5cf3de1b1703"
+    },
+    {
+      "id": "sign-out-24",
+      "path": "app/native/octicons/sign-out-24.svg",
+      "sha256": "3656db42bb6a2a6fa81eb60238a27933c97e601bebbfdcdbe728b79bf94615ba"
+    },
+    {
+      "id": "single-select-16",
+      "path": "app/native/octicons/single-select-16.svg",
+      "sha256": "eb2397d982a3ca7f8a094064e4e13ca21579bf8afc795d6dedc2db527e9be774"
+    },
+    {
+      "id": "single-select-24",
+      "path": "app/native/octicons/single-select-24.svg",
+      "sha256": "60ae0477668a46445669cabbb7cc60ebe1c62689c605bd3928d0d34a508d9c45"
+    },
+    {
+      "id": "skip-16",
+      "path": "app/native/octicons/skip-16.svg",
+      "sha256": "2685fdb1dedf4a24b1ea9027fabbbd94a9374774fb3fded6a52fd183ddb8d9e8"
+    },
+    {
+      "id": "skip-24",
+      "path": "app/native/octicons/skip-24.svg",
+      "sha256": "dbd468ae66036627bfbadf5b9c59e5a007f00c1a8428197e3469111c13237d81"
+    },
+    {
+      "id": "skip-fill-16",
+      "path": "app/native/octicons/skip-fill-16.svg",
+      "sha256": "31a2282e2b4527b271301e1e361da796a6247355d620c89ec45e6bb1c56f97b0"
+    },
+    {
+      "id": "skip-fill-24",
+      "path": "app/native/octicons/skip-fill-24.svg",
+      "sha256": "4ec7da4d975824cc15593927ebdb8b0f642822a7d2fd217b78481717819344ff"
+    },
+    {
+      "id": "sliders-16",
+      "path": "app/native/octicons/sliders-16.svg",
+      "sha256": "79542825547769bb2723a3e332ccd970907c896ec0fffbfd5801f35fae92b66b"
+    },
+    {
+      "id": "sliders-24",
+      "path": "app/native/octicons/sliders-24.svg",
+      "sha256": "e770c17958a84af36880fe13f6cb3f68d803644ac0400b9f4768e966ec69251c"
+    },
+    {
+      "id": "smiley-16",
+      "path": "app/native/octicons/smiley-16.svg",
+      "sha256": "488fdf34a41f1f69eff272597aea423e0487945bf5ec7b11d76f42e8cd82cfd8"
+    },
+    {
+      "id": "smiley-24",
+      "path": "app/native/octicons/smiley-24.svg",
+      "sha256": "0232967defc71d4e7f7239e7ee83bb520823e98c302a433af4ff7c52a6f39967"
+    },
+    {
+      "id": "smiley-frown-16",
+      "path": "app/native/octicons/smiley-frown-16.svg",
+      "sha256": "746a20baa3e9e4312ff6a5537e599bf44aef5b60abe7a2ae777ba2d26329bed9"
+    },
+    {
+      "id": "smiley-frown-24",
+      "path": "app/native/octicons/smiley-frown-24.svg",
+      "sha256": "94b055d5f69ba7b08b89c70c453d1393c10a79a12046dd0de1bd39e19ff63127"
+    },
+    {
+      "id": "smiley-frustrated-16",
+      "path": "app/native/octicons/smiley-frustrated-16.svg",
+      "sha256": "97750d732cb63f8b85c583d96e814d7cabb367b07631522f5365cddba40ebc76"
+    },
+    {
+      "id": "smiley-frustrated-24",
+      "path": "app/native/octicons/smiley-frustrated-24.svg",
+      "sha256": "1b3bb9c568f7ffe8f360bbb88e75ce67b0f9e24895b33f7cec9c616045cae880"
+    },
+    {
+      "id": "smiley-grin-16",
+      "path": "app/native/octicons/smiley-grin-16.svg",
+      "sha256": "ca4f4ac95bdb2a4a54f562e9773b446352bafe1739cc1e1b9034adfc009ceedb"
+    },
+    {
+      "id": "smiley-grin-24",
+      "path": "app/native/octicons/smiley-grin-24.svg",
+      "sha256": "d8b0518b5f61dce9857bc98c362c6a2f1fbdd7be6342544434ca3037c23f9b22"
+    },
+    {
+      "id": "smiley-neutral-16",
+      "path": "app/native/octicons/smiley-neutral-16.svg",
+      "sha256": "95399d35d87ee0f6ac130d22fc91f1cda6ba01bd5015f8a20c6d96a128f4b664"
+    },
+    {
+      "id": "smiley-neutral-24",
+      "path": "app/native/octicons/smiley-neutral-24.svg",
+      "sha256": "db0e4cee040222d5048c0f45e73bace269c1d07500117769df432007e02f73b4"
+    },
+    {
+      "id": "sort-asc-16",
+      "path": "app/native/octicons/sort-asc-16.svg",
+      "sha256": "065132867f7fd22e15012d6413b9e6ac4b902acaf564329682a55eaeffc9ae1b"
+    },
+    {
+      "id": "sort-asc-24",
+      "path": "app/native/octicons/sort-asc-24.svg",
+      "sha256": "68a47f81c91904c466836b5a14539b7db7b4df45f0d3845f48583c2b965d360e"
+    },
+    {
+      "id": "sort-desc-16",
+      "path": "app/native/octicons/sort-desc-16.svg",
+      "sha256": "73decf66013e029fafc334827b8e642083bbaa37d7a6bd74ced7e1050174936a"
+    },
+    {
+      "id": "sort-desc-24",
+      "path": "app/native/octicons/sort-desc-24.svg",
+      "sha256": "1690d7a3a018994d2813728fa92e7e921b44523a5e8cd64b703781ddf3d5cbba"
+    },
+    {
+      "id": "space-16",
+      "path": "app/native/octicons/space-16.svg",
+      "sha256": "7d1ebb7000744ff3abe59c11faae9526ff82bf8fa742eceea2b8d52f457aba8e"
+    },
+    {
+      "id": "space-24",
+      "path": "app/native/octicons/space-24.svg",
+      "sha256": "d21a4703d4e320b2ddc43884d0cb8a1e529f3c656ea2c6facca5539562e1c0f6"
+    },
+    {
+      "id": "spacing-large-16",
+      "path": "app/native/octicons/spacing-large-16.svg",
+      "sha256": "f75e669812593b63ed9aecc40fe4ce72033ba3f72ef571d5c2f572401595a42f"
+    },
+    {
+      "id": "spacing-large-24",
+      "path": "app/native/octicons/spacing-large-24.svg",
+      "sha256": "70f56de99d1d2a38da7d0a725912add6d749b0a7750d5b2010bbd48266680bbf"
+    },
+    {
+      "id": "spacing-medium-16",
+      "path": "app/native/octicons/spacing-medium-16.svg",
+      "sha256": "9a6873fb9729b09dbf260ee5dedb8d45fbaaf02cb1fe4aee55329c3545ec05e8"
+    },
+    {
+      "id": "spacing-medium-24",
+      "path": "app/native/octicons/spacing-medium-24.svg",
+      "sha256": "a0f0f99ede2e417c5fb7240e7bbbb843f417a0aba989e922adf4c4014cd59078"
+    },
+    {
+      "id": "spacing-small-16",
+      "path": "app/native/octicons/spacing-small-16.svg",
+      "sha256": "bfcf7ad0e68707a86e848915b8fe15bfe89757fdc26eb038eb817de7d5234780"
+    },
+    {
+      "id": "spacing-small-24",
+      "path": "app/native/octicons/spacing-small-24.svg",
+      "sha256": "f96e73a6d5835e75d02dac95e639279099a070c18884f7b21027ef2bae7d905c"
+    },
+    {
+      "id": "sparkle-16",
+      "path": "app/native/octicons/sparkle-16.svg",
+      "sha256": "56bd1f5c0a62fc04de7b33e862e03169b2821560e57bbbfaae95250fa70b845b"
+    },
+    {
+      "id": "sparkle-24",
+      "path": "app/native/octicons/sparkle-24.svg",
+      "sha256": "f6397fbc9bce38193aedd6bb6d2c285b77d3b80ddb358562379a0242269689f9"
+    },
+    {
+      "id": "sparkle-fill-16",
+      "path": "app/native/octicons/sparkle-fill-16.svg",
+      "sha256": "ea1d9c9734629c8621a3c1c51d2efbd7ec04fe0ed1577521b9a2c970d6f8aa04"
+    },
+    {
+      "id": "sparkle-fill-24",
+      "path": "app/native/octicons/sparkle-fill-24.svg",
+      "sha256": "6789419490164428ca1edb29f02c3972f03cf74d4666afd6db7fd29685d439e2"
+    },
+    {
+      "id": "sparkles-fill-16",
+      "path": "app/native/octicons/sparkles-fill-16.svg",
+      "sha256": "2711b799715d471f35a40c375f358435afe9942e77f7d3d93b5e9daa80a8e807"
+    },
+    {
+      "id": "sparkles-fill-24",
+      "path": "app/native/octicons/sparkles-fill-24.svg",
+      "sha256": "1dac41bdd211abc1bb9beca1253844c9a677b4b266a2c067c2dab72c83a9a3d0"
+    },
+    {
+      "id": "split-view-16",
+      "path": "app/native/octicons/split-view-16.svg",
+      "sha256": "a4e50c0b597a6f8696c3e60a211fef52ea000367c8ad9213b055538e0792dbf0"
+    },
+    {
+      "id": "split-view-24",
+      "path": "app/native/octicons/split-view-24.svg",
+      "sha256": "e9d393a628528075ef5d4cf0de543485b26135e520c965c342dbd887cc82565c"
+    },
+    {
+      "id": "sponsor-tiers-16",
+      "path": "app/native/octicons/sponsor-tiers-16.svg",
+      "sha256": "a31b6d01ac164d9b6e8dc0a1facbc59ef644c3896907022e1986ff8b06cc27db"
+    },
+    {
+      "id": "sponsor-tiers-24",
+      "path": "app/native/octicons/sponsor-tiers-24.svg",
+      "sha256": "9b5dd64d1339fbe2510026bd7fe84ff3be0d1c51a2622895888d790ce941530e"
+    },
+    {
+      "id": "square-16",
+      "path": "app/native/octicons/square-16.svg",
+      "sha256": "524090091b7b627e33012f0bfeb42052d807a3cfabc1a7de4dd895d6519ea332"
+    },
+    {
+      "id": "square-24",
+      "path": "app/native/octicons/square-24.svg",
+      "sha256": "8c0f939b8933bdc0536244e88e478046fef428a3073596d94e79754c3732a60d"
+    },
+    {
+      "id": "square-circle-16",
+      "path": "app/native/octicons/square-circle-16.svg",
+      "sha256": "e04f5b93117f698de378a2234dafd5851c7d4dbdf6c832137a3e64a5af2553e3"
+    },
+    {
+      "id": "square-circle-24",
+      "path": "app/native/octicons/square-circle-24.svg",
+      "sha256": "f22dddf46787dd8302deadb6cf5b3ac7efae5dc28a8d3f2b3dc509307ef7b24e"
+    },
+    {
+      "id": "square-fill-16",
+      "path": "app/native/octicons/square-fill-16.svg",
+      "sha256": "070c2cdc552f286dd7464013f2eec30daf105cf28adec41a4e2d21a95339331e"
+    },
+    {
+      "id": "square-fill-24",
+      "path": "app/native/octicons/square-fill-24.svg",
+      "sha256": "11a26d3bc1b141755e0d1064c9b6b913eb5d9fa220a0f64f17e1460a3d52118f"
+    },
+    {
+      "id": "squirrel-16",
+      "path": "app/native/octicons/squirrel-16.svg",
+      "sha256": "6134e815e50ccb09e69fe6092d1ec91e604bead9c96f9513a1895e35630c6c0b"
+    },
+    {
+      "id": "squirrel-24",
+      "path": "app/native/octicons/squirrel-24.svg",
+      "sha256": "e335422ad6dc6da6c38c3a17725c814ea722b1420080bb95ae12502b637a265b"
+    },
+    {
+      "id": "stack-16",
+      "path": "app/native/octicons/stack-16.svg",
+      "sha256": "251397e43ee48de86e7fd1b00e27a747419f924ed03597cdf0585bc521d3e442"
+    },
+    {
+      "id": "stack-24",
+      "path": "app/native/octicons/stack-24.svg",
+      "sha256": "0f19063a6d70382886ca794350784e82a177fe3c774dbe50b6efc7833af96a20"
+    },
+    {
+      "id": "stack-add-16",
+      "path": "app/native/octicons/stack-add-16.svg",
+      "sha256": "9462b425706e7247c00f7deec2d95fc1fbec180d523be50681095dd307020526"
+    },
+    {
+      "id": "stack-check-16",
+      "path": "app/native/octicons/stack-check-16.svg",
+      "sha256": "5fcdbb760d3d47e990f131b2e0861a7540608bdeaf7a87759f16099d11d1e2a7"
+    },
+    {
+      "id": "stack-remove-16",
+      "path": "app/native/octicons/stack-remove-16.svg",
+      "sha256": "e3d25599490514dffed212cd9d18d88e670b16868c2fd2327f5d68592e121185"
+    },
+    {
+      "id": "star-16",
+      "path": "app/native/octicons/star-16.svg",
+      "sha256": "dc7788c31fcc1d5cfb9fda8b1fb14007c330d4676088492942f66f8b402d3455"
+    },
+    {
+      "id": "star-24",
+      "path": "app/native/octicons/star-24.svg",
+      "sha256": "2934f578c59f7e913bd87f6de874022ad05c9d9041789a53e9d21a5b6e417704"
+    },
+    {
+      "id": "star-fill-16",
+      "path": "app/native/octicons/star-fill-16.svg",
+      "sha256": "93b1bb527f6275ca5dc7292bd66e981382ce074b906af25f44231de1d8678186"
+    },
+    {
+      "id": "star-fill-24",
+      "path": "app/native/octicons/star-fill-24.svg",
+      "sha256": "fcb0097acd75c2516447f5fc7f2a5f58ebe6c71adf2f39b2b98078d896649ede"
+    },
+    {
+      "id": "stop-16",
+      "path": "app/native/octicons/stop-16.svg",
+      "sha256": "4936114b6e2122a5341a64217143f4c364c59030e68b9bcca71c6b218f163087"
+    },
+    {
+      "id": "stop-24",
+      "path": "app/native/octicons/stop-24.svg",
+      "sha256": "1f5cf0e11efba739415b5c6351f558ee6761eb0228d287703f858ae32f2cfa8e"
+    },
+    {
+      "id": "stopwatch-16",
+      "path": "app/native/octicons/stopwatch-16.svg",
+      "sha256": "13633143ae565ee63c35ecb9939b73f41bf4b9b2e09d7d6eb87fc589b16fa7f9"
+    },
+    {
+      "id": "stopwatch-24",
+      "path": "app/native/octicons/stopwatch-24.svg",
+      "sha256": "564ce89feecf8667b932f037f758ead860ce31c1473a4dae6f7b4502fd5b6860"
+    },
+    {
+      "id": "strikethrough-16",
+      "path": "app/native/octicons/strikethrough-16.svg",
+      "sha256": "40e27fca6d00f6a31e53ec24f4c19ce1483943c6f3ac5b6048856f3931c4baac"
+    },
+    {
+      "id": "strikethrough-24",
+      "path": "app/native/octicons/strikethrough-24.svg",
+      "sha256": "b98c825e4b9a1748b1d05727179f733cd26b0c133ec2dafea2ea80263780126a"
+    },
+    {
+      "id": "sun-16",
+      "path": "app/native/octicons/sun-16.svg",
+      "sha256": "fabea2ac14f4923ed5b17b28d8cb78f2514661ef50089376f10583f3bc101cb2"
+    },
+    {
+      "id": "sun-24",
+      "path": "app/native/octicons/sun-24.svg",
+      "sha256": "8d15851dc8b4c26504777af7e52fb9f6693cec573441e0a2b41f8e16ef1c41c3"
+    },
+    {
+      "id": "sync-16",
+      "path": "app/native/octicons/sync-16.svg",
+      "sha256": "3301bbcd87299dd029fe3a3fd4e07fc47caa518b3511f7f4ee01d43a11ed4924"
+    },
+    {
+      "id": "sync-24",
+      "path": "app/native/octicons/sync-24.svg",
+      "sha256": "a71faf0a6aa910bf3e4ab556bfa56f01cb56f9d190bab66ac45cc64a0f783938"
+    },
+    {
+      "id": "tab-16",
+      "path": "app/native/octicons/tab-16.svg",
+      "sha256": "73ede5c1e8389a3bbe6470f2ba46885350a093ba24a6c13b252c77ab018f1caf"
+    },
+    {
+      "id": "tab-24",
+      "path": "app/native/octicons/tab-24.svg",
+      "sha256": "9d8eb6da8f4749fe0c7d6e895370949abfafdcf746aec51648c5073af14066eb"
+    },
+    {
+      "id": "tab-external-16",
+      "path": "app/native/octicons/tab-external-16.svg",
+      "sha256": "363459227a019fe5f39c25634e20e2a9b0f31f51c3a3d709ba9baf444c7b83d0"
+    },
+    {
+      "id": "tab-external-24",
+      "path": "app/native/octicons/tab-external-24.svg",
+      "sha256": "db0c9d7cbdb895dedfa0fd45ba50ee977c8b9c672ba37dccca27d2dd67705cd4"
+    },
+    {
+      "id": "table-16",
+      "path": "app/native/octicons/table-16.svg",
+      "sha256": "cc7630c490367e377389f6ce838dfd7d8d3fbd9a36754e03bb9ec118edbb1a30"
+    },
+    {
+      "id": "table-24",
+      "path": "app/native/octicons/table-24.svg",
+      "sha256": "65f3625c1f99726dffd9a3a9be6840e31ab423252b2890a8b84f5965a8c22b37"
+    },
+    {
+      "id": "tag-16",
+      "path": "app/native/octicons/tag-16.svg",
+      "sha256": "56c356a09b3a541d79d5895608da246188b8960ab6ce1e44803b5da91d8609ae"
+    },
+    {
+      "id": "tag-24",
+      "path": "app/native/octicons/tag-24.svg",
+      "sha256": "e4043db24f75e6b3da2fe99c91fbc086bcfa3702597b55282627952f3eb79c24"
+    },
+    {
+      "id": "tasklist-16",
+      "path": "app/native/octicons/tasklist-16.svg",
+      "sha256": "68f0e9949b1094be019fff6883a9d07c0f0a66d82c132314ae1fa1161ef4a04d"
+    },
+    {
+      "id": "tasklist-24",
+      "path": "app/native/octicons/tasklist-24.svg",
+      "sha256": "92112559cc7574a435be2e892e43eb4d8069ddeeaba658196dabddc99dc8b3a1"
+    },
+    {
+      "id": "telescope-16",
+      "path": "app/native/octicons/telescope-16.svg",
+      "sha256": "177fde40bce49096ada3c2d595233168f41d0470ebad2e9d26db700d9458118c"
+    },
+    {
+      "id": "telescope-24",
+      "path": "app/native/octicons/telescope-24.svg",
+      "sha256": "3bf15d724d5e783b4171baeb263454dd82e5ef853467e2b53fa80edf79bc4537"
+    },
+    {
+      "id": "telescope-fill-16",
+      "path": "app/native/octicons/telescope-fill-16.svg",
+      "sha256": "a8506cc4f2bd82515bd1f67990129bc97afe037ca12b9ee8008a53975ecfb239"
+    },
+    {
+      "id": "telescope-fill-24",
+      "path": "app/native/octicons/telescope-fill-24.svg",
+      "sha256": "2dc4298d71fe198b90401f5fec74eae63931b11313a5ad94f84a9cf8f65daa44"
+    },
+    {
+      "id": "terminal-16",
+      "path": "app/native/octicons/terminal-16.svg",
+      "sha256": "fef8997f940be9f43b2c044bad287f96dd877969b88e4d529284b361405cb1af"
+    },
+    {
+      "id": "terminal-24",
+      "path": "app/native/octicons/terminal-24.svg",
+      "sha256": "9637abddb8f0960658d3ec61f4c7ee3ad54e4491f6d37cdac66321c76e8aa657"
+    },
+    {
+      "id": "three-bars-16",
+      "path": "app/native/octicons/three-bars-16.svg",
+      "sha256": "55a77c2e744f2139f18000cef9db49573a025e4ddc35db8bf95bfb18ca9fc73d"
+    },
+    {
+      "id": "three-bars-24",
+      "path": "app/native/octicons/three-bars-24.svg",
+      "sha256": "a0234119d8150fee82deaeda7a4e025a5f3a1bed9e1cad1fbc97bd22a1e29c73"
+    },
+    {
+      "id": "thumbsdown-16",
+      "path": "app/native/octicons/thumbsdown-16.svg",
+      "sha256": "3add5c17a2c42fd6ce82399128ecf4ad2e34b23e4c8b5002d6ecc5fdaf5ccc71"
+    },
+    {
+      "id": "thumbsdown-24",
+      "path": "app/native/octicons/thumbsdown-24.svg",
+      "sha256": "6bcb4331466dd9ced51f7a8483f111bdbb3c55420426406a68102ae6bf090940"
+    },
+    {
+      "id": "thumbsup-16",
+      "path": "app/native/octicons/thumbsup-16.svg",
+      "sha256": "0ea3c97b28256dba4c3421f2b31bb96eb1050ea64aad2710ab168c2291b750d1"
+    },
+    {
+      "id": "thumbsup-24",
+      "path": "app/native/octicons/thumbsup-24.svg",
+      "sha256": "8f1a47eb8b286d87baa2c930859b972e8656c5f71d580e9d3316496c41e54f1a"
+    },
+    {
+      "id": "tools-16",
+      "path": "app/native/octicons/tools-16.svg",
+      "sha256": "cd1dcd756ef95b2dbfcbb90266e7396ddc8acdcee7d9db9a90a98f260c912d84"
+    },
+    {
+      "id": "tools-24",
+      "path": "app/native/octicons/tools-24.svg",
+      "sha256": "4f6015bb1eddcdf022eebc0ab5a6b867db14e6ac40a0aa93c332e9bfcec33fd6"
+    },
+    {
+      "id": "tracked-by-closed-completed-16",
+      "path": "app/native/octicons/tracked-by-closed-completed-16.svg",
+      "sha256": "f20c15d7495ca373393cddc5ca47e4b0e482355ae95862e09f41bb4c222d4770"
+    },
+    {
+      "id": "tracked-by-closed-completed-24",
+      "path": "app/native/octicons/tracked-by-closed-completed-24.svg",
+      "sha256": "1217569f7306992c9c999756118c9f18227d114525ca900e5c07db2f6ddc599e"
+    },
+    {
+      "id": "tracked-by-closed-not-planned-16",
+      "path": "app/native/octicons/tracked-by-closed-not-planned-16.svg",
+      "sha256": "bd3f390a6c8f929b5acb31309466ef69035ca19c2677db5342f0db5a91bfd978"
+    },
+    {
+      "id": "tracked-by-closed-not-planned-24",
+      "path": "app/native/octicons/tracked-by-closed-not-planned-24.svg",
+      "sha256": "9abfda1c526a21e4f835b6df6589d0116c958396c8e1abb0be673911d0eaa00a"
+    },
+    {
+      "id": "trash-16",
+      "path": "app/native/octicons/trash-16.svg",
+      "sha256": "91094961480d58395b6f9a0264dc32e90de4063e856602cb7ee1cda230cbbeb0"
+    },
+    {
+      "id": "trash-24",
+      "path": "app/native/octicons/trash-24.svg",
+      "sha256": "777896023aa44f13b7b70fb82074c833c0a176af2c29dd8018c9a82f29f76a1c"
+    },
+    {
+      "id": "triangle-down-16",
+      "path": "app/native/octicons/triangle-down-16.svg",
+      "sha256": "ae639f02c2e7697c0ad9aae969d367ae2f9de5f0504164fbb50a2f947d677143"
+    },
+    {
+      "id": "triangle-down-24",
+      "path": "app/native/octicons/triangle-down-24.svg",
+      "sha256": "0dcba63cbb428ad97d63c2fd206966cfd222f6ae884ef36b4e8986496a66439f"
+    },
+    {
+      "id": "triangle-left-16",
+      "path": "app/native/octicons/triangle-left-16.svg",
+      "sha256": "82cd3695f82fbbc006cc3ba2469035113f7fcb4789f2fbf3f247fda843f46b25"
+    },
+    {
+      "id": "triangle-left-24",
+      "path": "app/native/octicons/triangle-left-24.svg",
+      "sha256": "7f05ea663a70edad775cc325fb999a452b579e8ebfc432d8142e0e7bb4bf8139"
+    },
+    {
+      "id": "triangle-right-16",
+      "path": "app/native/octicons/triangle-right-16.svg",
+      "sha256": "296e7c5d868c64488d6d4b86524e89ca8926df30638627d747f4a3924f2a8165"
+    },
+    {
+      "id": "triangle-right-24",
+      "path": "app/native/octicons/triangle-right-24.svg",
+      "sha256": "558236353b4d742f286767b543ec01a8b85afca315258ceae98f0a8b2eeabc53"
+    },
+    {
+      "id": "triangle-up-16",
+      "path": "app/native/octicons/triangle-up-16.svg",
+      "sha256": "1a9586ca4a43b81b045970768a8f4a9856d5f1bacaa97155cefeb66be9d28059"
+    },
+    {
+      "id": "triangle-up-24",
+      "path": "app/native/octicons/triangle-up-24.svg",
+      "sha256": "2f9930b4b50267535e6347784da166664075f705c25d1872ba4af44af4496a72"
+    },
+    {
+      "id": "trophy-16",
+      "path": "app/native/octicons/trophy-16.svg",
+      "sha256": "8a711e5f52832fa37cffcc640609dfac66ef712c6b46f25d0de626f01e957d5c"
+    },
+    {
+      "id": "trophy-24",
+      "path": "app/native/octicons/trophy-24.svg",
+      "sha256": "3019879df71aa77e3fb713debdaf0017e12e897643f6e342ddf9f4df2c899458"
+    },
+    {
+      "id": "typography-16",
+      "path": "app/native/octicons/typography-16.svg",
+      "sha256": "b1bf33a644b1eddbdd5178a4851b1afc4fc3b19c7c2bbb3a54ef453ff60dce05"
+    },
+    {
+      "id": "typography-24",
+      "path": "app/native/octicons/typography-24.svg",
+      "sha256": "fbd479f0fe2df6a5cfcafedf94b585aeb5148c9d496e8c7f2baeb7208bfe1764"
+    },
+    {
+      "id": "undo-16",
+      "path": "app/native/octicons/undo-16.svg",
+      "sha256": "23d61bab916193d5d115e04bb49915d9829b57119a3ceabb07356ed48ce5ae2e"
+    },
+    {
+      "id": "undo-24",
+      "path": "app/native/octicons/undo-24.svg",
+      "sha256": "9b7279be47d62fcfc14fb973ddd2b351a39cac11e309cb8bf9d0e992e6c297f0"
+    },
+    {
+      "id": "unfold-16",
+      "path": "app/native/octicons/unfold-16.svg",
+      "sha256": "a0ac4dc6ec34970946f1e4547b09cdfde2ac9468c04accccf965dc227b56a83a"
+    },
+    {
+      "id": "unfold-24",
+      "path": "app/native/octicons/unfold-24.svg",
+      "sha256": "3a0c4775b8dd6e2ef945b3bf57173e7e22b6042b3b6e52e051a6f8574b345061"
+    },
+    {
+      "id": "unlink-16",
+      "path": "app/native/octicons/unlink-16.svg",
+      "sha256": "3083327486186d6dc70c968f0c13177be4290122db536e7b648ef1f8edb0d881"
+    },
+    {
+      "id": "unlink-24",
+      "path": "app/native/octicons/unlink-24.svg",
+      "sha256": "f1a52dafa5783b70b4483caf99dc53883fc9ef0fdce473cd88c9885f609f283f"
+    },
+    {
+      "id": "unlock-16",
+      "path": "app/native/octicons/unlock-16.svg",
+      "sha256": "2501f2bf1e82250f9856541a6fc12c16bef0ca8d1d3bb2f7094fa27f0c2e76d6"
+    },
+    {
+      "id": "unlock-24",
+      "path": "app/native/octicons/unlock-24.svg",
+      "sha256": "47b6033eb50acf0f039b933515d6fdbee0aa596789b8f03d2da16a838b71e3af"
+    },
+    {
+      "id": "unmute-16",
+      "path": "app/native/octicons/unmute-16.svg",
+      "sha256": "71bc87e9502de9a8adca790545e731baf06c7bf15230c190c6aa62e275fd893a"
+    },
+    {
+      "id": "unmute-24",
+      "path": "app/native/octicons/unmute-24.svg",
+      "sha256": "8cb77d5b0c9e19e7c53c407cf7224d9bb929137c09fd1ba9cdadb2803851f430"
+    },
+    {
+      "id": "unread-16",
+      "path": "app/native/octicons/unread-16.svg",
+      "sha256": "8c3466a8768591d00f4247bdee0845b1b0ff8ac7b294d4864693ffd6aa16d765"
+    },
+    {
+      "id": "unread-24",
+      "path": "app/native/octicons/unread-24.svg",
+      "sha256": "a0e23d1a92b3928cb96e54e92a6af4a75172eaf6480af42c3619dcc45c78083d"
+    },
+    {
+      "id": "unverified-16",
+      "path": "app/native/octicons/unverified-16.svg",
+      "sha256": "fcda10b41376c25e5d157d0126b9fbff539a7fcd78981c436134df249d5c62c7"
+    },
+    {
+      "id": "unverified-24",
+      "path": "app/native/octicons/unverified-24.svg",
+      "sha256": "739ee4ca163159e35ec82d34cbcff876f2792707ffed42b95df5fdd3bac83be1"
+    },
+    {
+      "id": "unwrap-16",
+      "path": "app/native/octicons/unwrap-16.svg",
+      "sha256": "be3d11f04f1c34697f404056e017de8274051744520d1429f52cfbd6885e4cee"
+    },
+    {
+      "id": "unwrap-24",
+      "path": "app/native/octicons/unwrap-24.svg",
+      "sha256": "6f7729c29cc6a4e1fdc0a8780154652f8d9ed7df0ae4d48e13d2b20a09a81836"
+    },
+    {
+      "id": "upload-16",
+      "path": "app/native/octicons/upload-16.svg",
+      "sha256": "d71171c90f435c6c5c3b2d06704181d28e8451459f23c39ca4b3d6e71a11d1a7"
+    },
+    {
+      "id": "upload-24",
+      "path": "app/native/octicons/upload-24.svg",
+      "sha256": "440e9e36f58315111756ad6c8adee2ef3a72ce1d307a011f62ddc875d2c9bb0d"
+    },
+    {
+      "id": "verified-16",
+      "path": "app/native/octicons/verified-16.svg",
+      "sha256": "b666f2f7e9ea11a6b7e2818d537438e63d85d12d829ee082841d1bc7355b43c5"
+    },
+    {
+      "id": "verified-24",
+      "path": "app/native/octicons/verified-24.svg",
+      "sha256": "da9803b6bd3022e388285185b6f44c49e554f8f6d7689ad9351676c09e54e0f7"
+    },
+    {
+      "id": "versions-16",
+      "path": "app/native/octicons/versions-16.svg",
+      "sha256": "63b5fa36caaa2c8a48fc4c7b087d56d55d6b1a29e5320ccf299ecee740b0ec08"
+    },
+    {
+      "id": "versions-24",
+      "path": "app/native/octicons/versions-24.svg",
+      "sha256": "ee8d7e12c166bc3ee8510f00d5f51d07d7bebdea5bd753ea788ff96298104b3a"
+    },
+    {
+      "id": "video-16",
+      "path": "app/native/octicons/video-16.svg",
+      "sha256": "20abd895d48f6f44db8e95fc237d5957990cf58ca1ac425301295d7c226f42e4"
+    },
+    {
+      "id": "video-24",
+      "path": "app/native/octicons/video-24.svg",
+      "sha256": "c57e050e0e55316f4ec18d23f7c7b345377ab3cd4323d0d5ac11d5b35046ada5"
+    },
+    {
+      "id": "vscode-16",
+      "path": "app/native/octicons/vscode-16.svg",
+      "sha256": "bcf4662ab6f1f157e04e0e85a79f9c8ed002aa6f570e90a53236e10be90020a0"
+    },
+    {
+      "id": "vscode-24",
+      "path": "app/native/octicons/vscode-24.svg",
+      "sha256": "2b5d8e690c5e79bb5b41eca1fab4fe5c2d66d6784ed63f1ac03d854db9746b0a"
+    },
+    {
+      "id": "webhook-16",
+      "path": "app/native/octicons/webhook-16.svg",
+      "sha256": "c75d2e6a37c52c1eb9383898d6853972bfbb7aec70839faa135db0cca53653dd"
+    },
+    {
+      "id": "workflow-16",
+      "path": "app/native/octicons/workflow-16.svg",
+      "sha256": "288b169ca830a28359d7bfe665098afcce2f5458024acab140b5943f90033bf1"
+    },
+    {
+      "id": "workflow-24",
+      "path": "app/native/octicons/workflow-24.svg",
+      "sha256": "31d362f1d9058cc83142a88c190024d7ba7c8df5d6ed3992674e97f90a23781f"
+    },
+    {
+      "id": "wrap-16",
+      "path": "app/native/octicons/wrap-16.svg",
+      "sha256": "f86316f466950f3da0030b127576226abdec25fc07239d8ff344c12ec73eb9eb"
+    },
+    {
+      "id": "wrap-24",
+      "path": "app/native/octicons/wrap-24.svg",
+      "sha256": "6431c4edd8f90d748c95a3df818d6fa6e5cd23a5cb4f522ddb99221ac351af7b"
+    },
+    {
+      "id": "x-12",
+      "path": "app/native/octicons/x-12.svg",
+      "sha256": "ce4e1137d23af3749e78581383c3ef00729a7cb508ec9a5eeac7f14e7164017e"
+    },
+    {
+      "id": "x-16",
+      "path": "app/native/octicons/x-16.svg",
+      "sha256": "d48518fbcd53f6c3162de358192d295fde4a4b5df80fbe458d23c8cab7b97f1e"
+    },
+    {
+      "id": "x-24",
+      "path": "app/native/octicons/x-24.svg",
+      "sha256": "57a614dc58e68b9579f4fc778f25debfe99e9f2173f8730414a28a62f7504c57"
+    },
+    {
+      "id": "x-circle-16",
+      "path": "app/native/octicons/x-circle-16.svg",
+      "sha256": "7354855c95b64d849966c3390686e6a9380d3d9567c3d141fa9871870bd2cfe1"
+    },
+    {
+      "id": "x-circle-24",
+      "path": "app/native/octicons/x-circle-24.svg",
+      "sha256": "a22f0197f30f392cf98b4eac7268b14ebfa43fcaf7796d8c735aad82054b02a2"
+    },
+    {
+      "id": "x-circle-fill-12",
+      "path": "app/native/octicons/x-circle-fill-12.svg",
+      "sha256": "932a7aa15854d1493b02e3cf06d197ff1f8a0767414ddb4ae611918a44fa0e97"
+    },
+    {
+      "id": "x-circle-fill-16",
+      "path": "app/native/octicons/x-circle-fill-16.svg",
+      "sha256": "411bee459ff6d3fdb481d3c7da75fc6dfb44aaac9e009e1c03bd06bb8cc9c57c"
+    },
+    {
+      "id": "x-circle-fill-24",
+      "path": "app/native/octicons/x-circle-fill-24.svg",
+      "sha256": "a73974a751913ce70c4c35115284793870d50a002718cd579577feeebcaad903"
+    },
+    {
+      "id": "zap-16",
+      "path": "app/native/octicons/zap-16.svg",
+      "sha256": "6aa640a83bd2a500f7f318b53d2fa634da50c0d1c44824eba65a637bc47403f9"
+    },
+    {
+      "id": "zap-24",
+      "path": "app/native/octicons/zap-24.svg",
+      "sha256": "8e67c09ee37b9c44447a62db9cdade601445eab9a1a033982bcfe4cb76fa9770"
+    },
+    {
+      "id": "zoom-in-16",
+      "path": "app/native/octicons/zoom-in-16.svg",
+      "sha256": "650b8f649319a49934c23a53b06777605a9207a56c02e964c04d8e0157269d48"
+    },
+    {
+      "id": "zoom-in-24",
+      "path": "app/native/octicons/zoom-in-24.svg",
+      "sha256": "bef89119210332916339d52cb50d83e51564bbe2ad276e4e216969a861456eea"
+    },
+    {
+      "id": "zoom-out-16",
+      "path": "app/native/octicons/zoom-out-16.svg",
+      "sha256": "fbfdf66e686611e4fffebaccd7e5d3db4e39d57e6dd021ca3355381c80912e44"
+    },
+    {
+      "id": "zoom-out-24",
+      "path": "app/native/octicons/zoom-out-24.svg",
+      "sha256": "a14ca57879682a93f2ec034d09c503dd69532d159b8b4ac385b3af0c1f79179f"
+    }
+  ]
+}

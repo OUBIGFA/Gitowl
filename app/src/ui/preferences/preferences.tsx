@@ -1,3 +1,4 @@
+import { savePreferences } from './preferences-controller'
 import * as React from 'react'
 import { Account, isDotComAccount } from '../../models/account'
 import { PreferencesTab } from '../../models/preferences'
@@ -8,10 +9,7 @@ import { Advanced } from './advanced'
 import { Git } from './git'
 import { assertNever } from '../../lib/fatal-error'
 import { Dialog, DialogFooter, DialogError } from '../dialog'
-import {
-  getGlobalConfigValue,
-  setGlobalConfigValue,
-} from '../../lib/git/config'
+import { getGlobalConfigValue } from '../../lib/git/config'
 import { lookupPreferredEmail } from '../../lib/email'
 import { Shell, getAvailableShells } from '../../lib/shells'
 import { getAvailableEditors } from '../../lib/editors/lookup'
@@ -29,15 +27,8 @@ import {
 } from '../../models/uncommitted-changes-strategy'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
-import {
-  isConfigFileLockError,
-  parseConfigLockFilePathFromError,
-} from '../../lib/git'
 import { ConfigLockFileExists } from '../lib/config-lock-file-exists'
-import {
-  setDefaultBranch,
-  getDefaultBranch,
-} from '../../lib/helpers/default-branch'
+import { getDefaultBranch } from '../../lib/helpers/default-branch'
 import { Prompts } from './prompts'
 import { Repository } from '../../models/repository'
 import { Notifications } from './notifications'
@@ -55,7 +46,6 @@ import { PopupType } from '../../models/popup'
 import {
   ICustomIntegration,
   TargetPathArgument,
-  isValidCustomIntegration,
 } from '../../lib/custom-integration'
 import {
   defaultGitHookEnvShell,
@@ -63,9 +53,6 @@ import {
   getCacheHooksEnv,
   getGitHookEnvShell,
   getHooksEnvEnabled,
-  setCacheHooksEnv,
-  setGitHookEnvShell,
-  setHooksEnvEnabled,
 } from '../../lib/hooks/config'
 import { enableCopilotSdkCommitMessageGeneration } from '../../lib/feature-flag'
 import {
@@ -76,17 +63,9 @@ import {
   getDateFormatPreference,
   getTimeFormatPreference,
   getNumberFormatPreference,
-  setDateFormatPreference,
-  setTimeFormatPreference,
-  setNumberFormatPreference,
 } from '../../models/formatting-preferences'
-import {
-  enableCopilotAppHandoff,
-  enableFormattingPreferences,
-} from '../../lib/feature-flag'
-import { validateCopilotAppPath } from '../../lib/copilot-app'
 
-interface IPreferencesProps {
+export interface IPreferencesProps {
   readonly dispatcher: Dispatcher
   readonly accounts: ReadonlyArray<Account>
   readonly repository: Repository | null
@@ -129,7 +108,7 @@ interface IPreferencesProps {
   readonly alwaysUseCopilotForConflictResolution: boolean
 }
 
-interface IPreferencesState {
+export interface IPreferencesState {
   readonly selectedIndex: PreferencesTab
   readonly committerName: string
   readonly committerEmail: string
@@ -1013,209 +992,10 @@ export class Preferences extends React.Component<
     )
   }
 
-  private onSave = async () => {
-    const { dispatcher } = this.props
-    const copilotAppPath = this.state.copilotAppPath.trim()
-    const initialCopilotAppPath = this.props.copilotAppPath?.trim() ?? ''
-    const copilotAppPathChanged = copilotAppPath !== initialCopilotAppPath
-
-    if (
-      enableCopilotAppHandoff() &&
-      copilotAppPathChanged &&
-      copilotAppPath.length > 0 &&
-      !(await validateCopilotAppPath(copilotAppPath))
-    ) {
-      this.setState({
-        selectedIndex: PreferencesTab.Integrations,
-        copilotAppPathError: __DARWIN__
-          ? 'Choose the GitHub Copilot application (.app).'
-          : 'Choose the GitHub Copilot executable (github.exe).',
-      })
-      return
-    }
-
-    try {
-      let shouldRefreshAuthor = false
-
-      if (this.state.committerName !== this.state.initialCommitterName) {
-        await setGlobalConfigValue('user.name', this.state.committerName)
-        shouldRefreshAuthor = true
-      }
-
-      if (this.state.committerEmail !== this.state.initialCommitterEmail) {
-        await setGlobalConfigValue('user.email', this.state.committerEmail)
-        shouldRefreshAuthor = true
-      }
-
-      if (this.props.repository !== null && shouldRefreshAuthor) {
-        dispatcher.refreshAuthor(this.props.repository)
-      }
-
-      // If the entered default branch is empty, we don't store it and keep
-      // the previous value.
-      // We do this because the preferences dialog doesn't have error states,
-      // and since the preferences dialog have a global "Save" button (that will
-      // save all the changes performed in every single tab), we cannot
-      // block the user from clicking "Save" because the entered branch is not valid
-      // (they will not be able to know the issue if they are in a different tab).
-      if (
-        this.state.defaultBranch.length > 0 &&
-        this.state.defaultBranch !== this.state.initialDefaultBranch
-      ) {
-        await setDefaultBranch(this.state.defaultBranch)
-      }
-
-      if (
-        this.props.repositoryIndicatorsEnabled !==
-        this.state.repositoryIndicatorsEnabled
-      ) {
-        dispatcher.setRepositoryIndicatorsEnabled(
-          this.state.repositoryIndicatorsEnabled
-        )
-      }
-
-      if (this.state.hooksPreferencesDirty) {
-        if (this.state.enableGitHookEnv !== undefined) {
-          setHooksEnvEnabled(this.state.enableGitHookEnv)
-        }
-
-        if (this.state.cacheGitHookEnv !== undefined) {
-          setCacheHooksEnv(this.state.cacheGitHookEnv)
-        }
-
-        if (this.state.selectedGitHookEnvShell !== undefined) {
-          setGitHookEnvShell(this.state.selectedGitHookEnvShell)
-        }
-      }
-    } catch (e) {
-      if (isConfigFileLockError(e)) {
-        const lockFilePath = parseConfigLockFilePathFromError(e.result)
-
-        if (lockFilePath !== null) {
-          this.setState({
-            existingLockFilePath: lockFilePath,
-            selectedIndex: PreferencesTab.Git,
-          })
-          return
-        }
-      }
-
-      this.props.onDismissed()
-      dispatcher.postError(e)
-      return
-    }
-
-    dispatcher.setUseWindowsOpenSSH(this.state.useWindowsOpenSSH)
-    dispatcher.setShowCommitLengthWarning(this.state.showCommitLengthWarning)
-    dispatcher.setNotificationsEnabled(this.state.notificationsEnabled)
-
-    await dispatcher.setStatsOptOut(this.state.optOutOfUsageTracking, false)
-
-    const { useCustomEditor, customEditor, useCustomShell, customShell } =
-      this.state
-
-    const isValidCustomEditor =
-      customEditor && (await isValidCustomIntegration(customEditor))
-    dispatcher.setUseCustomEditor(useCustomEditor && isValidCustomEditor)
-    if (isValidCustomEditor) {
-      dispatcher.setCustomEditor(customEditor)
-    }
-
-    const isValidCustomShell =
-      customShell && (await isValidCustomIntegration(customShell))
-    dispatcher.setUseCustomShell(useCustomShell && isValidCustomShell)
-    if (isValidCustomShell) {
-      dispatcher.setCustomShell(customShell)
-    }
-
-    if (enableCopilotAppHandoff() && copilotAppPathChanged) {
-      await dispatcher.setCopilotAppPath(
-        copilotAppPath.length === 0 ? null : copilotAppPath
-      )
-    }
-
-    if (
-      this.props.useExternalCredentialHelper !==
-      this.state.useExternalCredentialHelper
-    ) {
-      dispatcher.setUseExternalCredentialHelper(
-        this.state.useExternalCredentialHelper
-      )
-    }
-
-    await dispatcher.setConfirmRepoRemovalSetting(
-      this.state.confirmRepositoryRemoval
+  private onSave = () =>
+    savePreferences(this.props, this.state, change =>
+      this.setState(state => ({ ...state, ...change }))
     )
-
-    await dispatcher.setConfirmForcePushSetting(this.state.confirmForcePush)
-
-    await dispatcher.setConfirmDiscardStashSetting(
-      this.state.confirmDiscardStash
-    )
-
-    await dispatcher.setConfirmCheckoutCommitSetting(
-      this.state.confirmCheckoutCommit
-    )
-
-    await dispatcher.setConfirmUndoCommitSetting(this.state.confirmUndoCommit)
-    await dispatcher.setConfirmCommitFilteredChanges(
-      this.state.askForConfirmationOnCommitFilteredChanges
-    )
-    await dispatcher.setConfirmCommitMessageOverrideSetting(
-      this.state.confirmCommitMessageOverride
-    )
-    await dispatcher.setConfirmWorktreeRemovalSetting(
-      this.state.confirmWorktreeRemoval
-    )
-
-    if (this.state.selectedExternalEditor) {
-      await dispatcher.setExternalEditor(this.state.selectedExternalEditor)
-    }
-    await dispatcher.setShell(this.state.selectedShell)
-    await dispatcher.setConfirmDiscardChangesSetting(
-      this.state.confirmDiscardChanges
-    )
-    await dispatcher.setConfirmDiscardChangesPermanentlySetting(
-      this.state.confirmDiscardChangesPermanently
-    )
-
-    await dispatcher.setUncommittedChangesStrategySetting(
-      this.state.uncommittedChangesStrategy
-    )
-
-    dispatcher.setUnderlineLinksSetting(this.state.underlineLinks)
-
-    dispatcher.setDiffCheckMarksSetting(this.state.showDiffCheckMarks)
-    dispatcher.setAlwaysShowWorktreeList(this.state.alwaysShowWorktreeList)
-
-    dispatcher.setSelectedCopilotModelsByAccount(
-      this.state.selectedCopilotModelsByAccount
-    )
-
-    dispatcher.setAlwaysUseCopilotForConflictResolution(
-      this.state.alwaysUseCopilotForConflictResolution
-    )
-
-    if (enableFormattingPreferences()) {
-      if (this.state.selectedDateFormat !== undefined) {
-        setDateFormatPreference(this.state.selectedDateFormat)
-      }
-
-      if (this.state.selectedTimeFormat !== undefined) {
-        setTimeFormatPreference(this.state.selectedTimeFormat)
-      }
-
-      if (this.state.selectedNumberFormat !== undefined) {
-        setNumberFormatPreference(this.state.selectedNumberFormat)
-      }
-
-      if (this.state.preferAbsoluteDates !== undefined) {
-        dispatcher.setPreferAbsoluteDates(this.state.preferAbsoluteDates)
-      }
-    }
-
-    this.props.onDismissed()
-  }
 
   private onTabClicked = (visualIndex: number) => {
     this.setState({ selectedIndex: this.visualIndexToTab(visualIndex) })

@@ -1,3 +1,4 @@
+import { submitNotificationDialog } from '../lib/auxiliary-dialog-actions'
 import * as React from 'react'
 import { Row } from '../lib/row'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
@@ -143,17 +144,17 @@ export class PullRequestComment extends React.Component<
       shouldCheckoutBranch,
     } = this.props
 
-    if (shouldChangeRepository || shouldCheckoutBranch) {
-      this.setState({ switchingToPullRequest: true })
-      await dispatcher.selectRepository(repository)
-      await dispatcher.checkoutPullRequest(repository, pullRequest)
-      this.setState({ switchingToPullRequest: false })
-
-      dispatcher.incrementMetric(
-        'pullRequestCommentDialogSwitchToPullRequestCount'
-      )
-    }
-
-    this.props.onDismissed()
+    await submitNotificationDialog(
+      dispatcher,
+      repository,
+      pullRequest,
+      shouldChangeRepository || shouldCheckoutBranch,
+      switchingToPullRequest => this.setState({ switchingToPullRequest }),
+      () =>
+        dispatcher.incrementMetric(
+          'pullRequestCommentDialogSwitchToPullRequestCount'
+        ),
+      this.props.onDismissed
+    )
   }
 }

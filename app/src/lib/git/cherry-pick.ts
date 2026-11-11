@@ -25,7 +25,8 @@ import { getCommit } from '.'
 import { IMultiCommitOperationProgress } from '../../models/progress'
 import { join } from 'path'
 import { readFile } from 'fs/promises'
-import { pathExists } from '../path-exists'
+import { isCherryPickHeadFound } from './operation-state'
+export { isCherryPickHeadFound } from './operation-state'
 
 /** The app-specific results from attempting to cherry pick commits*/
 export enum CherryPickResult {
@@ -478,22 +479,4 @@ export async function continueCherryPick(
 /** Abandon the current cherry pick operation */
 export async function abortCherryPick(repository: Repository) {
   await git(['cherry-pick', '--abort'], repository.path, 'abortCherryPick')
-}
-
-/**
- * Check if the `.git/CHERRY_PICK_HEAD` file exists
- */
-export async function isCherryPickHeadFound(
-  repository: Repository
-): Promise<boolean> {
-  try {
-    return pathExists(join(repository.resolvedGitDir, 'CHERRY_PICK_HEAD'))
-  } catch (err) {
-    log.warn(
-      `[cherryPick] a problem was encountered reading .git/CHERRY_PICK_HEAD,
-       so it is unsafe to continue cherry-picking`,
-      err
-    )
-    return false
-  }
 }

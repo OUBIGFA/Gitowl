@@ -86,5 +86,10 @@ secrets*.json
 *.tar.gz
 *.tgz
 
+# Local visual-review context and generated design boards
+/PRODUCT.md
+/DESIGN.md
+.impeccable/
+
 # Must remain after every negation: ignore scratch directories at all depths.
 **/_temp/

@@ -48,6 +48,7 @@ mock.module('electron', {
       openPath: async () => '',
     },
     ipcRenderer: {
+      send: mock.fn(() => {}),
       invoke: mock.fn(async () => {}),
       on: mock.fn(x => {}),
     },

@@ -1,3 +1,7 @@
+import type {
+  ProviderSettings,
+  ProviderModelSelection,
+} from '../../lib/commit-generation/provider-types'
 import { Disposable } from 'event-kit'
 
 import {
@@ -4363,8 +4367,8 @@ export class Dispatcher {
     return this.appStore._setPullRequestSuggestedNextAction(value)
   }
 
-  public appFocusedElementChanged() {
-    this.appStore._appFocusedElementChanged()
+  public appFocusedElementChanged(nativeResizablePaneActive?: boolean) {
+    this.appStore._appFocusedElementChanged(nativeResizablePaneActive)
   }
 
   public updateCachedRepoRulesets(rulesets: Array<IAPIRepoRuleset | null>) {
@@ -4534,6 +4538,49 @@ export class Dispatcher {
       log.error(`Error updating BYOK Copilot provider '${provider.name}'`, e)
       this.postError(e)
     }
+  }
+
+  /** Official-SDK increment: propagate fixed errors, never log secrets or swallow failed saves. */
+  public saveCommitGenerationProvider(
+    settings: ProviderSettings & { readonly id?: string },
+    secret?: string
+  ) {
+    return this.appStore._saveCommitGenerationProvider(settings, secret)
+  }
+  public renameCommitGenerationProvider(id: string, name: string) {
+    return this.appStore._renameCommitGenerationProvider(id, name)
+  }
+  public deleteCommitGenerationProvider(id: string) {
+    return this.appStore._deleteCommitGenerationProvider(id)
+  }
+  public refreshCommitGenerationModels(id: string, signal?: AbortSignal) {
+    return this.appStore._refreshCommitGenerationModels(id, signal)
+  }
+  public setCommitGenerationModelEnabled(
+    providerId: string,
+    modelId: string,
+    enabled: boolean
+  ) {
+    return this.appStore._setCommitGenerationModelEnabled(
+      providerId,
+      modelId,
+      enabled
+    )
+  }
+  public setCommitGenerationDeployments(
+    id: string,
+    models: ReadonlyArray<{ readonly id: string; readonly name: string }>
+  ) {
+    return this.appStore._setCommitGenerationDeployments(id, models)
+  }
+  public selectCommitGenerationModel(
+    source: 'copilot' | 'custom',
+    selection: ProviderModelSelection | null
+  ) {
+    return this.appStore._selectCommitGenerationModel(source, selection)
+  }
+  public setCommitGenerationLanguage(language: string) {
+    return this.appStore._setCommitGenerationLanguage(language)
   }
 
   /** Remove a BYOK Copilot provider and its stored secret. */

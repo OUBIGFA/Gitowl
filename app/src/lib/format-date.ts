@@ -1,4 +1,5 @@
 import { format } from 'date-fns'
+import { zhCN, zhTW } from 'date-fns/locale'
 import {
   getDateFormatPreference,
   getTimeFormatPreference,
@@ -17,6 +18,8 @@ const getDateFormatter = mem(Intl.DateTimeFormat, {
 })
 
 interface IFormatDateOptions {
+  /** Presentation locale; omitted callers retain the original English output. */
+  readonly locale?: string
   /** Whether to include the date portion. Defaults to true. */
   readonly date?: boolean
   /** Whether to include the time portion. Defaults to true. */
@@ -49,14 +52,20 @@ interface IFormatDateOptions {
  */
 export function formatDate(
   value: Date,
-  { date = true, time = true, dateStyle, timeStyle }: IFormatDateOptions = {}
+  {
+    date = true,
+    time = true,
+    dateStyle,
+    timeStyle,
+    locale = 'en-US',
+  }: IFormatDateOptions = {}
 ): string {
   if (isNaN(value.valueOf())) {
     return 'Invalid date'
   }
 
   if (!enableFormattingPreferences()) {
-    return getDateFormatter('en-US', { dateStyle, timeStyle }).format(value)
+    return getDateFormatter(locale, { dateStyle, timeStyle }).format(value)
   }
 
   let formatString: string
@@ -75,7 +84,10 @@ export function formatDate(
   }
 
   try {
-    return format(value, formatString)
+    return format(value, formatString, {
+      locale:
+        locale === 'zh-Hans' ? zhCN : locale === 'zh-Hant' ? zhTW : undefined,
+    })
   } catch (e) {
     // In case the user has configured an invalid format pattern, we don't want
     // the app to crash, let's fall back to a default format and log the error

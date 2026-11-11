@@ -1,9 +1,10 @@
 import { git, HookCallbackOptions, IGitStringExecutionOptions } from './core'
 import { Repository } from '../../models/repository'
 import { IPushProgress } from '../../models/progress'
-import { PushProgressParser, executionOptionsWithProgress } from '../progress'
+import { PushProgressParser } from '../progress/push'
+import { executionOptionsWithProgress } from '../progress/from-process'
 import { IRemote } from '../../models/remote'
-import { envForRemoteOperation } from './environment'
+import { envForRemoteOperation, GitProxyResolver } from './environment'
 import { Branch } from '../../models/branch'
 
 /** Preserve native pushInsteadOf behavior when push falls back to the fetch URL. */
@@ -23,6 +24,18 @@ export type PushOptions = {
 
   readonly noVerify?: boolean
 
+  /** Optional native system/PAC resolver; Electron remains the default. */
+  readonly resolveProxy?: GitProxyResolver
+
+  /** Cancellation does not prove that the remote rejected or undid the push. */
+  readonly signal?: AbortSignal
+
+  /**
+   * Limit a native ordinary push to branches, despite mirror/followTags config.
+   * Keeps the existing hook, LFS, and submodule policy; never skips verification.
+   */
+  readonly ordinary?: boolean
+
   /** Desktop-owned assisted entry; never enables force, tag, or submodule pushes. */
   readonly assistedCommit?: {
     readonly expectedTip: string
@@ -40,13 +53,18 @@ export function getAssistedCommitPushConfigParameters(
   rawURL: string,
   source: AssistedCommitPushURLSource
 ): string {
-  const parameters = process.env.GIT_CONFIG_PARAMETERS ?? ''
   const property = source === 'push-url' ? 'pushurl' : 'url'
-  return `${parameters}${parameters.length === 0 ? '' : ' '}${[
+  return appendPushConfigParameters(
     `remote.${remoteName}.${property}=`,
     `remote.${remoteName}.${property}=${rawURL}`,
-    `remote.${remoteName}.mirror=false`,
-  ]
+    `remote.${remoteName}.mirror=false`
+  )
+}
+
+/** Preserve parameter quoting for operation-local policy, never write config. */
+function appendPushConfigParameters(...values: string[]): string {
+  const parameters = process.env.GIT_CONFIG_PARAMETERS ?? ''
+  return `${parameters}${parameters.length === 0 ? '' : ' '}${values
     .map(parameter => `'${parameter.replace(/'/g, "'\\''")}'`)
     .join(' ')}`
 }
@@ -87,6 +105,21 @@ export async function push(
   const args = ['push']
   const assisted = options?.assistedCommit
   if (
+    options?.ordinary &&
+    (assisted !== undefined ||
+      options.forceWithLease ||
+      options.noVerify ||
+      tagsToPush !== null)
+  ) {
+    throw new Error('Ordinary push cannot force, skip hooks, or push tags')
+  }
+
+  if (options?.ordinary) {
+    // Keep branch-only force/tag policy even when push.followTags is configured.
+    args.push('--no-force', '--no-mirror', '--no-follow-tags')
+  }
+
+  if (
     assisted !== undefined &&
     (!/^(?:[0-9a-f]{40}|[0-9a-f]{64})$/.test(assisted.expectedTip) ||
       !assisted.remoteRef.startsWith('refs/heads/') ||
@@ -115,16 +148,24 @@ export async function push(
     args.push('--no-verify')
   }
 
-  const remoteEnv = await envForRemoteOperation(assisted?.pushURL ?? remote.url)
+  const remoteEnv = await envForRemoteOperation(
+    assisted?.pushURL ?? remote.url,
+    options?.resolveProxy
+  )
+  // Git applies remote.<name>.mirror after parsing --no-mirror, so the
+  // operation-local config override is required as well as the safety flag.
   const pushParameters =
-    assisted === undefined
-      ? undefined
-      : getAssistedCommitPushConfigParameters(
+    assisted !== undefined
+      ? getAssistedCommitPushConfigParameters(
           remote.name,
           assisted.rawPushURL,
           assisted.pushURLSource
         )
+      : options?.ordinary
+      ? appendPushConfigParameters(`remote.${remote.name}.mirror=false`)
+      : undefined
   let opts: IGitStringExecutionOptions = {
+    signal: options?.signal,
     env: {
       ...remoteEnv,
       ...(pushParameters === undefined

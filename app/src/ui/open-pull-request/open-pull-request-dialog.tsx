@@ -1,3 +1,4 @@
+import { submitPullRequestPreview } from '../lib/auxiliary-dialog-actions'
 import * as React from 'react'
 import { IConstrainedValue, IPullRequestState } from '../../lib/app-state'
 import { getDotComAPIEndpoint } from '../../lib/api'
@@ -91,16 +92,13 @@ export class OpenPullRequestDialog extends React.Component<IOpenPullRequestDialo
     const { currentBranchHasPullRequest, dispatcher, repository, onDismissed } =
       this.props
 
-    if (currentBranchHasPullRequest) {
-      dispatcher.showPullRequest(repository)
-    } else {
-      const { baseBranch } = this.props.pullRequestState
-      dispatcher.createPullRequest(repository, baseBranch ?? undefined)
-      dispatcher.incrementMetric('createPullRequestCount')
-      dispatcher.incrementMetric('createPullRequestFromPreviewCount')
-    }
-
-    onDismissed()
+    submitPullRequestPreview(
+      dispatcher,
+      repository,
+      this.props.pullRequestState,
+      currentBranchHasPullRequest,
+      onDismissed
+    )
   }
 
   private onBranchChange = (branch: Branch) => {

@@ -1,9 +1,6 @@
 import * as React from 'react'
 import * as Path from 'path'
-import {
-  buildCustomMarkDownNodeFilterPipe,
-  MarkdownContext,
-} from '../../lib/markdown-filters/node-filter'
+import { MarkdownContext } from '../../lib/markdown-filters/node-filter'
 import { GitHubRepository } from '../../models/github-repository'
 import { readFile } from 'fs/promises'
 import { Tooltip } from './tooltip'
@@ -11,8 +8,10 @@ import { createObservableRef } from './observable-ref'
 import { getObjectId } from './object-id'
 import debounce from 'lodash/debounce'
 import { Emoji } from '../../lib/emoji'
-import { marked } from 'marked'
-import DOMPurify from 'dompurify'
+import {
+  sanitizeDialogMarkdown,
+  applyDialogMarkdownFilters,
+} from './dialog-markdown'
 
 interface ISandboxedMarkdownProps {
   /** A string of unparsed markdown to display */
@@ -133,17 +132,7 @@ export class SandboxedMarkdown extends React.PureComponent<
   public renderMarkdown = async () => {
     const { markdown } = this.props
 
-    const body = DOMPurify.sanitize(
-      marked(markdown, {
-        // https://marked.js.org/using_advanced  If true, use approved GitHub
-        // Flavored Markdown (GFM) specification.
-        gfm: true,
-        // https://marked.js.org/using_advanced, If true, add <br> on a single
-        // line break (copies GitHub behavior on comments, but not on rendered
-        // markdown files). Requires gfm be true.
-        breaks: true,
-      })
-    )
+    const body = sanitizeDialogMarkdown(markdown)
 
     const styleSheet = await this.getInlineStyleSheet()
 
@@ -363,44 +352,12 @@ export class SandboxedMarkdown extends React.PureComponent<
 
   private async applyFilters(doc: Document) {
     const { emoji, repository, markdownContext } = this.props
-    const filters = buildCustomMarkDownNodeFilterPipe({
-      emoji,
-      repository,
-      markdownContext,
-    })
-
-    for (const nodeFilter of filters) {
-      let docMutated = false
-      const walker = nodeFilter.createFilterTreeWalker(doc)
-
-      let node = walker.nextNode()
-      while (node !== null) {
-        const replacementNodes = await nodeFilter.filter(node)
-
-        if (this.currentDocument !== doc) {
-          // Abort, the document has changed
-          return
-        }
-
-        const currentNode = node
-        node = walker.nextNode()
-
-        if (replacementNodes === null) {
-          continue
-        }
-
-        docMutated = true
-
-        for (const replacementNode of replacementNodes) {
-          currentNode.parentNode?.insertBefore(replacementNode, currentNode)
-        }
-        currentNode.parentNode?.removeChild(currentNode)
-      }
-
-      if (docMutated) {
-        this.refreshHeight()
-      }
-    }
+    await applyDialogMarkdownFilters(
+      doc,
+      { emoji, repository, markdownContext },
+      () => this.currentDocument !== doc,
+      this.refreshHeight
+    )
   }
 
   public render() {

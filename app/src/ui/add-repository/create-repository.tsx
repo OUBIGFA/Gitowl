@@ -2,37 +2,26 @@ import * as React from 'react'
 import * as Path from 'path'
 
 import { Dispatcher } from '../dispatcher'
-import {
-  initGitRepository,
-  createCommit,
-  getStatus,
-  getAuthorIdentity,
-  getRepositoryType,
-  RepositoryType,
-} from '../../lib/git'
+import { getRepositoryType, RepositoryType } from '../../lib/git'
+import { createRepositoryCore } from '../lib/repository-creation'
 import { TextBox } from '../lib/text-box'
 import { Row } from '../lib/row'
 import { Checkbox, CheckboxValue } from '../lib/checkbox'
-import { writeDefaultReadme } from './write-default-readme'
 import { Select } from '../lib/select'
-import { writeGitDescription } from '../../lib/git/description'
-import { getGitIgnoreNames, writeGitIgnore } from './gitignores'
-import { ILicense, getLicenses, writeLicense } from './licenses'
-import { writeGitAttributes } from './git-attributes'
+import { getGitIgnoreNames } from './gitignores'
+import { ILicense, getLicenses } from './licenses'
 import { Dialog, DialogContent, DialogFooter, DialogError } from '../dialog'
 import { LinkButton } from '../lib/link-button'
 import { PopupType } from '../../models/popup'
 import { Ref } from '../lib/ref'
 import { enableReadmeOverwriteWarning } from '../../lib/feature-flag'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { mkdir } from 'fs/promises'
 import { directoryExists } from '../../lib/directory-exists'
 import { FoldoutType } from '../../lib/app-state'
 import { join } from 'path'
 import { isTopMostDialog } from '../dialog/is-top-most'
 import { InputError } from '../lib/input-description/input-error'
 import { InputWarning } from '../lib/input-description/input-warning'
-import { CreateRepositoryError } from '../../lib/error-with-metadata'
 import { RepositoryPath } from '../lib/repository-path'
 import { pathExists } from '../../lib/path-exists'
 import {
@@ -327,137 +316,17 @@ export class CreateRepository extends React.Component<
       | 'licenses'
     >
   ): Promise<Repository | undefined> {
-    try {
-      await mkdir(fullPath, { recursive: true })
-      if (this.mounted) {
-        this.setState({ isValidPath: true })
-      }
-    } catch (e) {
-      if (e.code === 'EACCES' && e.errno === -13) {
+    return createRepositoryCore(
+      this.props.dispatcher,
+      fullPath,
+      options,
+      error => this.postCreationError(error),
+      isValidPath => {
         if (this.mounted) {
-          this.setState({ isValidPath: false })
+          this.setState({ isValidPath })
         }
-        return
       }
-
-      log.error(
-        `createRepository: the directory at ${fullPath} is not valid`,
-        e
-      )
-      this.postCreationError(e)
-      return
-    }
-
-    try {
-      await initGitRepository(fullPath)
-    } catch (e) {
-      log.error(
-        `createRepository: unable to initialize a Git repository at ${fullPath}`,
-        e
-      )
-      this.postCreationError(e)
-      return
-    }
-
-    const repositories = await this.props.dispatcher.addRepositories([fullPath])
-    if (repositories.length < 1) {
-      return
-    }
-
-    const repository = repositories[0]
-
-    if (options.createWithReadme) {
-      try {
-        await writeDefaultReadme(fullPath, options.name, options.description)
-      } catch (e) {
-        log.error(`createRepository: unable to write README at ${fullPath}`, e)
-        this.postCreationError(e)
-      }
-    }
-
-    const gitIgnore = options.gitIgnore
-    if (gitIgnore !== NoGitIgnoreValue) {
-      try {
-        await writeGitIgnore(fullPath, gitIgnore)
-      } catch (e) {
-        log.error(
-          `createRepository: unable to write .gitignore file at ${fullPath}`,
-          e
-        )
-        this.postCreationError(e)
-      }
-    }
-
-    const description = options.description
-    if (description) {
-      try {
-        await writeGitDescription(fullPath, description)
-      } catch (e) {
-        log.error(
-          `createRepository: unable to write .git/description file at ${fullPath}`,
-          e
-        )
-        this.postCreationError(e)
-      }
-    }
-
-    const licenseName =
-      options.license === NoLicenseValue.name ? null : options.license
-    const license = (options.licenses || []).find(l => l.name === licenseName)
-
-    if (license) {
-      try {
-        const author = await getAuthorIdentity(repository)
-
-        await writeLicense(fullPath, license, {
-          fullname: author ? author.name : '',
-          email: author ? author.email : '',
-          year: new Date().getFullYear().toString(),
-          description: '',
-          project: options.name,
-        })
-      } catch (e) {
-        log.error(`createRepository: unable to write LICENSE at ${fullPath}`, e)
-        this.postCreationError(e)
-      }
-    }
-
-    try {
-      const gitAttributes = Path.join(fullPath, '.gitattributes')
-      const gitAttributesExists = await pathExists(gitAttributes)
-      if (!gitAttributesExists) {
-        await writeGitAttributes(fullPath)
-      }
-    } catch (e) {
-      log.error(
-        `createRepository: unable to write .gitattributes at ${fullPath}`,
-        e
-      )
-      this.postCreationError(e)
-    }
-
-    const status = await getStatus(repository, true, true).catch(e => {
-      log.error(`createRepository: unable to get status for ${fullPath}`, e)
-      this.postCreationError(new CreateRepositoryError(e))
-      return null
-    })
-
-    if (status === null) {
-      return
-    }
-
-    try {
-      const wd = status.workingDirectory
-      const files = wd.files
-      if (files.length > 0) {
-        await createCommit(repository, 'Initial commit', files)
-      }
-    } catch (e) {
-      log.error(`createRepository: initial commit failed at ${fullPath}`, e)
-      this.postCreationError(e)
-    }
-
-    return repository
+    )
   }
 
   private postCreationError(error: Error): void {

@@ -58,4 +58,4 @@ Desktop Plus 的 [byok.ts](https://github.com/desktop-plus/desktop-plus/blob/8c9
 
 该能力有上游依据：MyGo v0.7.4 的 `docs/i18n.md`、`internal/windows/locale.go` 和 `cmd/mygo/languages.go` 已核对；`docs/distribution.md` 说明 Windows NSIS 安装器按语言目录生成资源并自动匹配系统显示语言。已确认 v0.7.4 的 `cmd/mygo/nsis.go:411–412` 将“程序正在运行”和“程序仍在运行”两条提示硬编码为英文。正式接入前必须通过有源码基线、校验和回归测试的有限补丁或已修复的官方版本补齐，不能仅凭标准 NSIS 页语言正确就认定安装器全部完成。
 
-[Impeccable](https://github.com/pbakaus/impeccable) 与 [unslop](https://github.com/heydamir/unslop) 本轮仅作为 UI 方法参考；其 DOM/CSS 检查、CDP、浏览器注入不能验收原生 MyGo 界面，未安装或运行它们的外部脚本。原生界面仍需键盘、中文输入法、缩放、深浅主题和真实窗口验收。
+[Impeccable](https://github.com/pbakaus/impeccable) 与 [unslop](https://github.com/heydamir/unslop) 的首次调查仅阅读了 README，不构成实际设计审查。后续重设计已读取两者的具体工作指引，并运行固定版本 Impeccable 的 context、surface-brief 工作流；来源和适用范围记录在 [design-tools.json](design-tools.json)。MyGo 不是 HTML/CSS 界面，因此不拿 DOM 扫描或 CDP 注入的空结果充当验收。原生界面通过真实截图、键盘、中文输入法、缩放、深浅主题和独立视觉审查进行检查。

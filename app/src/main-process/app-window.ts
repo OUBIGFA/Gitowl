@@ -29,6 +29,7 @@ import {
 import { addTrustedIPCSender } from './trusted-ipc-sender'
 import { getUpdaterGUID } from '../lib/get-updater-guid'
 import { CLIAction } from '../lib/cli-action'
+import type { NativeWindowPresentation } from '../native-kernel/main-transport'
 
 export class AppWindow {
   private window: Electron.BrowserWindow
@@ -44,7 +45,7 @@ export class AppWindow {
   // See https://github.com/desktop/desktop/pull/11162
   private shouldMaximizeOnShow = false
 
-  public constructor() {
+  public constructor(private readonly nativePresentation?: NativeWindowPresentation) {
     const savedWindowState = windowStateKeeper({
       defaultWidth: this.minWidth,
       defaultHeight: this.minHeight,
@@ -79,6 +80,12 @@ export class AppWindow {
       windowOptions.frame = false
     } else if (__LINUX__) {
       windowOptions.icon = path.join(__dirname, 'static', 'icon-logo.png')
+    }
+
+    if (nativePresentation !== undefined) {
+      // Keep the original browser-backed kernel scheduler/storage alive without
+      // mounting or showing the upstream React frontend.
+      windowOptions.webPreferences!.backgroundThrottling = false
     }
 
     this.window = new BrowserWindow(windowOptions)
@@ -174,7 +181,7 @@ export class AppWindow {
     })
 
     this.window.webContents.once('did-finish-load', () => {
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === 'development' && this.nativePresentation === undefined) {
         this.window.webContents.openDevTools()
       }
 
@@ -188,6 +195,11 @@ export class AppWindow {
     })
 
     this.window.webContents.on('did-fail-load', () => {
+      if (this.nativePresentation !== undefined) {
+        this.nativePresentation.action('attention')
+        this.nativePresentation.fail('load')
+        return
+      }
       this.window.webContents.openDevTools()
       this.window.show()
     })
@@ -213,7 +225,7 @@ export class AppWindow {
     // have an IPC round trip to get that information from the main process.
     const localeCountryCode = app.getLocaleCountryCode() ?? ''
     this.window.loadURL(
-      encodePathAsUrl(__dirname, 'index.html') +
+      encodePathAsUrl(__dirname, this.nativePresentation === undefined ? 'index.html' : 'native-kernel.html') +
         `#lc=${encodeURIComponent(localeCountryCode)}`
     )
 
@@ -258,33 +270,49 @@ export class AppWindow {
   }
 
   public isMinimized() {
-    return this.window.isMinimized()
+    return this.nativePresentation?.getState().minimized ?? this.window.isMinimized()
   }
 
   /** Is the window currently visible? */
   public isVisible() {
-    return this.window.isVisible()
+    return this.nativePresentation?.getState().visible ?? this.window.isVisible()
   }
 
   public restore() {
+    if (this.nativePresentation !== undefined) {
+      this.nativePresentation.action('restore')
+      return
+    }
     this.window.restore()
   }
 
   public isFocused() {
-    return this.window.isFocused()
+    return this.nativePresentation?.getState().focused ?? this.window.isFocused()
   }
 
   public focus() {
+    if (this.nativePresentation !== undefined) {
+      this.nativePresentation.action('focus')
+      return
+    }
     this.window.focus()
   }
 
   /** Selects all the windows web contents */
   public selectAllWindowContents() {
+    if (this.nativePresentation !== undefined) {
+      this.nativePresentation.action('select-all')
+      return
+    }
     this.window.webContents.selectAll()
   }
 
   /** Show the window. */
   public show() {
+    if (this.nativePresentation !== undefined) {
+      this.nativePresentation.action('show')
+      return
+    }
     this.window.show()
     if (this.shouldMaximizeOnShow) {
       // Only maximize the window the first time it's shown, not every time.
@@ -331,6 +359,12 @@ export class AppWindow {
 
   /** Handle when a modal dialog is opened. */
   public dialogDidOpen() {
+    if (this.nativePresentation !== undefined) {
+      if (!this.nativePresentation.getState().focused) {
+        this.nativePresentation.action('attention')
+      }
+      return
+    }
     if (this.window.isFocused()) {
       // No additional notifications are needed.
       return
@@ -461,35 +495,54 @@ export class AppWindow {
   }
 
   public minimizeWindow() {
+    if (this.nativePresentation !== undefined) {
+      this.nativePresentation.action('minimize')
+      return
+    }
     this.window.minimize()
   }
 
   public maximizeWindow() {
+    if (this.nativePresentation !== undefined) {
+      this.nativePresentation.action('maximize')
+      return
+    }
     this.window.maximize()
   }
 
   public unmaximizeWindow() {
+    if (this.nativePresentation !== undefined) {
+      this.nativePresentation.action('unmaximize')
+      return
+    }
     this.window.unmaximize()
   }
 
   public closeWindow() {
+    if (this.nativePresentation !== undefined) {
+      this.nativePresentation.action('close')
+      return
+    }
     this.window.close()
   }
 
   public isMaximized() {
-    return this.window.isMaximized()
+    return this.nativePresentation === undefined
+      ? this.window.isMaximized()
+      : this.nativePresentation.getState().state === 'maximized'
   }
 
   public getCurrentWindowState() {
-    return getWindowState(this.window)
+    return this.nativePresentation?.getState().state ?? getWindowState(this.window)
   }
 
   public getCurrentWindowZoomFactor() {
-    return this.window.webContents.zoomFactor
+    return this.nativePresentation?.getState().zoom ?? this.window.webContents.zoomFactor
   }
 
   public setWindowZoomFactor(zoomFactor: number) {
     this.window.webContents.zoomFactor = zoomFactor
+    this.nativePresentation?.setZoom(zoomFactor)
   }
 
   /**

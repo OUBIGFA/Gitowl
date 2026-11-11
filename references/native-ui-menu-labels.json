@@ -1,0 +1,594 @@
+{
+  "menu.app": { "en": "Gitowl", "zh-Hans": "Gitowl", "zh-Hant": "Gitowl" },
+  "menu.file": { "en": "File", "zh-Hans": "文件", "zh-Hant": "檔案" },
+  "menu.edit": { "en": "Edit", "zh-Hans": "编辑", "zh-Hant": "編輯" },
+  "menu.view": { "en": "View", "zh-Hans": "视图", "zh-Hant": "檢視" },
+  "menu.repository": {
+    "en": "Repository",
+    "zh-Hans": "仓库",
+    "zh-Hant": "儲存庫"
+  },
+  "menu.branch": { "en": "Branch", "zh-Hans": "分支", "zh-Hant": "分支" },
+  "menu.window": { "en": "Window", "zh-Hans": "窗口", "zh-Hant": "視窗" },
+  "menu.help": { "en": "Help", "zh-Hans": "帮助", "zh-Hant": "說明" },
+  "menu.about": {
+    "en": "About Gitowl",
+    "zh-Hans": "关于 Gitowl",
+    "zh-Hant": "關於 Gitowl"
+  },
+  "menu.preferences": {
+    "en": "Settings…",
+    "zh-Hans": "设置…",
+    "zh-Hant": "設定…"
+  },
+  "menu.install-cli": {
+    "en": "Install Command Line Tool…",
+    "zh-Hans": "安装命令行工具…",
+    "zh-Hant": "安裝命令列工具…"
+  },
+  "menu.services": { "en": "Services", "zh-Hans": "服务", "zh-Hant": "服務" },
+  "menu.hide": {
+    "en": "Hide Gitowl",
+    "zh-Hans": "隐藏 Gitowl",
+    "zh-Hant": "隱藏 Gitowl"
+  },
+  "menu.hideOthers": {
+    "en": "Hide Others",
+    "zh-Hans": "隐藏其他应用",
+    "zh-Hant": "隱藏其他應用程式"
+  },
+  "menu.unhide": {
+    "en": "Show All",
+    "zh-Hans": "显示全部",
+    "zh-Hant": "顯示全部"
+  },
+  "menu.quit": { "en": "Exit", "zh-Hans": "退出", "zh-Hant": "結束" },
+  "menu.new-repository": {
+    "en": "New Repository…",
+    "zh-Hans": "新建仓库…",
+    "zh-Hant": "新增儲存庫…"
+  },
+  "menu.add-local-repository": {
+    "en": "Add Local Repository…",
+    "zh-Hans": "添加本地仓库…",
+    "zh-Hant": "加入本機儲存庫…"
+  },
+  "menu.clone-repository": {
+    "en": "Clone Repository…",
+    "zh-Hans": "克隆仓库…",
+    "zh-Hant": "複製儲存庫…"
+  },
+  "menu.undo": { "en": "Undo", "zh-Hans": "撤销", "zh-Hant": "復原" },
+  "menu.redo": { "en": "Redo", "zh-Hans": "重做", "zh-Hant": "重做" },
+  "menu.cut": { "en": "Cut", "zh-Hans": "剪切", "zh-Hant": "剪下" },
+  "menu.copy": { "en": "Copy", "zh-Hans": "复制", "zh-Hant": "複製" },
+  "menu.paste": { "en": "Paste", "zh-Hans": "粘贴", "zh-Hant": "貼上" },
+  "menu.select-all": {
+    "en": "Select All",
+    "zh-Hans": "全选",
+    "zh-Hant": "全選"
+  },
+  "menu.find": { "en": "Find", "zh-Hans": "查找", "zh-Hant": "尋找" },
+  "menu.show-changes": {
+    "en": "Changes",
+    "zh-Hans": "改动",
+    "zh-Hant": "變更"
+  },
+  "menu.show-history": {
+    "en": "History",
+    "zh-Hans": "历史",
+    "zh-Hant": "歷程"
+  },
+  "menu.show-repository-list": {
+    "en": "Repository List",
+    "zh-Hans": "仓库列表",
+    "zh-Hant": "儲存庫清單"
+  },
+  "menu.show-branches-list": {
+    "en": "Branches List",
+    "zh-Hans": "分支列表",
+    "zh-Hant": "分支清單"
+  },
+  "menu.show-worktrees-list": {
+    "en": "Worktrees List",
+    "zh-Hans": "工作树列表",
+    "zh-Hant": "工作樹清單"
+  },
+  "menu.go-to-commit-message": {
+    "en": "Go to Summary",
+    "zh-Hans": "转到提交摘要",
+    "zh-Hant": "前往提交摘要"
+  },
+  "menu.show-stashed-changes": {
+    "en": "Show Stashed Changes",
+    "zh-Hans": "显示暂存改动",
+    "zh-Hant": "顯示儲藏變更"
+  },
+  "menu.hide-stashed-changes": {
+    "en": "Hide Stashed Changes",
+    "zh-Hans": "隐藏暂存改动",
+    "zh-Hant": "隱藏儲藏變更"
+  },
+  "menu.show-filter": {
+    "en": "Show Changes Filter",
+    "zh-Hans": "显示改动筛选",
+    "zh-Hant": "顯示變更篩選"
+  },
+  "menu.hide-filter": {
+    "en": "Hide Changes Filter",
+    "zh-Hans": "隐藏改动筛选",
+    "zh-Hant": "隱藏變更篩選"
+  },
+  "menu.togglefullscreen": {
+    "en": "Toggle Full Screen",
+    "zh-Hans": "切换全屏",
+    "zh-Hant": "切換全螢幕"
+  },
+  "menu.resetZoom": {
+    "en": "Reset Zoom",
+    "zh-Hans": "重置缩放",
+    "zh-Hant": "重設縮放"
+  },
+  "menu.zoomIn": { "en": "Zoom In", "zh-Hans": "放大", "zh-Hant": "放大" },
+  "menu.zoomOut": { "en": "Zoom Out", "zh-Hans": "缩小", "zh-Hant": "縮小" },
+  "menu.increase-active-resizable-width": {
+    "en": "Expand Active Resizable",
+    "zh-Hans": "加宽当前面板",
+    "zh-Hant": "加寬目前面板"
+  },
+  "menu.decrease-active-resizable-width": {
+    "en": "Contract Active Resizable",
+    "zh-Hans": "缩窄当前面板",
+    "zh-Hant": "縮窄目前面板"
+  },
+  "menu.reload-window": {
+    "en": "Reload",
+    "zh-Hans": "重新加载",
+    "zh-Hant": "重新載入"
+  },
+  "menu.show-devtools": {
+    "en": "Toggle Developer Tools",
+    "zh-Hans": "切换开发者工具",
+    "zh-Hant": "切換開發者工具"
+  },
+  "menu.push": { "en": "Push", "zh-Hans": "推送", "zh-Hant": "推送" },
+  "menu.force-push": {
+    "en": "Force Push",
+    "zh-Hans": "强制推送",
+    "zh-Hant": "強制推送"
+  },
+  "menu.confirm-force-push": {
+    "en": "Force Push…",
+    "zh-Hans": "强制推送…",
+    "zh-Hant": "強制推送…"
+  },
+  "menu.pull": { "en": "Pull", "zh-Hans": "拉取", "zh-Hant": "提取" },
+  "menu.fetch": {
+    "en": "Fetch",
+    "zh-Hans": "获取远程更新",
+    "zh-Hant": "擷取遠端更新"
+  },
+  "menu.remove-repository": {
+    "en": "Remove",
+    "zh-Hans": "移除",
+    "zh-Hant": "移除"
+  },
+  "menu.confirm-remove-repository": {
+    "en": "Remove…",
+    "zh-Hans": "移除…",
+    "zh-Hant": "移除…"
+  },
+  "menu.view-repository-on-github": {
+    "en": "View on GitHub",
+    "zh-Hans": "在 GitHub 查看",
+    "zh-Hant": "在 GitHub 檢視"
+  },
+  "menu.open-in": {
+    "en": "Open in {value}",
+    "zh-Hans": "在 {value} 中打开",
+    "zh-Hant": "在 {value} 中開啟"
+  },
+  "menu.open-in-shell": {
+    "en": "Open in Shell",
+    "zh-Hans": "在终端中打开",
+    "zh-Hant": "在終端機中開啟"
+  },
+  "menu.open-external-editor": {
+    "en": "Open in External Editor",
+    "zh-Hans": "在外部编辑器中打开",
+    "zh-Hant": "在外部編輯器中開啟"
+  },
+  "menu.open-working-directory": {
+    "en": "Show in Explorer",
+    "zh-Hans": "在文件资源管理器中显示",
+    "zh-Hant": "在檔案總管中顯示"
+  },
+  "menu.finder": {
+    "en": "Show in Finder",
+    "zh-Hans": "在访达中显示",
+    "zh-Hant": "在 Finder 中顯示"
+  },
+  "menu.file-manager": {
+    "en": "Show in your File Manager",
+    "zh-Hans": "在文件管理器中显示",
+    "zh-Hant": "在檔案管理員中顯示"
+  },
+  "menu.open-in-copilot-app": {
+    "en": "Open in GitHub Copilot",
+    "zh-Hans": "在 GitHub Copilot 中打开",
+    "zh-Hant": "在 GitHub Copilot 中開啟"
+  },
+  "menu.open-with-external-editor": {
+    "en": "Open With…",
+    "zh-Hans": "打开方式…",
+    "zh-Hant": "開啟方式…"
+  },
+  "menu.create-issue-in-repository-on-github": {
+    "en": "Create Issue on GitHub",
+    "zh-Hans": "在 GitHub 创建议题",
+    "zh-Hant": "在 GitHub 建立議題"
+  },
+  "menu.create-worktree": {
+    "en": "New Worktree…",
+    "zh-Hans": "新建工作树…",
+    "zh-Hant": "新增工作樹…"
+  },
+  "menu.show-repository-settings": {
+    "en": "Repository Settings…",
+    "zh-Hans": "仓库设置…",
+    "zh-Hant": "儲存庫設定…"
+  },
+  "menu.create-branch": {
+    "en": "New Branch…",
+    "zh-Hans": "新建分支…",
+    "zh-Hant": "新增分支…"
+  },
+  "menu.rename-branch": {
+    "en": "Rename…",
+    "zh-Hans": "重命名…",
+    "zh-Hant": "重新命名…"
+  },
+  "menu.delete-branch": {
+    "en": "Delete…",
+    "zh-Hans": "删除…",
+    "zh-Hant": "刪除…"
+  },
+  "menu.discard-all-changes": {
+    "en": "Discard All Changes…",
+    "zh-Hans": "放弃全部改动…",
+    "zh-Hant": "捨棄所有變更…"
+  },
+  "menu.stash-all-changes": {
+    "en": "Stash All Changes",
+    "zh-Hans": "暂存全部改动",
+    "zh-Hant": "儲藏所有變更"
+  },
+  "menu.confirm-stash-all-changes": {
+    "en": "Stash All Changes…",
+    "zh-Hans": "暂存全部改动…",
+    "zh-Hant": "儲藏所有變更…"
+  },
+  "menu.update-default": {
+    "en": "Update from Default Branch",
+    "zh-Hans": "从默认分支更新",
+    "zh-Hant": "從預設分支更新"
+  },
+  "menu.update-from": {
+    "en": "Update from {value}",
+    "zh-Hans": "从 {value} 更新",
+    "zh-Hant": "從 {value} 更新"
+  },
+  "menu.compare-to-branch": {
+    "en": "Compare to Branch",
+    "zh-Hans": "与分支比较",
+    "zh-Hant": "與分支比較"
+  },
+  "menu.merge-branch": {
+    "en": "Merge into Current Branch…",
+    "zh-Hans": "合并到当前分支…",
+    "zh-Hant": "合併至目前分支…"
+  },
+  "menu.squash-and-merge-branch": {
+    "en": "Squash and Merge into Current Branch…",
+    "zh-Hans": "压缩并合并到当前分支…",
+    "zh-Hant": "壓縮並合併至目前分支…"
+  },
+  "menu.rebase-branch": {
+    "en": "Rebase Current Branch…",
+    "zh-Hans": "变基当前分支…",
+    "zh-Hant": "重定目前分支的基底…"
+  },
+  "menu.compare-on-github": {
+    "en": "Compare on GitHub",
+    "zh-Hans": "在 GitHub 比较",
+    "zh-Hant": "在 GitHub 比較"
+  },
+  "menu.branch-on-github": {
+    "en": "View Branch on GitHub",
+    "zh-Hans": "在 GitHub 查看分支",
+    "zh-Hant": "在 GitHub 檢視分支"
+  },
+  "menu.preview-pull-request": {
+    "en": "Preview Pull Request",
+    "zh-Hans": "预览拉取请求",
+    "zh-Hant": "預覽提取要求"
+  },
+  "menu.create-pull-request": {
+    "en": "Create Pull Request",
+    "zh-Hans": "创建拉取请求",
+    "zh-Hant": "建立提取要求"
+  },
+  "menu.view-pull-request": {
+    "en": "View Pull Request on GitHub",
+    "zh-Hans": "在 GitHub 查看拉取请求",
+    "zh-Hant": "在 GitHub 檢視提取要求"
+  },
+  "menu.minimize": {
+    "en": "Minimize",
+    "zh-Hans": "最小化",
+    "zh-Hant": "最小化"
+  },
+  "menu.zoom": { "en": "Zoom", "zh-Hans": "缩放窗口", "zh-Hant": "縮放視窗" },
+  "menu.close": {
+    "en": "Close Window",
+    "zh-Hans": "关闭窗口",
+    "zh-Hant": "關閉視窗"
+  },
+  "menu.front": {
+    "en": "Bring All to Front",
+    "zh-Hans": "全部置于前台",
+    "zh-Hant": "全部移至最前方"
+  },
+  "menu.report": {
+    "en": "Report Issue…",
+    "zh-Hans": "报告问题…",
+    "zh-Hant": "回報問題…"
+  },
+  "menu.support": {
+    "en": "Contact GitHub Support…",
+    "zh-Hans": "联系 GitHub 支持…",
+    "zh-Hant": "聯絡 GitHub 支援…"
+  },
+  "menu.guides": {
+    "en": "Show User Guides",
+    "zh-Hans": "查看用户指南",
+    "zh-Hant": "檢視使用指南"
+  },
+  "menu.shortcuts": {
+    "en": "Show Keyboard Shortcuts",
+    "zh-Hans": "查看键盘快捷键",
+    "zh-Hant": "檢視鍵盤快速鍵"
+  },
+  "menu.logs": {
+    "en": "Show Logs in Explorer",
+    "zh-Hans": "在文件资源管理器中查看日志",
+    "zh-Hant": "在檔案總管中檢視記錄"
+  },
+  "menu.logs-finder": {
+    "en": "Show Logs in Finder",
+    "zh-Hans": "在访达中查看日志",
+    "zh-Hant": "在 Finder 中檢視記錄"
+  },
+  "menu.logs-manager": {
+    "en": "Show Logs in your File Manager",
+    "zh-Hans": "在文件管理器中查看日志",
+    "zh-Hant": "在檔案管理員中檢視記錄"
+  },
+  "menu.cli": {
+    "en": "Command Line Tool",
+    "zh-Hans": "命令行工具",
+    "zh-Hant": "命令列工具"
+  },
+  "menu.install": { "en": "Install", "zh-Hans": "安装", "zh-Hant": "安裝" },
+  "menu.uninstall": {
+    "en": "Uninstall",
+    "zh-Hans": "卸载",
+    "zh-Hant": "解除安裝"
+  },
+  "menu.crash-main": {
+    "en": "Crash main process…",
+    "zh-Hans": "使主进程崩溃…",
+    "zh-Hant": "使主處理程序當機…"
+  },
+  "menu.crash-renderer": {
+    "en": "Crash renderer process…",
+    "zh-Hans": "使渲染进程崩溃…",
+    "zh-Hant": "使呈現處理程序當機…"
+  },
+  "menu.prune": {
+    "en": "Prune branches",
+    "zh-Hans": "清理分支",
+    "zh-Hant": "清理分支"
+  },
+  "menu.notification": {
+    "en": "Show notification",
+    "zh-Hans": "显示通知",
+    "zh-Hant": "顯示通知"
+  },
+  "menu.cli-action": {
+    "en": "Dispatch CLI action",
+    "zh-Hans": "执行命令行动作",
+    "zh-Hant": "執行命令列動作"
+  },
+  "menu.stats": {
+    "en": "Send stats",
+    "zh-Hans": "发送统计数据",
+    "zh-Hant": "傳送統計資料"
+  },
+  "menu.popup": {
+    "en": "Show popup",
+    "zh-Hans": "显示弹窗",
+    "zh-Hant": "顯示彈出視窗"
+  },
+  "menu.banner": {
+    "en": "Show banner",
+    "zh-Hans": "显示横幅",
+    "zh-Hant": "顯示橫幅"
+  },
+  "menu.error-dialogs": {
+    "en": "Show Error Dialogs",
+    "zh-Hans": "显示错误对话框",
+    "zh-Hant": "顯示錯誤對話方塊"
+  },
+  "menu.release-notes": {
+    "en": "Release notes",
+    "zh-Hans": "发行说明",
+    "zh-Hant": "版本說明"
+  },
+  "menu.thank-you": { "en": "Thank you", "zh-Hans": "感谢", "zh-Hant": "感謝" },
+  "menu.app-error": {
+    "en": "Show App Error",
+    "zh-Hans": "显示应用错误",
+    "zh-Hant": "顯示應用程式錯誤"
+  },
+  "menu.icons": {
+    "en": "Octicons",
+    "zh-Hans": "Octicons 图标",
+    "zh-Hant": "Octicons 圖示"
+  },
+  "menu.about-test": {
+    "en": "About dialog (test mode)",
+    "zh-Hans": "关于对话框（测试模式）",
+    "zh-Hant": "關於對話方塊（測試模式）"
+  },
+  "menu.snapshot": {
+    "en": "Copilot snapshot card",
+    "zh-Hans": "Copilot 快照卡片",
+    "zh-Hant": "Copilot 快照卡片"
+  },
+  "menu.token-expiration": {
+    "en": "Token expiration",
+    "zh-Hans": "令牌过期",
+    "zh-Hant": "權杖到期"
+  },
+  "menu.update-banner": {
+    "en": "Update banner",
+    "zh-Hans": "更新横幅",
+    "zh-Hant": "更新橫幅"
+  },
+  "menu.priority-banner": {
+    "en": "Update banner (priority)",
+    "zh-Hans": "更新横幅（优先）",
+    "zh-Hant": "更新橫幅（優先）"
+  },
+  "menu.showcase-banner": {
+    "en": "Showcase Update banner",
+    "zh-Hans": "功能展示更新横幅",
+    "zh-Hant": "功能展示更新橫幅"
+  },
+  "menu.arm64-banner": {
+    "en": "Arm64 banner",
+    "zh-Hans": "Arm64 横幅",
+    "zh-Hant": "Arm64 橫幅"
+  },
+  "menu.apple-banner": {
+    "en": "Apple silicon banner",
+    "zh-Hans": "Apple 芯片横幅",
+    "zh-Hant": "Apple 晶片橫幅"
+  },
+  "menu.reorder-success": {
+    "en": "Reorder Successful",
+    "zh-Hans": "重新排序成功",
+    "zh-Hant": "重新排序成功"
+  },
+  "menu.reorder-undone": {
+    "en": "Reorder Undone",
+    "zh-Hans": "重新排序已撤销",
+    "zh-Hant": "重新排序已復原"
+  },
+  "menu.cherry-conflicts": {
+    "en": "Cherry Pick Conflicts",
+    "zh-Hans": "挑选提交冲突",
+    "zh-Hant": "揀選提交衝突"
+  },
+  "menu.merge-success": {
+    "en": "Merge Successful",
+    "zh-Hans": "合并成功",
+    "zh-Hant": "合併成功"
+  },
+  "menu.unsupported-os": {
+    "en": "OS Version No Longer Supported",
+    "zh-Hans": "操作系统版本不再受支持",
+    "zh-Hant": "作業系統版本不再受支援"
+  },
+  "menu.conflicted-files": {
+    "en": "Confirm Committing Conflicted Files",
+    "zh-Hans": "确认提交冲突文件",
+    "zh-Hant": "確認提交衝突檔案"
+  },
+  "menu.unrecoverable": {
+    "en": "Discarded Changes Will Be Unrecoverable",
+    "zh-Hans": "放弃的改动将无法恢复",
+    "zh-Hant": "捨棄的變更將無法復原"
+  },
+  "menu.fork": {
+    "en": "Do you want to fork this repository?",
+    "zh-Hans": "要派生此仓库吗？",
+    "zh-Hant": "要分叉此儲存庫嗎？"
+  },
+  "menu.newer-commits": {
+    "en": "Newer Commits On Remote",
+    "zh-Hans": "远程存在更新提交",
+    "zh-Hant": "遠端有較新的提交"
+  },
+  "menu.large-files": {
+    "en": "Files Too Large",
+    "zh-Hans": "文件过大",
+    "zh-Hant": "檔案過大"
+  },
+  "menu.git-auth": {
+    "en": "Generic Git Authentication",
+    "zh-Hans": "通用 Git 身份验证",
+    "zh-Hant": "一般 Git 驗證"
+  },
+  "menu.invalid-token": {
+    "en": "Invalidated Account Token",
+    "zh-Hans": "账户令牌失效",
+    "zh-Hant": "帳戶權杖失效"
+  },
+  "menu.move-app": {
+    "en": "Move to Application Folder",
+    "zh-Hans": "移至应用程序文件夹",
+    "zh-Hant": "移至應用程式資料夾"
+  },
+  "menu.push-rejected": {
+    "en": "Push Rejected",
+    "zh-Hans": "推送被拒绝",
+    "zh-Hant": "推送遭拒"
+  },
+  "menu.reauth": {
+    "en": "Re-Authorization Required",
+    "zh-Hans": "需要重新授权",
+    "zh-Hant": "需要重新授權"
+  },
+  "menu.no-git": {
+    "en": "Unable to Locate Git",
+    "zh-Hans": "找不到 Git",
+    "zh-Hant": "找不到 Git"
+  },
+  "menu.no-editor": {
+    "en": "Unable to Open External Editor",
+    "zh-Hans": "无法打开外部编辑器",
+    "zh-Hant": "無法開啟外部編輯器"
+  },
+  "menu.no-shell": {
+    "en": "Unable to Open Shell",
+    "zh-Hans": "无法打开终端",
+    "zh-Hant": "無法開啟終端機"
+  },
+  "menu.untrusted": {
+    "en": "Untrusted Server",
+    "zh-Hans": "不受信任的服务器",
+    "zh-Hant": "不受信任的伺服器"
+  },
+  "menu.update-lfs": {
+    "en": "Update Existing Git LFS Filters?",
+    "zh-Hans": "更新现有 Git LFS 过滤器？",
+    "zh-Hant": "更新現有 Git LFS 篩選器？"
+  },
+  "menu.upstream-exists": {
+    "en": "Upstream Already Exists",
+    "zh-Hans": "上游已存在",
+    "zh-Hant": "上游已存在"
+  }
+}

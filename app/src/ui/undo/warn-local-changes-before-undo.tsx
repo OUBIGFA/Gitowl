@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { undoOperation } from '../../native-kernel/operation-dialogs'
+import { PopupType } from '../../models/popup'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { Repository } from '../../models/repository'
 import { Dispatcher } from '../dispatcher'
@@ -118,8 +120,16 @@ export class WarnLocalChangesBeforeUndo extends React.Component<
     this.setState({ isLoading: true })
 
     try {
-      dispatcher.setConfirmUndoCommitSetting(this.state.confirmUndoCommit)
-      await dispatcher.undoCommit(repository, commit, false)
+      await undoOperation(
+        dispatcher,
+        {
+          type: PopupType.WarnLocalChangesBeforeUndo,
+          repository,
+          commit,
+          isWorkingDirectoryClean: this.props.isWorkingDirectoryClean,
+        },
+        this.state.confirmUndoCommit
+      )
     } finally {
       this.setState({ isLoading: false })
     }

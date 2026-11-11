@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { Dispatcher } from '../dispatcher'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { RetryAction } from '../../models/retry-actions'
-import { SignInResult } from '../../lib/stores'
+import { reauthorizeDialog } from '../lib/auxiliary-dialog-actions'
 
 const okButtonText = __DARWIN__ ? 'Continue in Browser' : 'Continue in browser'
 
@@ -68,14 +68,15 @@ export class SAMLReauthRequiredDialog extends React.Component<
     this.setState({ loading: true })
     const { dispatcher, endpoint } = this.props
 
-    const result = await new Promise<SignInResult>(async resolve => {
-      dispatcher.beginBrowserBasedSignIn(endpoint, resolve)
-    })
-
-    if (result.kind === 'success' && this.props.retryAction) {
-      dispatcher.performRetry(this.props.retryAction)
-    }
-
-    this.props.onDismissed()
+    await reauthorizeDialog(
+      dispatcher,
+      endpoint,
+      () => {
+        if (this.props.retryAction) {
+          dispatcher.performRetry(this.props.retryAction)
+        }
+      },
+      this.props.onDismissed
+    )
   }
 }

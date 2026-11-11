@@ -7,10 +7,22 @@ import {
   DefaultDialogFooter,
 } from './dialog'
 import { dialogTransitionTimeout } from './app'
-import { GitError, isAuthFailureError } from '../lib/git/core'
+import { isAuthFailureError } from '../lib/git/core'
 import { Popup, PopupType } from '../models/popup'
 import { OkCancelButtonGroup } from './dialog/ok-cancel-button-group'
 import { ErrorWithMetadata, getErrorCauses } from '../lib/error-with-metadata'
+import {
+  getUnderlyingError,
+  isErrorWithMetaData,
+  isGitError,
+  isRawGitError,
+} from '../lib/underlying-error'
+export {
+  getUnderlyingError,
+  isErrorWithMetaData,
+  isGitError,
+  isRawGitError,
+} from '../lib/underlying-error'
 import { RetryActionType, RetryAction } from '../models/retry-actions'
 import { Ref } from './lib/ref'
 import { GitError as DugiteError } from 'dugite'
@@ -333,31 +345,6 @@ export class AppError extends React.Component<IAppErrorProps, IAppErrorState> {
       </Dialog>
     )
   }
-}
-
-export function getUnderlyingError(error: Error): Error {
-  const copilotError = getErrorCauses(error).find(
-    (cause): cause is CopilotError => cause instanceof CopilotError
-  )
-  return (
-    copilotError ?? (isErrorWithMetaData(error) ? error.underlyingError : error)
-  )
-}
-
-export function isErrorWithMetaData(error: Error): error is ErrorWithMetadata {
-  return error instanceof ErrorWithMetadata
-}
-
-export function isGitError(error: Error): error is GitError {
-  return error instanceof GitError
-}
-
-export function isRawGitError(error: Error | null) {
-  if (!error) {
-    return false
-  }
-  const e = getUnderlyingError(error)
-  return e instanceof GitError && e.isRawMessage
 }
 
 function isCloneError(error: Error) {

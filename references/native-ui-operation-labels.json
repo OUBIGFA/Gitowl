@@ -1,0 +1,570 @@
+{
+  "operation.kind.Merge": { "en": "Merge", "zh-Hans": "合并", "zh-Hant": "合併" },
+  "operation.kind.Rebase": { "en": "Rebase", "zh-Hans": "变基", "zh-Hant": "重訂基底" },
+  "operation.kind.Cherry-pick": { "en": "Cherry-pick", "zh-Hans": "挑选提交", "zh-Hant": "揀選提交" },
+  "operation.kind.Squash": { "en": "Squash commits", "zh-Hans": "压缩提交", "zh-Hant": "壓縮提交" },
+  "operation.kind.Reorder": { "en": "Reorder commits", "zh-Hans": "调整提交顺序", "zh-Hant": "調整提交順序" },
+  "operation.repositoryUnavailable": {
+    "en": "The repository for this dialog is no longer available. Cancel this dialog and reopen the operation from its repository.",
+    "zh-Hans": "此对话框所属的仓库已不可用。请取消对话框，再从对应仓库重新打开操作。",
+    "zh-Hant": "此對話框所屬的儲存庫已無法使用。請取消對話框，再從對應儲存庫重新開啟操作。"
+  },
+  "operation.authorSearching": {
+    "en": "Looking up co-author…",
+    "zh-Hans": "正在查找共同作者…",
+    "zh-Hant": "正在尋找共同作者…"
+  },
+  "operation.authorNotFound": {
+    "en": "Co-author not found",
+    "zh-Hans": "未找到共同作者",
+    "zh-Hant": "找不到共同作者"
+  },
+  "operation.editMessage": {
+    "en": "Update draft",
+    "zh-Hans": "更新草稿",
+    "zh-Hant": "更新草稿"
+  },
+  "operation.searchAuthors": {
+    "en": "Search co-authors",
+    "zh-Hans": "搜索共同作者",
+    "zh-Hant": "搜尋共同作者"
+  },
+  "operation.authorHit": {
+    "en": "Author suggestion",
+    "zh-Hans": "作者建议",
+    "zh-Hant": "作者建議"
+  },
+  "operation.addAuthor": {
+    "en": "Add selected co-author",
+    "zh-Hans": "添加所选共同作者",
+    "zh-Hant": "加入所選共同作者"
+  },
+  "operation.removeAuthor": {
+    "en": "Remove selected co-author",
+    "zh-Hans": "移除所选共同作者",
+    "zh-Hant": "移除所選共同作者"
+  },
+  "operation.rulesPending": {
+    "en": "Checking repository rules…",
+    "zh-Hans": "正在检查仓库规则…",
+    "zh-Hant": "正在檢查儲存庫規則…"
+  },
+  "operation.rulesBlocked": {
+    "en": "Repository rules prevent this commit. Review the message, author and branch rules.",
+    "zh-Hans": "仓库规则阻止此提交。请检查说明、作者及分支规则。",
+    "zh-Hant": "儲存庫規則阻止此提交。請檢查說明、作者及分支規則。"
+  },
+  "operation.rulesPassed": {
+    "en": "Repository rules checked",
+    "zh-Hans": "已检查仓库规则",
+    "zh-Hant": "已檢查儲存庫規則"
+  },
+  "operation.summaryLength": {
+    "en": "A summary of 50 characters or fewer is recommended.",
+    "zh-Hans": "建议摘要不超过 50 个字符。",
+    "zh-Hant": "建議摘要不超過 50 個字元。"
+  },
+  "operation.summaryRequired": {
+    "en": "Enter a commit summary.",
+    "zh-Hans": "请输入提交摘要。",
+    "zh-Hant": "請輸入提交摘要。"
+  },
+  "operation.ConfirmDiscardChanges": {
+    "en": "Confirm discard changes",
+    "zh-Hans": "确认放弃改动",
+    "zh-Hant": "確認捨棄變更"
+  },
+  "operation.ConfirmDiscardSelection": {
+    "en": "Confirm discard selected changes",
+    "zh-Hans": "确认放弃所选改动",
+    "zh-Hant": "確認捨棄所選變更"
+  },
+  "operation.OversizedFiles": {
+    "en": "Files too large",
+    "zh-Hans": "文件过大",
+    "zh-Hant": "檔案過大"
+  },
+  "operation.CommitConflictsWarning": {
+    "en": "Confirm committing conflicted files",
+    "zh-Hans": "确认提交有冲突的文件",
+    "zh-Hant": "確認提交有衝突的檔案"
+  },
+  "operation.StashAndSwitchBranch": {
+    "en": "Switch branch",
+    "zh-Hans": "切换分支",
+    "zh-Hant": "切換分支"
+  },
+  "operation.ConfirmOverwriteStash": {
+    "en": "Overwrite stash?",
+    "zh-Hans": "覆盖暂存的改动？",
+    "zh-Hant": "覆寫暫存的變更？"
+  },
+  "operation.ConfirmDiscardStash": {
+    "en": "Discard stash?",
+    "zh-Hans": "放弃暂存的改动？",
+    "zh-Hant": "捨棄暫存的變更？"
+  },
+  "operation.ConfirmCheckoutCommit": {
+    "en": "Checkout commit?",
+    "zh-Hans": "检出提交？",
+    "zh-Hant": "簽出提交？"
+  },
+  "operation.LocalChangesOverwritten": {
+    "en": "Local changes would be overwritten",
+    "zh-Hans": "本地改动将被覆盖",
+    "zh-Hant": "本機變更將被覆寫"
+  },
+  "operation.WarnLocalChangesBeforeUndo": {
+    "en": "Undo commit",
+    "zh-Hans": "撤销提交",
+    "zh-Hant": "復原提交"
+  },
+  "operation.WarningBeforeReset": {
+    "en": "Reset to commit",
+    "zh-Hans": "重置到提交",
+    "zh-Hant": "重設至提交"
+  },
+  "operation.WarnForcePush": {
+    "en": "This operation will require force push",
+    "zh-Hans": "此操作将需要强制推送",
+    "zh-Hant": "此操作將需要強制推送"
+  },
+  "operation.DiscardChangesRetry": {
+    "en": "Discarded changes will be unrecoverable",
+    "zh-Hans": "放弃的改动将无法恢复",
+    "zh-Hant": "捨棄的變更將無法還原"
+  },
+  "operation.UnknownAuthors": {
+    "en": "Unknown co-authors",
+    "zh-Hans": "未知共同作者",
+    "zh-Hant": "未知共同作者"
+  },
+  "operation.ConfirmCommitFilteredChanges": {
+    "en": "Commit filtered changes?",
+    "zh-Hans": "提交筛选隐藏的改动？",
+    "zh-Hant": "提交篩選隱藏的變更？"
+  },
+  "operation.CommitMessage": {
+    "en": "Commit message",
+    "zh-Hans": "提交说明",
+    "zh-Hant": "提交說明"
+  },
+  "operation.MultiCommitOperation": {
+    "en": "Commit operation",
+    "zh-Hans": "提交操作",
+    "zh-Hant": "提交操作"
+  },
+  "operation.AssistedCommitDisclaimer": {
+    "en": "GitHub Copilot",
+    "zh-Hans": "GitHub Copilot",
+    "zh-Hant": "GitHub Copilot"
+  },
+  "operation.CopilotConflictResolutionDisclaimer": {
+    "en": "GitHub Copilot",
+    "zh-Hans": "GitHub Copilot",
+    "zh-Hant": "GitHub Copilot"
+  },
+  "operation.CopilotConflictResolutionAlwaysNudge": {
+    "en": "Always use Copilot for conflict resolution?",
+    "zh-Hans": "始终使用 Copilot 解决冲突？",
+    "zh-Hant": "一律使用 Copilot 解決衝突？"
+  },
+  "operation.confirmAgain": {
+    "en": "Ask for confirmation next time",
+    "zh-Hans": "下次仍询问确认",
+    "zh-Hant": "下次仍詢問確認"
+  },
+  "operation.cancel": { "en": "Cancel", "zh-Hans": "取消", "zh-Hant": "取消" },
+  "operation.close": { "en": "Close", "zh-Hans": "关闭", "zh-Hant": "關閉" },
+  "operation.continue": {
+    "en": "Continue",
+    "zh-Hans": "继续",
+    "zh-Hant": "繼續"
+  },
+  "operation.discard": {
+    "en": "Discard changes",
+    "zh-Hans": "放弃改动",
+    "zh-Hant": "捨棄變更"
+  },
+  "operation.discardAll": {
+    "en": "Discard all changes",
+    "zh-Hans": "放弃全部改动",
+    "zh-Hant": "捨棄所有變更"
+  },
+  "operation.commitAnyway": {
+    "en": "Commit anyway",
+    "zh-Hans": "仍然提交",
+    "zh-Hant": "仍然提交"
+  },
+  "operation.switchBranch": {
+    "en": "Switch branch",
+    "zh-Hans": "切换分支",
+    "zh-Hant": "切換分支"
+  },
+  "operation.moveChanges": {
+    "en": "Bring my changes to the target branch (otherwise stash on the current branch)",
+    "zh-Hans": "将改动带到目标分支（否则暂存到当前分支）",
+    "zh-Hant": "將變更帶至目標分支（否則暫存至目前分支）"
+  },
+  "operation.overwrite": {
+    "en": "Overwrite",
+    "zh-Hans": "覆盖",
+    "zh-Hant": "覆寫"
+  },
+  "operation.stashContinue": {
+    "en": "Stash changes and continue",
+    "zh-Hans": "暂存改动并继续",
+    "zh-Hant": "暫存變更並繼續"
+  },
+  "operation.begin": {
+    "en": "Begin operation",
+    "zh-Hans": "开始操作",
+    "zh-Hant": "開始操作"
+  },
+  "operation.discardPermanently": {
+    "en": "Permanently discard changes",
+    "zh-Hans": "永久放弃改动",
+    "zh-Hant": "永久捨棄變更"
+  },
+  "operation.showFiles": {
+    "en": "Show hidden changes",
+    "zh-Hans": "显示隐藏的改动",
+    "zh-Hant": "顯示隱藏的變更"
+  },
+  "operation.saveCommitMessage": {
+    "en": "Use this commit message",
+    "zh-Hans": "使用此提交说明",
+    "zh-Hant": "使用此提交說明"
+  },
+  "operation.understand": {
+    "en": "I understand",
+    "zh-Hans": "我已了解",
+    "zh-Hant": "我已瞭解"
+  },
+  "operation.yes": { "en": "Yes", "zh-Hans": "是", "zh-Hant": "是" },
+  "operation.no": { "en": "No", "zh-Hans": "否", "zh-Hant": "否" },
+  "operation.files": { "en": "Files", "zh-Hans": "文件", "zh-Hant": "檔案" },
+  "operation.file": { "en": "File", "zh-Hans": "文件", "zh-Hant": "檔案" },
+  "operation.selectedChanges": {
+    "en": "File containing the selected changes",
+    "zh-Hans": "包含所选改动的文件",
+    "zh-Hant": "包含所選變更的檔案"
+  },
+  "operation.currentBranch": {
+    "en": "Current branch",
+    "zh-Hans": "当前分支",
+    "zh-Hant": "目前分支"
+  },
+  "operation.targetBranch": {
+    "en": "Target branch",
+    "zh-Hans": "目标分支",
+    "zh-Hant": "目標分支"
+  },
+  "operation.existingStash": {
+    "en": "Existing stash will be overwritten if changes are left here",
+    "zh-Hans": "若将改动留在此分支，将覆盖已有暂存",
+    "zh-Hant": "若將變更留在此分支，將覆寫現有暫存"
+  },
+  "operation.stash": {
+    "en": "Stash",
+    "zh-Hans": "暂存的改动",
+    "zh-Hant": "暫存的變更"
+  },
+  "operation.commit": { "en": "Commit", "zh-Hans": "提交", "zh-Hant": "提交" },
+  "operation.operation": {
+    "en": "Operation",
+    "zh-Hans": "操作",
+    "zh-Hant": "操作"
+  },
+  "operation.unknownAuthors": {
+    "en": "Users not found (they will not be added as co-authors)",
+    "zh-Hans": "未找到的用户（不会添加为共同作者）",
+    "zh-Hant": "找不到的使用者（不會加入為共同作者）"
+  },
+  "operation.context": {
+    "en": "Original operation context",
+    "zh-Hans": "原操作上下文",
+    "zh-Hant": "原操作內容"
+  },
+  "operation.summary": {
+    "en": "Summary",
+    "zh-Hans": "摘要",
+    "zh-Hant": "摘要"
+  },
+  "operation.description": {
+    "en": "Description",
+    "zh-Hans": "详细说明",
+    "zh-Hant": "詳細說明"
+  },
+  "operation.coAuthors": {
+    "en": "Co-authors",
+    "zh-Hans": "共同作者",
+    "zh-Hant": "共同作者"
+  },
+  "operation.skipCommitHooks": {
+    "en": "Skip commit hooks",
+    "zh-Hans": "跳过提交钩子",
+    "zh-Hant": "略過提交掛鉤"
+  },
+  "operation.signOffCommits": {
+    "en": "Sign off commit",
+    "zh-Hans": "添加 Signed-off-by 尾注",
+    "zh-Hant": "加入 Signed-off-by 尾註"
+  },
+  "operation.step": {
+    "en": "Current step",
+    "zh-Hans": "当前步骤",
+    "zh-Hant": "目前步驟"
+  },
+  "operation.commits": {
+    "en": "Selected commits",
+    "zh-Hans": "所选提交",
+    "zh-Hant": "所選提交"
+  },
+  "operation.branch": { "en": "Branch", "zh-Hans": "分支", "zh-Hant": "分支" },
+  "operation.newBranchName": {
+    "en": "New branch name",
+    "zh-Hans": "新分支名称",
+    "zh-Hant": "新分支名稱"
+  },
+  "operation.newBranch": {
+    "en": "Cherry-pick to a new branch",
+    "zh-Hans": "拣选到新分支",
+    "zh-Hant": "挑選至新分支"
+  },
+  "operation.startPoint": {
+    "en": "Start point",
+    "zh-Hans": "起点",
+    "zh-Hant": "起點"
+  },
+  "operation.createAndCherryPick": {
+    "en": "Create branch and cherry-pick",
+    "zh-Hans": "创建分支并拣选",
+    "zh-Hant": "建立分支並挑選"
+  },
+  "operation.merge": {
+    "en": "Create a merge commit",
+    "zh-Hans": "创建合并提交",
+    "zh-Hant": "建立合併提交"
+  },
+  "operation.squashMerge": {
+    "en": "Squash and merge",
+    "zh-Hans": "压缩并合并",
+    "zh-Hant": "壓縮並合併"
+  },
+  "operation.rebase": {
+    "en": "Rebase",
+    "zh-Hans": "变基",
+    "zh-Hant": "重訂基底"
+  },
+  "operation.progress": {
+    "en": "Progress",
+    "zh-Hans": "进度",
+    "zh-Hant": "進度"
+  },
+  "operation.abort": {
+    "en": "Abort operation",
+    "zh-Hans": "中止操作",
+    "zh-Hant": "中止操作"
+  },
+  "operation.returnToConflicts": {
+    "en": "Return to conflicts",
+    "zh-Hans": "返回冲突",
+    "zh-Hant": "返回衝突"
+  },
+  "operation.showConflicts": {
+    "en": "Show conflicts",
+    "zh-Hans": "显示冲突",
+    "zh-Hant": "顯示衝突"
+  },
+  "operation.hideConflicts": {
+    "en": "Hide dialog and continue in the workbench",
+    "zh-Hans": "隐藏对话框并在工作台继续",
+    "zh-Hant": "隱藏對話框並在工作台繼續"
+  },
+  "operation.stop": {
+    "en": "Stop Copilot and return to manual resolution",
+    "zh-Hans": "停止 Copilot 并返回手动解决",
+    "zh-Hant": "停止 Copilot 並返回手動解決"
+  },
+  "operation.applyChoices": {
+    "en": "Apply resolution choices",
+    "zh-Hans": "应用解决选项",
+    "zh-Hant": "套用解決選項"
+  },
+  "operation.openFile": {
+    "en": "Open selected file in editor",
+    "zh-Hans": "在编辑器中打开所选文件",
+    "zh-Hant": "在編輯器中開啟所選檔案"
+  },
+  "operation.openShell": {
+    "en": "Open repository in terminal",
+    "zh-Hans": "在终端中打开仓库",
+    "zh-Hant": "在終端機中開啟儲存庫"
+  },
+  "operation.manual": {
+    "en": "Switch to manual resolution",
+    "zh-Hans": "切换到手动解决",
+    "zh-Hant": "切換至手動解決"
+  },
+  "operation.resolveCopilot": {
+    "en": "Resolve with Copilot",
+    "zh-Hans": "使用 Copilot 解决",
+    "zh-Hant": "使用 Copilot 解決"
+  },
+  "operation.ours": {
+    "en": "Use current changes",
+    "zh-Hans": "使用当前改动",
+    "zh-Hant": "使用目前變更"
+  },
+  "operation.theirs": {
+    "en": "Use incoming changes",
+    "zh-Hans": "使用传入改动",
+    "zh-Hant": "使用傳入變更"
+  },
+  "operation.copilotSuggestion": {
+    "en": "Use Copilot's suggestion",
+    "zh-Hans": "使用 Copilot 的建议",
+    "zh-Hant": "使用 Copilot 的建議"
+  },
+  "operation.reason": {
+    "en": "Resolution reasoning",
+    "zh-Hans": "解决理由",
+    "zh-Hant": "解決理由"
+  },
+  "operation.skipped": {
+    "en": "Skipped by Copilot",
+    "zh-Hans": "Copilot 跳过的文件",
+    "zh-Hant": "Copilot 略過的檔案"
+  },
+  "operation.discardDescription": {
+    "en": "Discard all changes to the listed files? Changes can be restored from the system trash.",
+    "zh-Hans": "放弃所列文件的全部改动？可从系统回收站恢复。",
+    "zh-Hant": "捨棄所列檔案的所有變更？可從系統垃圾桶還原。"
+  },
+  "operation.discardSelectionDescription": {
+    "en": "Discard only the originally selected changes in this file?",
+    "zh-Hans": "仅放弃此文件中原先选中的改动？",
+    "zh-Hant": "僅捨棄此檔案中原先選取的變更？"
+  },
+  "operation.oversizedDescription": {
+    "en": "These files exceed 100 MB. Committing them prevents pushing this repository to GitHub.com. Avoid committing them or use Git LFS.",
+    "zh-Hans": "这些文件超过 100 MB。提交后将无法推送到 GitHub.com。建议避免提交或使用 Git LFS。",
+    "zh-Hant": "這些檔案超過 100 MB。提交後將無法推送至 GitHub.com。建議避免提交或使用 Git LFS。"
+  },
+  "operation.commitConflictsDescription": {
+    "en": "The listed conflicted files will be committed. Do you want to continue?",
+    "zh-Hans": "所列有冲突的文件将被提交。是否继续？",
+    "zh-Hant": "所列有衝突的檔案將被提交。是否繼續？"
+  },
+  "operation.switchBranchDescription": {
+    "en": "Leave changes on the current branch to stash them for later, or bring them to the target branch. An existing stash needs a separate overwrite confirmation.",
+    "zh-Hans": "可将改动暂存到当前分支以便稍后恢复，或带到目标分支。覆盖已有暂存需另行确认。",
+    "zh-Hant": "可將變更暫存至目前分支以便稍後還原，或帶至目標分支。覆寫現有暫存需另行確認。"
+  },
+  "operation.overwriteDescription": {
+    "en": "This will overwrite your existing stash with your current changes. Continue?",
+    "zh-Hans": "这将用当前改动覆盖已有暂存。是否继续？",
+    "zh-Hant": "這將以目前變更覆寫現有暫存。是否繼續？"
+  },
+  "operation.discardStashDescription": {
+    "en": "Discard these stashed changes?",
+    "zh-Hans": "放弃这些暂存的改动？",
+    "zh-Hant": "捨棄這些暫存的變更？"
+  },
+  "operation.checkoutDescription": {
+    "en": "Checking out this commit creates a detached HEAD. You will no longer be on a branch. Continue?",
+    "zh-Hans": "检出此提交会进入分离 HEAD 状态，不再位于任何分支。是否继续？",
+    "zh-Hant": "簽出此提交會進入分離 HEAD 狀態，不再位於任何分支。是否繼續？"
+  },
+  "operation.localChangesDescription": {
+    "en": "This operation cannot continue while your local changes would be overwritten. If there is no existing stash, you may stash changes and retry. Restoring a stash cannot create another stash here.",
+    "zh-Hans": "本地改动将被覆盖，无法继续操作。若无已有暂存，可暂存改动后重试。恢复暂存时不能在此创建另一个暂存。",
+    "zh-Hant": "本機變更將被覆寫，無法繼續操作。若無現有暫存，可暫存變更後重試。還原暫存時不能在此建立另一個暫存。"
+  },
+  "operation.undoDescription": {
+    "en": "You have changes in progress. Undoing the commit might lose some changes. Continue anyway?",
+    "zh-Hans": "存在未提交的改动。撤销提交可能丢失部分改动。是否仍然继续？",
+    "zh-Hant": "存在尚未提交的變更。復原提交可能遺失部分變更。是否仍然繼續？"
+  },
+  "operation.mergeUndoDescription": {
+    "en": "Undoing a merge applies its changes to your working directory. Committing again creates a new commit, losing the merge relationship; commits from the merged branch could disappear. Continue anyway?",
+    "zh-Hans": "撤销合并会将改动应用到工作目录。再次提交将创建新提交，丢失合并关系；合并分支中的提交可能消失。是否继续？",
+    "zh-Hant": "復原合併會將變更套用至工作目錄。再次提交將建立新提交，失去合併關係；合併分支中的提交可能消失。是否繼續？"
+  },
+  "operation.dirtyMergeUndoDescription": {
+    "en": "Undoing this merge may lose your in-progress changes. It applies the merge changes to the working directory, loses the merge relationship, and commits from the merged branch could disappear. Continue anyway?",
+    "zh-Hans": "撤销此合并可能丢失正在进行的改动，并将合并改动应用到工作目录、丢失合并关系；合并分支中的提交可能消失。是否继续？",
+    "zh-Hant": "復原此合併可能遺失進行中的變更，並將合併變更套用至工作目錄、失去合併關係；合併分支中的提交可能消失。是否繼續？"
+  },
+  "operation.resetDescription": {
+    "en": "You have changes in progress. Resetting to a previous commit might lose some changes. Continue anyway?",
+    "zh-Hans": "存在未提交的改动。重置到较早提交可能丢失部分改动。是否继续？",
+    "zh-Hant": "存在尚未提交的變更。重設至較早提交可能遺失部分變更。是否繼續？"
+  },
+  "operation.forcePushDescription": {
+    "en": "After this operation, updating the upstream branch will require force push. Force pushing alters remote history and can disrupt collaborators. This confirmation begins the local operation; it does not push.",
+    "zh-Hans": "此操作后更新上游分支将需要强制推送。强制推送会改写远程历史，可能影响协作者。此处确认仅开始本地操作，不会推送。",
+    "zh-Hant": "此操作後更新上游分支將需要強制推送。強制推送會改寫遠端歷史，可能影響協作者。此處確認僅開始本機操作，不會推送。"
+  },
+  "operation.discardRetryDescription": {
+    "en": "Moving changes to the system trash failed, possibly due to immediate deletion settings or restricted access. Permanently discarding them makes them unrecoverable.",
+    "zh-Hans": "移至系统回收站失败，可能是立即删除设置或权限限制所致。永久放弃后将无法恢复。",
+    "zh-Hant": "移至系統垃圾桶失敗，可能是立即刪除設定或權限限制所致。永久捨棄後將無法還原。"
+  },
+  "operation.unknownAuthorsDescription": {
+    "en": "These users were not found and will not be added as co-authors. Commit anyway?",
+    "zh-Hans": "未找到这些用户，他们不会被添加为共同作者。是否仍然提交？",
+    "zh-Hant": "找不到這些使用者，他們不會加入為共同作者。是否仍然提交？"
+  },
+  "operation.filteredDescription": {
+    "en": "A filter is hiding selected changes that will be committed. Show the hidden changes or commit anyway.",
+    "zh-Hans": "筛选隐藏了将被提交的所选改动。可显示隐藏改动或仍然提交。",
+    "zh-Hant": "篩選隱藏了將被提交的所選變更。可顯示隱藏變更或仍然提交。"
+  },
+  "operation.commitMessageDescription": {
+    "en": "Review the message for the original operation. Existing co-authors and commit trailers are retained. Failed submissions retain this draft.",
+    "zh-Hans": "审阅原操作的提交说明。保留已有共同作者及提交尾注。提交失败时保留此草稿。",
+    "zh-Hant": "審閱原操作的提交說明。保留現有共同作者及提交尾註。提交失敗時保留此草稿。"
+  },
+  "operation.chooseBranchDescription": {
+    "en": "Choose a branch and an operation, then select Begin operation. Gitowl checks the changes before starting.",
+    "zh-Hans": "选择分支和操作方式，然后点击“开始操作”。Gitowl 会先检查改动。",
+    "zh-Hant": "選取分支和操作方式，然後按「開始操作」。Gitowl 會先檢查變更。"
+  },
+  "operation.abortDescription": {
+    "en": "Abort this operation? Conflict resolutions made during it will be lost. You can return to the previous conflict step instead.",
+    "zh-Hans": "中止此操作？操作期间的冲突解决将丢失。也可返回之前的冲突步骤。",
+    "zh-Hant": "中止此操作？操作期間的衝突解決將遺失。也可返回先前的衝突步驟。"
+  },
+  "operation.hiddenConflictsDescription": {
+    "en": "Conflicts are hidden while you review changes in the workbench. Reopen them to continue.",
+    "zh-Hans": "在工作台审阅改动时已隐藏冲突。重新打开后可继续。",
+    "zh-Hant": "在工作台審閱變更時已隱藏衝突。重新開啟後可繼續。"
+  },
+  "operation.copilotLoadingDescription": {
+    "en": "Copilot is resolving conflicts. Stop cancels Copilot and returns to manual resolution; hiding this dialog allows resolution to continue in the background.",
+    "zh-Hans": "Copilot 正在解决冲突。停止会取消 Copilot 并返回手动解决；隐藏对话框则允许后台继续。",
+    "zh-Hant": "Copilot 正在解決衝突。停止會取消 Copilot 並返回手動解決；隱藏對話框則允許背景繼續。"
+  },
+  "operation.conflictsDescription": {
+    "en": "Resolve conflicts before continuing. Choose at most one side per file. Skipped Copilot files require a manual choice or an external edit with all markers removed.",
+    "zh-Hans": "继续前需解决冲突。每个文件最多选一侧。Copilot 跳过的文件需手动选择，或在外部编辑器中移除全部标记。",
+    "zh-Hant": "繼續前需解決衝突。每個檔案最多選一側。Copilot 略過的檔案需手動選取，或在外部編輯器中移除所有標記。"
+  },
+  "operation.assistedDisclaimerDescription": {
+    "en": "Copilot is powered by AI, so mistakes are possible. It plans selected changes and creates one or more local commits without editing your files. Cancel before local acceptance to undo commits from this run. Once pushing starts, all local commits are kept even if pushing fails. Learn more: https://gh.io/copilot-for-desktop-transparency",
+    "zh-Hans": "Copilot 基于 AI，可能出错。它规划所选改动并创建一个或多个本地提交，不编辑文件。本地接受前取消可撤销本次生成的提交。一旦开始推送，即使推送失败也会保留全部本地提交。了解更多：https://gh.io/copilot-for-desktop-transparency",
+    "zh-Hant": "Copilot 基於 AI，可能出錯。它規劃所選變更並建立一個或多個本機提交，不編輯檔案。本機接受前取消可復原本次產生的提交。一旦開始推送，即使推送失敗也會保留所有本機提交。瞭解更多：https://gh.io/copilot-for-desktop-transparency"
+  },
+  "operation.conflictDisclaimerDescription": {
+    "en": "Copilot is powered by AI, so mistakes are possible. Carefully review suggested resolutions before applying them to your files. Learn more: https://gh.io/copilot-for-desktop-transparency",
+    "zh-Hans": "Copilot 基于 AI，可能出错。应用到文件前请仔细审阅建议的解决方案。了解更多：https://gh.io/copilot-for-desktop-transparency",
+    "zh-Hant": "Copilot 基於 AI，可能出錯。套用至檔案前請仔細審閱建議的解決方案。瞭解更多：https://gh.io/copilot-for-desktop-transparency"
+  },
+  "operation.alwaysDescription": {
+    "en": "Automatically start with Copilot whenever conflicts are detected? You can change this in Copilot settings. Yes and No both continue this resolution; closing the window only dismisses the prompt.",
+    "zh-Hans": "检测到冲突时自动使用 Copilot？可在 Copilot 设置中更改。“是”和“否”均继续本次解决；关闭窗口只关闭提示。",
+    "zh-Hant": "偵測到衝突時自動使用 Copilot？可在 Copilot 設定中變更。「是」和「否」均繼續本次解決；關閉視窗僅關閉提示。"
+  }
+}

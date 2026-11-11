@@ -1,5 +1,8 @@
 import React from 'react'
-import { CherryPickConflictState } from '../../lib/app-state'
+import {
+  continueOperation,
+  abortOperation,
+} from '../../native-kernel/operation-dialogs'
 import { Branch } from '../../models/branch'
 import {
   MultiCommitOperationKind,
@@ -11,8 +14,7 @@ import { BaseMultiCommitOperation } from './base-multi-commit-operation'
 
 export abstract class CherryPick extends BaseMultiCommitOperation {
   protected onContinueAfterConflicts = async (): Promise<void> => {
-    const { repository, dispatcher, workingDirectory, state, conflictState } =
-      this.props
+    const { state, conflictState } = this.props
     const { operationDetail, targetBranch } = state
 
     // Conflicts were resolved externally — nothing left to continue.
@@ -29,27 +31,11 @@ export abstract class CherryPick extends BaseMultiCommitOperation {
       return
     }
 
-    const { commits } = operationDetail
-
-    await dispatcher.switchMultiCommitOperationToShowProgress(repository)
-
-    const cherryPickConflictState: CherryPickConflictState = {
-      kind: 'cherryPick',
-      targetBranchName: targetBranch.name,
-      manualResolutions: conflictState.manualResolutions,
-    }
-
-    await dispatcher.continueCherryPick(
-      repository,
-      workingDirectory.files,
-      cherryPickConflictState,
-      commits,
-      operationDetail.sourceBranch
-    )
+    await continueOperation(this.props)
   }
 
   protected onAbort = async (): Promise<void> => {
-    const { repository, dispatcher, state } = this.props
+    const { state } = this.props
     const { operationDetail } = state
 
     if (operationDetail.kind !== MultiCommitOperationKind.CherryPick) {
@@ -57,8 +43,7 @@ export abstract class CherryPick extends BaseMultiCommitOperation {
       return
     }
 
-    this.onFlowEnded()
-    return dispatcher.abortCherryPick(repository, operationDetail.sourceBranch)
+    return abortOperation(this.props)
   }
 
   protected onConflictsDialogDismissed = () => {

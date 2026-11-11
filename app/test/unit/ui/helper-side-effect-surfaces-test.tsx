@@ -4,7 +4,7 @@ import * as React from 'react'
 
 import { AppTheme } from '../../../src/ui/app-theme'
 import { ApplicationTheme } from '../../../src/ui/lib/application-theme'
-import { fireEvent, render } from '../../helpers/ui/render'
+import { fireEvent, render, waitFor } from '../../helpers/ui/render'
 
 type TUnlinkBehavior = (path: string) => Promise<void>
 
@@ -94,7 +94,7 @@ describe('helper side-effect surfaces', () => {
     )
 
     fireEvent.click(view.container.querySelector('.link-button-component')!)
-    await Promise.resolve()
+    await waitFor(() => assert.equal(deletedCount, 1))
 
     view.rerender(
       <ConfigLockFileExists
@@ -109,7 +109,7 @@ describe('helper side-effect surfaces', () => {
     )
 
     fireEvent.click(view.container.querySelector('.link-button-component')!)
-    await Promise.resolve()
+    await waitFor(() => assert.equal(deletedCount, 2))
 
     assert.deepEqual(deletedPaths, ['/tmp/repo.lock', '/tmp/repo.missing.lock'])
     assert.equal(deletedCount, 2)
@@ -141,7 +141,7 @@ describe('helper side-effect surfaces', () => {
     )
 
     fireEvent.click(view.container.querySelector('.link-button-component')!)
-    await Promise.resolve()
+    await waitFor(() => assert.deepEqual(errors, ['permission denied']))
 
     assert.equal(deletedCount, 0)
     assert.deepEqual(errors, ['permission denied'])

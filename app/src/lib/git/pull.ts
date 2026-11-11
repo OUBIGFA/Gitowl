@@ -8,9 +8,10 @@ import {
 } from './core'
 import { Repository } from '../../models/repository'
 import { IPullProgress } from '../../models/progress'
-import { PullProgressParser, executionOptionsWithProgress } from '../progress'
+import { PullProgressParser } from '../progress/pull'
+import { executionOptionsWithProgress } from '../progress/from-process'
 import { IRemote } from '../../models/remote'
-import { envForRemoteOperation } from './environment'
+import { envForRemoteOperation, GitProxyResolver } from './environment'
 import { getConfigValue } from './config'
 
 /**
@@ -38,6 +39,14 @@ export async function pull(
     ) => Promise<'abort' | 'ignore'>
     onTerminalOutputAvailable?: TerminalOutputCallback
     noVerify?: boolean
+    /** Optional native system/PAC resolver; Electron remains the default. */
+    resolveProxy?: GitProxyResolver
+    /** False excludes submodule updates; omitted preserves upstream behavior. */
+    recurseSubmodules?: boolean
+    /** Native pull must not create an automatic stash, even if configured. */
+    noAutoStash?: boolean
+    /** Cancellation may leave an updated worktree or an unfinished merge. */
+    signal?: AbortSignal
   }
 ): Promise<void> {
   // Git pull forwards the remote name to its child git fetch without a `--`
@@ -48,7 +57,11 @@ export async function pull(
   }
 
   let opts: IGitStringExecutionOptions = {
-    env: await envForRemoteOperation(remote.url),
+    signal: options?.signal,
+    env: await envForRemoteOperation(remote.url, options?.resolveProxy),
+    onHookProgress: options?.onHookProgress,
+    onHookFailure: options?.onHookFailure,
+    onTerminalOutputAvailable: options?.onTerminalOutputAvailable,
     // git pull triggers merge or rebase hooks depending on config, instead of
     // trying to check pull.rebase and friends we'll just intercept all possible
     // hooks that could be run as part of a pull operation.
@@ -104,7 +117,10 @@ export async function pull(
     ...gitRebaseArguments(),
     'pull',
     ...(await getDefaultPullDivergentBranchArguments(repository)),
-    '--recurse-submodules',
+    options?.recurseSubmodules === false
+      ? '--recurse-submodules=no'
+      : '--recurse-submodules',
+    ...(options?.noAutoStash ? ['--no-autostash'] : []),
     ...(options?.progressCallback ? ['--progress'] : []),
     ...(options?.noVerify ? ['--no-verify'] : []),
     '--',

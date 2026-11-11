@@ -1,11 +1,20 @@
 import { envForAuthentication } from './authentication'
-import { resolveGitProxy } from '../resolve-git-proxy'
-import { getHTMLURL } from '../api'
+import { getHTMLURL } from '../api-endpoints'
 import {
   Repository,
   isRepositoryWithGitHubRepository,
 } from '../../models/repository'
 import { IRemote } from '../../models/remote'
+
+/** A trusted platform resolver; the URL is resolved from Git, not the client. */
+export type GitProxyResolver = (url: string) => Promise<string | undefined>
+
+// Electron remains the default for existing callers. Native callers inject the
+// parent's system/PAC resolver, so importing Git does not load renderer IPC.
+const resolveDefaultGitProxy: GitProxyResolver = async url => {
+  const { resolveGitProxy } = await import('../resolve-git-proxy')
+  return resolveGitProxy(url)
+}
 
 /**
  * For many remote operations it's well known what the primary remote
@@ -73,10 +82,13 @@ export function getFallbackUrlForProxyResolve(
  *                  pointing to another host entirely. Used to resolve which
  *                  proxy (if any) should be used for the operation.
  */
-export async function envForRemoteOperation(remoteUrl: string) {
+export async function envForRemoteOperation(
+  remoteUrl: string,
+  resolveProxy?: GitProxyResolver
+) {
   return {
     ...envForAuthentication(),
-    ...(await envForProxy(remoteUrl)),
+    ...(await envForProxy(remoteUrl, process.env, resolveProxy)),
   }
 }
 
@@ -93,7 +105,7 @@ export async function envForRemoteOperation(remoteUrl: string) {
 export async function envForProxy(
   remoteUrl: string,
   env: NodeJS.ProcessEnv = process.env,
-  resolve: (url: string) => Promise<string | undefined> = resolveGitProxy
+  resolve: GitProxyResolver = resolveDefaultGitProxy
 ): Promise<Record<string, string | undefined> | undefined> {
   const protocolMatch = /^(https?):\/\//i.exec(remoteUrl)
 

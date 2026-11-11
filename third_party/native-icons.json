@@ -1,0 +1,108 @@
+{
+  "name": "lucide-static",
+  "version": "1.70.0",
+  "source": "https://github.com/lucide-icons/lucide",
+  "npmIntegrity": "sha512-A9UgY98g94IuHQY7rl7/AFwHX7T1qNpzryim+Kw5CGhdV2STobtBY+ib/Z44ohyqXEJB88gvXFAeJ87uOOHKLw==",
+  "license": "ISC; Feather-derived icons retain MIT notices",
+  "licenseFile": "third_party/licenses/native/lucide-LICENSE",
+  "licenseSha256": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57",
+  "modifications": "none; rendered as monochrome icons by MyGo ui.Icon",
+  "files": [
+    {
+      "path": "app/native/icons/folder.svg",
+      "sha256": "c67f53e0e26cb88c6030fc43d8c02591eaea5c48643a98693a706f7208f0e631"
+    },
+    {
+      "path": "app/native/icons/folder-open.svg",
+      "sha256": "ea786e6f32454e9d4e818ab97207c94f28d36463a4775347e6e690006080f32f"
+    },
+    {
+      "path": "app/native/icons/plus.svg",
+      "sha256": "6785279aad64300db83832507ef7909f5c4470334add79dcc0fa5b74564fd08e"
+    },
+    {
+      "path": "app/native/icons/chevron-right.svg",
+      "sha256": "bb612d70c6438fc1db7e3a1553ae6979a030f34f5a4486246eaef697b33395d4"
+    },
+    {
+      "path": "app/native/icons/chevron-left.svg",
+      "sha256": "4b44625e062328fadad5aaf649d71d4f6b72b49adde7193468bfc4d669cdc427"
+    },
+    {
+      "path": "app/native/icons/chevron-down.svg",
+      "sha256": "ff32eb8d7f31b0e773f7618deaf4e212ac8cbb5c480b110a72823e975ccb86db"
+    },
+    {
+      "path": "app/native/icons/arrow-left.svg",
+      "sha256": "a2da54389919145a33b20c0723710c4e1f9116bf41c6d09f3e84c1ac386dbfa3"
+    },
+    {
+      "path": "app/native/icons/file.svg",
+      "sha256": "b31effdd3f00e9ace5083b618d8c9449589f26c9e0d5a1a066db97ff5ffdb167"
+    },
+    {
+      "path": "app/native/icons/file-text.svg",
+      "sha256": "411f1e52b691e42cf958c14659a4305bcb9e15f5e5ffbb52987fbafa099d4f2c"
+    },
+    {
+      "path": "app/native/icons/file-code.svg",
+      "sha256": "27f1e39b0d45154fad9dd0b5c28eca26764a06fb84c897bcaea37cf10bb12a32"
+    },
+    {
+      "path": "app/native/icons/image.svg",
+      "sha256": "46edc0e20b84f327844f7733c8d2cb3739c4e3cb4000a64cf9e52d8b28edf8e2"
+    },
+    {
+      "path": "app/native/icons/history.svg",
+      "sha256": "815e002405d5f97cfe3c8331b1cc34dbe0e0e8655b3a09096e4f67d36facb656"
+    },
+    {
+      "path": "app/native/icons/git-branch.svg",
+      "sha256": "160b73332db6ced1b82bc6976e8cb04e9fddf453cade4bdbfdeaa0beeff77975"
+    },
+    {
+      "path": "app/native/icons/check.svg",
+      "sha256": "a0adbb843813a89f6f509155bb710a47de44c39e73f984e23cd89d3392828eaf"
+    },
+    {
+      "path": "app/native/icons/settings.svg",
+      "sha256": "c02c11ec0c28c77e3865bb8ba960c62e1752eef44f45f70821f669d983d2796a"
+    },
+    {
+      "path": "app/native/icons/search.svg",
+      "sha256": "b395924bb54d8c436cb5bf6aa21899dfbf5f43a8a3b4252ed88d3391ec724aa5"
+    },
+    {
+      "path": "app/native/icons/ellipsis.svg",
+      "sha256": "a544da4f89679ee871b2d1e26fc0edd39e9af101c6d6fb4dcdd86e5622045b43"
+    },
+    {
+      "path": "app/native/icons/panel-left-close.svg",
+      "sha256": "b56b8975c53c9f78eeec3bfc159100d42afde63b5fb5dd15ed5a2fa0efad10a7"
+    },
+    {
+      "path": "app/native/icons/panel-left-open.svg",
+      "sha256": "dce0714b971fb1b25e954dff5e13c3499b54bd72b9acdc422d65b677c3dc9a2c"
+    },
+    {
+      "path": "app/native/icons/refresh-cw.svg",
+      "sha256": "d2da45f193b5a64eb08fe91da5aafec8a8c5fff57da852d124efaf3636f83389"
+    },
+    {
+      "path": "app/native/icons/arrow-up-right.svg",
+      "sha256": "1c647ffb1298c179ea1461bee9712a454c3394a6bcdfe0ac587e407b66dbce2b"
+    },
+    {
+      "path": "app/native/icons/x.svg",
+      "sha256": "4fcd3eb7104ef5e1ae949ebc9f316b72e3839bd790766d9795ee5f8d1eace91e"
+    },
+    {
+      "path": "app/native/icons/circle-check.svg",
+      "sha256": "3715ba897186b5b1946d58e1fbdca7b804c301ff9b1b0d8f031b68ef1a6601dc"
+    },
+    {
+      "path": "app/native/icons/copy.svg",
+      "sha256": "865d4712a410fef237c2fbbeda4b4efcad30f98f22bac6d7a1b4d35daf82019b"
+    }
+  ]
+}

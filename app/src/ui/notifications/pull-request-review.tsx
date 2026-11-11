@@ -1,3 +1,4 @@
+import { submitNotificationDialog } from '../lib/auxiliary-dialog-actions'
 import * as React from 'react'
 import { Row } from '../lib/row'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
@@ -151,16 +152,17 @@ export class PullRequestReview extends React.Component<
 
     const isApprovedReview = review.state === 'APPROVED'
 
-    // Only switch to the PR when needed, if it's not an approved review
-    if (!isApprovedReview && (shouldChangeRepository || shouldCheckoutBranch)) {
-      this.setState({ switchingToPullRequest: true })
-      await dispatcher.selectRepository(repository)
-      await dispatcher.checkoutPullRequest(repository, pullRequest)
-      this.setState({ switchingToPullRequest: false })
-
-      dispatcher.recordPullRequestReviewDialogSwitchToPullRequest(review.state)
-    }
-
-    this.props.onDismissed()
+    await submitNotificationDialog(
+      dispatcher,
+      repository,
+      pullRequest,
+      !isApprovedReview && (shouldChangeRepository || shouldCheckoutBranch),
+      switchingToPullRequest => this.setState({ switchingToPullRequest }),
+      () =>
+        dispatcher.recordPullRequestReviewDialogSwitchToPullRequest(
+          review.state
+        ),
+      this.props.onDismissed
+    )
   }
 }

@@ -9,7 +9,8 @@ import {
 import { TextBox } from '../lib/text-box'
 import { Row } from '../lib/row'
 
-import { match, IMatch, IMatches } from '../../lib/fuzzy-find'
+import { IMatches } from '../../lib/fuzzy-find'
+import { filterListItems } from './filter-list-items'
 import { AriaLiveContainer } from '../accessibility/aria-live-container'
 import {
   InvalidRowIndexPath,
@@ -801,13 +802,7 @@ export class AugmentedSectionFilterList<
   }
 }
 
-export function getText<T extends IFilterListItem>(
-  item: T
-): ReadonlyArray<string> {
-  return item['text']
-}
-
-function getFirstVisibleRow<T extends IFilterListItem>(
+export function getFirstVisibleRow<T extends IFilterListItem>(
   rows: ReadonlyArray<ReadonlyArray<IFilterListRow<T>>>
 ): RowIndexPath {
   for (let i = 0; i < rows.length; i++) {
@@ -838,17 +833,7 @@ function createStateUpdate<T extends IFilterListItem>(
   for (const [idx, group] of props.groups.entries()) {
     const groupRows = new Array<IFilterListRow<T>>()
 
-    const itemsToMatch = filterMethod
-      ? group.items.filter(filterMethod)
-      : group.items
-
-    const items: ReadonlyArray<IMatch<T>> = filter
-      ? match(filter, itemsToMatch, getText)
-      : itemsToMatch.map(item => ({
-          score: 1,
-          matches: { title: [], subtitle: [] },
-          item,
-        }))
+    const items = filterListItems(group.items, filter, filterMethod)
 
     if (group.items.length !== items.length) {
       filterValueChanged = true

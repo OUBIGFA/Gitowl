@@ -5,6 +5,10 @@ import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { Repository } from '../../models/repository'
 import { Ref } from '../lib/ref'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
+import {
+  submitPushBranchDialog,
+  createPullRequestWithoutPush,
+} from '../lib/auxiliary-dialog-actions'
 
 interface IPushBranchCommitsProps {
   readonly dispatcher: Dispatcher
@@ -158,22 +162,11 @@ export class PushBranchCommits extends React.Component<
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
     e.preventDefault()
-    this.props.onConfirm(this.props.repository, this.props.branch)
-    this.props.onDismissed()
+    createPullRequestWithoutPush(this.props)
   }
 
-  private onSubmit = async () => {
-    const { repository, branch } = this.props
-
-    this.setState({ isPushingOrPublishing: true })
-
-    try {
-      await this.props.dispatcher.push(repository)
-    } finally {
-      this.setState({ isPushingOrPublishing: false })
-    }
-
-    this.props.onConfirm(repository, branch)
-    this.props.onDismissed()
-  }
+  private onSubmit = () =>
+    submitPushBranchDialog(this.props, isPushingOrPublishing => {
+      this.setState({ isPushingOrPublishing })
+    })
 }

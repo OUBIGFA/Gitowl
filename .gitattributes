@@ -3,6 +3,12 @@
 *.json text eol=lf
 *.yml text eol=lf
 *.yaml text eol=lf
+# Unified diff context legitimately prefixes tab-indented source with a space.
+/third_party/patches/**/*.patch -whitespace
+# Official Chromium notices are generated verbatim; their separators and
+# trailing spaces are license text, not our merge/formatting edits. Per-part
+# UTF-8, size and concatenated official SHA-256 are checked by repository tests.
+/third_party/licenses/native/electron-Chromium-notices-*.html -text -diff -whitespace
 *.png binary
 *.jpg binary
 *.jpeg binary

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Commit } from '../../models/commit'
 import { lookupPreferredEmail } from '../../lib/email'
-import { setGlobalConfigValue } from '../../lib/git/config'
+import { saveConfiguredGitAuthor } from './git-author-configuration'
 import { CommitListItem } from '../history/commit-list-item'
 import { Account, isDotComAccount } from '../../models/account'
 import { CommitIdentity } from '../../models/commit-identity'
@@ -9,10 +9,6 @@ import { Form } from '../lib/form'
 import { Button } from '../lib/button'
 import { TextBox } from '../lib/text-box'
 import { Row } from '../lib/row'
-import {
-  isConfigFileLockError,
-  parseConfigLockFilePathFromError,
-} from '../../lib/git'
 import { ConfigLockFileExists } from './config-lock-file-exists'
 import { RadioButton } from './radio-button'
 import { Select } from './select'
@@ -346,23 +342,15 @@ export class ConfigureGitUser extends React.Component<
     const name = useGitHubAuthorInfo ? gitHubName : manualName
     const email = useGitHubAuthorInfo ? gitHubEmail : manualEmail
 
-    try {
-      if (name.length > 0 && name !== this.props.globalUserName) {
-        await setGlobalConfigValue('user.name', name)
-      }
-
-      if (email.length > 0 && email !== this.props.globalUserEmail) {
-        await setGlobalConfigValue('user.email', email)
-      }
-    } catch (e) {
-      if (isConfigFileLockError(e)) {
-        const lockFilePath = parseConfigLockFilePathFromError(e.result)
-
-        if (lockFilePath !== null) {
-          this.setState({ existingLockFilePath: lockFilePath })
-          return
-        }
-      }
+    const result = await saveConfiguredGitAuthor(
+      name,
+      email,
+      this.props.globalUserName,
+      this.props.globalUserEmail
+    )
+    if (result.kind === 'locked') {
+      this.setState({ existingLockFilePath: result.path })
+      return
     }
 
     if (this.props.onSave) {

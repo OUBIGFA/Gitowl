@@ -1,0 +1,25 @@
+diff --git a/ui/number.go b/ui/number.go
+--- a/ui/number.go
++++ b/ui/number.go
+@@ -58,11 +58,20 @@
+ 			}
+ 		})
+ 		in.hasRange, in.accRange, in.accStep = true, [3]float64{lo, hi, *value}, step
++		// Finite Gitowl locale adapter until upstream localizes number actions.
++		// Only accessibility labels change; parsing, stepping and bounds remain original.
++		increase, decrease := "Increase", "Decrease"
++		switch c.Locale() {
++		case "zh-Hans":
++			increase, decrease = "增加", "减少"
++		case "zh-Hant":
++			increase, decrease = "增加", "減少"
++		}
+ 		for _, b := range []struct {
+ 			label string
+ 			delta float64
+ 		}{{"−", -step}, {"+", step}} {
+-			btn := coreButton(c, b.label).Padding(t.Space(1), t.Space(2)).Label(map[bool]string{true: "Increase", false: "Decrease"}[b.delta > 0])
++			btn := coreButton(c, b.label).Padding(t.Space(1), t.Space(2)).Label(map[bool]string{true: increase, false: decrease}[b.delta > 0])
+ 			btn.Disabled(b.delta < 0 && *value <= lo || b.delta > 0 && *value >= hi)
+ 			btn.afterInput(func() {
+ 				if btn.Clicked() {

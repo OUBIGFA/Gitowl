@@ -560,7 +560,10 @@ describe('AppStore explicitly adding repositories', () => {
       })
 
       it('uses the current account after switching back to a worktree', async t => {
-        const { main } = await setupWorktree(t)
+        const { added: separatelyRegistered, main } = await setupWorktree(t)
+        // This case switches one repository record between worktrees. A target
+        // already registered separately intentionally keeps its own account.
+        await stores.repositoriesStore.removeRepository(separatelyRegistered)
         const { listWorktrees } = await import('../../../src/lib/git/worktree')
         const { realpath } = await import('fs/promises')
         const mainPath = await realpath(main.path)
@@ -588,6 +591,7 @@ describe('AppStore explicitly adding repositories', () => {
         const mainStore = appStore['gitStoreCache'].get(alices)
 
         const switched = await appStore._switchWorktree(alices, otherEntry)
+        assert.strictEqual(switched.id, alices.id)
         const bobs = await appStore._updateRepositoryAccount(switched, 'bob')
         const back = await appStore._switchWorktree(bobs, mainEntry)
 

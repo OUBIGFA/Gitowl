@@ -1,3 +1,26 @@
+import { resolveCommitGenerationAccount } from '../commit-generation/generation-account'
+import { ProviderStore } from '../commit-generation/provider-store'
+import {
+  ConfiguredProvider,
+  ProviderError,
+  ProviderSettings,
+  ProviderModelSelection,
+  canonicalCommitGenerationLanguage,
+} from '../commit-generation/provider-types'
+import {
+  discoverProviderModels,
+  generateWithProvider,
+} from '../commit-generation/provider-adapters'
+import {
+  buildCommitMessageSystemPrompt,
+  buildCommitMessageUserPrompt,
+  generateCommitMessagePromptTags,
+  getCleanedEnforcedRuleDescriptions,
+} from '../commit-generation/commit-prompts'
+import { parseCopilotCommitMessage } from '../copilot-commit-message'
+import { getAssistedCommitInputVersions } from '../assisted-commit-request'
+import { readGenerationHead } from '../commit-generation/generation-head'
+import { arrayEquals } from '../equality'
 import { storePushAfterAssistedCommit } from './helpers/assisted-commit-push-storage'
 import {
   AssistedCommitPushOutcome as PushBranchOutcome,
@@ -213,7 +236,6 @@ import { assertNever, fatalError, forceUnwrap } from '../fatal-error'
 
 import { formatCommitMessage } from '../format-commit-message'
 import {
-  getAccountForCommitMessageGeneration,
   getAccountForCopilotConflictResolution,
   getAccountForRepository,
 } from '../get-account-for-repository'
@@ -794,10 +816,11 @@ export class AppStore extends TypedBaseStore<IAppState> {
   private readonly repositoryAssociations = new Map<string, string>()
 
   /**
-   * Working directories being renamed, keyed by `getRepositoryStateKey`.
-   * Operations don't start on them, since their state is about to move.
+   * Working directories being renamed or removed. Refreshes cannot outlive
+   * the directory they read; pause new ones while draining existing refreshes.
    */
   private readonly movingWorktrees = new Set<string>()
+  private readonly repositoryRefreshes = new Map<string, Set<Promise<void>>>()
 
   private repositoryAccountPromptQueue: Promise<void> = Promise.resolve()
 
@@ -830,6 +853,23 @@ export class AppStore extends TypedBaseStore<IAppState> {
   private copilotQuotaSnapshotsByAccount: CopilotQuotaSnapshotsByAccount =
     new Map()
   private byokProviders: ReadonlyArray<IBYOKProvider> = []
+  private commitGenerationSource: 'copilot' | 'custom' =
+    localStorage.getItem('gitowl-commit-generation-source') === 'custom'
+      ? 'custom'
+      : 'copilot'
+  private commitGenerationLanguage: string = (() => {
+    const language =
+      localStorage.getItem('gitowl-commit-generation-language') ?? 'auto'
+    try {
+      return canonicalCommitGenerationLanguage(language)
+    } catch {
+      // Preserve explicitly saved output-language intent rather than resetting it.
+      throw new ProviderError('storage-corrupt')
+    }
+  })()
+  // Transient request identity, not a second provider/account state store.
+  // Returning to a previous choice must not revive that choice's old response.
+  private commitGenerationRevision = 0
 
   public constructor(
     private readonly gitHubUserStore: GitHubUserStore,
@@ -843,7 +883,8 @@ export class AppStore extends TypedBaseStore<IAppState> {
     private readonly repositoryStateCache: RepositoryStateCache,
     private readonly apiRepositoriesStore: ApiRepositoriesStore,
     private readonly notificationsStore: NotificationsStore,
-    private readonly copilotStore: CopilotStore
+    private readonly copilotStore: CopilotStore,
+    private readonly commitGenerationProviders?: ProviderStore
   ) {
     super()
     this.assistedCommits = new AssistedCommitCoordinator(
@@ -1510,6 +1551,17 @@ export class AppStore extends TypedBaseStore<IAppState> {
       copilotModelsByAccount: this.copilotModelsByAccount,
       copilotQuotaSnapshotsByAccount: this.copilotQuotaSnapshotsByAccount,
       byokProviders: this.byokProviders,
+      ...(this.commitGenerationProviders === undefined
+        ? {}
+        : {
+            commitGeneration: {
+              providers: this.commitGenerationProviders.getProviders(),
+              enabledModels: this.commitGenerationProviders.getEnabledModels(),
+              selection: this.commitGenerationProviders.currentSelection,
+              source: this.commitGenerationSource,
+              language: this.commitGenerationLanguage,
+            },
+          }),
     }
   }
 
@@ -4344,9 +4396,23 @@ export class AppStore extends TypedBaseStore<IAppState> {
 
   /** This shouldn't be called directly. See `Dispatcher`. */
   public async _refreshRepository(repository: Repository): Promise<void> {
-    return this.assistedCommits.readers.refresh(repository, () =>
+    if (this.movingWorktrees.has(repository.path)) {
+      return
+    }
+    const refresh = this.assistedCommits.readers.refresh(repository, () =>
       this.refreshRepositoryCore(repository)
     )
+    const pending = this.repositoryRefreshes.get(repository.path) ?? new Set()
+    pending.add(refresh)
+    this.repositoryRefreshes.set(repository.path, pending)
+    try {
+      await refresh
+    } finally {
+      pending.delete(refresh)
+      if (pending.size === 0) {
+        this.repositoryRefreshes.delete(repository.path)
+      }
+    }
   }
 
   private async refreshRepositoryCore(repository: Repository): Promise<void> {
@@ -5568,9 +5634,9 @@ export class AppStore extends TypedBaseStore<IAppState> {
     )
   }
 
-  /** Whether the repository's worktree is being renamed. */
+  /** Whether the repository's worktree is being renamed or removed. */
   private isWorktreeMoving(repository: Repository) {
-    return this.movingWorktrees.has(getRepositoryStateKey(repository))
+    return this.movingWorktrees.has(repository.path)
   }
 
   /** Whether the repository refers to the selected working directory. */
@@ -7241,10 +7307,12 @@ export class AppStore extends TypedBaseStore<IAppState> {
   ): Promise<void> {
     this.assistedCommits.state.assertAvailable(repository)
     assertRepositoryGitAvailable(worktreePath)
-    return this.assistedCommits.state.withDestruction(worktreePath, () =>
-      withRepositoryGitOperation(repository.path, 'mutation', () =>
-        withRepositoryGitOperation(worktreePath, 'mutation', () =>
-          this.deleteWorktreeCore(repository, worktreePath, options)
+    return this.withWorktreeRefreshesPaused(worktreePath, () =>
+      this.assistedCommits.state.withDestruction(worktreePath, () =>
+        withRepositoryGitOperation(repository.path, 'mutation', () =>
+          withRepositoryGitOperation(worktreePath, 'mutation', () =>
+            this.deleteWorktreeCore(repository, worktreePath, options)
+          )
         )
       )
     )
@@ -7337,34 +7405,45 @@ export class AppStore extends TypedBaseStore<IAppState> {
     this.assistedCommits.state.assertAvailable(repository)
     assertRepositoryGitAvailable(worktreePath)
     const isCurrentWorktree = repository.path === worktreePath
-    const key = getRepositoryStateKey(repository)
     if (
       isCurrentWorktree &&
-      (this.isRepositoryBusy(repository) || this.movingWorktrees.has(key))
+      (this.isRepositoryBusy(repository) || this.isWorktreeMoving(repository))
     ) {
       throw new Error(
         'The worktree cannot be renamed while an operation is in progress. Please try again once it has finished.'
       )
     }
-    if (isCurrentWorktree) {
-      this.movingWorktrees.add(key)
-    }
-    try {
-      return await this.assistedCommits.state.withDestruction(
-        worktreePath,
-        () =>
-          this.assistedCommits.state.withDestruction(newPath, () =>
-            withRepositoryGitOperation(repository.path, 'mutation', () =>
-              withRepositoryGitOperation(worktreePath, 'mutation', () =>
-                this.moveWorktreeCore(repository, worktreePath, newPath)
-              )
+    return this.withWorktreeRefreshesPaused(worktreePath, () =>
+      this.assistedCommits.state.withDestruction(worktreePath, () =>
+        this.assistedCommits.state.withDestruction(newPath, () =>
+          withRepositoryGitOperation(repository.path, 'mutation', () =>
+            withRepositoryGitOperation(worktreePath, 'mutation', () =>
+              this.moveWorktreeCore(repository, worktreePath, newPath)
             )
           )
+        )
       )
+    )
+  }
+
+  /**
+   * A selection refresh starts in the background and can still read history
+   * after switching away. Set admission before awaiting it, so rename/remove
+   * never invalidates that reader's cwd or starts another refresh behind it.
+   */
+  private async withWorktreeRefreshesPaused<T>(
+    path: string,
+    operation: () => Promise<T>
+  ): Promise<T> {
+    if (this.movingWorktrees.has(path)) {
+      throw new Error('A worktree operation is already in progress.')
+    }
+    this.movingWorktrees.add(path)
+    try {
+      await Promise.all(this.repositoryRefreshes.get(path) ?? [])
+      return await operation()
     } finally {
-      if (isCurrentWorktree) {
-        this.movingWorktrees.delete(key)
-      }
+      this.movingWorktrees.delete(path)
     }
   }
 
@@ -7563,12 +7642,29 @@ export class AppStore extends TypedBaseStore<IAppState> {
     repository: Repository,
     filesSelected: ReadonlyArray<WorkingDirectoryFileChange>
   ): Promise<boolean> {
-    const account = getAccountForCommitMessageGeneration(
+    const generationRepository = this.gitStoreCache.get(repository).repository
+    const account = resolveCommitGenerationAccount(
       this.accounts,
-      repository
+      generationRepository
     )
-
-    if (!account) {
+    const custom = this.commitGenerationSource === 'custom'
+    const store = this.commitGenerationProviders
+    const selection = custom ? store?.currentSelection ?? null : null
+    const provider =
+      selection === null ? null : store!.getProvider(selection.providerId)
+    if (!account && !custom) {
+      return false
+    }
+    // A missing/expired custom choice must require reselection, never Copilot fallback.
+    if (
+      custom &&
+      (store === undefined || selection === null || provider === null)
+    ) {
+      this.emitError(
+        new ProviderError(
+          store === undefined ? 'storage-unavailable' : 'invalid-selection'
+        )
+      )
       return false
     }
 
@@ -7587,13 +7683,107 @@ export class AppStore extends TypedBaseStore<IAppState> {
       return false
     }
 
+    // Freeze the destination before any diff/keychain/model-resolution await.
+    // A later settings change can invalidate this request, but never redirect it.
+    const revision = this.commitGenerationRevision
+    const language = this.commitGenerationLanguage
+    const outputLanguage = language === 'auto' ? undefined : language
+    const copilotSelection = account
+      ? this.getSelectedCopilotModels(account)['commit-message-generation'] ??
+        null
+      : null
+    const customRequest =
+      provider === null || selection === null
+        ? undefined
+        : { provider, modelId: selection.modelId, language: outputLanguage }
+    const repositoryIdentity =
+      getRepositoryAccountIdentity(generationRepository)
+
     return this.withIsGeneratingCommitMessage(repository, async signal => {
+      const gitStore = this.gitStoreCache.get(repository)
+      const inputsRevision = gitStore.commitInputsRevision
+      const commitToAmend =
+        this.repositoryStateCache.get(repository).commitToAmend?.sha
+      // Reuse the existing conservative file versions, including rename sources.
+      // Generation remains a read/preview flow and never enters a commit transaction.
+      const versionFiles = filesSelected.flatMap(file =>
+        file.status.kind === AppFileStatusKind.Renamed ||
+        file.status.kind === AppFileStatusKind.Copied
+          ? [
+              file,
+              new WorkingDirectoryFileChange(
+                file.status.oldPath,
+                file.status,
+                file.selection
+              ),
+            ]
+          : [file]
+      )
+      let inputVersions: ReadonlyArray<string> | undefined
+      let inputHead: string | undefined
+      const assertCurrent = async () => {
+        const [versions, head] = await Promise.all([
+          getAssistedCommitInputVersions(repository, versionFiles),
+          readGenerationHead(repository),
+        ])
+        const accounts = custom ? [] : await this.accountsStore.getAll()
+        if (signal.aborted) {
+          throw new CommitMessageGenerationCancelledError()
+        }
+        const state = this.repositoryStateCache.get(repository)
+        const identity = getRepositoryAccountIdentity(gitStore.repository)
+        if (
+          revision !== this.commitGenerationRevision ||
+          inputsRevision !== gitStore.commitInputsRevision ||
+          (inputVersions !== undefined &&
+            !arrayEquals(inputVersions, versions)) ||
+          (inputHead !== undefined && inputHead !== head) ||
+          state.commitToAmend?.sha !== commitToAmend ||
+          (repositoryIdentity === null
+            ? identity !== null
+            : !isSameAccount(repositoryIdentity, identity)) ||
+          state.changesState.workingDirectory.files.filter(
+            file => file.selection.getSelectionType() !== DiffSelectionType.None
+          ).length !== filesSelected.length ||
+          !filesSelected.every(file =>
+            state.changesState.workingDirectory
+              .findFileWithID(file.id)
+              ?.selection.equals(file.selection)
+          )
+        ) {
+          throw new ProviderError('stale-request')
+        }
+        inputVersions ??= versions
+        inputHead ??= head
+        if (custom) {
+          const current = store!.currentSelection
+          if (
+            current?.providerId !== selection!.providerId ||
+            current?.modelId !== selection!.modelId
+          ) {
+            throw new ProviderError('stale-request')
+          }
+        } else {
+          const current = resolveCommitGenerationAccount(
+            accounts,
+            gitStore.repository
+          )
+          if (
+            current === undefined ||
+            getCopilotAccountCacheKey(current) !==
+              getCopilotAccountCacheKey(account!) ||
+            (this.getSelectedCopilotModels(current)[
+              'commit-message-generation'
+            ] ?? null) !== copilotSelection
+          ) {
+            throw new ProviderError('stale-request')
+          }
+        }
+      }
       try {
-        // If user is amending a commit, we want to use the commit
-        // to amend as the base for the commit message generation.
-        const commitToAmend =
-          this.repositoryStateCache.get(repository)?.commitToAmend?.sha ??
-          undefined
+        await assertCurrent()
+        // Keep the upstream selected-file/partial-selection and amend-base path,
+        // including temporary staging and unstage cleanup. No alternate Git exists.
         const diff = await getFilesDiffText(
           repository,
           filesSelected,
@@ -7602,48 +7792,233 @@ export class AppStore extends TypedBaseStore<IAppState> {
         if (!diff) {
           return false
         }
+        await assertCurrent()
 
-        const response = enableCopilotSdkCommitMessageGeneration(account)
-          ? await this.copilotStore.generateCommitMessage(
-              account,
-              diff,
-              repository.path,
-              await this.resolveCopilotModelRequest(
-                this.getSelectedCopilotModels(account)[
-                  'commit-message-generation'
-                ] ?? null
-              ),
-              this.repositoryStateCache
-                .get(repository)
-                ?.changesState.currentRepoRulesInfo?.commitMessagePatterns.getRules() ??
-                [],
-              signal
-            )
-          : await API.fromAccount(account).getDiffChangesCommitMessage(diff)
-
-        this._setCommitMessage(repository, {
+        let response
+        if (custom) {
+          response = await this.generateCustomCommitMessage(
+            repository,
+            diff,
+            signal,
+            customRequest!
+          )
+        } else if (
+          enableCopilotSdkCommitMessageGeneration(account!) ||
+          outputLanguage !== undefined
+        ) {
+          const request = await this.resolveCopilotModelRequest(
+            copilotSelection
+          )
+          await assertCurrent()
+          response = await this.copilotStore.generateCommitMessage(
+            account!,
+            diff,
+            repository.path,
+            request,
+            this.repositoryStateCache
+              .get(repository)
+              .changesState.currentRepoRulesInfo?.commitMessagePatterns.getRules() ??
+              [],
+            signal,
+            outputLanguage
+          )
+        } else {
+          // Omission preserves the original production non-SDK API behavior.
+          response = await API.fromAccount(
+            account!
+          ).getDiffChangesCommitMessage(diff)
+        }
+        await assertCurrent()
+        // This boundary also covers the original non-SDK Copilot API, which
+        // does not use the shared local prompt/parser. Never erase a draft with
+        // an incomplete result or manufacture a body from its title.
+        if (!response.title.trim() || !response.description?.trim()) {
+          throw new ProviderError('invalid-response')
+        }
+        await this._setCommitMessage(repository, {
           summary: response.title,
           description: response.description,
           timestamp: Date.now(),
-          generatedByCopilot: true,
+          generatedByCopilot: !custom,
         })
 
         this.statsStore.increment('generateCommitMessageCount')
       } catch (e) {
-        if (e instanceof CommitMessageGenerationCancelledError) {
+        if (
+          e instanceof CommitMessageGenerationCancelledError ||
+          (e instanceof ProviderError && e.code === 'cancelled')
+        ) {
           return false
         }
 
-        this.emitError(
-          new ErrorWithMetadata(e, {
-            repository,
-          })
-        )
+        this.emitError(new ErrorWithMetadata(e, { repository }))
         return false
       }
 
       return true
     })
+  }
+
+  /** Explicit SDK increment under the original generation busy/cancel wrapper. */
+  private async generateCustomCommitMessage(
+    repository: Repository,
+    diff: string,
+    signal: AbortSignal,
+    request: {
+      readonly provider: ConfiguredProvider
+      readonly modelId: string
+      readonly language?: string
+    }
+  ) {
+    const { provider, modelId, language } = request
+    const tags = generateCommitMessagePromptTags()
+    const rules = getCleanedEnforcedRuleDescriptions(
+      this.repositoryStateCache
+        .get(repository)
+        .changesState.currentRepoRulesInfo?.commitMessagePatterns.getRules()
+    )
+    const secret = await this.requireCommitGenerationProviders().getSecret(
+      provider.id,
+      provider
+    )
+    const text = await generateWithProvider(
+      provider,
+      modelId,
+      secret,
+      buildCommitMessageSystemPrompt(rules.length > 0, tags, language),
+      buildCommitMessageUserPrompt(diff, tags, rules),
+      signal
+    )
+    if (signal.aborted) {
+      throw new ProviderError('cancelled')
+    }
+    // Neither raw response nor parser errors may escape into logs/DTOs.
+    try {
+      return parseCopilotCommitMessage(text)
+    } catch {
+      throw new ProviderError('invalid-response')
+    }
+  }
+
+  private requireCommitGenerationProviders(): ProviderStore {
+    if (this.commitGenerationProviders === undefined) {
+      throw new ProviderError('storage-unavailable')
+    }
+    return this.commitGenerationProviders
+  }
+
+  /** Native increment methods are exposed only by named Dispatcher methods. */
+  public async _saveCommitGenerationProvider(
+    settings: ProviderSettings & { readonly id?: string },
+    secret?: string
+  ) {
+    const saved = await this.requireCommitGenerationProviders().saveProvider(
+      settings,
+      secret
+    )
+    this.commitGenerationRevision++
+    this.emitUpdate()
+    return saved
+  }
+
+  /** A display-only rename keeps the model, keychain identity and catalog. */
+  public async _renameCommitGenerationProvider(id: string, name: string) {
+    const saved = await this.requireCommitGenerationProviders().renameProvider(
+      id,
+      name
+    )
+    this.emitUpdate()
+    return saved
+  }
+
+  public async _deleteCommitGenerationProvider(id: string): Promise<void> {
+    await this.requireCommitGenerationProviders().deleteProvider(id)
+    this.commitGenerationRevision++
+    this.emitUpdate()
+  }
+
+  public async _refreshCommitGenerationModels(
+    id: string,
+    signal?: AbortSignal
+  ): Promise<void> {
+    const store = this.requireCommitGenerationProviders()
+    const provider = store.getProvider(id)
+    if (provider === null) {
+      throw new ProviderError('provider-not-found')
+    }
+    const secret = await store.getSecret(id, provider)
+    const discovered = await discoverProviderModels(provider, secret, signal)
+    const previousSelection = store.currentSelection
+    // The expected snapshot is checked inside the storage mutation queue.
+    await store.updateModels(id, discovered, provider, signal)
+    const currentSelection = store.currentSelection
+    if (
+      previousSelection?.providerId !== currentSelection?.providerId ||
+      previousSelection?.modelId !== currentSelection?.modelId
+    ) {
+      this.commitGenerationRevision++
+    }
+    this.emitUpdate()
+  }
+
+  public async _setCommitGenerationModelEnabled(
+    providerId: string,
+    modelId: string,
+    enabled: boolean
+  ): Promise<void> {
+    await this.requireCommitGenerationProviders().setModelEnabled(
+      providerId,
+      modelId,
+      enabled
+    )
+    this.commitGenerationRevision++
+    this.emitUpdate()
+  }
+
+  public async _setCommitGenerationDeployments(
+    id: string,
+    models: ReadonlyArray<{ readonly id: string; readonly name: string }>
+  ): Promise<void> {
+    const store = this.requireCommitGenerationProviders()
+    if (store.getProvider(id)?.format !== 'azure-openai-v1') {
+      throw new ProviderError('invalid-configuration')
+    }
+    await store.updateModels(id, models)
+    this.commitGenerationRevision++
+    this.emitUpdate()
+  }
+
+  public async _selectCommitGenerationModel(
+    source: 'copilot' | 'custom',
+    selection: ProviderModelSelection | null
+  ): Promise<void> {
+    if (source !== 'copilot' && source !== 'custom') {
+      throw new ProviderError('invalid-selection')
+    }
+    if (source === 'copilot' && selection !== null) {
+      throw new ProviderError('invalid-selection')
+    }
+    await this.requireCommitGenerationProviders().setCurrentSelection(selection)
+    this.commitGenerationRevision++
+    try {
+      localStorage.setItem('gitowl-commit-generation-source', source)
+    } catch {
+      throw new ProviderError('storage-unavailable')
+    }
+    this.commitGenerationSource = source
+    this.emitUpdate()
+  }
+
+  public _setCommitGenerationLanguage(language: string): void {
+    const canonical = canonicalCommitGenerationLanguage(language)
+    try {
+      localStorage.setItem('gitowl-commit-generation-language', canonical)
+    } catch {
+      throw new ProviderError('storage-unavailable')
+    }
+    this.commitGenerationLanguage = canonical
+    this.commitGenerationRevision++
+    this.emitUpdate()
   }
 
   /** This shouldn't be called directly. See 'Dispatcher'. */
@@ -12240,8 +12615,11 @@ export class AppStore extends TypedBaseStore<IAppState> {
     )
   }
 
-  public _appFocusedElementChanged() {
-    const resizablePaneActive = this.isResizePaneActive()
+  public _appFocusedElementChanged(nativeResizablePaneActive?: boolean) {
+    // MyGo supplies the visible focus fact; the original React path keeps its
+    // DOM detection. Both feed the unchanged menu-availability state contract.
+    const resizablePaneActive =
+      nativeResizablePaneActive ?? this.isResizePaneActive()
 
     if (resizablePaneActive !== this.resizablePaneActive) {
       this.resizablePaneActive = resizablePaneActive

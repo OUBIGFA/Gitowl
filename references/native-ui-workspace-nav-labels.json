@@ -1,0 +1,762 @@
+{
+  "workspace.copyRepoName": {
+    "en": "Copy project name",
+    "zh-Hans": "复制项目名称",
+    "zh-Hant": "複製專案名稱"
+  },
+  "workspace.copyRepoPath": {
+    "en": "Copy project path",
+    "zh-Hans": "复制项目路径",
+    "zh-Hant": "複製專案路徑"
+  },
+  "workspace.viewRepository": {
+    "en": "View on GitHub",
+    "zh-Hans": "在 GitHub 上查看",
+    "zh-Hant": "在 GitHub 上檢視"
+  },
+  "workspace.openNamed": {
+    "en": "Open in {0}",
+    "zh-Hans": "在 {0} 中打开",
+    "zh-Hant": "在 {0} 中開啟"
+  },
+  "workspace.openShell": {
+    "en": "Open in terminal",
+    "zh-Hans": "在终端中打开",
+    "zh-Hant": "在終端機中開啟"
+  },
+  "workspace.removeRepositoryConfirm": {
+    "en": "Remove project…",
+    "zh-Hans": "移除项目…",
+    "zh-Hant": "移除專案…"
+  },
+  "workspace.removeRepository": {
+    "en": "Remove project",
+    "zh-Hans": "移除项目",
+    "zh-Hant": "移除專案"
+  },
+  "workspace.createAlias": {
+    "en": "Create alias",
+    "zh-Hans": "创建别名",
+    "zh-Hant": "建立別名"
+  },
+  "workspace.changeAlias": {
+    "en": "Change alias",
+    "zh-Hans": "更改别名",
+    "zh-Hant": "變更別名"
+  },
+  "workspace.removeAlias": {
+    "en": "Remove alias",
+    "zh-Hans": "移除别名",
+    "zh-Hant": "移除別名"
+  },
+  "workspace.showWorktrees": {
+    "en": "Show worktrees",
+    "zh-Hans": "显示工作树",
+    "zh-Hant": "顯示工作樹"
+  },
+  "workspace.signedOutAccount": {
+    "en": "@{0} (Signed out)",
+    "zh-Hans": "@{0}（已退出登录）",
+    "zh-Hant": "@{0}（已登出）"
+  },
+  "workspace.accountLogin": {
+    "en": "@{0}",
+    "zh-Hans": "@{0}",
+    "zh-Hant": "@{0}"
+  },
+  "workspace.repositoryAccount": {
+    "en": "Account",
+    "zh-Hans": "账户",
+    "zh-Hant": "帳戶"
+  },
+  "workspace.repositorySettings": {
+    "en": "Project settings…",
+    "zh-Hans": "项目设置…",
+    "zh-Hant": "專案設定…"
+  },
+  "workspace.searchProjects": {
+    "en": "Search projects",
+    "zh-Hans": "搜索项目",
+    "zh-Hant": "搜尋專案"
+  },
+  "workspace.noProjectsFound": {
+    "en": "No matching projects",
+    "zh-Hans": "没有匹配的项目",
+    "zh-Hant": "沒有相符的專案"
+  },
+  "workspace.filterStatus": {
+    "en": "Filter by status",
+    "zh-Hans": "按状态筛选",
+    "zh-Hant": "依狀態篩選"
+  },
+  "workspace.conflicts.merge": {
+    "en": "Merge in progress",
+    "zh-Hans": "正在合并",
+    "zh-Hant": "正在合併"
+  },
+  "workspace.conflicts.rebase": {
+    "en": "Rebase in progress",
+    "zh-Hans": "正在变基",
+    "zh-Hant": "正在重定基底"
+  },
+  "workspace.conflicts.cherryPick": {
+    "en": "Cherry-pick in progress",
+    "zh-Hans": "正在拣选",
+    "zh-Hant": "正在揀選"
+  },
+  "workspace.conflicts.remaining": {
+    "en": "Unresolved files: {0}",
+    "zh-Hans": "未解决文件：{0}",
+    "zh-Hant": "未解決檔案：{0}"
+  },
+  "workspace.conflicts.untracked": {
+    "en": "Untracked files will be excluded",
+    "zh-Hans": "未跟踪文件将被排除",
+    "zh-Hant": "未追蹤檔案將被排除"
+  },
+  "workspace.conflicts.open": {
+    "en": "Review conflicts",
+    "zh-Hans": "审阅冲突",
+    "zh-Hant": "審閱衝突"
+  },
+  "workspace.conflicts.continue": {
+    "en": "Continue operation",
+    "zh-Hans": "继续操作",
+    "zh-Hant": "繼續操作"
+  },
+  "workspace.conflicts.abort": {
+    "en": "Abort operation…",
+    "zh-Hans": "中止操作…",
+    "zh-Hant": "中止操作…"
+  },
+  "workspace.branches": {
+    "en": "Branches",
+    "zh-Hans": "分支",
+    "zh-Hant": "分支"
+  },
+  "workspace.worktrees": {
+    "en": "Worktrees",
+    "zh-Hans": "工作树",
+    "zh-Hant": "工作樹"
+  },
+  "workspace.pullRequests": {
+    "en": "Pull requests",
+    "zh-Hans": "拉取请求",
+    "zh-Hant": "提取要求"
+  },
+  "workspace.currentBranch": {
+    "en": "Current branch",
+    "zh-Hans": "当前分支",
+    "zh-Hant": "目前分支"
+  },
+  "workspace.detached": {
+    "en": "Detached HEAD",
+    "zh-Hans": "游离 HEAD",
+    "zh-Hant": "分離 HEAD"
+  },
+  "workspace.default": {
+    "en": "Default branch",
+    "zh-Hans": "默认分支",
+    "zh-Hant": "預設分支"
+  },
+  "workspace.recent": {
+    "en": "Recent branches",
+    "zh-Hans": "最近分支",
+    "zh-Hant": "最近分支"
+  },
+  "workspace.other": {
+    "en": "Other branches",
+    "zh-Hans": "其他分支",
+    "zh-Hant": "其他分支"
+  },
+  "workspace.remote": { "en": "Remote", "zh-Hans": "远程", "zh-Hant": "遠端" },
+  "workspace.main": {
+    "en": "Main worktree",
+    "zh-Hans": "主工作树",
+    "zh-Hant": "主要工作樹"
+  },
+  "workspace.missing": {
+    "en": "Missing — review removal",
+    "zh-Hans": "已缺失 — 检查移除操作",
+    "zh-Hant": "已遺失 — 檢查移除操作"
+  },
+  "workspace.locked": {
+    "en": "Repository operations are locked",
+    "zh-Hans": "仓库操作已锁定",
+    "zh-Hant": "儲存庫操作已鎖定"
+  },
+  "workspace.checkoutBusy": {
+    "en": "Switching branch…",
+    "zh-Hans": "正在切换分支…",
+    "zh-Hant": "正在切換分支…"
+  },
+  "workspace.searchBranches": {
+    "en": "Filter branches",
+    "zh-Hans": "筛选分支",
+    "zh-Hant": "篩選分支"
+  },
+  "workspace.searchWorktrees": {
+    "en": "Filter worktrees",
+    "zh-Hans": "筛选工作树",
+    "zh-Hant": "篩選工作樹"
+  },
+  "workspace.searchPRs": {
+    "en": "Filter pull requests",
+    "zh-Hans": "筛选拉取请求",
+    "zh-Hant": "篩選提取要求"
+  },
+  "workspace.newBranch": {
+    "en": "New branch…",
+    "zh-Hans": "新建分支…",
+    "zh-Hant": "新增分支…"
+  },
+  "workspace.newWorktree": {
+    "en": "New worktree…",
+    "zh-Hans": "新建工作树…",
+    "zh-Hant": "新增工作樹…"
+  },
+  "workspace.empty": {
+    "en": "No matching items",
+    "zh-Hans": "没有匹配的项目",
+    "zh-Hant": "沒有相符的項目"
+  },
+  "workspace.loadingPRs": {
+    "en": "Loading pull requests…",
+    "zh-Hans": "正在加载拉取请求…",
+    "zh-Hant": "正在載入提取要求…"
+  },
+  "workspace.refreshPRs": {
+    "en": "Refresh pull requests",
+    "zh-Hans": "刷新拉取请求",
+    "zh-Hant": "重新整理提取要求"
+  },
+  "workspace.draft": { "en": "Draft", "zh-Hans": "草稿", "zh-Hant": "草稿" },
+  "workspace.actions": {
+    "en": "Actions",
+    "zh-Hans": "操作",
+    "zh-Hant": "操作"
+  },
+  "workspace.rename": {
+    "en": "Rename…",
+    "zh-Hans": "重命名…",
+    "zh-Hant": "重新命名…"
+  },
+  "workspace.delete": {
+    "en": "Delete…",
+    "zh-Hans": "删除…",
+    "zh-Hant": "刪除…"
+  },
+  "workspace.copyBranch": {
+    "en": "Copy branch name",
+    "zh-Hans": "复制分支名称",
+    "zh-Hant": "複製分支名稱"
+  },
+  "workspace.viewBranch": {
+    "en": "View branch on GitHub",
+    "zh-Hans": "在 GitHub 查看分支",
+    "zh-Hant": "在 GitHub 檢視分支"
+  },
+  "workspace.viewPR": {
+    "en": "View pull request on GitHub",
+    "zh-Hans": "在 GitHub 查看拉取请求",
+    "zh-Hant": "在 GitHub 檢視提取要求"
+  },
+  "workspace.checkoutWorktree": {
+    "en": "Checkout in new worktree…",
+    "zh-Hans": "在新工作树中检出…",
+    "zh-Hant": "在新工作樹中簽出…"
+  },
+  "workspace.copyWorktree": {
+    "en": "Copy worktree name",
+    "zh-Hans": "复制工作树名称",
+    "zh-Hant": "複製工作樹名稱"
+  },
+  "workspace.copyWorktreePath": {
+    "en": "Copy worktree path",
+    "zh-Hans": "复制工作树路径",
+    "zh-Hant": "複製工作樹路徑"
+  },
+  "workspace.data": { "en": "{0}", "zh-Hans": "{0}", "zh-Hant": "{0}" },
+  "workspace.discardConfirm": {
+    "en": "Discard {0} selected changes…",
+    "zh-Hans": "丢弃 {0} 项选中更改…",
+    "zh-Hant": "捨棄 {0} 項所選變更…"
+  },
+  "workspace.discard": {
+    "en": "Discard {0} selected changes",
+    "zh-Hans": "丢弃 {0} 项选中更改",
+    "zh-Hant": "捨棄 {0} 項所選變更"
+  },
+  "workspace.ignoreFile": {
+    "en": "Ignore file (add to .gitignore)",
+    "zh-Hans": "忽略文件（添加到 .gitignore）",
+    "zh-Hant": "忽略檔案（加入 .gitignore）"
+  },
+  "workspace.ignoreFolder": {
+    "en": "Ignore folder (add to .gitignore)",
+    "zh-Hans": "忽略文件夹（添加到 .gitignore）",
+    "zh-Hant": "忽略資料夾（加入 .gitignore）"
+  },
+  "workspace.ignoreSelected": {
+    "en": "Ignore {0} selected files (add to .gitignore)",
+    "zh-Hans": "忽略 {0} 个选中文件（添加到 .gitignore）",
+    "zh-Hant": "忽略 {0} 個所選檔案（加入 .gitignore）"
+  },
+  "workspace.ignoreExtension": {
+    "en": "Ignore all {0} files (add to .gitignore)",
+    "zh-Hans": "忽略所有 {0} 文件（添加到 .gitignore）",
+    "zh-Hant": "忽略所有 {0} 檔案（加入 .gitignore）"
+  },
+  "workspace.includeSelected": {
+    "en": "Include selected files",
+    "zh-Hans": "包含选中文件",
+    "zh-Hant": "包含所選檔案"
+  },
+  "workspace.excludeSelected": {
+    "en": "Exclude selected files",
+    "zh-Hans": "排除选中文件",
+    "zh-Hant": "排除所選檔案"
+  },
+  "workspace.copyPath": {
+    "en": "Copy file path",
+    "zh-Hans": "复制文件路径",
+    "zh-Hant": "複製檔案路徑"
+  },
+  "workspace.copyPaths": {
+    "en": "Copy selected file paths",
+    "zh-Hans": "复制选中文件路径",
+    "zh-Hant": "複製所選檔案路徑"
+  },
+  "workspace.copyRelativePath": {
+    "en": "Copy relative file path",
+    "zh-Hans": "复制文件相对路径",
+    "zh-Hant": "複製檔案相對路徑"
+  },
+  "workspace.copyRelativePaths": {
+    "en": "Copy selected relative file paths",
+    "zh-Hans": "复制选中文件相对路径",
+    "zh-Hant": "複製所選檔案相對路徑"
+  },
+  "workspace.reveal": {
+    "en": "Show in file manager",
+    "zh-Hans": "在文件管理器中显示",
+    "zh-Hant": "在檔案管理員中顯示"
+  },
+  "workspace.openEditorNamed": {
+    "en": "Open in {0}",
+    "zh-Hans": "在 {0} 中打开",
+    "zh-Hant": "在 {0} 中開啟"
+  },
+  "workspace.openEditor": {
+    "en": "Open in external editor",
+    "zh-Hans": "在外部编辑器中打开",
+    "zh-Hant": "在外部編輯器中開啟"
+  },
+  "workspace.openDefault": {
+    "en": "Open with default program",
+    "zh-Hans": "使用默认程序打开",
+    "zh-Hant": "使用預設程式開啟"
+  },
+  "workspace.fileMissing": {
+    "en": "File does not exist on disk",
+    "zh-Hans": "磁盘上不存在该文件",
+    "zh-Hant": "磁碟上沒有此檔案"
+  },
+  "workspace.viewEnterprise": {
+    "en": "View on GitHub Enterprise",
+    "zh-Hans": "在 GitHub Enterprise 上查看",
+    "zh-Hant": "在 GitHub Enterprise 上檢視"
+  },
+  "workspace.viewGitHub": {
+    "en": "View on GitHub",
+    "zh-Hans": "在 GitHub 上查看",
+    "zh-Hant": "在 GitHub 上檢視"
+  },
+  "workspace.cherryPickMany": {
+    "en": "Cherry-pick {0} commits…",
+    "zh-Hans": "拣选 {0} 个提交…",
+    "zh-Hant": "揀選 {0} 個提交…"
+  },
+  "workspace.squashMany": {
+    "en": "Squash {0} commits…",
+    "zh-Hans": "压缩 {0} 个提交…",
+    "zh-Hant": "壓縮 {0} 個提交…"
+  },
+  "workspace.reorderMany": {
+    "en": "Reorder {0} commits…",
+    "zh-Hans": "重排 {0} 个提交…",
+    "zh-Hant": "重新排序 {0} 個提交…"
+  },
+  "workspace.amend": {
+    "en": "Amend commit…",
+    "zh-Hans": "修订提交…",
+    "zh-Hant": "修訂提交…"
+  },
+  "workspace.undoCommit": {
+    "en": "Undo commit…",
+    "zh-Hans": "撤销提交…",
+    "zh-Hant": "復原提交…"
+  },
+  "workspace.reset": {
+    "en": "Reset to commit…",
+    "zh-Hans": "重置到此提交…",
+    "zh-Hant": "重設至此提交…"
+  },
+  "workspace.checkoutCommit": {
+    "en": "Checkout commit",
+    "zh-Hans": "检出提交",
+    "zh-Hant": "簽出提交"
+  },
+  "workspace.reorderCommit": {
+    "en": "Reorder commit",
+    "zh-Hans": "重排提交",
+    "zh-Hant": "重新排序提交"
+  },
+  "workspace.revert": {
+    "en": "Revert changes in commit",
+    "zh-Hans": "还原提交中的更改",
+    "zh-Hant": "還原提交中的變更"
+  },
+  "workspace.branchFromCommit": {
+    "en": "Create branch from commit",
+    "zh-Hans": "从提交创建分支",
+    "zh-Hant": "從提交建立分支"
+  },
+  "workspace.createTag": {
+    "en": "Create tag…",
+    "zh-Hans": "创建标签…",
+    "zh-Hant": "建立標籤…"
+  },
+  "workspace.deleteTag": {
+    "en": "Delete tag…",
+    "zh-Hans": "删除标签…",
+    "zh-Hant": "刪除標籤…"
+  },
+  "workspace.deleteTagNamed": {
+    "en": "Delete tag {0}",
+    "zh-Hans": "删除标签 {0}",
+    "zh-Hant": "刪除標籤 {0}"
+  },
+  "workspace.cherryPick": {
+    "en": "Cherry-pick commit…",
+    "zh-Hans": "拣选提交…",
+    "zh-Hant": "揀選提交…"
+  },
+  "workspace.copySHA": {
+    "en": "Copy full SHA",
+    "zh-Hans": "复制完整 SHA",
+    "zh-Hant": "複製完整 SHA"
+  },
+  "workspace.copyTags": {
+    "en": "Copy tags",
+    "zh-Hans": "复制标签",
+    "zh-Hant": "複製標籤"
+  },
+  "workspace.compareOperation.merge": {
+    "en": "Create a merge commit",
+    "zh-Hans": "创建合并提交",
+    "zh-Hant": "建立合併提交"
+  },
+  "workspace.compareOperation.squash": {
+    "en": "Squash and merge",
+    "zh-Hans": "压缩并合并",
+    "zh-Hant": "壓縮並合併"
+  },
+  "workspace.compareOperation.rebase": {
+    "en": "Rebase",
+    "zh-Hans": "变基",
+    "zh-Hant": "重定基底"
+  },
+  "workspace.compareApply": {
+    "en": "Update branch",
+    "zh-Hans": "更新分支",
+    "zh-Hant": "更新分支"
+  },
+  "workspace.compare": {
+    "en": "Compare branch",
+    "zh-Hans": "比较分支",
+    "zh-Hant": "比較分支"
+  },
+  "workspace.history": {
+    "en": "Show branch history",
+    "zh-Hans": "显示分支历史",
+    "zh-Hant": "顯示分支歷程"
+  },
+  "workspace.ahead": { "en": "Ahead", "zh-Hans": "领先", "zh-Hant": "領先" },
+  "workspace.behind": { "en": "Behind", "zh-Hans": "落后", "zh-Hant": "落後" },
+  "workspace.merge": {
+    "en": "Merge comparison",
+    "zh-Hans": "合并比较分支",
+    "zh-Hant": "合併比較分支"
+  },
+  "workspace.reorderHint": {
+    "en": "Choose an insertion point, then confirm. Escape cancels reordering.",
+    "zh-Hans": "选择插入位置后确认；按 Escape 取消重排。",
+    "zh-Hant": "選擇插入位置後確認；按 Escape 取消重新排序。"
+  },
+  "workspace.insertHere": {
+    "en": "Insert here",
+    "zh-Hans": "在此插入",
+    "zh-Hant": "在此插入"
+  },
+  "workspace.cancelReorder": {
+    "en": "Cancel reordering",
+    "zh-Hans": "取消重排",
+    "zh-Hant": "取消重新排序"
+  },
+  "workspace.reviewSelection": {
+    "en": "Review selected commits",
+    "zh-Hans": "审阅选中提交",
+    "zh-Hant": "審閱所選提交"
+  },
+  "workspace.historySelection": {
+    "en": "Selected commits: {0}",
+    "zh-Hans": "已选提交：{0}",
+    "zh-Hant": "已選提交：{0}"
+  },
+  "workspace.nonContiguous": {
+    "en": "Select consecutive commits to view their combined diff. Non-consecutive selections can be cherry-picked, squashed or reordered.",
+    "zh-Hans": "选择连续提交以查看合并差异。非连续提交仍可拣选、压缩或重排。",
+    "zh-Hant": "選擇連續提交以檢視合併差異。非連續提交仍可揀選、壓縮或重新排序。"
+  },
+  "workspace.stash": {
+    "en": "Stashed changes",
+    "zh-Hans": "已暂存的更改",
+    "zh-Hant": "已儲藏的變更"
+  },
+  "workspace.viewStash": {
+    "en": "Review stash",
+    "zh-Hans": "审阅暂存更改",
+    "zh-Hant": "審閱儲藏變更"
+  },
+  "workspace.stashAll": {
+    "en": "Stash all changes",
+    "zh-Hans": "暂存所有更改",
+    "zh-Hant": "儲藏所有變更"
+  },
+  "workspace.stashAllConfirm": {
+    "en": "Stash all changes…",
+    "zh-Hans": "暂存所有更改…",
+    "zh-Hant": "儲藏所有變更…"
+  },
+  "workspace.discardAll": {
+    "en": "Discard all changes…",
+    "zh-Hans": "丢弃所有更改…",
+    "zh-Hant": "捨棄所有變更…"
+  },
+  "workspace.restoreStash": {
+    "en": "Restore stash",
+    "zh-Hans": "恢复暂存更改",
+    "zh-Hant": "還原儲藏變更"
+  },
+  "workspace.discardStash": {
+    "en": "Discard stash…",
+    "zh-Hans": "丢弃暂存更改…",
+    "zh-Hant": "捨棄儲藏變更…"
+  },
+  "workspace.hideStash": {
+    "en": "Back to changes",
+    "zh-Hans": "返回更改",
+    "zh-Hant": "返回變更"
+  },
+  "workspace.loadingStash": {
+    "en": "Loading stashed files…",
+    "zh-Hans": "正在加载暂存文件…",
+    "zh-Hant": "正在載入儲藏檔案…"
+  },
+  "workspace.filterFiles": {
+    "en": "Filter changed files",
+    "zh-Hans": "筛选更改文件",
+    "zh-Hant": "篩選變更檔案"
+  },
+  "workspace.filterIncluded": {
+    "en": "Included",
+    "zh-Hans": "已包含",
+    "zh-Hant": "已包含"
+  },
+  "workspace.filterExcluded": {
+    "en": "Excluded",
+    "zh-Hans": "已排除",
+    "zh-Hant": "已排除"
+  },
+  "workspace.filterNew": {
+    "en": "New files",
+    "zh-Hans": "新文件",
+    "zh-Hant": "新檔案"
+  },
+  "workspace.filterModified": {
+    "en": "Modified files",
+    "zh-Hans": "已修改文件",
+    "zh-Hant": "已修改檔案"
+  },
+  "workspace.filterDeleted": {
+    "en": "Deleted files",
+    "zh-Hans": "已删除文件",
+    "zh-Hant": "已刪除檔案"
+  },
+  "workspace.includeLines": {
+    "en": "Include selected lines",
+    "zh-Hans": "包含选中行",
+    "zh-Hant": "包含所選行"
+  },
+  "workspace.excludeLines": {
+    "en": "Exclude selected lines",
+    "zh-Hans": "排除选中行",
+    "zh-Hant": "排除所選行"
+  },
+  "workspace.selectLinesHint": {
+    "en": "Select changed lines to include only that part in the version.",
+    "zh-Hans": "选中更改行，仅将该部分包含在版本中。",
+    "zh-Hant": "選取變更行，僅將該部分包含在版本中。"
+  },
+  "workspace.expandWhole": {
+    "en": "Expand whole file",
+    "zh-Hans": "展开整个文件",
+    "zh-Hant": "展開整個檔案"
+  },
+  "workspace.collapseExpanded": {
+    "en": "Collapse expanded lines",
+    "zh-Hans": "折叠已展开行",
+    "zh-Hant": "摺疊已展開行"
+  },
+  "workspace.discardLines": {
+    "en": "Discard selected lines…",
+    "zh-Hans": "丢弃选中行…",
+    "zh-Hant": "捨棄所選行…"
+  },
+  "workspace.whitespace": {
+    "en": "Hide whitespace changes",
+    "zh-Hans": "隐藏空白更改",
+    "zh-Hant": "隱藏空白變更"
+  },
+  "workspace.sideBySide": {
+    "en": "Side-by-side diff",
+    "zh-Hans": "并排差异",
+    "zh-Hant": "並排差異"
+  },
+  "workspace.checkMarks": {
+    "en": "Show line checkboxes",
+    "zh-Hans": "显示行复选框",
+    "zh-Hant": "顯示行核取方塊"
+  },
+  "workspace.banner.open": {
+    "en": "View conflicts",
+    "zh-Hans": "查看冲突",
+    "zh-Hant": "檢視衝突"
+  },
+  "workspace.banner.openCard": {
+    "en": "Open your card",
+    "zh-Hans": "打开感谢卡",
+    "zh-Hant": "開啟感謝卡"
+  },
+  "workspace.banner.throwAway": {
+    "en": "Throw it away",
+    "zh-Hans": "丢弃感谢卡",
+    "zh-Hant": "丟棄感謝卡"
+  },
+  "workspace.banner.undo": {
+    "en": "Undo",
+    "zh-Hans": "撤销",
+    "zh-Hant": "復原"
+  },
+  "workspace.banner.dismiss": {
+    "en": "Dismiss",
+    "zh-Hans": "关闭提示",
+    "zh-Hant": "關閉提示"
+  },
+  "workspace.banner.support": {
+    "en": "Support details",
+    "zh-Hans": "支持详情",
+    "zh-Hant": "支援詳細資訊"
+  },
+  "workspace.banner.SuccessfulMerge.withSource": {
+    "en": "Successfully merged {1} into {0}.",
+    "zh-Hans": "已成功将 {1} 合并到 {0}。",
+    "zh-Hant": "已成功將 {1} 合併至 {0}。"
+  },
+  "workspace.banner.SuccessfulRebase.withSource": {
+    "en": "Successfully rebased {0} onto {1}.",
+    "zh-Hans": "已成功将 {0} 变基到 {1}。",
+    "zh-Hant": "已成功將 {0} 重定基底至 {1}。"
+  },
+  "workspace.banner.BranchAlreadyUpToDate.withSource": {
+    "en": "{0} is already up to date with {1}.",
+    "zh-Hans": "{0} 相对于 {1} 已是最新。",
+    "zh-Hant": "{0} 相對於 {1} 已是最新。"
+  },
+  "workspace.banner.SuccessfulMerge": {
+    "en": "Merged successfully into {0}.",
+    "zh-Hans": "已成功合并到 {0}。",
+    "zh-Hant": "已成功合併至 {0}。"
+  },
+  "workspace.banner.MergeConflictsFound": {
+    "en": "Resolve conflicts and commit to merge into {0}.",
+    "zh-Hans": "解决冲突并提交，以合并到 {0}。",
+    "zh-Hant": "解決衝突並提交，以合併至 {0}。"
+  },
+  "workspace.banner.SuccessfulRebase": {
+    "en": "Successfully rebased {0}.",
+    "zh-Hans": "已成功变基 {0}。",
+    "zh-Hant": "已成功重定基底 {0}。"
+  },
+  "workspace.banner.RebaseConflictsFound": {
+    "en": "Resolve conflicts to continue rebasing {0}.",
+    "zh-Hans": "解决冲突以继续变基 {0}。",
+    "zh-Hant": "解決衝突以繼續重定基底 {0}。"
+  },
+  "workspace.banner.BranchAlreadyUpToDate": {
+    "en": "{0} is already up to date.",
+    "zh-Hans": "{0} 已是最新。",
+    "zh-Hant": "{0} 已是最新。"
+  },
+  "workspace.banner.SuccessfulCherryPick": {
+    "en": "Cherry-picked {0} commits onto {1}.",
+    "zh-Hans": "已将 {0} 个提交拣选到 {1}。",
+    "zh-Hant": "已將 {0} 個提交揀選至 {1}。"
+  },
+  "workspace.banner.CherryPickConflictsFound": {
+    "en": "Resolve conflicts to continue cherry-picking onto {0}.",
+    "zh-Hans": "解决冲突以继续拣选到 {0}。",
+    "zh-Hant": "解決衝突以繼續揀選至 {0}。"
+  },
+  "workspace.banner.CherryPickUndone": {
+    "en": "Undid cherry-picking of {0} commits onto {1}.",
+    "zh-Hans": "已撤销将 {0} 个提交拣选到 {1}。",
+    "zh-Hant": "已復原將 {0} 個提交揀選至 {1}。"
+  },
+  "workspace.banner.SquashUndone": {
+    "en": "Undid squash of {0} commits.",
+    "zh-Hans": "已撤销压缩 {0} 个提交。",
+    "zh-Hant": "已復原壓縮 {0} 個提交。"
+  },
+  "workspace.banner.ReorderUndone": {
+    "en": "Undid reorder of {0} commits.",
+    "zh-Hans": "已撤销重排 {0} 个提交。",
+    "zh-Hant": "已復原重新排序 {0} 個提交。"
+  },
+  "workspace.banner.OpenThankYouCard": {
+    "en": "The Desktop team would like to thank you for your contributions.",
+    "zh-Hans": "Desktop 团队感谢你的贡献。",
+    "zh-Hant": "Desktop 團隊感謝你的貢獻。"
+  },
+  "workspace.banner.SuccessfulSquash": {
+    "en": "Successfully squashed {0} commits.",
+    "zh-Hans": "已成功压缩 {0} 个提交。",
+    "zh-Hant": "已成功壓縮 {0} 個提交。"
+  },
+  "workspace.banner.SuccessfulReorder": {
+    "en": "Successfully reordered {0} commits.",
+    "zh-Hans": "已成功重排 {0} 个提交。",
+    "zh-Hant": "已成功重新排序 {0} 個提交。"
+  },
+  "workspace.banner.ConflictsFound": {
+    "en": "Resolve conflicts to continue the operation.",
+    "zh-Hans": "解决冲突以继续操作。",
+    "zh-Hant": "解決衝突以繼續操作。"
+  },
+  "workspace.banner.OSVersionNoLongerSupported": {
+    "en": "This operating system is no longer supported. Software updates have been disabled.",
+    "zh-Hans": "此操作系统已不再受支持，软件更新已停用。",
+    "zh-Hant": "此作業系統已不再受支援，軟體更新已停用。"
+  }
+}

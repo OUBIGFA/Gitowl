@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { TooltippedContent } from './lib/tooltipped-content'
-import { formatDate } from '../lib/format-date'
-import { formatRelative } from '../lib/format-relative'
+import { getRelativeTimeInfoFromDate } from '../lib/relative-time-info'
+export { getRelativeTimeInfoFromDate } from '../lib/relative-time-info'
 
 interface IRelativeTimeProps {
   /**
@@ -28,71 +28,7 @@ interface IRelativeTimeState {
   readonly relativeText: string
 }
 
-const SECOND = 1000
-const MINUTE = SECOND * 60
-const HOUR = MINUTE * 60
-const DAY = HOUR * 24
-
-// The maximum value that can be used in setInterval or
-// setTimeout without it overflowing (2 ^ 31 - 1). See
-//  http://stackoverflow.com/a/16314807
 const MAX_INTERVAL = 2147483647
-
-type RelativeTimeInfo = {
-  absoluteText: string
-  relativeText: string
-  duration?: number
-}
-
-export function getRelativeTimeInfoFromDate(
-  then: Date,
-  onlyRelative: boolean = true
-): RelativeTimeInfo {
-  const diff = then.getTime() - Date.now()
-  const duration = Math.abs(diff)
-
-  const absoluteText = formatDate(then, {
-    dateStyle: 'full',
-    timeStyle: 'short',
-  })
-
-  const relativeText = formatRelative(diff)
-
-  // Future date, let's just show as absolute and reschedule. If it's less
-  // than a minute into the future we'll treat it as 'just now'.
-  if (diff > 0 && duration > MINUTE) {
-    return {
-      absoluteText,
-      relativeText: formatDate(then, {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-      }),
-      duration,
-    }
-  } else if (duration < MINUTE) {
-    return {
-      absoluteText,
-      relativeText: 'just now',
-      duration: MINUTE - duration,
-    }
-  } else if (duration < HOUR) {
-    return { absoluteText, relativeText, duration: MINUTE }
-  } else if (duration < DAY) {
-    return { absoluteText, relativeText, duration: HOUR }
-  } else if (duration < 7 * DAY) {
-    return { absoluteText, relativeText, duration: 6 * HOUR }
-  } else {
-    if (onlyRelative) {
-      return { absoluteText, relativeText, duration: 6 * HOUR }
-    } else {
-      // More than a week ago, just the date will suffice
-      return {
-        absoluteText,
-        relativeText: formatDate(then, { time: false, dateStyle: 'medium' }),
-      }
-    }
-  }
-}
 
 /**
  * An auto-updating component rendering a relative time in human readable form.

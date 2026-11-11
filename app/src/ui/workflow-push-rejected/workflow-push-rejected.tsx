@@ -4,7 +4,7 @@ import { Dispatcher } from '../dispatcher'
 import { Ref } from '../lib/ref'
 import { RepositoryWithGitHubRepository } from '../../models/repository'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
-import { SignInResult } from '../../lib/stores'
+import { reauthorizeDialog } from '../lib/auxiliary-dialog-actions'
 
 const okButtonText = __DARWIN__ ? 'Continue in Browser' : 'Continue in browser'
 
@@ -65,14 +65,13 @@ export class WorkflowPushRejectedDialog extends React.Component<
     const { repository, dispatcher } = this.props
     const { endpoint } = repository.gitHubRepository
 
-    const result = await new Promise<SignInResult>(async resolve => {
-      dispatcher.beginBrowserBasedSignIn(endpoint, resolve)
-    })
-
-    if (result.kind === 'success') {
-      dispatcher.push(repository)
-    }
-
-    this.props.onDismissed()
+    await reauthorizeDialog(
+      dispatcher,
+      endpoint,
+      () => {
+        dispatcher.push(repository)
+      },
+      this.props.onDismissed
+    )
   }
 }

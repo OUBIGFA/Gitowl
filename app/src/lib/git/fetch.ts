@@ -1,10 +1,11 @@
 import { git, IGitStringExecutionOptions } from './core'
 import { Repository } from '../../models/repository'
 import { IFetchProgress } from '../../models/progress'
-import { FetchProgressParser, executionOptionsWithProgress } from '../progress'
+import { FetchProgressParser } from '../progress/fetch'
+import { executionOptionsWithProgress } from '../progress/from-process'
 import { IRemote } from '../../models/remote'
 import { ITrackingBranch } from '../../models/branch'
-import { envForRemoteOperation } from './environment'
+import { envForRemoteOperation, GitProxyResolver } from './environment'
 
 async function getFetchArgs(
   remote: string,
@@ -38,17 +39,24 @@ async function getFetchArgs(
  * @param isBackgroundTask  - Whether the fetch is being performed as a
  *                            background task as opposed to being user initiated
  * @param recurseSubmodules - Whether to fetch populated submodules on demand.
+ * @param resolveProxy      - Optional native system/PAC resolver. Existing
+ *                            callers continue to use Electron's resolver.
+ * @param signal            - Cancel the Git subprocess. Cancellation is not a
+ *                            guarantee that no tracking refs have changed.
  */
 export async function fetch(
   repository: Repository,
   remote: IRemote,
   progressCallback?: (progress: IFetchProgress) => void,
   isBackgroundTask = false,
-  recurseSubmodules = true
+  recurseSubmodules = true,
+  resolveProxy?: GitProxyResolver,
+  signal?: AbortSignal
 ): Promise<void> {
   let opts: IGitStringExecutionOptions = {
     successExitCodes: new Set([0]),
-    env: await envForRemoteOperation(remote.url),
+    signal,
+    env: await envForRemoteOperation(remote.url, resolveProxy),
   }
 
   if (progressCallback) {

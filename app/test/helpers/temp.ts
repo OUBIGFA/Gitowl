@@ -2,12 +2,13 @@ import { mkdtemp, rm } from 'fs/promises'
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { TestContext } from 'node:test'
-import { sleep } from '../../src/lib/promise'
+import { setTimeout as sleep } from 'node:timers/promises'
 import { isErrnoException } from '../../src/lib/errno-exception'
 
 const isBusyError = (e: unknown) => isErrnoException(e) && e.code === 'EBUSY'
 
 // Reimplementation of retry logic in rimraf:
+// Fixture cleanup must not depend on UI timers, which store tests suspend.
 // https://github.com/isaacs/rimraf/blob/8733d4c30078a1ae5f18bb6affe83c1eea0259b4/src/retry-busy.ts#L10
 const clean = async (path: string, n = 1): Promise<void> =>
   rm(path, { recursive: true }).catch((e: unknown) =>

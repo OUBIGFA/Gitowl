@@ -1,5 +1,5 @@
 import { IFileListFilterState } from '../../lib/app-state'
-import { IChangesListItem } from './filter-changes-list'
+import type { IChangesListItem } from './filter-changes-list'
 import memoizeOne from 'memoize-one'
 
 /**
@@ -49,7 +49,7 @@ export function applyFilterOptions(
 export const isCommittingFileHiddenByFilter = memoizeOne(
   (
     fileIdsIncludedInCommit: ReadonlyArray<string>,
-    filteredItems: Map<string, IChangesListItem>,
+    filteredItems: ReadonlyMap<string, unknown>,
     fileCount: number,
     filters: IFileListFilterState
   ): boolean => {

@@ -1,0 +1,291 @@
+--- a/cmd/mygo/nsis.go
++++ b/cmd/mygo/nsis.go
+@@ -216,7 +216,7 @@
+ !insertmacro MUI_UNPAGE_CONFIRM
+ !insertmacro MUI_UNPAGE_INSTFILES
+ ` + languages + include + `
+-` + nsisCloseApp(c) + `
++` + nsisCloseApp(c, langs...) + `
+ Section
+   Push "$INSTDIR"
+   Call CloseApp
+@@ -252,18 +252,41 @@
+   Pop $0
+ FunctionEnd
+ 
++; A just-exited helper or Explorer can briefly retain a file. Retry the
++; actual deletion for five seconds, then report failure without discarding
++; the installation registration needed by a repair installation.
++Function un.RemoveAppFiles
++  Push $0
++  StrCpy $0 50
++  SetOutPath "$TEMP"
++  retry_remove:
++    IfFileExists "$INSTDIR\*.*" 0 removed
++    ClearErrors
++    RMDir /r "$INSTDIR"
++    IfErrors 0 removed
++    IntOp $0 $0 - 1
++    IntCmp $0 0 remove_failed
++    Sleep 100
++    Goto retry_remove
++  remove_failed:
++    Pop $0
++    MessageBox MB_OK|MB_ICONSTOP "$(MYGO_REMOVE_FAILED)" /SD IDOK
++    SetErrorLevel 1
++    Quit
++  removed:
++    Pop $0
++FunctionEnd
++
+ Section "Uninstall"
+   Push "$INSTDIR"
+   Call un.CloseApp
++` + uninstall + `  Call un.RemoveAppFiles
+   Push "$SMPROGRAMS\` + shortcut + `"
+   Call un.DeleteShortcut
+   Push "$DESKTOP\` + shortcut + `"
+   Call un.DeleteShortcut
+   DeleteRegKey HKCU ` + nsisString(uninstallKey) + `
+-` + unregister + uninstall + `  ; Last, so that the app's folder is gone once the uninstall is done:
+-  ; the uninstaller runs from a copy of itself that nothing waits for.
+-  RMDir /r "$INSTDIR"
+-SectionEnd
++` + unregister + `SectionEnd
+ `, nil
+ }
+ 
+@@ -396,7 +419,7 @@
+ // uninstall (/S), as an update runs, quits it without asking; the others
+ // ask first and stop when the user cancels. Windows without PowerShell go
+ // on as before.
+-func nsisCloseApp(c *Config) string {
++func nsisCloseApp(c *Config, languages ...appLanguage) string {
+ 	// NSIS strings hold 1024 characters, too few for the script on the
+ 	// command line: the installer writes it to a file, line by line, which
+ 	// PowerShell reads, named by the environment, as quotes would not do
+@@ -408,9 +431,42 @@
+ 		}
+ 	}
+ 	command := `'"$1" -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create([IO.File]::ReadAllText($$env:MYGO_APP_SCRIPT)))"'`
+-	running := nsisString(c.windowsName() + " is running. Close it to continue?")
+-	stuck := nsisString(c.windowsName() + " is still running. Quit it, then try again.")
++	running := `"$(MYGO_CLOSE_APP)"`
++	stuck := `"$(MYGO_APP_STILL_RUNNING)"`
+ 	var out strings.Builder
++	// Use the same NSIS language set as the installer pages. These messages
++	// must not fall back to English in an otherwise translated installation.
++	if len(languages) == 0 {
++		languages = []appLanguage{{Tag: "en"}}
++	}
++	seen := map[string]bool{}
++	for _, language := range languages {
++		nsis, _ := nsisLanguage(language.Tag) // validated by nsisLanguageMacros
++		if seen[nsis] {
++			continue
++		}
++		seen[nsis] = true
++		name := language.Name
++		if name == "" {
++			name = c.windowsName()
++		}
++		closeText := name + " is running. Close it to continue?"
++		stuckText := name + " is still running. Quit it, then try again."
++		removeText := "Some files could not be removed. Close programs using the installation folder, then reinstall " + name + " and uninstall it again."
++		switch nsis {
++		case "SimpChinese":
++			closeText = name + " 正在运行。是否关闭并继续？"
++			stuckText = name + " 仍在运行。请退出后重试。"
++			removeText = "部分文件无法删除。请关闭占用安装目录的程序，重新安装 " + name + " 后再卸载。"
++		case "TradChinese":
++			closeText = name + " 正在執行。是否關閉並繼續？"
++			stuckText = name + " 仍在執行。請結束後重試。"
++			removeText = "部分檔案無法刪除。請關閉佔用安裝目錄的程式，重新安裝 " + name + " 後再解除安裝。"
++		}
++		fmt.Fprintf(&out, "LangString MYGO_CLOSE_APP ${LANG_%s} %s\n", strings.ToUpper(nsis), nsisString(closeText))
++		fmt.Fprintf(&out, "LangString MYGO_APP_STILL_RUNNING ${LANG_%s} %s\n", strings.ToUpper(nsis), nsisString(stuckText))
++		fmt.Fprintf(&out, "LangString MYGO_REMOVE_FAILED ${LANG_%s} %s\n", strings.ToUpper(nsis), nsisString(removeText))
++	}
+ 	for _, prefix := range []string{"", "un."} {
+ 		out.WriteString(`; Quits the app running from the folder on the stack.
+ Function ` + prefix + `CloseApp
+--- a/cmd/mygo/nsis_test.go
++++ b/cmd/mygo/nsis_test.go
+@@ -583,7 +583,7 @@
+ 	for _, order := range [][]string{
+ 		{`!include "MUI2.nsh"`, `!insertmacro MUI_LANGUAGE "English"`, include, "\nSection\n"},
+ 		{"\nSection\n", "  WriteUninstaller ", install + "SectionEnd\n"},
+-		{"Section \"Uninstall\"\n", "  DeleteRegKey HKCU ", uninstall + "  ; Last,", "  RMDir /r \"$INSTDIR\"\n"},
++		{"Section \"Uninstall\"\n", uninstall, "  Call un.RemoveAppFiles\n", "  DeleteRegKey HKCU "},
+ 	} {
+ 		at := 0
+ 		for _, s := range order {
+--- /dev/null
++++ b/cmd/mygo/gitowl_installer_test.go
+@@ -0,0 +1,27 @@
++package main
++
++import (
++	"strings"
++	"testing"
++)
++
++func TestGitowlInstallerProcessMessages(t *testing.T) {
++	script := nsisCloseApp(&Config{Name: "Gitowl"}, appLanguage{Tag: "en"}, appLanguage{Tag: "zh-Hans"}, appLanguage{Tag: "zh-CN"}, appLanguage{Tag: "zh-Hant"})
++	for _, text := range []string{
++		`LangString MYGO_CLOSE_APP ${LANG_ENGLISH} "Gitowl is running. Close it to continue?"`,
++		`LangString MYGO_CLOSE_APP ${LANG_SIMPCHINESE} "Gitowl 正在运行。是否关闭并继续？"`,
++		`LangString MYGO_APP_STILL_RUNNING ${LANG_SIMPCHINESE} "Gitowl 仍在运行。请退出后重试。"`,
++		`LangString MYGO_CLOSE_APP ${LANG_TRADCHINESE} "Gitowl 正在執行。是否關閉並繼續？"`,
++		`LangString MYGO_APP_STILL_RUNNING ${LANG_TRADCHINESE} "Gitowl 仍在執行。請結束後重試。"`,
++	} {
++		if strings.Count(script, text) != 1 {
++			t.Errorf("missing or duplicate language text %q", text)
++		}
++	}
++	if strings.Count(script, `MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "$(MYGO_CLOSE_APP)"`) != 2 {
++		t.Fatal("install/uninstall must use the chosen language")
++	}
++	if strings.Count(script, `MessageBox MB_OK|MB_ICONSTOP "$(MYGO_APP_STILL_RUNNING)"`) != 2 {
++		t.Fatal("stuck-process messages must use the chosen language")
++	}
++}
+--- /dev/null
++++ b/cmd/mygo/gitowl_uninstall_windows_test.go
+@@ -0,0 +1,136 @@
++package main
++
++import (
++	"fmt"
++	"os"
++	"os/exec"
++	"path/filepath"
++	"strings"
++	"testing"
++	"time"
++
++	windows "syscall"
++)
++
++// Exercise the generated uninstaller against actual Windows sharing locks.
++// A successful process exit must mean its files and registration are gone.
++func TestGitowlInstallerRemoval(t *testing.T) {
++	compiler := makensis()
++	if compiler == "" {
++		t.Fatal("the installer regression requires the registered NSIS compiler")
++	}
++	base := t.TempDir()
++	name := fmt.Sprintf("Gitowl Removal Test %d", os.Getpid())
++	identifier := fmt.Sprintf("io.github.oubigfa.gitowl.removal-test-%d", os.Getpid())
++	key := `HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\` + identifier
++	c := &Config{Name: name, Identifier: identifier, Version: "0.0.1"}
++	payload := filepath.Join(base, "payload.dat")
++	if err := os.WriteFile(payload, []byte("owned deletion fixture"), 0o600); err != nil {
++		t.Fatal(err)
++	}
++	setup := filepath.Join(base, "setup.exe")
++	script, err := installerScript(c, setup, "unused.exe", "  File "+nsisString(payload)+"\n", "", "")
++	if err != nil {
++		t.Fatal(err)
++	}
++	nsi := filepath.Join(base, "fixture.nsi")
++	if err := writeNSIS(nsi, script); err != nil {
++		t.Fatal(err)
++	}
++	if out, err := exec.Command(compiler, "-V2", nsi).CombinedOutput(); err != nil {
++		t.Fatalf("compile: %v\n%s", err, out)
++	}
++	registered := func() bool { return exec.Command("reg.exe", "query", key).Run() == nil }
++	if registered() {
++		t.Fatal("test registration already exists")
++	}
++	for _, mode := range []string{"unlocked", "temporary-lock", "persistent-lock"} {
++		t.Run(mode, func(t *testing.T) {
++			install := filepath.Join(base, mode)
++			// NSIS parses /D and _? as an unquoted tail, even with spaces.
++			installCmd := exec.Command(setup)
++			installCmd.SysProcAttr = &windows.SysProcAttr{CmdLine: windows.EscapeArg(setup) + " /S /D=" + install}
++			if out, err := installCmd.CombinedOutput(); err != nil {
++				t.Fatalf("install: %v\n%s", err, out)
++			}
++			if !registered() {
++				t.Fatal("fixture install did not register")
++			}
++			uninstaller := filepath.Join(base, mode+"-uninstall.exe")
++			bytes, err := os.ReadFile(filepath.Join(install, "Uninstall.exe"))
++			if err != nil {
++				t.Fatal(err)
++			}
++			if err := os.WriteFile(uninstaller, bytes, 0o700); err != nil {
++				t.Fatal(err)
++			}
++			command := func() *exec.Cmd {
++				cmd := exec.Command(uninstaller)
++				cmd.SysProcAttr = &windows.SysProcAttr{CmdLine: windows.EscapeArg(uninstaller) + " /S _?=" + install}
++				return cmd
++			}
++			var held windows.Handle
++			if mode != "unlocked" {
++				path, err := windows.UTF16PtrFromString(filepath.Join(install, "payload.dat"))
++				if err != nil {
++					t.Fatal(err)
++				}
++				held, err = windows.CreateFile(path, windows.GENERIC_READ, windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE, nil, windows.OPEN_EXISTING, 0, 0)
++				if err != nil {
++					t.Fatal(err)
++				}
++			}
++			cmd := command()
++			if err := cmd.Start(); err != nil {
++				t.Fatal(err)
++			}
++			if mode == "temporary-lock" {
++				// Observe a file actually removed by RMDir before releasing the
++				// lock. A fixed sleep could elapse during the close-app check.
++				deadline := time.Now().Add(20 * time.Second)
++				for fileExists(filepath.Join(install, "Uninstall.exe")) && time.Now().Before(deadline) {
++					time.Sleep(10 * time.Millisecond)
++				}
++				if fileExists(filepath.Join(install, "Uninstall.exe")) {
++					t.Error("uninstaller never reached file removal")
++				}
++				windows.CloseHandle(held)
++				held = 0
++			}
++			err = cmd.Wait()
++			if mode == "persistent-lock" {
++				if err == nil {
++					t.Error("uninstaller reported success with an undeletable file")
++				}
++				if !registered() {
++					t.Error("failed removal discarded recovery registration")
++				}
++				windows.CloseHandle(held)
++				held = 0
++				// Release only this test's lock, then retry the same owned copy.
++				err = command().Run()
++			}
++			if held != 0 {
++				windows.CloseHandle(held)
++			}
++			if err != nil {
++				t.Errorf("removal after lock release: %v", err)
++			}
++			if _, err := os.Stat(install); !os.IsNotExist(err) {
++				t.Errorf("uninstaller left installation: %v", err)
++			}
++			if registered() {
++				t.Error("successful removal left registration")
++			}
++			// Clean only this fixture's registration if testing the unfixed
++			// implementation. Original failures remain in the test result.
++			if registered() {
++				exec.Command("reg.exe", "delete", key, "/f").Run()
++			}
++			shortcut := filepath.Join(shellFolder(t, "Programs"), name+".lnk")
++			if strings.HasPrefix(filepath.Base(shortcut), "Gitowl Removal Test ") {
++				os.Remove(shortcut)
++			}
++		})
++	}
++}

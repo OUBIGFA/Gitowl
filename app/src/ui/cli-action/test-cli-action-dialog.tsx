@@ -7,6 +7,7 @@ import { TextBox } from '../lib/text-box'
 import { Row } from '../lib/row'
 import { CLIAction } from '../../lib/cli-action'
 import { assertNever } from '../../lib/fatal-error'
+import { getTestCLIAction } from '../lib/dialog-development-actions'
 
 /** The CLI action kinds available to dispatch, in tab order. */
 const tabs: ReadonlyArray<CLIAction['kind']> = ['open-repository', 'clone-url']
@@ -128,23 +129,12 @@ export class TestCLIActionDialog extends React.Component<
   }
 
   private getAction(): CLIAction | null {
-    const kind = tabs[this.state.selectedTabIndex]
-
-    switch (kind) {
-      case 'open-repository': {
-        const path = this.state.path.trim()
-        return path.length === 0 ? null : { kind, path }
-      }
-      case 'clone-url': {
-        const url = this.state.url.trim()
-        const branch = this.state.branch.trim()
-        return url.length === 0
-          ? null
-          : { kind, url, branch: branch.length === 0 ? undefined : branch }
-      }
-      default:
-        return assertNever(kind, `Unknown CLI action kind: ${kind}`)
-    }
+    return getTestCLIAction(
+      tabs[this.state.selectedTabIndex],
+      this.state.path,
+      this.state.url,
+      this.state.branch
+    )
   }
 
   private isActionValid() {

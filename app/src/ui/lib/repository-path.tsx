@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as Path from 'path'
+import { safeDirectoryName, repositoryFullPath } from './repository-path-policy'
 
 import { TextBox } from './text-box'
 import { Button } from './button'
@@ -20,9 +20,6 @@ import { InputWarning } from './input-description/input-warning'
 // created in the OrgA folder.
 //
 // macOS and Linux are way more allowing so there's no need to sanitize
-const safeDirectoryName = (name: string) => {
-  return __WIN32__ ? name.replace(/[<>:"|?*]/g, '-').replace(/\s+$/, '') : name
-}
 
 interface IRepositoryPathProps {
   /** Initial name value. Defaults to ''. */
@@ -122,10 +119,7 @@ export class RepositoryPath extends React.Component<
 
   private getFullPath(): string | null {
     const { name, path } = this.state
-    if (path === null || path.length === 0 || name.trim().length === 0) {
-      return null
-    }
-    return Path.join(path, safeDirectoryName(name))
+    return repositoryFullPath(name, path)
   }
 
   private emitFullPath = () => {

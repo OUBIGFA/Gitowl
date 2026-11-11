@@ -7,14 +7,12 @@ import { GitHubRepository } from '../../models/github-repository'
 import { Repository } from '../../models/repository'
 import { Dispatcher } from '../dispatcher'
 import {
-  APICheckConclusion,
-  APICheckStatus,
-  IAPICheckSuite,
-} from '../../lib/api'
+  determineCheckRerunnability,
+  rerunDialogChecks,
+} from '../lib/auxiliary-dialog-actions'
 import { Octicon } from '../octicons'
 import * as octicons from './../octicons/octicons.generated'
 import { encodePathAsUrl } from '../../lib/path'
-import { offsetFromNow } from '../../lib/offset-from'
 
 const BlankSlateImage = encodePathAsUrl(
   __dirname,
@@ -66,80 +64,31 @@ export class CICheckRunRerunDialog extends React.Component<
   private onSubmit = async () => {
     const { dispatcher, repository, localRepository, prRef } = this.props
     this.setState({ loadingRerun: true })
-    const results = await dispatcher.rerequestCheckSuites(
-      repository,
-      localRepository,
-      this.state.rerunnable,
-      this.props.failedOnly
-    )
-    if (results.length === 0 || results.some(result => !result)) {
-      this.setState({ loadingRerun: false })
-      return
-    }
-    await dispatcher.manualRefreshSubscription(
+    const succeeded = await rerunDialogChecks(
+      dispatcher,
       repository,
       localRepository,
       prRef,
-      this.state.rerunnable
+      this.state.rerunnable,
+      this.props.failedOnly
     )
-    dispatcher.incrementMetric('rerunsChecks')
+    if (!succeeded) {
+      this.setState({ loadingRerun: false })
+      return
+    }
     this.props.onDismissed()
   }
 
   private determineRerunnability = async () => {
-    const checkRunsToConsider = this.props.failedOnly
-      ? this.props.checkRuns.filter(
-          cr => cr.conclusion === APICheckConclusion.Failure
-        )
-      : this.props.checkRuns
-
-    // Get unique set of check suite ids
-    const checkSuiteIds = new Set(
-      checkRunsToConsider.map(cr => cr.checkSuiteId)
+    const { dispatcher, repository, localRepository, checkRuns, failedOnly } =
+      this.props
+    const { rerunnable, nonRerunnable } = await determineCheckRerunnability(
+      dispatcher,
+      repository,
+      localRepository,
+      checkRuns,
+      failedOnly
     )
-
-    const checkSuitesPromises = new Array<Promise<IAPICheckSuite | null>>()
-
-    for (const id of checkSuiteIds) {
-      if (id === null) {
-        continue
-      }
-      checkSuitesPromises.push(
-        this.props.dispatcher.fetchCheckSuite(
-          this.props.repository,
-          this.props.localRepository,
-          id
-        )
-      )
-    }
-
-    const rerequestableCheckSuiteIds: number[] = []
-    for (const cs of await Promise.all(checkSuitesPromises)) {
-      if (cs === null) {
-        continue
-      }
-
-      const createdAt = Date.parse(cs.created_at)
-      if (
-        cs.rerequestable &&
-        createdAt > offsetFromNow(-30, 'days') && // Must be less than a month old
-        cs.status === APICheckStatus.Completed // Must be completed
-      ) {
-        rerequestableCheckSuiteIds.push(cs.id)
-      }
-    }
-
-    const rerunnable = checkRunsToConsider.filter(
-      cr =>
-        cr.checkSuiteId !== null &&
-        rerequestableCheckSuiteIds.includes(cr.checkSuiteId)
-    )
-    const nonRerunnable = checkRunsToConsider.filter(
-      cr =>
-        cr.checkSuiteId === null ||
-        !rerequestableCheckSuiteIds.includes(cr.checkSuiteId)
-    )
-
     this.setState({ loadingCheckSuites: false, rerunnable, nonRerunnable })
   }
 

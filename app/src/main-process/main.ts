@@ -1,3 +1,5 @@
+import { executableMenuItem } from './menu/executable-menu-item'
+import { nativeKernelInput, nativeKernelMode } from './native-mode'
 import '../lib/logging/main/install'
 
 import {
@@ -14,11 +16,13 @@ import {
 import * as Fs from 'fs'
 
 import { AppWindow } from './app-window'
+import { NativeKernelTransport } from '../native-kernel/main-transport'
 import { buildDefaultMenu, getAllMenuItems } from './menu'
 import { shellNeedsPatching, updateEnvironmentForProcess } from '../lib/shell'
 import { parseAppURL } from '../lib/parse-app-url'
 import {
   handleSquirrelEvent,
+  handleNativeCLIEvent,
   installWindowsCLI,
   uninstallWindowsCLI,
 } from './squirrel-updater'
@@ -59,6 +63,15 @@ app.setAppLogsPath()
 enableSourceMaps()
 
 let mainWindow: AppWindow | null = null
+const nativeTransport = nativeKernelMode
+  ? new NativeKernelTransport(nativeKernelInput, process.stdout, exitCode => {
+      if (exitCode === 0) {
+        app.quit()
+      } else {
+        app.exit(exitCode)
+      }
+    })
+  : undefined
 
 const launchTime = now()
 
@@ -79,6 +92,13 @@ function handleUncaughtException(error: Error) {
   // this only affects the presentation of the crash dialog
   // it's a safe assumption to make.
   const isLaunchError = mainWindow === null
+
+  if (nativeTransport !== undefined) {
+    // The pipe must flush failure/unknown-outcome messages before app.exit.
+    // No crash dialog or hidden Web frontend is shown in native mode.
+    nativeTransport.fatal()
+    return
+  }
 
   if (mainWindow) {
     mainWindow.destroy()
@@ -120,7 +140,9 @@ if (__DARWIN__) {
 
 // On Windows, in order to get notifications properly working for dev builds,
 // we'll want to set the right App User Model ID from production builds.
-if (__WIN32__ && __DEV__) {
+if (__WIN32__ && nativeKernelMode) {
+  app.setAppUserModelId('io.github.oubigfa.gitowl')
+} else if (__WIN32__ && __DEV__) {
   app.setAppUserModelId('com.squirrel.GitHubDesktop.GitHubDesktop')
 }
 
@@ -140,20 +162,26 @@ process.on('uncaughtException', (error: Error) => {
   handleUncaughtException(error)
 })
 
-let handlingSquirrelEvent = false
+let handlingInstallEvent = false
 if (__WIN32__ && process.argv.length > 1) {
   const arg = process.argv[1]
-  const promise = handleSquirrelEvent(arg)
+  const nativeEvent = handleNativeCLIEvent(process.argv)
+  const promise = nativeEvent ?? handleSquirrelEvent(arg)
 
   if (promise) {
-    handlingSquirrelEvent = true
-    promise
-      .catch(e => log.error(`Failed handling Squirrel event: ${arg}`, e))
-      .then(() => app.quit())
+    handlingInstallEvent = true
+    promise.then(
+      () => app.quit(),
+      e => {
+        log.error('Failed handling installation event', e)
+        if (nativeEvent !== null) app.exit(1)
+        else app.quit()
+      }
+    )
   }
 }
 
-if (!handlingSquirrelEvent) {
+if (!handlingInstallEvent && !nativeKernelMode) {
   handleCommandLineArguments(process.argv)
 }
 
@@ -174,7 +202,7 @@ let isDuplicateInstance = false
 // If we're handling a Squirrel event we don't want to enforce single instance.
 // We want to let the updated instance launch and do its work. It will then quit
 // once it's done.
-if (!handlingSquirrelEvent) {
+if (!handlingInstallEvent) {
   const gotSingleInstanceLock = app.requestSingleInstanceLock()
   isDuplicateInstance = !gotSingleInstanceLock
 
@@ -192,7 +220,9 @@ if (!handlingSquirrelEvent) {
       mainWindow.focus()
     }
 
-    handleCommandLineArguments(args)
+    if (!nativeKernelMode) {
+      handleCommandLineArguments(args)
+    }
   })
 
   if (isDuplicateInstance) {
@@ -208,7 +238,9 @@ app.on('will-finish-launching', () => {
   // macOS only
   app.on('open-url', (event, url) => {
     event.preventDefault()
-    handleAppURL(url)
+    if (!nativeKernelMode) {
+      handleAppURL(url)
+    }
   })
 })
 
@@ -216,6 +248,9 @@ if (__DARWIN__) {
   app.on('open-file', async (event, path) => {
     event.preventDefault()
 
+    if (nativeKernelMode) {
+      return
+    }
     log.info(`[main] a path to ${path} was triggered`)
 
     Fs.stat(path, (err, stats) => {
@@ -336,13 +371,17 @@ if (process.env.GITHUB_DESKTOP_DISABLE_HARDWARE_ACCELERATION) {
 }
 
 app.on('ready', () => {
-  if (isDuplicateInstance || handlingSquirrelEvent) {
+  if (isDuplicateInstance || handlingInstallEvent) {
     return
   }
 
   readyTime = now() - launchTime
 
-  possibleProtocols.forEach(protocol => setAsDefaultProtocolClient(protocol))
+  // The sole visible MyGo presenter will own protocol registration in native
+  // mode; the kernel must not redirect its links to the internal host executable.
+  if (!nativeKernelMode) {
+    possibleProtocols.forEach(protocol => setAsDefaultProtocolClient(protocol))
+  }
 
   createWindow()
 
@@ -464,13 +503,16 @@ app.on('ready', () => {
    * is executed (ie clicked).
    */
   ipcMain.on('execute-menu-item-by-id', (event, id) => {
+    if (event.sender !== mainWindow?.webContents) {
+      return
+    }
     const currentMenu = Menu.getApplicationMenu()
 
     if (currentMenu === null) {
       return
     }
 
-    const menuItem = currentMenu.getMenuItemById(id)
+    const menuItem = executableMenuItem(currentMenu, id)
     if (menuItem) {
       const window = BrowserWindow.fromWebContents(event.sender) || undefined
       const fakeEvent = { preventDefault: () => {}, sender: event.sender }
@@ -542,13 +584,20 @@ app.on('ready', () => {
     clipboard.writeText(text)
   )
 
-  ipcMain.handle('check-for-updates', async (_, url) =>
-    mainWindow?.checkForUpdates(url)
-  )
+  ipcMain.handle('check-for-updates', async (_, url) => {
+    if (nativeKernelMode) {
+      throw new Error(
+        'Gitowl updates require its own MyGo installer feed; Electron Squirrel updates are not compatible.'
+      )
+    }
+    return mainWindow?.checkForUpdates(url)
+  })
 
-  ipcMain.on('quit-and-install-updates', () =>
-    mainWindow?.quitAndInstallUpdate()
-  )
+  ipcMain.on('quit-and-install-updates', () => {
+    if (!nativeKernelMode) {
+      mainWindow?.quitAndInstallUpdate()
+    }
+  })
 
   ipcMain.on('quit-app', () => app.quit())
 
@@ -807,9 +856,10 @@ app.on(
 )
 
 function createWindow() {
-  const window = new AppWindow()
+  const window = new AppWindow(nativeTransport)
+  nativeTransport?.attach(window.webContents)
 
-  if (__DEV__) {
+  if (__DEV__ && !nativeKernelMode) {
     const {
       default: installExtension,
       REACT_DEVELOPER_TOOLS,

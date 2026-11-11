@@ -3,7 +3,7 @@ import { GitError } from 'dugite'
 import byline from 'byline'
 
 import { Repository } from '../../models/repository'
-import { RebaseInternalState, RebaseProgressOptions } from '../../models/rebase'
+import { RebaseProgressOptions } from '../../models/rebase'
 import { IMultiCommitOperationProgress } from '../../models/progress'
 import {
   WorkingDirectoryFileChange,
@@ -30,7 +30,8 @@ import { getCommitsBetweenCommits } from './rev-list'
 import { Branch } from '../../models/branch'
 import { join } from 'path'
 import { readFile } from 'fs/promises'
-import { pathExists } from '../path-exists'
+import { isRebaseHeadSet } from './operation-state'
+export { getRebaseInternalState } from './operation-state'
 
 /** The app-specific results from attempting to rebase a repository */
 export enum RebaseResult {
@@ -66,74 +67,6 @@ export enum RebaseResult {
    * Check the logs to find the relevant Git details.
    */
   Error = 'Error',
-}
-
-/**
- * Check the `.git/REBASE_HEAD` file exists in a repository to confirm
- * a rebase operation is underway.
- */
-function isRebaseHeadSet(repository: Repository) {
-  const path = join(repository.resolvedGitDir, 'REBASE_HEAD')
-  return pathExists(path)
-}
-
-/**
- * Get the internal state about the rebase being performed on a repository. This
- * information is required to help Desktop display information to the user
- * about the current action as well as the options available.
- *
- * Returns `null` if no rebase is detected, or if the expected information
- * cannot be found in the repository.
- */
-export async function getRebaseInternalState(
-  repository: Repository
-): Promise<RebaseInternalState | null> {
-  const isRebase = await isRebaseHeadSet(repository)
-
-  if (!isRebase) {
-    return null
-  }
-
-  let originalBranchTip: string | null = null
-  let targetBranch: string | null = null
-  let baseBranchTip: string | null = null
-
-  try {
-    originalBranchTip = await readFile(
-      join(repository.resolvedGitDir, 'rebase-merge', 'orig-head'),
-      'utf8'
-    )
-
-    originalBranchTip = originalBranchTip.trim()
-
-    targetBranch = await readFile(
-      join(repository.resolvedGitDir, 'rebase-merge', 'head-name'),
-      'utf8'
-    )
-
-    if (targetBranch.startsWith('refs/heads/')) {
-      targetBranch = targetBranch.substring(11).trim()
-    }
-
-    baseBranchTip = await readFile(
-      join(repository.resolvedGitDir, 'rebase-merge', 'onto'),
-      'utf8'
-    )
-
-    baseBranchTip = baseBranchTip.trim()
-  } catch {}
-
-  if (
-    originalBranchTip != null &&
-    targetBranch != null &&
-    baseBranchTip != null
-  ) {
-    return { originalBranchTip, targetBranch, baseBranchTip }
-  }
-
-  // unable to resolve the rebase state of this repository
-
-  return null
 }
 
 /**

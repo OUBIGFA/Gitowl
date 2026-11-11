@@ -1,0 +1,1585 @@
+{
+  "aux.chooseTestAccount": {
+    "en": "Select account",
+    "zh-Hans": "选择账户",
+    "zh-Hant": "選擇帳戶"
+  },
+  "aux.ConfirmAccountSignOut.title": {
+    "en": "Sign out of this account?",
+    "zh-Hans": "退出此账户？",
+    "zh-Hant": "登出此帳戶？"
+  },
+  "aux.ConfirmAccountSignOut.description": {
+    "en": "Keep repository assignments to reuse this account next time, or clear them to choose an account again.",
+    "zh-Hans": "保留仓库分配以便下次继续使用此账户，或清除分配以重新选择账户。",
+    "zh-Hant": "保留儲存庫指派以便下次繼續使用此帳戶，或清除指派以重新選擇帳戶。"
+  },
+  "aux.InstallGit.title": {
+    "en": "Unable to locate Git",
+    "zh-Hans": "找不到 Git",
+    "zh-Hant": "找不到 Git"
+  },
+  "aux.InstallGit.description": {
+    "en": "Git is required to execute Git commands in your terminal. Install and configure Git, or open the terminal without it.",
+    "zh-Hans": "终端需要 Git 才能执行 Git 命令。请安装并配置 Git，或在没有 Git 的情况下打开终端。",
+    "zh-Hant": "終端機需要 Git 才能執行 Git 命令。請安裝並設定 Git，或在沒有 Git 的情況下開啟終端機。"
+  },
+  "aux.About.title": {
+    "en": "About",
+    "zh-Hans": "关于",
+    "zh-Hant": "關於"
+  },
+  "aux.About.description": {
+    "en": "Application information, updates, terms and open source notices.",
+    "zh-Hans": "应用信息、更新、条款和开源声明。",
+    "zh-Hant": "應用程式資訊、更新、條款和開源聲明。"
+  },
+  "aux.Acknowledgements.title": {
+    "en": "License and Open Source Notices",
+    "zh-Hans": "许可证和开源声明",
+    "zh-Hant": "授權條款和開源聲明"
+  },
+  "aux.Acknowledgements.description": {
+    "en": "GitHub Desktop is an open source project under the MIT License and also distributes the libraries listed below.",
+    "zh-Hans": "GitHub Desktop 是采用 MIT 许可证的开源项目，并分发以下库。",
+    "zh-Hant": "GitHub Desktop 是採用 MIT 授權條款的開源專案，並散布以下程式庫。"
+  },
+  "aux.UntrustedCertificate.title": {
+    "en": "Untrusted server",
+    "zh-Hans": "不受信任的服务器",
+    "zh-Hant": "不受信任的伺服器"
+  },
+  "aux.UntrustedCertificate.description": {
+    "en": "The server identity cannot be verified. This certificate is invalid or untrusted. Attackers may be trying to steal your data. If unsure, cancel and contact your system administrator.",
+    "zh-Hans": "无法验证服务器身份。证书无效或不受信任，攻击者可能正在窃取您的数据。如果不确定，请取消并联系系统管理员。",
+    "zh-Hant": "無法驗證伺服器身分。憑證無效或不受信任，攻擊者可能正在竊取您的資料。如果不確定，請取消並聯絡系統管理員。"
+  },
+  "aux.TermsAndConditions.title": {
+    "en": "GitHub Open Source Applications Terms and Conditions",
+    "zh-Hans": "GitHub 开源应用条款和条件",
+    "zh-Hant": "GitHub 開源應用程式條款與條件"
+  },
+  "aux.TermsAndConditions.description": {
+    "en": "Original legal terms are shown below.",
+    "zh-Hans": "以下为原始法律条款。",
+    "zh-Hant": "以下為原始法律條款。"
+  },
+  "aux.CLIInstalled.title": {
+    "en": "Command line tool installed",
+    "zh-Hans": "命令行工具已安装",
+    "zh-Hant": "命令列工具已安裝"
+  },
+  "aux.CLIInstalled.description": {
+    "en": "The command line tool has been installed at the following location.",
+    "zh-Hans": "命令行工具已安装到以下位置。",
+    "zh-Hant": "命令列工具已安裝到以下位置。"
+  },
+  "aux.ExternalEditorFailed.title": {
+    "en": "Unable to open external editor",
+    "zh-Hans": "无法打开外部编辑器",
+    "zh-Hant": "無法開啟外部編輯器"
+  },
+  "aux.ExternalEditorFailed.description": {
+    "en": "The external editor could not be launched.",
+    "zh-Hans": "无法启动外部编辑器。",
+    "zh-Hant": "無法啟動外部編輯器。"
+  },
+  "aux.CopilotAppNotFound.title": {
+    "en": "GitHub Copilot",
+    "zh-Hans": "GitHub Copilot",
+    "zh-Hant": "GitHub Copilot"
+  },
+  "aux.CopilotAppNotFound.description": {
+    "en": "Could not find the GitHub Copilot App. Download it or configure its location in Preferences.",
+    "zh-Hans": "找不到 GitHub Copilot 应用。请下载该应用，或在偏好设置中配置其位置。",
+    "zh-Hant": "找不到 GitHub Copilot 應用程式。請下載該應用程式，或在偏好設定中設定其位置。"
+  },
+  "aux.OpenWithExternalEditor.title": {
+    "en": "Open with…",
+    "zh-Hans": "打开方式…",
+    "zh-Hant": "開啟方式…"
+  },
+  "aux.OpenWithExternalEditor.description": {
+    "en": "Select an installed editor or configure a custom editor.",
+    "zh-Hans": "选择已安装的编辑器，或配置自定义编辑器。",
+    "zh-Hant": "選擇已安裝的編輯器，或設定自訂編輯器。"
+  },
+  "aux.OpenShellFailed.title": {
+    "en": "Unable to open shell",
+    "zh-Hans": "无法打开终端",
+    "zh-Hant": "無法開啟終端機"
+  },
+  "aux.OpenShellFailed.description": {
+    "en": "The configured shell could not be launched.",
+    "zh-Hans": "无法启动配置的终端。",
+    "zh-Hant": "無法啟動設定的終端機。"
+  },
+  "aux.InitializeLFS.title": {
+    "en": "Initialize Git LFS",
+    "zh-Hans": "初始化 Git LFS",
+    "zh-Hant": "初始化 Git LFS"
+  },
+  "aux.InitializeLFS.description": {
+    "en": "These repositories use Git LFS. To contribute, Git LFS must first be initialized. Initialize it now?",
+    "zh-Hans": "这些仓库使用 Git LFS。贡献前必须先初始化 Git LFS。现在初始化吗？",
+    "zh-Hant": "這些儲存庫使用 Git LFS。貢獻前必須先初始化 Git LFS。現在初始化嗎？"
+  },
+  "aux.LFSAttributeMismatch.title": {
+    "en": "Update existing Git LFS filters?",
+    "zh-Hans": "更新现有 Git LFS 过滤器？",
+    "zh-Hant": "更新現有 Git LFS 篩選器？"
+  },
+  "aux.LFSAttributeMismatch.description": {
+    "en": "Git LFS filters in your global Git config do not match the expected values. Update them now?",
+    "zh-Hans": "全局 Git 配置中的 Git LFS 过滤器与预期值不符。现在更新吗？",
+    "zh-Hant": "全域 Git 設定中的 Git LFS 篩選器與預期值不符。現在更新嗎？"
+  },
+  "aux.ReleaseNotes.title": {
+    "en": "Release notes",
+    "zh-Hans": "发行说明",
+    "zh-Hant": "版本說明"
+  },
+  "aux.ReleaseNotes.description": {
+    "en": "Changes in this release.",
+    "zh-Hans": "此版本的改动。",
+    "zh-Hant": "此版本的變更。"
+  },
+  "aux.DeletePullRequest.title": {
+    "en": "Delete branch",
+    "zh-Hans": "删除分支",
+    "zh-Hant": "刪除分支"
+  },
+  "aux.DeletePullRequest.description": {
+    "en": "This branch may have an open pull request. If it has been merged, you can also delete the remote branch on GitHub.",
+    "zh-Hans": "此分支可能关联尚未合并的拉取请求。如果已合并，也可以前往 GitHub 删除远程分支。",
+    "zh-Hant": "此分支可能關聯尚未合併的提取要求。如果已合併，也可以前往 GitHub 刪除遠端分支。"
+  },
+  "aux.PushRejectedDueToMissingWorkflowScope.title": {
+    "en": "Push rejected",
+    "zh-Hans": "推送被拒绝",
+    "zh-Hant": "推送遭拒"
+  },
+  "aux.PushRejectedDueToMissingWorkflowScope.description": {
+    "en": "The push changes a workflow file. Additional permissions are required. Continue in your browser to grant permission to update workflow files?",
+    "zh-Hans": "推送修改了工作流文件，需要额外权限。是否在浏览器中继续，授予更新工作流文件的权限？",
+    "zh-Hant": "推送修改了工作流程檔案，需要額外權限。是否在瀏覽器中繼續，授予更新工作流程檔案的權限？"
+  },
+  "aux.SAMLReauthRequired.title": {
+    "en": "Re-authorization required",
+    "zh-Hans": "需要重新授权",
+    "zh-Hant": "需要重新授權"
+  },
+  "aux.SAMLReauthRequired.description": {
+    "en": "This organization enforces SAML SSO. Sign in again and grant permission to access its repositories?",
+    "zh-Hans": "此组织实施 SAML SSO。是否重新登录并授予访问其仓库的权限？",
+    "zh-Hant": "此組織實施 SAML SSO。是否重新登入並授予存取其儲存庫的權限？"
+  },
+  "aux.MoveToApplicationsFolder.title": {
+    "en": "Move to the Applications folder?",
+    "zh-Hans": "移至“应用程序”文件夹？",
+    "zh-Hant": "移至「應用程式」資料夾？"
+  },
+  "aux.MoveToApplicationsFolder.description": {
+    "en": "Running outside the Applications folder can cause problems, including signing in. Moving the application will restart it.",
+    "zh-Hans": "从“应用程序”文件夹以外的位置运行可能导致问题，包括无法登录。移动应用会将其重启。",
+    "zh-Hant": "從「應用程式」資料夾以外的位置執行可能導致問題，包括無法登入。移動應用程式會將其重新啟動。"
+  },
+  "aux.ThankYou.title": {
+    "en": "Thank you!",
+    "zh-Hans": "谢谢！",
+    "zh-Hant": "謝謝！"
+  },
+  "aux.ThankYou.description": {
+    "en": "Thank you for your contributions and for making the application better for everyone.",
+    "zh-Hans": "感谢您的贡献，让应用更好地服务所有人。",
+    "zh-Hant": "感謝您的貢獻，讓應用程式更好地服務所有人。"
+  },
+  "aux.InvalidatedToken.title": {
+    "en": "Invalidated account token",
+    "zh-Hans": "账户令牌已失效",
+    "zh-Hant": "帳戶權杖已失效"
+  },
+  "aux.InvalidatedToken.description": {
+    "en": "Your account token is no longer valid and you have been signed out. Sign in to this account again?",
+    "zh-Hans": "账户令牌已失效，您已退出登录。是否重新登录此账户？",
+    "zh-Hant": "帳戶權杖已失效，您已登出。是否重新登入此帳戶？"
+  },
+  "aux.PullRequestChecksFailed.title": {
+    "en": "Pull request checks failed",
+    "zh-Hans": "拉取请求检查失败",
+    "zh-Hant": "提取要求檢查失敗"
+  },
+  "aux.PullRequestChecksFailed.description": {
+    "en": "Review the failed checks and steps. Switch to the pull request to start fixing them.",
+    "zh-Hans": "查看失败的检查及步骤。切换到拉取请求以开始修复。",
+    "zh-Hant": "查看失敗的檢查及步驟。切換到提取要求以開始修復。"
+  },
+  "aux.CICheckRunRerun.title": {
+    "en": "Re-run checks",
+    "zh-Hans": "重新运行检查",
+    "zh-Hant": "重新執行檢查"
+  },
+  "aux.CICheckRunRerun.description": {
+    "en": "New attempts include dependent jobs. Checks cannot be re-run if they are over a month old, unfinished, or not configured to be re-run.",
+    "zh-Hans": "新尝试会包含依赖任务。超过一个月、未完成或未配置为可重新运行的检查无法重新运行。",
+    "zh-Hant": "新嘗試會包含相依工作。超過一個月、未完成或未設定為可重新執行的檢查無法重新執行。"
+  },
+  "aux.PullRequestReview.title": {
+    "en": "Pull request review",
+    "zh-Hans": "拉取请求审查",
+    "zh-Hant": "提取要求審查"
+  },
+  "aux.PullRequestReview.description": {
+    "en": "Review activity on your pull request.",
+    "zh-Hans": "拉取请求的审查动态。",
+    "zh-Hant": "提取要求的審查動態。"
+  },
+  "aux.UnreachableCommits.title": {
+    "en": "Commit reachability",
+    "zh-Hans": "提交可达性",
+    "zh-Hant": "提交可達性"
+  },
+  "aux.UnreachableCommits.description": {
+    "en": "Only commits in the ancestry path of the most recent selected commit contribute changes to this diff.",
+    "zh-Hans": "仅所选最新提交的祖先路径中的提交会在此差异中贡献改动。",
+    "zh-Hant": "僅所選最新提交的祖先路徑中的提交會在此差異中貢獻變更。"
+  },
+  "aux.StartPullRequest.title": {
+    "en": "Preview pull request",
+    "zh-Hans": "预览拉取请求",
+    "zh-Hant": "預覽提取要求"
+  },
+  "aux.StartPullRequest.description": {
+    "en": "Compare your branch with a base branch before continuing on GitHub.",
+    "zh-Hans": "前往 GitHub 之前，将当前分支与基础分支比较。",
+    "zh-Hant": "前往 GitHub 之前，將目前分支與基底分支比較。"
+  },
+  "aux.InstallingUpdate.title": {
+    "en": "Installing update…",
+    "zh-Hans": "正在安装更新…",
+    "zh-Hant": "正在安裝更新…"
+  },
+  "aux.InstallingUpdate.description": {
+    "en": "Do not close the application while the update is in progress. Closing now may break your installation.",
+    "zh-Hans": "更新进行中请勿关闭应用。现在关闭可能损坏安装。",
+    "zh-Hant": "更新進行中請勿關閉應用程式。現在關閉可能損壞安裝。"
+  },
+  "aux.PullRequestComment.title": {
+    "en": "Pull request comment",
+    "zh-Hans": "拉取请求评论",
+    "zh-Hant": "提取要求留言"
+  },
+  "aux.PullRequestComment.description": {
+    "en": "Comment activity on your pull request.",
+    "zh-Hans": "拉取请求的评论动态。",
+    "zh-Hant": "提取要求的留言動態。"
+  },
+  "aux.PushProtectionError.title": {
+    "en": "Push blocked: secret detected",
+    "zh-Hans": "推送被阻止：检测到机密",
+    "zh-Hant": "推送遭封鎖：偵測到機密"
+  },
+  "aux.PushProtectionError.description": {
+    "en": "Secret Scanning found secrets in the commits you attempted to push. Exposing secrets allows others to identify them, access resources, act as their owner, or push them without blocking. Consider removing secrets from your commits and history.",
+    "zh-Hans": "机密扫描在尝试推送的提交中发现了机密。公开机密可能允许他人识别机密、访问资源、冒充所有者，或在不被阻止的情况下推送机密。请考虑从提交及历史中移除机密。",
+    "zh-Hant": "機密掃描在嘗試推送的提交中發現了機密。公開機密可能允許他人識別機密、存取資源、冒充擁有者，或在不被封鎖的情況下推送機密。請考慮從提交及歷程中移除機密。"
+  },
+  "aux.BypassPushProtection.title": {
+    "en": "Bypass push detection",
+    "zh-Hans": "绕过推送检测",
+    "zh-Hant": "略過推送偵測"
+  },
+  "aux.BypassPushProtection.description": {
+    "en": "Why are you bypassing this secret? Select an explicit reason. Allowing a real secret exposes it and may open a security alert and notify repository admins.",
+    "zh-Hans": "为何绕过此机密？请明确选择原因。允许公开真实机密可能触发安全警报并通知仓库管理员。",
+    "zh-Hant": "為何略過此機密？請明確選擇原因。允許公開真實機密可能觸發安全警示並通知儲存庫管理員。"
+  },
+  "aux.CommitProgress.title": {
+    "en": "Committing changes",
+    "zh-Hans": "正在提交改动",
+    "zh-Hant": "正在提交變更"
+  },
+  "aux.CommitProgress.description": {
+    "en": "Live output from the current commit operation. Closing this view does not abort the operation.",
+    "zh-Hans": "当前提交操作的实时输出。关闭此视图不会中止操作。",
+    "zh-Hant": "目前提交操作的即時輸出。關閉此檢視不會中止操作。"
+  },
+  "aux.linesAdded": {
+    "en": "Lines added",
+    "zh-Hans": "新增行数",
+    "zh-Hant": "新增行數"
+  },
+  "aux.linesDeleted": {
+    "en": "Lines deleted",
+    "zh-Hans": "删除行数",
+    "zh-Hant": "刪除行數"
+  },
+  "aux.addCertificate": {
+    "en": "Add certificate",
+    "zh-Hans": "添加证书",
+    "zh-Hant": "新增憑證"
+  },
+  "aux.ok": {
+    "en": "Ok",
+    "zh-Hans": "确定",
+    "zh-Hant": "確定"
+  },
+  "aux.yes": {
+    "en": "Yes",
+    "zh-Hans": "是",
+    "zh-Hant": "是"
+  },
+  "aux.no": {
+    "en": "No",
+    "zh-Hans": "否",
+    "zh-Hant": "否"
+  },
+  "aux.dismiss": {
+    "en": "Dismiss",
+    "zh-Hans": "关闭",
+    "zh-Hant": "關閉"
+  },
+  "aux.openContentLink": {
+    "en": "Open link",
+    "zh-Hans": "打开链接",
+    "zh-Hant": "開啟連結"
+  },
+  "aux.contentLink": {
+    "en": "Content links",
+    "zh-Hans": "内容链接",
+    "zh-Hant": "內容連結"
+  },
+  "aux.close": {
+    "en": "Close",
+    "zh-Hans": "关闭",
+    "zh-Hant": "關閉"
+  },
+  "aux.cancel": {
+    "en": "Cancel",
+    "zh-Hans": "取消",
+    "zh-Hant": "取消"
+  },
+  "aux.signOut": {
+    "en": "Sign out",
+    "zh-Hans": "退出登录",
+    "zh-Hant": "登出"
+  },
+  "aux.installGit": {
+    "en": "Install Git",
+    "zh-Hans": "安装 Git",
+    "zh-Hant": "安裝 Git"
+  },
+  "aux.openWithoutGit": {
+    "en": "Open without Git",
+    "zh-Hans": "不使用 Git 打开",
+    "zh-Hant": "不使用 Git 開啟"
+  },
+  "aux.login": {
+    "en": "Account",
+    "zh-Hans": "账户",
+    "zh-Hant": "帳戶"
+  },
+  "aux.endpoint": {
+    "en": "Server",
+    "zh-Hans": "服务器",
+    "zh-Hant": "伺服器"
+  },
+  "aux.repositoryCount": {
+    "en": "Repository count",
+    "zh-Hans": "仓库数量",
+    "zh-Hant": "儲存庫數量"
+  },
+  "aux.clearAssignments": {
+    "en": "Clear repository account assignments",
+    "zh-Hans": "清除仓库账户分配",
+    "zh-Hant": "清除儲存庫帳戶指派"
+  },
+  "aux.path": {
+    "en": "Path",
+    "zh-Hans": "路径",
+    "zh-Hant": "路徑"
+  },
+  "aux.application": {
+    "en": "Application",
+    "zh-Hans": "应用",
+    "zh-Hant": "應用程式"
+  },
+  "aux.version": {
+    "en": "Version",
+    "zh-Hans": "版本",
+    "zh-Hant": "版本"
+  },
+  "aux.architecture": {
+    "en": "Architecture",
+    "zh-Hans": "架构",
+    "zh-Hant": "架構"
+  },
+  "aux.lastChecked": {
+    "en": "Last checked",
+    "zh-Hans": "上次检查",
+    "zh-Hant": "上次檢查"
+  },
+  "aux.releaseNotes": {
+    "en": "View all release notes",
+    "zh-Hans": "查看全部发行说明",
+    "zh-Hant": "查看全部版本說明"
+  },
+  "aux.terms": {
+    "en": "Terms and Conditions",
+    "zh-Hans": "条款和条件",
+    "zh-Hant": "條款與條件"
+  },
+  "aux.acknowledgements": {
+    "en": "License and Open Source Notices",
+    "zh-Hans": "许可证和开源声明",
+    "zh-Hant": "授權條款和開源聲明"
+  },
+  "aux.copilotTransparency": {
+    "en": "Responsible use of Copilot",
+    "zh-Hans": "负责任地使用 Copilot",
+    "zh-Hant": "負責任地使用 Copilot"
+  },
+  "aux.betaChannel": {
+    "en": "Beta Channel",
+    "zh-Hans": "Beta 通道",
+    "zh-Hant": "Beta 通道"
+  },
+  "aux.quitAndInstall": {
+    "en": "Quit and Install Update",
+    "zh-Hans": "退出并安装更新",
+    "zh-Hant": "結束並安裝更新"
+  },
+  "aux.checkUpdates": {
+    "en": "Check for Updates",
+    "zh-Hans": "检查更新",
+    "zh-Hant": "檢查更新"
+  },
+  "aux.supportedOS": {
+    "en": "Supported operating systems",
+    "zh-Hans": "支持的操作系统",
+    "zh-Hant": "支援的作業系統"
+  },
+  "aux.loading": {
+    "en": "Loading…",
+    "zh-Hans": "正在加载…",
+    "zh-Hant": "正在載入…"
+  },
+  "aux.license": {
+    "en": "License",
+    "zh-Hans": "许可证",
+    "zh-Hant": "授權條款"
+  },
+  "aux.licenseRepository": {
+    "en": "Package source",
+    "zh-Hans": "软件包源码",
+    "zh-Hant": "套件原始碼"
+  },
+  "aux.website": {
+    "en": "Website",
+    "zh-Hans": "网站",
+    "zh-Hant": "網站"
+  },
+  "aux.source": {
+    "en": "Source code",
+    "zh-Hans": "源码",
+    "zh-Hant": "原始碼"
+  },
+  "aux.host": {
+    "en": "Host",
+    "zh-Hans": "主机",
+    "zh-Hant": "主機"
+  },
+  "aux.certificate": {
+    "en": "Certificate",
+    "zh-Hans": "证书",
+    "zh-Hant": "憑證"
+  },
+  "aux.viewCertificate": {
+    "en": "View Certificate",
+    "zh-Hans": "查看证书",
+    "zh-Hant": "檢視憑證"
+  },
+  "aux.legalTerms": {
+    "en": "Original legal terms",
+    "zh-Hans": "原始法律条款",
+    "zh-Hant": "原始法律條款"
+  },
+  "aux.contact": {
+    "en": "Contact",
+    "zh-Hans": "联系",
+    "zh-Hant": "聯絡"
+  },
+  "aux.logos": {
+    "en": "Logos and Usage Policy",
+    "zh-Hans": "标志和使用政策",
+    "zh-Hant": "標誌與使用政策"
+  },
+  "aux.privacy": {
+    "en": "Privacy Statement",
+    "zh-Hans": "隐私声明",
+    "zh-Hant": "隱私權聲明"
+  },
+  "aux.creativeCommons": {
+    "en": "Creative Commons Attribution license",
+    "zh-Hans": "知识共享署名许可",
+    "zh-Hant": "創用 CC 姓名標示授權"
+  },
+  "aux.diagnostic": {
+    "en": "Diagnostic message",
+    "zh-Hans": "诊断信息",
+    "zh-Hant": "診斷訊息"
+  },
+  "aux.editorName": {
+    "en": "Editor",
+    "zh-Hans": "编辑器",
+    "zh-Hant": "編輯器"
+  },
+  "aux.preferences": {
+    "en": "Open Preferences / options",
+    "zh-Hans": "打开偏好设置／选项",
+    "zh-Hant": "開啟偏好設定／選項"
+  },
+  "aux.downloadEditor": {
+    "en": "Download editor",
+    "zh-Hans": "下载编辑器",
+    "zh-Hant": "下載編輯器"
+  },
+  "aux.downloadCopilot": {
+    "en": "Download GitHub Copilot",
+    "zh-Hans": "下载 GitHub Copilot",
+    "zh-Hant": "下載 GitHub Copilot"
+  },
+  "aux.editor": {
+    "en": "Select an editor",
+    "zh-Hans": "选择编辑器",
+    "zh-Hant": "選擇編輯器"
+  },
+  "aux.customEditor": {
+    "en": "Configure custom editor…",
+    "zh-Hans": "配置自定义编辑器…",
+    "zh-Hant": "設定自訂編輯器…"
+  },
+  "aux.customPath": {
+    "en": "Custom editor path",
+    "zh-Hans": "自定义编辑器路径",
+    "zh-Hant": "自訂編輯器路徑"
+  },
+  "aux.customArguments": {
+    "en": "Arguments",
+    "zh-Hans": "参数",
+    "zh-Hant": "引數"
+  },
+  "aux.openEditor": {
+    "en": "Open",
+    "zh-Hans": "打开",
+    "zh-Hant": "開啟"
+  },
+  "aux.repositories": {
+    "en": "Repositories",
+    "zh-Hans": "仓库",
+    "zh-Hant": "儲存庫"
+  },
+  "aux.lfsWebsite": {
+    "en": "Git LFS website",
+    "zh-Hans": "Git LFS 网站",
+    "zh-Hant": "Git LFS 網站"
+  },
+  "aux.initializeLFS": {
+    "en": "Initialize Git LFS",
+    "zh-Hans": "初始化 Git LFS",
+    "zh-Hant": "初始化 Git LFS"
+  },
+  "aux.updateFilters": {
+    "en": "Update existing filters",
+    "zh-Hans": "更新现有过滤器",
+    "zh-Hant": "更新現有篩選器"
+  },
+  "aux.editGlobalGitConfig": {
+    "en": "Edit global Git config",
+    "zh-Hans": "编辑全局 Git 配置",
+    "zh-Hant": "編輯全域 Git 設定"
+  },
+  "aux.published": {
+    "en": "Published",
+    "zh-Hans": "发布日期",
+    "zh-Hant": "發佈日期"
+  },
+  "aux.pretext": {
+    "en": "Release summary",
+    "zh-Hans": "版本摘要",
+    "zh-Hant": "版本摘要"
+  },
+  "aux.enhancements": {
+    "en": "Enhancements",
+    "zh-Hans": "改进",
+    "zh-Hant": "改進"
+  },
+  "aux.bugfixes": {
+    "en": "Bugfixes",
+    "zh-Hans": "问题修复",
+    "zh-Hant": "問題修正"
+  },
+  "aux.other": {
+    "en": "Other",
+    "zh-Hans": "其他",
+    "zh-Hant": "其他"
+  },
+  "aux.installAndRestart": {
+    "en": "Install and restart",
+    "zh-Hans": "安装并重启",
+    "zh-Hant": "安裝並重新啟動"
+  },
+  "aux.branch": {
+    "en": "Branch",
+    "zh-Hans": "分支",
+    "zh-Hant": "分支"
+  },
+  "aux.pullRequest": {
+    "en": "Pull request",
+    "zh-Hans": "拉取请求",
+    "zh-Hant": "提取要求"
+  },
+  "aux.deleteBranch": {
+    "en": "Delete",
+    "zh-Hans": "删除",
+    "zh-Hant": "刪除"
+  },
+  "aux.viewPullRequest": {
+    "en": "View pull request",
+    "zh-Hans": "查看拉取请求",
+    "zh-Hant": "檢視提取要求"
+  },
+  "aux.rejectedPath": {
+    "en": "Workflow file",
+    "zh-Hans": "工作流文件",
+    "zh-Hant": "工作流程檔案"
+  },
+  "aux.reauthorize": {
+    "en": "Continue in browser",
+    "zh-Hans": "在浏览器中继续",
+    "zh-Hant": "在瀏覽器中繼續"
+  },
+  "aux.organization": {
+    "en": "Organization",
+    "zh-Hans": "组织",
+    "zh-Hant": "組織"
+  },
+  "aux.doNotAskAgain": {
+    "en": "Do not show this message again",
+    "zh-Hans": "不再显示此消息",
+    "zh-Hant": "不要再顯示此訊息"
+  },
+  "aux.notNow": {
+    "en": "Not now",
+    "zh-Hans": "暂不执行",
+    "zh-Hant": "暫不執行"
+  },
+  "aux.moveAndRestart": {
+    "en": "Move and Restart",
+    "zh-Hans": "移动并重启",
+    "zh-Hant": "移動並重新啟動"
+  },
+  "aux.friendlyName": {
+    "en": "Contributor",
+    "zh-Hans": "贡献者",
+    "zh-Hant": "貢獻者"
+  },
+  "aux.contributions": {
+    "en": "You contributed",
+    "zh-Hans": "您的贡献",
+    "zh-Hant": "您的貢獻"
+  },
+  "aux.signIn": {
+    "en": "Yes, sign in again",
+    "zh-Hans": "是，重新登录",
+    "zh-Hant": "是，重新登入"
+  },
+  "aux.check": {
+    "en": "Check run",
+    "zh-Hans": "检查运行",
+    "zh-Hant": "檢查執行"
+  },
+  "aux.steps": {
+    "en": "Job steps",
+    "zh-Hans": "任务步骤",
+    "zh-Hant": "工作步驟"
+  },
+  "aux.step": {
+    "en": "Step",
+    "zh-Hans": "步骤",
+    "zh-Hant": "步驟"
+  },
+  "aux.viewStep": {
+    "en": "View step on GitHub",
+    "zh-Hans": "在 GitHub 查看步骤",
+    "zh-Hant": "在 GitHub 檢視步驟"
+  },
+  "aux.switchPullRequest": {
+    "en": "Switch to pull request",
+    "zh-Hans": "切换到拉取请求",
+    "zh-Hant": "切換到提取要求"
+  },
+  "aux.switchRepositoryPullRequest": {
+    "en": "Switch to repository and pull request",
+    "zh-Hans": "切换到仓库和拉取请求",
+    "zh-Hant": "切換到儲存庫和提取要求"
+  },
+  "aux.selectCheck": {
+    "en": "Select check",
+    "zh-Hans": "选择检查",
+    "zh-Hant": "選擇檢查"
+  },
+  "aux.viewCheck": {
+    "en": "View check on GitHub",
+    "zh-Hans": "在 GitHub 查看检查",
+    "zh-Hant": "在 GitHub 檢視檢查"
+  },
+  "aux.rerunAll": {
+    "en": "Re-run all checks",
+    "zh-Hans": "重新运行全部检查",
+    "zh-Hant": "重新執行全部檢查"
+  },
+  "aux.rerunFailed": {
+    "en": "Re-run failed checks",
+    "zh-Hans": "重新运行失败的检查",
+    "zh-Hant": "重新執行失敗的檢查"
+  },
+  "aux.rerunSelected": {
+    "en": "Re-run selected check",
+    "zh-Hans": "重新运行所选检查",
+    "zh-Hant": "重新執行所選檢查"
+  },
+  "aux.rerunnable": {
+    "en": "Checks that can be re-run",
+    "zh-Hans": "可重新运行的检查",
+    "zh-Hant": "可重新執行的檢查"
+  },
+  "aux.nonRerunnable": {
+    "en": "Checks that cannot be re-run",
+    "zh-Hans": "无法重新运行的检查",
+    "zh-Hant": "無法重新執行的檢查"
+  },
+  "aux.rerun": {
+    "en": "Re-run checks",
+    "zh-Hans": "重新运行检查",
+    "zh-Hant": "重新執行檢查"
+  },
+  "aux.author": {
+    "en": "Author",
+    "zh-Hans": "作者",
+    "zh-Hant": "作者"
+  },
+  "aux.body": {
+    "en": "Comment",
+    "zh-Hans": "评论",
+    "zh-Hant": "留言"
+  },
+  "aux.eventDate": {
+    "en": "Date",
+    "zh-Hans": "日期",
+    "zh-Hant": "日期"
+  },
+  "aux.reviewState": {
+    "en": "Review state",
+    "zh-Hans": "审查状态",
+    "zh-Hant": "審查狀態"
+  },
+  "aux.viewNotification": {
+    "en": "Open in browser",
+    "zh-Hans": "在浏览器中打开",
+    "zh-Hant": "在瀏覽器中開啟"
+  },
+  "aux.viewAuthor": {
+    "en": "View author",
+    "zh-Hans": "查看作者",
+    "zh-Hant": "檢視作者"
+  },
+  "aux.tab": {
+    "en": "Reachability",
+    "zh-Hans": "可达性",
+    "zh-Hant": "可達性"
+  },
+  "aux.unreachable": {
+    "en": "Unreachable",
+    "zh-Hans": "不可达",
+    "zh-Hant": "無法到達"
+  },
+  "aux.reachable": {
+    "en": "Reachable",
+    "zh-Hans": "可达",
+    "zh-Hant": "可到達"
+  },
+  "aux.commits": {
+    "en": "Commits",
+    "zh-Hans": "提交",
+    "zh-Hant": "提交"
+  },
+  "aux.selectTab": {
+    "en": "Select tab",
+    "zh-Hans": "切换选项卡",
+    "zh-Hant": "切換分頁"
+  },
+  "aux.unreachableHelp": {
+    "en": "Learn more about unreachable commits",
+    "zh-Hans": "了解不可达提交",
+    "zh-Hant": "瞭解無法到達的提交"
+  },
+  "aux.baseBranch": {
+    "en": "Base branch",
+    "zh-Hans": "基础分支",
+    "zh-Hant": "基底分支"
+  },
+  "aux.recentBases": {
+    "en": "Recent base branches",
+    "zh-Hans": "最近的基础分支",
+    "zh-Hant": "最近的基底分支"
+  },
+  "aux.defaultBranch": {
+    "en": "Default branch",
+    "zh-Hans": "默认分支",
+    "zh-Hant": "預設分支"
+  },
+  "aux.commitCount": {
+    "en": "Commit count",
+    "zh-Hans": "提交数量",
+    "zh-Hant": "提交數量"
+  },
+  "aux.noDefaultBranch": {
+    "en": "Could not find a default branch. Select a base branch above.",
+    "zh-Hans": "找不到默认分支。请在上方选择基础分支。",
+    "zh-Hant": "找不到預設分支。請在上方選擇基底分支。"
+  },
+  "aux.unrelatedHistories": {
+    "en": "There are no changes: these branches have entirely different histories.",
+    "zh-Hans": "没有可比较的改动：这些分支的历史完全不同。",
+    "zh-Hant": "沒有可比較的變更：這些分支的歷程完全不同。"
+  },
+  "aux.noChanges": {
+    "en": "There are no changes: the base branch is up to date with all commits.",
+    "zh-Hans": "没有改动：基础分支已包含所有提交。",
+    "zh-Hant": "沒有變更：基底分支已包含所有提交。"
+  },
+  "aux.allCommits": {
+    "en": "Showing changes from all commits",
+    "zh-Hans": "显示所有提交的改动",
+    "zh-Hant": "顯示所有提交的變更"
+  },
+  "aux.file": {
+    "en": "File",
+    "zh-Hans": "文件",
+    "zh-Hant": "檔案"
+  },
+  "aux.hideWhitespace": {
+    "en": "Hide whitespace changes",
+    "zh-Hans": "隐藏空白改动",
+    "zh-Hant": "隱藏空白變更"
+  },
+  "aux.sideBySide": {
+    "en": "Show side-by-side diff",
+    "zh-Hans": "并排显示差异",
+    "zh-Hant": "並排顯示差異"
+  },
+  "aux.imageDiffType": {
+    "en": "Image diff mode",
+    "zh-Hans": "图像差异模式",
+    "zh-Hant": "影像差異模式"
+  },
+  "aux.diff": {
+    "en": "Diff",
+    "zh-Hans": "差异",
+    "zh-Hant": "差異"
+  },
+  "aux.diffKind": {
+    "en": "Diff type",
+    "zh-Hans": "差异类型",
+    "zh-Hant": "差異類型"
+  },
+  "aux.previousImage": {
+    "en": "Previous image",
+    "zh-Hans": "原图像",
+    "zh-Hant": "原影像"
+  },
+  "aux.currentImage": {
+    "en": "Current image",
+    "zh-Hans": "新图像",
+    "zh-Hant": "新影像"
+  },
+  "aux.submodulePath": {
+    "en": "Submodule",
+    "zh-Hans": "子模块",
+    "zh-Hant": "子模組"
+  },
+  "aux.submoduleStatus": {
+    "en": "Submodule status",
+    "zh-Hans": "子模块状态",
+    "zh-Hant": "子模組狀態"
+  },
+  "aux.oldSHA": {
+    "en": "Previous commit",
+    "zh-Hans": "原提交",
+    "zh-Hant": "原提交"
+  },
+  "aux.newSHA": {
+    "en": "Current commit",
+    "zh-Hans": "新提交",
+    "zh-Hant": "新提交"
+  },
+  "aux.createPullRequest": {
+    "en": "Create pull request",
+    "zh-Hans": "创建拉取请求",
+    "zh-Hant": "建立提取要求"
+  },
+  "aux.changeBase": {
+    "en": "Change base branch",
+    "zh-Hans": "更改基础分支",
+    "zh-Hant": "變更基底分支"
+  },
+  "aux.selectFile": {
+    "en": "Select file",
+    "zh-Hans": "选择文件",
+    "zh-Hant": "選擇檔案"
+  },
+  "aux.diffOptions": {
+    "en": "Apply diff options",
+    "zh-Hans": "应用差异选项",
+    "zh-Hant": "套用差異選項"
+  },
+  "aux.openFileInEditor": {
+    "en": "Open file in external editor",
+    "zh-Hans": "在外部编辑器中打开文件",
+    "zh-Hant": "在外部編輯器中開啟檔案"
+  },
+  "aux.quitAnyway": {
+    "en": "Quit anyway",
+    "zh-Hans": "仍然退出",
+    "zh-Hant": "仍然結束"
+  },
+  "aux.secret": {
+    "en": "Detected secret",
+    "zh-Hans": "检测到的机密",
+    "zh-Hant": "偵測到的機密"
+  },
+  "aux.locations": {
+    "en": "Show more / fewer locations",
+    "zh-Hans": "显示更多／更少位置",
+    "zh-Hant": "顯示更多／更少位置"
+  },
+  "aux.bypass": {
+    "en": "Bypass",
+    "zh-Hans": "绕过",
+    "zh-Hant": "略過"
+  },
+  "aux.copySecretSHA": {
+    "en": "Copy full SHA",
+    "zh-Hans": "复制完整 SHA",
+    "zh-Hant": "複製完整 SHA"
+  },
+  "aux.secretScanningHelp": {
+    "en": "Secret Scanning",
+    "zh-Hans": "机密扫描",
+    "zh-Hant": "機密掃描"
+  },
+  "aux.remediation": {
+    "en": "Remove secrets from commits and history",
+    "zh-Hans": "从提交及历史中移除机密",
+    "zh-Hant": "從提交及歷程中移除機密"
+  },
+  "aux.secretDescription": {
+    "en": "Secret description",
+    "zh-Hans": "机密描述",
+    "zh-Hant": "機密描述"
+  },
+  "aux.reason": {
+    "en": "Why are you bypassing this secret?",
+    "zh-Hans": "为何绕过此机密？",
+    "zh-Hant": "為何略過此機密？"
+  },
+  "aux.reason.used_in_tests": {
+    "en": "It's used in tests — it poses no risk and cannot grant access to sensitive information.",
+    "zh-Hans": "仅用于测试：不构成风险，也无法用于访问敏感信息。",
+    "zh-Hant": "僅用於測試：不構成風險，也無法用於存取敏感資訊。"
+  },
+  "aux.reason.false_positive": {
+    "en": "It's a false positive — the detected string is not a secret.",
+    "zh-Hans": "误报：检测到的字符串并非机密。",
+    "zh-Hant": "誤報：偵測到的字串並非機密。"
+  },
+  "aux.reason.will_fix_later": {
+    "en": "I'll fix it later — it is real; I understand the risk and must revoke it. An alert will notify repository admins.",
+    "zh-Hans": "稍后修复：机密是真实的，我了解风险并必须撤销它。安全警报将通知仓库管理员。",
+    "zh-Hant": "稍後修復：機密是真實的，我瞭解風險並必須撤銷它。安全警示將通知儲存庫管理員。"
+  },
+  "aux.allowSecret": {
+    "en": "Allow me to expose this secret",
+    "zh-Hans": "允许我公开此机密",
+    "zh-Hant": "允許我公開此機密"
+  },
+  "aux.terminal": {
+    "en": "Commit output",
+    "zh-Hans": "提交输出",
+    "zh-Hant": "提交輸出"
+  },
+  "aux.merge.none": {
+    "en": "Merge status unavailable",
+    "zh-Hans": "合并状态不可用",
+    "zh-Hant": "合併狀態無法使用"
+  },
+  "aux.merge.loading": {
+    "en": "Checking mergeability… You can still create the pull request.",
+    "zh-Hans": "正在检查可合并性…您仍可创建拉取请求。",
+    "zh-Hant": "正在檢查可合併性…您仍可建立提取要求。"
+  },
+  "aux.merge.clean": {
+    "en": "Able to merge. These branches can be automatically merged.",
+    "zh-Hans": "可以合并。这些分支可以自动合并。",
+    "zh-Hant": "可以合併。這些分支可以自動合併。"
+  },
+  "aux.merge.conflicts": {
+    "en": "Cannot automatically merge. You can still create the pull request.",
+    "zh-Hans": "无法自动合并。您仍可创建拉取请求。",
+    "zh-Hant": "無法自動合併。您仍可建立提取要求。"
+  },
+  "aux.merge.invalid": {
+    "en": "Error checking merge status. Unable to merge unrelated histories.",
+    "zh-Hans": "检查合并状态出错。无法合并无关历史。",
+    "zh-Hant": "檢查合併狀態出錯。無法合併無關歷程。"
+  },
+  "aux.update.checking": {
+    "en": "Checking for updates…",
+    "zh-Hans": "正在检查更新…",
+    "zh-Hant": "正在檢查更新…"
+  },
+  "aux.update.downloading": {
+    "en": "Downloading update…",
+    "zh-Hans": "正在下载更新…",
+    "zh-Hant": "正在下載更新…"
+  },
+  "aux.update.latest": {
+    "en": "You have the latest version.",
+    "zh-Hans": "您使用的是最新版本。",
+    "zh-Hant": "您使用的是最新版本。"
+  },
+  "aux.update.ready": {
+    "en": "An update is ready to be installed.",
+    "zh-Hans": "更新已准备好安装。",
+    "zh-Hant": "更新已準備好安裝。"
+  },
+  "aux.update.notChecked": {
+    "en": "Updates have not been checked yet.",
+    "zh-Hans": "尚未检查更新。",
+    "zh-Hant": "尚未檢查更新。"
+  },
+  "aux.update.development": {
+    "en": "Running in development; updates are disabled.",
+    "zh-Hans": "开发模式运行中，不接收更新。",
+    "zh-Hant": "開發模式執行中，不接收更新。"
+  },
+  "aux.update.unsupportedOS": {
+    "en": "This operating system is no longer supported. Updates are disabled.",
+    "zh-Hans": "此操作系统已不再受支持，更新已禁用。",
+    "zh-Hant": "此作業系統已不再受支援，更新已停用。"
+  },
+  "aux.update.missingLastChecked": {
+    "en": "Could not determine when an update was last checked. Try a manual check or contact GitHub Support.",
+    "zh-Hans": "无法确定上次检查更新的时间。请手动检查或联系 GitHub 支持。",
+    "zh-Hant": "無法確定上次檢查更新的時間。請手動檢查或聯絡 GitHub 支援。"
+  },
+  "aux.publishBranch.title": {
+    "en": "Publish branch?",
+    "zh-Hans": "发布分支？",
+    "zh-Hant": "發佈分支？"
+  },
+  "aux.publishBranch.description": {
+    "en": "This branch must be published before opening a pull request. Publish it now and continue in your browser?",
+    "zh-Hans": "创建拉取请求前必须先发布此分支。现在发布并在浏览器中继续吗？",
+    "zh-Hant": "建立提取要求前必須先發佈此分支。現在發佈並在瀏覽器中繼續嗎？"
+  },
+  "aux.pushCommits.title": {
+    "en": "Push local changes?",
+    "zh-Hans": "推送本地改动？",
+    "zh-Hant": "推送本機變更？"
+  },
+  "aux.pushCommits.description": {
+    "en": "This branch has commits that have not been pushed. Push them before creating a pull request, or explicitly create without pushing.",
+    "zh-Hans": "此分支有尚未推送的提交。先推送再创建拉取请求，或明确选择不推送直接创建。",
+    "zh-Hant": "此分支有尚未推送的提交。先推送再建立提取要求，或明確選擇不推送直接建立。"
+  },
+  "aux.publishBranch": {
+    "en": "Publish branch",
+    "zh-Hans": "发布分支",
+    "zh-Hant": "發佈分支"
+  },
+  "aux.pushCommits": {
+    "en": "Push commits",
+    "zh-Hans": "推送提交",
+    "zh-Hant": "推送提交"
+  },
+  "aux.withoutPush": {
+    "en": "Create without pushing",
+    "zh-Hans": "不推送直接创建",
+    "zh-Hant": "不推送直接建立"
+  },
+  "aux.unpushedCommits": {
+    "en": "Unpushed commits",
+    "zh-Hans": "未推送的提交数",
+    "zh-Hant": "未推送的提交數"
+  },
+  "aux.CreateTutorialRepository.title": {
+    "en": "Start tutorial",
+    "zh-Hans": "开始教程",
+    "zh-Hant": "開始教學"
+  },
+  "aux.CreateTutorialRepository.description": {
+    "en": "This creates a local repository and pushes it to the account below. It will be private and visible only to you.",
+    "zh-Hans": "这将创建本地仓库并推送至以下账户。仓库保持私有，仅您可见。",
+    "zh-Hant": "這將建立本機儲存庫並推送至以下帳戶。儲存庫保持私人，僅您可見。"
+  },
+  "aux.ConfirmExitTutorial.title": {
+    "en": "Exit tutorial",
+    "zh-Hans": "退出教程",
+    "zh-Hant": "離開教學"
+  },
+  "aux.ConfirmExitTutorial.description": {
+    "en": "Leave the tutorial and return to the home screen? You can resume it later.",
+    "zh-Hans": "离开教程并返回首页？稍后可以继续教程。",
+    "zh-Hant": "離開教學並返回首頁？稍後可以繼續教學。"
+  },
+  "aux.tutorialProgress": {
+    "en": "Tutorial repository progress",
+    "zh-Hans": "教程仓库创建进度",
+    "zh-Hant": "教學儲存庫建立進度"
+  },
+  "aux.createTutorial": {
+    "en": "Continue",
+    "zh-Hans": "继续",
+    "zh-Hant": "繼續"
+  },
+  "aux.tutorialAccount": {
+    "en": "View account server",
+    "zh-Hans": "查看账户服务器",
+    "zh-Hant": "檢視帳戶伺服器"
+  },
+  "aux.exitTutorial": {
+    "en": "Exit tutorial",
+    "zh-Hans": "退出教程",
+    "zh-Hant": "離開教學"
+  },
+  "aux.bundleID": {
+    "en": "Application bundle ID",
+    "zh-Hans": "应用 Bundle ID",
+    "zh-Hant": "應用程式 Bundle ID"
+  },
+  "aux.developmentOnly": {
+    "en": "These tools require the original test-menu capability. Release builds disable debug tools by default.",
+    "zh-Hans": "这些工具需要启用原测试菜单能力。发布构建默认不启用调试工具。",
+    "zh-Hant": "這些工具需要啟用原測試選單能力。發佈組建預設不啟用除錯工具。"
+  },
+  "aux.TestIcons.title": {
+    "en": "Icon preview",
+    "zh-Hans": "图标预览",
+    "zh-Hant": "圖示預覽"
+  },
+  "aux.TestIcons.description": {
+    "en": "All size variants from the original, locked Octicons library.",
+    "zh-Hans": "原始锁定 Octicons 图标库的全部尺寸变体。",
+    "zh-Hant": "原始鎖定 Octicons 圖示庫的全部尺寸變體。"
+  },
+  "aux.icons": {
+    "en": "Octicons",
+    "zh-Hans": "Octicons 图标",
+    "zh-Hant": "Octicons 圖示"
+  },
+  "aux.TestAbout.title": {
+    "en": "About — update test",
+    "zh-Hans": "关于——更新测试",
+    "zh-Hant": "關於——更新測試"
+  },
+  "aux.TestAbout.description": {
+    "en": "Simulated update timing only. Installing from this test view just closes it; it does not install an update.",
+    "zh-Hans": "仅模拟更新时序。在此测试视图中选择安装只会关闭视图，不会安装更新。",
+    "zh-Hant": "僅模擬更新時序。在此測試檢視中選擇安裝只會關閉檢視，不會安裝更新。"
+  },
+  "aux.TestCLIAction.title": {
+    "en": "Dispatch CLI action",
+    "zh-Hans": "分发 CLI 操作",
+    "zh-Hant": "分派 CLI 操作"
+  },
+  "aux.TestCLIAction.description": {
+    "en": "Development tool for the real CLI entry. Dispatching can open or clone a repository; results are not simulated.",
+    "zh-Hans": "真实 CLI 入口的开发测试工具。分发可能打开或克隆仓库，结果不会被模拟。",
+    "zh-Hant": "真實 CLI 入口的開發測試工具。分派可能開啟或複製儲存庫，結果不會被模擬。"
+  },
+  "aux.cliKind": {
+    "en": "CLI action",
+    "zh-Hans": "CLI 操作",
+    "zh-Hant": "CLI 操作"
+  },
+  "aux.cliOpenRepository": {
+    "en": "Open repository",
+    "zh-Hans": "打开仓库",
+    "zh-Hant": "開啟儲存庫"
+  },
+  "aux.cliCloneURL": {
+    "en": "Clone URL",
+    "zh-Hans": "克隆 URL",
+    "zh-Hant": "複製 URL"
+  },
+  "aux.cliPath": {
+    "en": "Repository path",
+    "zh-Hans": "仓库路径",
+    "zh-Hant": "儲存庫路徑"
+  },
+  "aux.cliURL": {
+    "en": "Repository URL",
+    "zh-Hans": "仓库 URL",
+    "zh-Hant": "儲存庫 URL"
+  },
+  "aux.cliBranch": {
+    "en": "Branch (optional)",
+    "zh-Hans": "分支（可选）",
+    "zh-Hant": "分支（選填）"
+  },
+  "aux.cliChange": {
+    "en": "Update action inputs",
+    "zh-Hans": "更新操作输入",
+    "zh-Hant": "更新操作輸入"
+  },
+  "aux.dispatchCLI": { "en": "Dispatch", "zh-Hans": "分发", "zh-Hant": "分派" },
+  "aux.TestTokenExpiration.title": {
+    "en": "Test token expiration",
+    "zh-Hans": "测试令牌过期",
+    "zh-Hant": "測試權杖到期"
+  },
+  "aux.TestTokenExpiration.description": {
+    "en": "Override local expiration only, not the token's actual lifetime. Overrides reset on renewal or restart. Ordinary requests renew within 10 minutes of expiry; Copilot session creation renews within 61 minutes and 1 second. No credentials are displayed or saved here.",
+    "zh-Hans": "仅覆盖本地过期时间，不改变令牌的真实有效期。续期或重启会重置覆盖。普通请求在到期前 10 分钟内续期，Copilot 会话创建在到期前 61 分 1 秒内续期。此处不显示或保存凭据。",
+    "zh-Hant": "僅覆寫本機到期時間，不改變權杖的真實有效期。續期或重新啟動會重設覆寫。一般請求在到期前 10 分鐘內續期，Copilot 工作階段建立在到期前 61 分 1 秒內續期。此處不顯示或儲存憑證。"
+  },
+  "aux.testAccount": { "en": "Account", "zh-Hans": "账户", "zh-Hant": "帳戶" },
+  "aux.testDateTime": {
+    "en": "Expiration (local time)",
+    "zh-Hans": "过期时间（本地时间）",
+    "zh-Hant": "到期時間（本機時間）"
+  },
+  "aux.tokenExpires": {
+    "en": "Current local expiry",
+    "zh-Hans": "当前本地过期时间",
+    "zh-Hant": "目前本機到期時間"
+  },
+  "aux.tokenOverridden": {
+    "en": "Expiration is overridden",
+    "zh-Hans": "过期时间已覆盖",
+    "zh-Hant": "到期時間已覆寫"
+  },
+  "aux.tokenOriginalExpires": {
+    "en": "Original expiry",
+    "zh-Hans": "原始过期时间",
+    "zh-Hant": "原始到期時間"
+  },
+  "aux.notRefreshable": {
+    "en": "Sign in with short-lived tokens to test expiration; this account has no refreshable token.",
+    "zh-Hans": "此账户没有可续期令牌。请启用短期令牌并重新登录后测试过期时间。",
+    "zh-Hant": "此帳戶沒有可續期權杖。請啟用短期權杖並重新登入後測試到期時間。"
+  },
+  "aux.applyExpiration": {
+    "en": "Apply expiry",
+    "zh-Hans": "应用过期时间",
+    "zh-Hant": "套用到期時間"
+  },
+  "aux.editExpiration": {
+    "en": "Update expiration input",
+    "zh-Hans": "更新过期时间输入",
+    "zh-Hant": "更新到期時間輸入"
+  },
+  "aux.expireNow": {
+    "en": "Expired",
+    "zh-Hans": "已过期",
+    "zh-Hant": "已到期"
+  },
+  "aux.expire10min": {
+    "en": "In 10 min",
+    "zh-Hans": "10 分钟后",
+    "zh-Hant": "10 分鐘後"
+  },
+  "aux.expire1h": {
+    "en": "In 1 hour",
+    "zh-Hans": "1 小时后",
+    "zh-Hant": "1 小時後"
+  },
+  "aux.expire62min": {
+    "en": "In 62 min",
+    "zh-Hans": "62 分钟后",
+    "zh-Hant": "62 分鐘後"
+  },
+  "aux.expire8h": {
+    "en": "In 8 hours",
+    "zh-Hans": "8 小时后",
+    "zh-Hant": "8 小時後"
+  },
+  "aux.resetExpiration": {
+    "en": "Reset override",
+    "zh-Hans": "重置覆盖",
+    "zh-Hant": "重設覆寫"
+  },
+  "aux.reloadExpiration": {
+    "en": "Reload details",
+    "zh-Hans": "重新载入详情",
+    "zh-Hant": "重新載入詳細資料"
+  },
+  "aux.tokenRestored": {
+    "en": "Original expiration restored.",
+    "zh-Hans": "原始过期时间已恢复。",
+    "zh-Hant": "原始到期時間已還原。"
+  },
+  "aux.tokenApplied": {
+    "en": "Expiration override applied.",
+    "zh-Hans": "过期时间覆盖已应用。",
+    "zh-Hant": "到期時間覆寫已套用。"
+  },
+  "aux.debug.tokenFailed": {
+    "en": "Could not read or change token expiration. Confirm the account is signed in and refreshable, then reload details.",
+    "zh-Hans": "无法读取或修改令牌过期时间。请确认账户已登录且令牌可续期，再重新载入详情。",
+    "zh-Hant": "無法讀取或修改權杖到期時間。請確認帳戶已登入且權杖可續期，再重新載入詳細資料。"
+  },
+  "aux.TestNotifications.title": {
+    "en": "Test notifications",
+    "zh-Hans": "测试通知",
+    "zh-Hant": "測試通知"
+  },
+  "aux.TestNotifications.description": {
+    "en": "Select real pull request data through the original debug store, then simulate its notification.",
+    "zh-Hans": "通过原调试存储选择真实拉取请求数据，再模拟对应通知。",
+    "zh-Hant": "透過原除錯儲存選擇真實提取要求資料，再模擬對應通知。"
+  },
+  "aux.permission.default": {
+    "en": "Check that system notifications are enabled for Gitowl.",
+    "zh-Hans": "请确认系统已为 Gitowl 启用通知。",
+    "zh-Hant": "請確認系統已為 Gitowl 啟用通知。"
+  },
+  "aux.permission.granted": {
+    "en": "System notification permission is granted. Check notification settings if banners are not visible.",
+    "zh-Hans": "系统通知权限已授予。若横幅不可见，请检查通知设置。",
+    "zh-Hant": "系統通知權限已授予。若橫幅不可見，請檢查通知設定。"
+  },
+  "aux.permission.denied": {
+    "en": "Notification permission is denied. Enable it in system notification settings.",
+    "zh-Hans": "通知权限被拒绝。请在系统通知设置中启用。",
+    "zh-Hant": "通知權限遭拒。請在系統通知設定中啟用。"
+  },
+  "aux.grantNotifications": {
+    "en": "Grant notification permission",
+    "zh-Hans": "授予通知权限",
+    "zh-Hant": "授予通知權限"
+  },
+  "aux.notificationSettings": {
+    "en": "Notification settings",
+    "zh-Hans": "通知设置",
+    "zh-Hant": "通知設定"
+  },
+  "aux.notificationType": {
+    "en": "Notification type",
+    "zh-Hans": "通知类型",
+    "zh-Hant": "通知類型"
+  },
+  "aux.notificationItem": {
+    "en": "Pull request, review or comment",
+    "zh-Hans": "拉取请求、审查或评论",
+    "zh-Hant": "提取要求、審查或留言"
+  },
+  "aux.notificationType.PullRequestReview": {
+    "en": "Pull request review",
+    "zh-Hans": "拉取请求审查",
+    "zh-Hant": "提取要求審查"
+  },
+  "aux.notificationType.PullRequestComment": {
+    "en": "Pull request comment",
+    "zh-Hans": "拉取请求评论",
+    "zh-Hant": "提取要求留言"
+  },
+  "aux.notificationType.ChecksFailed": {
+    "en": "Pull request checks failed",
+    "zh-Hans": "拉取请求检查失败",
+    "zh-Hant": "提取要求檢查失敗"
+  },
+  "aux.chooseNotificationType": {
+    "en": "Choose notification type",
+    "zh-Hans": "选择通知类型",
+    "zh-Hant": "選擇通知類型"
+  },
+  "aux.chooseNotification": {
+    "en": "Select",
+    "zh-Hans": "选择",
+    "zh-Hant": "選擇"
+  },
+  "aux.viewNotificationItem": {
+    "en": "View selected item in browser",
+    "zh-Hans": "在浏览器查看所选项目",
+    "zh-Hant": "在瀏覽器檢視所選項目"
+  },
+  "aux.backNotification": {
+    "en": "Back",
+    "zh-Hans": "返回",
+    "zh-Hant": "返回"
+  },
+  "aux.debug.notificationFailed": {
+    "en": "Could not load notification test data. Go back, check the account and connection, then select again.",
+    "zh-Hans": "无法载入通知测试数据。请返回并检查账户和连接，再重新选择。",
+    "zh-Hant": "無法載入通知測試資料。請返回並檢查帳戶和連線，再重新選擇。"
+  },
+  "aux.TestCopilotSnapshotCard.title": {
+    "en": "Test Copilot snapshot card",
+    "zh-Hans": "测试 Copilot 配额卡片",
+    "zh-Hant": "測試 Copilot 配額卡片"
+  },
+  "aux.TestCopilotSnapshotCard.description": {
+    "en": "Preview fake account and quota data using the original snapshot calculations. These controls never change real accounts or Copilot quotas.",
+    "zh-Hans": "使用原快照计算预览测试账户及配额数据。这些控制项不会修改真实账户或 Copilot 配额。",
+    "zh-Hant": "使用原快照計算預覽測試帳戶及配額資料。這些控制項不會修改真實帳戶或 Copilot 配額。"
+  },
+  "aux.testLogin": {
+    "en": "Test login",
+    "zh-Hans": "测试登录名",
+    "zh-Hant": "測試登入名稱"
+  },
+  "aux.testName": {
+    "en": "Test display name",
+    "zh-Hans": "测试显示名称",
+    "zh-Hant": "測試顯示名稱"
+  },
+  "aux.testEndpoint": {
+    "en": "Test endpoint",
+    "zh-Hans": "测试端点",
+    "zh-Hant": "測試端點"
+  },
+  "aux.testAvatarURL": {
+    "en": "Test avatar URL",
+    "zh-Hans": "测试头像 URL",
+    "zh-Hant": "測試頭像 URL"
+  },
+  "aux.snapshotChange": {
+    "en": "Update snapshot preview",
+    "zh-Hans": "更新快照预览",
+    "zh-Hant": "更新快照預覽"
+  },
+  "aux.aiCreditsPreset": {
+    "en": "AI credits preset",
+    "zh-Hans": "AI 点数预设",
+    "zh-Hant": "AI 點數預設"
+  },
+  "aux.rateLimitPreset": {
+    "en": "Rate limit preset",
+    "zh-Hans": "速率限制预设",
+    "zh-Hant": "速率限制預設"
+  },
+  "aux.done": { "en": "Done", "zh-Hans": "完成", "zh-Hant": "完成" },
+  "aux.snapshot.chat": {
+    "en": "Chat messages",
+    "zh-Hans": "聊天消息",
+    "zh-Hant": "聊天訊息"
+  },
+  "aux.snapshot.completions": {
+    "en": "Code completions",
+    "zh-Hans": "代码补全",
+    "zh-Hant": "程式碼補全"
+  },
+  "aux.snapshot.premium_interactions": {
+    "en": "Premium requests",
+    "zh-Hans": "高级请求",
+    "zh-Hant": "進階請求"
+  },
+  "aux.snapshot.session": {
+    "en": "Session limits",
+    "zh-Hans": "会话限制",
+    "zh-Hant": "工作階段限制"
+  },
+  "aux.snapshot.weekly": {
+    "en": "Weekly limits",
+    "zh-Hans": "每周限制",
+    "zh-Hant": "每週限制"
+  },
+  "aux.snapshot.aiCredits": {
+    "en": "AI credits",
+    "zh-Hans": "AI 点数",
+    "zh-Hant": "AI 點數"
+  },
+  "aux.snapshot.unlimited": {
+    "en": "No usage limit",
+    "zh-Hans": "无使用限制",
+    "zh-Hant": "無使用限制"
+  },
+  "aux.snapshot.resetDate": {
+    "en": "Reset date",
+    "zh-Hans": "重置日期",
+    "zh-Hant": "重設日期"
+  },
+  "aux.snapshot.field.enabled": {
+    "en": "Enabled",
+    "zh-Hans": "启用",
+    "zh-Hant": "啟用"
+  },
+  "aux.snapshot.field.tokenBasedBilling": {
+    "en": "Token-based billing",
+    "zh-Hans": "按令牌计费",
+    "zh-Hant": "按權杖計費"
+  },
+  "aux.snapshot.field.isUnlimitedEntitlement": {
+    "en": "Unlimited",
+    "zh-Hans": "无限配额",
+    "zh-Hant": "無限配額"
+  },
+  "aux.snapshot.field.entitlementRequests": {
+    "en": "Entitlement requests",
+    "zh-Hans": "请求配额",
+    "zh-Hant": "請求配額"
+  },
+  "aux.snapshot.field.usedRequests": {
+    "en": "Used requests",
+    "zh-Hans": "已用请求",
+    "zh-Hant": "已用請求"
+  },
+  "aux.snapshot.field.usageAllowedWithExhaustedQuota": {
+    "en": "Usage allowed with exhausted quota",
+    "zh-Hans": "配额用尽后允许使用",
+    "zh-Hant": "配額用盡後允許使用"
+  },
+  "aux.snapshot.field.remainingPercentage": {
+    "en": "Remaining percentage",
+    "zh-Hans": "剩余百分比",
+    "zh-Hant": "剩餘百分比"
+  },
+  "aux.snapshot.field.overage": {
+    "en": "Overage",
+    "zh-Hans": "超额用量",
+    "zh-Hant": "超額用量"
+  },
+  "aux.snapshot.field.overageAllowedWithExhaustedQuota": {
+    "en": "Overage allowed with exhausted quota",
+    "zh-Hans": "配额用尽后允许超额使用",
+    "zh-Hant": "配額用盡後允許超額使用"
+  },
+  "aux.snapshot.field.resetDate": {
+    "en": "Reset date",
+    "zh-Hans": "重置日期",
+    "zh-Hant": "重設日期"
+  },
+  "aux.imageMode.TwoUp": {
+    "en": "Side by side",
+    "zh-Hans": "并排对比",
+    "zh-Hant": "並排比較"
+  },
+  "aux.imageMode.Swipe": {
+    "en": "Swipe",
+    "zh-Hans": "滑动对比",
+    "zh-Hant": "滑動比較"
+  },
+  "aux.imageMode.OnionSkin": {
+    "en": "Onion skin",
+    "zh-Hans": "叠加对比",
+    "zh-Hant": "疊加比較"
+  },
+  "aux.imageMode.Difference": {
+    "en": "Difference",
+    "zh-Hans": "差异高亮",
+    "zh-Hant": "差異強調"
+  }
+}

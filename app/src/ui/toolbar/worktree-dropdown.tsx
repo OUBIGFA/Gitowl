@@ -4,12 +4,17 @@ import { Dispatcher } from '../dispatcher'
 import * as octicons from '../octicons/octicons.generated'
 import { Repository } from '../../models/repository'
 import { ToolbarDropdown, DropdownState } from './dropdown'
-import { FoldoutType, IConstrainedValue } from '../../lib/app-state'
+import { IConstrainedValue } from '../../lib/app-state'
 import { WorktreeEntry } from '../../models/worktree'
 import { WorktreeList } from '../worktrees/worktree-list'
 import { showContextualMenu, IMenuItem } from '../../lib/menu-item'
 import { generateWorktreeContextMenuItems } from '../worktrees/worktree-list-item-context-menu'
-import { PopupType } from '../../models/popup'
+import {
+  selectWorkspaceWorktree,
+  renameWorkspaceWorktree,
+  removeWorkspaceWorktree,
+  createWorkspaceWorktree,
+} from '../worktrees/worktree-controller'
 import { Resizable } from '../resizable'
 import { enableResizingToolbarButtons } from '../../lib/feature-flag'
 
@@ -43,16 +48,11 @@ export class WorktreeDropdown extends React.Component<
     if (this.props.disabled) {
       return
     }
-    const { dispatcher, repository } = this.props
-
-    dispatcher.closeFoldout(FoldoutType.Worktree)
-
-    if (worktree.isPrunable) {
-      dispatcher.requestDeleteWorktree(repository, worktree.path)
-      return
-    }
-
-    await dispatcher.switchWorktree(repository, worktree)
+    await selectWorkspaceWorktree(
+      this.props.dispatcher,
+      this.props.repository,
+      worktree
+    )
   }
 
   private onWorktreeContextMenu = (
@@ -73,25 +73,15 @@ export class WorktreeDropdown extends React.Component<
   }
 
   private onRenameWorktree = (path: string) => {
-    this.props.dispatcher.closeFoldout(FoldoutType.Worktree)
-    this.props.dispatcher.showPopup({
-      type: PopupType.RenameWorktree,
-      repository: this.props.repository,
-      worktreePath: path,
-    })
+    renameWorkspaceWorktree(this.props.dispatcher, this.props.repository, path)
   }
 
   private onRemoveWorktree = (path: string) => {
-    this.props.dispatcher.closeFoldout(FoldoutType.Worktree)
-    this.props.dispatcher.requestDeleteWorktree(this.props.repository, path)
+    removeWorkspaceWorktree(this.props.dispatcher, this.props.repository, path)
   }
 
   private onCreateNewWorktree = () => {
-    this.props.dispatcher.closeFoldout(FoldoutType.Worktree)
-    this.props.dispatcher.showPopup({
-      type: PopupType.AddWorktree,
-      repository: this.props.repository,
-    })
+    createWorkspaceWorktree(this.props.dispatcher, this.props.repository)
   }
 
   private onContextMenu = (event: React.MouseEvent<HTMLButtonElement>) => {

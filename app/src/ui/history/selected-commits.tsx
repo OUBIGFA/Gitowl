@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { writeClipboardText } from '../main-process-proxy'
+import { generateHistoryFileContextMenu } from './history-file-menu-controller'
 import * as Path from 'path'
 
 import { Repository } from '../../models/repository'
@@ -8,17 +8,8 @@ import { Commit } from '../../models/commit'
 import { IDiff, ImageDiffType } from '../../models/diff'
 
 import { encodePathAsUrl } from '../../lib/path'
-import { revealInFileManager } from '../../lib/app-shell'
 
 import { openFile } from '../lib/open-file'
-import {
-  isSafeFileExtension,
-  CopyFilePathLabel,
-  DefaultEditorLabel,
-  RevealInFileManagerLabel,
-  OpenWithDefaultProgramLabel,
-  CopyRelativeFilePathLabel,
-} from '../lib/context-menu'
 import { ThrottledScheduler } from '../lib/throttled-scheduler'
 
 import { Dispatcher } from '../dispatcher'
@@ -27,8 +18,6 @@ import { showContextualMenu } from '../../lib/menu-item'
 
 import { FileList } from './file-list'
 import { SeamlessDiffSwitcher } from '../diff/seamless-diff-switcher'
-import { getDotComAPIEndpoint } from '../../lib/api'
-import { IMenuItem } from '../../lib/menu-item'
 import { IChangesetData } from '../../lib/git'
 import { IConstrainedValue } from '../../lib/app-state'
 import { clamp } from '../../lib/clamp'
@@ -383,78 +372,19 @@ export class SelectedCommits extends React.Component<
 
     const fullPath = Path.join(repository.path, file.path)
     const fileExistsOnDisk = await pathExists(fullPath)
-    if (!fileExistsOnDisk) {
-      showContextualMenu([
-        {
-          label: __DARWIN__
-            ? 'File Does Not Exist on Disk'
-            : 'File does not exist on disk',
-          enabled: false,
-        },
-      ])
-      return
-    }
-
-    const extension = Path.extname(file.path)
-
-    const isSafeExtension = isSafeFileExtension(extension)
-    const openInExternalEditor = externalEditorLabel
-      ? `Open in ${externalEditorLabel}`
-      : DefaultEditorLabel
-
-    const items: IMenuItem[] = [
-      {
-        label: RevealInFileManagerLabel,
-        action: () => revealInFileManager(repository, file.path),
-        enabled: fileExistsOnDisk,
-      },
-      {
-        label: openInExternalEditor,
-        action: () => this.props.onOpenInExternalEditor(file.path),
-        enabled: fileExistsOnDisk,
-      },
-      {
-        label: OpenWithDefaultProgramLabel,
-        action: () => this.onOpenItem(file.path),
-        enabled: isSafeExtension && fileExistsOnDisk,
-      },
-      { type: 'separator' },
-      {
-        label: CopyFilePathLabel,
-        action: () => writeClipboardText(fullPath),
-      },
-      {
-        label: CopyRelativeFilePathLabel,
-        action: () => writeClipboardText(Path.normalize(file.path)),
-      },
-      { type: 'separator' },
-    ]
-
-    let viewOnGitHubLabel = 'View on GitHub'
-    const gitHubRepository = repository.gitHubRepository
-
-    if (
-      gitHubRepository &&
-      gitHubRepository.endpoint !== getDotComAPIEndpoint()
-    ) {
-      viewOnGitHubLabel = 'View on GitHub Enterprise'
-    }
-
-    items.push({
-      label: viewOnGitHubLabel,
-      action: () => this.onViewOnGitHub(selectedCommits[0].sha, file),
-      enabled:
-        selectedCommits.length === 1 &&
-        !localCommitSHAs.includes(selectedCommits[0].sha) &&
-        !!gitHubRepository &&
-        this.props.selectedCommits.length > 0,
-    })
-
-    showContextualMenu(items)
-  }
-
-  private onViewOnGitHub = (sha: string, file: CommittedFileChange) => {
-    this.props.onViewCommitOnGitHub(sha, file.path)
+    showContextualMenu(
+      generateHistoryFileContextMenu(
+        repository,
+        file,
+        fileExistsOnDisk,
+        selectedCommits,
+        localCommitSHAs,
+        externalEditorLabel,
+        this.props.onOpenInExternalEditor,
+        this.onOpenItem,
+        this.props.onViewCommitOnGitHub
+      )
+    )
   }
 }
 

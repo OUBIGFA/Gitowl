@@ -29,8 +29,9 @@ import { HttpStatusCode } from './http-status-code'
 import { CopilotError, parseCopilotPaymentRequiredError } from './copilot-error'
 import { BypassReasonType } from '../ui/secret-scanning/bypass-push-protection-dialog'
 
-const envEndpoint = process.env['DESKTOP_GITHUB_DOTCOM_API_ENDPOINT']
-const envHTMLURL = process.env['DESKTOP_GITHUB_DOTCOM_HTML_URL']
+import { getHTMLURL, getDotComAPIEndpoint } from './api-endpoints'
+export { getHTMLURL, getDotComAPIEndpoint } from './api-endpoints'
+
 const envAdditionalCookies =
   process.env['DESKTOP_GITHUB_DOTCOM_ADDITIONAL_COOKIES']
 
@@ -2343,47 +2344,6 @@ export function getEndpointForRepository(url: string): string {
 }
 
 /**
- * Get the URL for the HTML site. For example:
- *
- * https://api.github.com -> https://github.com
- * http://github.mycompany.com/api -> http://github.mycompany.com
- * https://github.mycompany.com:8443/api/v3 -> https://github.mycompany.com:8443
- */
-export function getHTMLURL(endpoint: string): string {
-  if (envHTMLURL !== undefined) {
-    return envHTMLURL
-  }
-
-  // In the case of GitHub.com, the HTML site lives on the parent domain.
-  //  E.g., https://api.github.com -> https://github.com
-  //
-  // Whereas with Enterprise, it lives on the same domain but without the
-  // API path:
-  //  E.g., https://github.mycompany.com/api/v3 -> https://github.mycompany.com
-  //
-  // We need to normalize them.
-  if (endpoint === getDotComAPIEndpoint() && !envEndpoint) {
-    return 'https://github.com'
-  } else {
-    if (isGHE(endpoint)) {
-      const url = new URL.URL(endpoint)
-
-      url.pathname = '/'
-
-      if (url.hostname.startsWith('api.')) {
-        url.hostname = url.hostname.replace(/^api\./, '')
-      }
-
-      return url.toString()
-    }
-
-    // Use the origin rather than the hostname so that GitHub Enterprise
-    // Server instances running on a non-default port retain their port.
-    return new URL.URL(endpoint).origin
-  }
-}
-
-/**
  * Get the API URL for an HTML URL. For example:
  *
  * http://github.mycompany.com -> https://github.mycompany.com/api/v3
@@ -2396,20 +2356,6 @@ export function getEnterpriseAPIURL(endpoint: string): string {
 
 export const getAPIEndpoint = (endpoint: string) =>
   isDotCom(endpoint) ? getDotComAPIEndpoint() : getEnterpriseAPIURL(endpoint)
-
-/** Get github.com's API endpoint. */
-export function getDotComAPIEndpoint(): string {
-  // NOTE:
-  // `DESKTOP_GITHUB_DOTCOM_API_ENDPOINT` only needs to be set if you are
-  // developing against a local version of GitHub the Website, and need to debug
-  // the server-side interaction. For all other cases you should leave this
-  // unset.
-  if (envEndpoint && envEndpoint.length > 0) {
-    return envEndpoint
-  }
-
-  return 'https://api.github.com'
-}
 
 /**
  * Build an OAuth authorization URL.

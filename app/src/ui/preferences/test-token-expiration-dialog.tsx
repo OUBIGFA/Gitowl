@@ -7,6 +7,11 @@ import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { Button } from '../lib/button'
 import { Select } from '../lib/select'
 import { Row } from '../lib/row'
+import {
+  firstTestAccountKey as firstAccountKey,
+  testTokenLocalDateTime as localDateTime,
+  chosenTestTokenExpiration,
+} from '../lib/dialog-development-actions'
 
 interface ITestTokenExpirationDialogProps {
   readonly accounts: ReadonlyArray<Account>
@@ -26,21 +31,6 @@ interface ITestTokenExpirationDialogState {
   readonly busy: boolean
   readonly error: string | null
   readonly message: string | null
-}
-
-function firstAccountKey(accounts: ReadonlyArray<Account>): string {
-  const first = accounts.at(0)
-  return first === undefined ? '' : getAccountKey(first)
-}
-
-function localDateTime(expiresAt: number | undefined): string {
-  if (expiresAt === undefined) {
-    return ''
-  }
-  const date = new Date(expiresAt)
-  return new Date(expiresAt - date.getTimezoneOffset() * 60_000)
-    .toISOString()
-    .slice(0, 19)
 }
 
 function describeExpiration(expiresAt: number | undefined): string {
@@ -236,8 +226,7 @@ export class TestTokenExpirationDialog extends React.Component<
   }
 
   private getChosenExpiration(): number | undefined {
-    const value = new Date(this.state.dateTime).getTime()
-    return Number.isSafeInteger(value) && value >= 0 ? value : undefined
+    return chosenTestTokenExpiration(this.state.dateTime)
   }
 
   private loadExpiration = async () => {

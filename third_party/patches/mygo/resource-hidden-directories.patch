@@ -1,0 +1,70 @@
+--- a/cmd/mygo/resources.go
++++ b/cmd/mygo/resources.go
+@@ -761,7 +761,7 @@
+ 			}
+ 			// See junkName: dotfiles ship, hidden directories and the
+ 			// droppings of a file manager do not.
+-			if junkName(e.Name()) || (hiddenName(e.Name()) && child.IsDir()) {
++			if junkName(e.Name()) || (hiddenName(e.Name()) && child.IsDir() && r.filter != nil) {
+ 				continue
+ 			}
+ 			if r.filter.excludes(filepath.Join(path, e.Name()), child.IsDir()) {
+--- a/cmd/mygo/resources_test.go
++++ b/cmd/mygo/resources_test.go
+@@ -23,16 +23,17 @@
+ 	t.Helper()
+ 	dir := t.TempDir()
+ 	writeFiles(t, dir, map[string]string{
+-		"mygo.json":                     json,
+-		"resources/icon.png":            string(defaultIcon()),
+-		"resources/data/words.txt":      "hello",
+-		"resources/data/.DS_Store":      "junk",
+-		"resources/data/.manifest.json": "{}",
+-		"resources/data/.cache/keep":    "",
+-		"resources/.gitkeep":            "",
+-		"legal/NOTICE.txt":              "notice",
+-		"vendor/models/tiny.bin":        "model",
+-		"vendor/models/sub/more.bin":    "more",
++		"mygo.json":                            json,
++		"resources/icon.png":                   string(defaultIcon()),
++		"resources/data/words.txt":             "hello",
++		"resources/data/.DS_Store":             "junk",
++		"resources/data/.manifest.json":        "{}",
++		"resources/data/.cache/keep":           "",
++		"resources/.gitkeep":                   "",
++		"legal/NOTICE.txt":                     "notice",
++		"vendor/models/tiny.bin":               "model",
++		"vendor/models/sub/more.bin":           "more",
++		"vendor/models/.catalog/manifest.json": "catalog",
+ 	})
+ 	tool := filepath.Join(dir, "resources", "bin", "tool")
+ 	writeFiles(t, dir, map[string]string{"resources/bin/tool": "#!/bin/sh\n"})
+@@ -81,10 +82,11 @@
+ 		t.Fatal(err)
+ 	}
+ 	for name, content := range map[string]string{
+-		"data/words.txt":      "hello",
+-		"NOTICE.txt":          "notice",
+-		"models/tiny.bin":     "model",
+-		"models/sub/more.bin": "more",
++		"data/words.txt":                "hello",
++		"NOTICE.txt":                    "notice",
++		"models/tiny.bin":               "model",
++		"models/sub/more.bin":           "more",
++		"models/.catalog/manifest.json": "catalog",
+ 	} {
+ 		if got, err := os.ReadFile(filepath.Join(dst, filepath.FromSlash(name))); err != nil || string(got) != content {
+ 			t.Errorf("%s = %q, %v", name, got, err)
+@@ -98,6 +100,12 @@
+ 	}
+ 	if _, err := os.Lstat(filepath.Join(dst, "data", ".DS_Store")); err == nil {
+ 		t.Error("a file manager's droppings were copied")
++	}
++	// An explicitly listed resource keeps hidden directories that are part of
++	// its runtime layout, while the project's own resources/.gitkeep and the
++	// hidden data directory above remain excluded.
++	if _, err := os.Lstat(filepath.Join(dst, "models", ".catalog", "manifest.json")); err != nil {
++		t.Errorf("a hidden directory inside a listed resource was not copied: %v", err)
+ 	}
+ 	if _, err := os.Lstat(filepath.Join(dst, ".gitkeep")); err == nil {
+ 		t.Error("a hidden entry of resources/ was copied")

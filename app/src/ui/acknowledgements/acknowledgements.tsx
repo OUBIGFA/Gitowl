@@ -1,7 +1,9 @@
-import * as Path from 'path'
-import * as Fs from 'fs'
+import {
+  DialogLicenses,
+  loadDialogLicenses,
+  normalizedLicenseURL,
+} from '../lib/dialog-licenses'
 import * as React from 'react'
-import { getAppPath } from '../lib/app-proxy'
 import { Loading } from '../lib/loading'
 import { LinkButton } from '../lib/link-button'
 import { Dialog, DialogContent, DefaultDialogFooter } from '../dialog'
@@ -19,13 +21,7 @@ interface IAcknowledgementsProps {
   readonly applicationVersion: string
 }
 
-interface ILicense {
-  readonly repository?: string
-  readonly sourceText?: string
-  readonly license?: string
-}
-
-type Licenses = { [key: string]: ILicense }
+type Licenses = DialogLicenses
 
 interface IAcknowledgementsState {
   readonly licenses: Licenses | null
@@ -43,21 +39,7 @@ export class Acknowledgements extends React.Component<
   }
 
   public async componentDidMount() {
-    const path = Path.join(await getAppPath(), 'static', 'licenses.json')
-    Fs.readFile(path, 'utf8', (err, data) => {
-      if (err) {
-        log.error('Error loading licenses', err)
-        return
-      }
-
-      const parsed = JSON.parse(data)
-      if (!parsed) {
-        log.warn(`Couldn't parse licenses!`)
-        return
-      }
-
-      this.setState({ licenses: parsed })
-    })
+    await loadDialogLicenses(licenses => this.setState({ licenses }))
   }
 
   private renderLicenses(licenses: Licenses) {
@@ -73,7 +55,7 @@ export class Acknowledgements extends React.Component<
       let nameElement
 
       if (repository) {
-        const uri = normalizedGitHubURL(repository)
+        const uri = normalizedLicenseURL(repository)
         nameElement = <LinkButton uri={uri}>{key}</LinkButton>
       } else {
         nameElement = key
@@ -138,12 +120,4 @@ export class Acknowledgements extends React.Component<
       </Dialog>
     )
   }
-}
-
-/** Normalize a package URL to a GitHub URL. */
-function normalizedGitHubURL(url: string): string {
-  let newURL = url
-  newURL = newURL.replace('git+https://github.com', 'https://github.com')
-  newURL = newURL.replace('git+ssh://git@github.com', 'https://github.com')
-  return newURL
 }

@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { discardSelectionOperation } from '../../native-kernel/operation-dialogs'
+import { PopupType } from '../../models/popup'
 
 import { Repository } from '../../models/repository'
 import { Dispatcher } from '../dispatcher'
@@ -113,16 +115,18 @@ export class DiscardSelection extends React.Component<
   private discard = async () => {
     this.setState({ isDiscardingSelection: true })
 
-    await this.props.dispatcher.discardChangesFromSelection(
-      this.props.repository,
-      this.props.file.path,
-      this.props.diff,
-      this.props.selection
+    await discardSelectionOperation(
+      this.props.dispatcher,
+      {
+        type: PopupType.ConfirmDiscardSelection,
+        repository: this.props.repository,
+        file: this.props.file,
+        diff: this.props.diff,
+        selection: this.props.selection,
+      },
+      this.state.confirmDiscardSelection,
+      this.props.onDismissed
     )
-    this.props.dispatcher.setConfirmDiscardChangesSetting(
-      this.state.confirmDiscardSelection
-    )
-    this.props.onDismissed()
   }
 
   private onConfirmDiscardSelectionChanged = (

@@ -19,7 +19,7 @@
  * @param error - the caught error
  */
 
-import { getHasOptedOutOfStats } from '../stats/stats-store'
+import { getHasOptedOutOfStats } from '../stats/stats-preference'
 
 let lastNonFatalException: number | undefined = undefined
 

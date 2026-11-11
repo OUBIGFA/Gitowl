@@ -10,7 +10,7 @@ import { WorkingDirectoryFileChange } from '../../models/status'
 import { Repository } from '../../models/repository'
 import { Dispatcher } from '../dispatcher'
 import { SeamlessDiffSwitcher } from '../diff/seamless-diff-switcher'
-import { PopupType } from '../../models/popup'
+import { discardWorkspaceDiffSelection } from '../diff/diff-menu-controller'
 
 interface IChangesProps {
   readonly repository: Repository
@@ -81,22 +81,14 @@ export class Changes extends React.Component<IChangesProps, {}> {
       return
     }
 
-    if (this.props.askForConfirmationOnDiscardChanges) {
-      this.props.dispatcher.showPopup({
-        type: PopupType.ConfirmDiscardSelection,
-        repository: this.props.repository,
-        file: this.props.file,
-        diff,
-        selection: diffSelection,
-      })
-    } else {
-      this.props.dispatcher.discardChangesFromSelection(
-        this.props.repository,
-        this.props.file.path,
-        diff,
-        diffSelection
-      )
-    }
+    return discardWorkspaceDiffSelection(
+      this.props.dispatcher,
+      this.props.repository,
+      this.props.file,
+      diff,
+      diffSelection,
+      this.props.askForConfirmationOnDiscardChanges
+    )
   }
 
   public render() {

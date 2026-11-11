@@ -4,15 +4,13 @@ import {
   UserAutocompletionProvider,
   AutocompletingInput,
   UserHit,
-  KnownUserHit,
 } from '../../autocompletion'
 import {
   Author,
   isKnownAuthor,
-  KnownAuthor,
   UnknownAuthor,
 } from '../../../models/author'
-import { getLegacyStealthEmailForUser } from '../../../lib/email'
+import { authorFromUserHit } from './author-from-hit'
 import memoizeOne from 'memoize-one'
 import { FocusContainer } from '../focus-container'
 import { AuthorHandle } from './author-handle'
@@ -64,36 +62,6 @@ interface IAuthorInputState {
 
   /** Last action description to be announced by screen readers */
   readonly lastActionDescription: string | null
-}
-
-/**
- * Returns an email address which can be used on the host side to
- * look up the user which is to be given attribution.
- *
- * If the user has a public email address specified in their profile
- * that's used and if they don't then we'll generate a stealth email
- * address.
- */
-function getEmailAddressForUser(user: KnownUserHit) {
-  return user.email && user.email.length > 0
-    ? user.email
-    : getLegacyStealthEmailForUser(user.username, user.endpoint)
-}
-
-/**
- * Convert a IUserHit object which is returned from
- * user-autocomplete-provider into a KnownAuthor object.
- *
- * If the IUserHit object lacks an email address we'll
- * attempt to create a stealth email address.
- */
-function authorFromUserHit(user: KnownUserHit): KnownAuthor {
-  return {
-    kind: 'known',
-    name: user.name || user.username,
-    email: getEmailAddressForUser(user),
-    username: user.username,
-  }
 }
 
 /**

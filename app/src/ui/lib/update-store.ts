@@ -1,5 +1,16 @@
 const lastSuccessfulCheckKey = 'last-successful-update-check'
 
+/** Electron/Squirrel cannot update a MyGo/NSIS installation. Keep this guard
+ * at the shared command boundary so About, shortcuts and banners cannot bypass
+ * the native startup policy or convert an unavailable feed into "latest". */
+function assertElectronUpdatesAvailable() {
+  if (process.env.GITOWL_NATIVE_CORE === '1') {
+    throw new Error(
+      'Gitowl updates are not configured. Install the fixed Gitowl test installer; GitHub Desktop/Squirrel updates cannot update this application.'
+    )
+  }
+}
+
 import { Emitter, Disposable } from 'event-kit'
 
 import {
@@ -198,6 +209,7 @@ class UpdateStore {
    *                       attempt to retrieve the latest available deployment.
    */
   public async checkForUpdates(inBackground: boolean, skipGuidCheck: boolean) {
+    assertElectronUpdatesAvailable()
     // An update has been downloaded and the app is waiting to be restarted.
     // Checking for updates again may result in the running app being nuked
     // when it finds a subsequent update on Windows, or the "Quit and Update"
@@ -263,6 +275,7 @@ class UpdateStore {
 
   /** Quit and install the update. */
   public quitAndInstallUpdate() {
+    assertElectronUpdatesAvailable()
     // This is synchronous so that we can ensure the app will let itself be quit
     // before we call the function to quit.
     // eslint-disable-next-line no-sync

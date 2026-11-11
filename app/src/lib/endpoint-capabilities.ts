@@ -1,5 +1,6 @@
 import * as semver from 'semver'
-import { getDotComAPIEndpoint } from './api'
+import { getDotComAPIEndpoint, isGHE } from './api-endpoints'
+export { isGHE } from './api-endpoints'
 import { assertNonNullable } from './fatal-error'
 
 export type VersionConstraint = {
@@ -57,9 +58,6 @@ export const isGist = (ep: string) => {
   const { hostname } = new URL(ep)
   return hostname === 'gist.github.com' || hostname === 'gist.ghe.io'
 }
-
-/** Whether or not the given endpoint URI is under the ghe.com domain */
-export const isGHE = (ep: string) => new URL(ep).hostname.endsWith('.ghe.com')
 
 /**
  * Whether or not the given endpoint URI appears to point to a GitHub Enterprise

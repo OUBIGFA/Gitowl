@@ -2,6 +2,7 @@ import * as Path from 'path'
 import * as React from 'react'
 
 import { DiffSelectionType } from '../../models/diff'
+import { createWorkbenchCommit } from './create-workbench-commit'
 import {
   IChangesState,
   RebaseConflictState,
@@ -25,9 +26,6 @@ import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { openFile } from '../lib/open-file'
 import { Account } from '../../models/account'
 import { PopupType } from '../../models/popup'
-import { filesNotTrackedByLFS } from '../../lib/git/lfs'
-import { getLargeFilePaths } from '../../lib/large-files'
-import { isConflictedFile, hasUnresolvedConflicts } from '../../lib/status'
 import { getAccountForRepository } from '../../lib/get-account-for-repository'
 import { IAheadBehind } from '../../models/branch'
 import { Emoji } from '../../lib/emoji'
@@ -159,69 +157,13 @@ export class ChangesSidebar extends React.Component<IChangesSidebarProps, {}> {
     }
   }
 
-  private onCreateCommit = async (
-    context: ICommitContext
-  ): Promise<boolean> => {
-    const { workingDirectory } = this.props.changes
-
-    const overSizedFiles = await getLargeFilePaths(
+  private onCreateCommit = (context: ICommitContext): Promise<boolean> =>
+    createWorkbenchCommit(
+      this.props.dispatcher,
       this.props.repository,
-      workingDirectory
-    )
-
-    const filesIgnoredByLFS = await filesNotTrackedByLFS(
-      this.props.repository,
-      overSizedFiles
-    )
-
-    if (filesIgnoredByLFS.length !== 0) {
-      this.props.dispatcher.showPopup({
-        type: PopupType.OversizedFiles,
-        oversizedFiles: filesIgnoredByLFS,
-        context: context,
-        repository: this.props.repository,
-      })
-
-      return false
-    }
-
-    // are any conflicted files left?
-    const conflictedFilesLeft = workingDirectory.files.filter(
-      f =>
-        isConflictedFile(f.status) &&
-        f.selection.getSelectionType() === DiffSelectionType.None
-    )
-
-    if (conflictedFilesLeft.length === 0) {
-      this.props.dispatcher.clearBanner()
-      this.props.dispatcher.incrementMetric(
-        'unguidedConflictedMergeCompletionCount'
-      )
-    }
-
-    // which of the files selected for committing are conflicted (with markers)?
-    const conflictedFilesSelected = workingDirectory.files.filter(
-      f =>
-        isConflictedFile(f.status) &&
-        hasUnresolvedConflicts(f.status) &&
-        f.selection.getSelectionType() !== DiffSelectionType.None
-    )
-
-    if (conflictedFilesSelected.length > 0) {
-      this.props.dispatcher.showPopup({
-        type: PopupType.CommitConflictsWarning,
-        files: conflictedFilesSelected,
-        repository: this.props.repository,
-        context,
-      })
-      return false
-    }
-
-    return this.props.dispatcher.commitIncludedChanges(
-      this.props.repository,
+      this.props.changes.workingDirectory,
       context
     )
-  }
 
   private onCreateCopilotAssistedCommits = (
     request: ICopilotAssistedCommitRequest

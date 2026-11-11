@@ -66,34 +66,19 @@ export const main = merge({}, commonConfig, {
   ],
 })
 
-export const renderer = merge(
+// Both frontends run the original Dispatcher in an Electron renderer. CLI
+// helpers and Copilot JSON-RPC therefore need the same non-browser bundling.
+const rendererPlatformConfig: webpack.Configuration = merge(
   {},
-  commonConfig,
   getKoffiWebpackConfig(
     path.resolve(__dirname, 'node_modules'),
     process.platform,
     getDistArchitecture()
   ),
   {
-    entry: { renderer: path.resolve(__dirname, 'src/ui/index') },
     target: 'electron-renderer',
-    module: {
-      rules: [
-        {
-          test: /\.(jpe?g|png|gif|ico)$/,
-          use: ['file?name=[path][name].[ext]'],
-        },
-        {
-          test: /\.cmd$/,
-          type: 'asset/resource',
-        },
-      ],
-    },
+    module: { rules: [{ test: /\.cmd$/, type: 'asset/resource' }] },
     plugins: [
-      new HtmlWebpackPlugin({
-        template: path.join(__dirname, 'static', 'index.html'),
-        chunks: ['renderer'],
-      }),
       new webpack.NormalModuleReplacementPlugin(
         /^vscode-jsonrpc$/,
         resource => {
@@ -106,18 +91,57 @@ export const renderer = merge(
           resource.request = 'vscode-jsonrpc/lib/node/main.js'
         }
       ),
-      new webpack.DefinePlugin(
-        Object.assign({}, replacements, {
-          __PROCESS_KIND__: JSON.stringify('ui'),
-        })
-      ),
     ],
     resolve: {
-      // Prevent the renderer from using browser-specific versions of modules
+      // Prevent the original kernel from selecting browser-specific modules.
       aliasFields: [],
     },
   }
 )
+
+export const renderer = merge({}, commonConfig, rendererPlatformConfig, {
+  entry: { renderer: path.resolve(__dirname, 'src/ui/index') },
+  target: 'electron-renderer',
+  module: {
+    rules: [
+      {
+        test: /\.(jpe?g|png|gif|ico)$/,
+        use: ['file?name=[path][name].[ext]'],
+      },
+    ],
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, 'static', 'index.html'),
+      chunks: ['renderer'],
+    }),
+    new webpack.DefinePlugin(
+      Object.assign({}, replacements, {
+        __PROCESS_KIND__: JSON.stringify('ui'),
+      })
+    ),
+  ],
+})
+
+export const nativeKernel = merge({}, commonConfig, rendererPlatformConfig, {
+  entry: {
+    'native-kernel': path.resolve(__dirname, 'src/native-kernel/renderer'),
+  },
+  target: 'electron-renderer',
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, 'static', 'native-kernel.html'),
+      filename: 'native-kernel.html',
+      chunks: ['native-kernel'],
+    }),
+    new webpack.DefinePlugin(
+      Object.assign({}, replacements, {
+        __PROCESS_KIND__: JSON.stringify('ui'),
+      })
+    ),
+  ],
+  resolve: { aliasFields: [] },
+})
 
 export const crash = merge({}, commonConfig, {
   entry: { crash: path.resolve(__dirname, 'src/crash/index') },

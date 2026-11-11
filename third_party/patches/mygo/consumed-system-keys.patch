@@ -1,0 +1,98 @@
+diff --git a/ui/input.go b/ui/input.go
+--- a/ui/input.go
++++ b/ui/input.go
+@@ -982,7 +982,8 @@
+ 		return true
+ 	}
+ 	if (key == KeyContextMenu && mods == 0 || key == KeyF10 && mods == Shift) && !rt.claimed(k) && rt.menuKey() {
+-		return false
++		// A context menu owns its key; the host must not also open its bar.
++		return true
+ 	}
+ 	if s := rt.states[rt.focused]; s != nil && s.editor != nil && s.flags&(flagEditable|flagSelectable) != 0 && s.editor.wants(k) {
+ 		if rt.textSelectionKey(s, k) {
+diff --git a/internal/windows/surface.go b/internal/windows/surface.go
+--- a/internal/windows/surface.go
++++ b/internal/windows/surface.go
+@@ -922,7 +922,7 @@
+ 		}
+ 		// Alt+F4, Alt+Space and F10 keep working, and Alt the menu bar, unless
+ 		// the content took it as a key of its own.
+-		return 0, m == wmKeyDown || rawTaken
++		return 0, m == wmKeyDown || s.keyTaken
+ 	case wmKeyUp, wmSysKeyUp:
+ 		modifiers := mods()
+ 		if modifierKey(wp) {
+diff --git a/ui/gitowl_context_key_test.go b/ui/gitowl_context_key_test.go
+new file mode 100644
+--- /dev/null
++++ b/ui/gitowl_context_key_test.go
+@@ -0,0 +1,32 @@
++package ui
++
++import (
++	"testing"
++
++	"github.com/egoist/mygo/internal/platform"
++)
++
++func TestGitowlContextMenuKeysAreConsumed(t *testing.T) {
++	for _, key := range []struct {
++		key  platform.Key
++		mods platform.Modifiers
++	}{
++		{platform.KeyF10, platform.ModShift}, {platform.KeyContextMenu, 0},
++	} {
++		a := &menuApp{}
++		tt := coreNewTester(a.view, 400, 400)
++		tt.Click("Report.pdf")
++		if !tt.rt.event(platform.SurfaceEvent{Kind: platform.KeyPressed, Key: key.key, Mods: key.mods}) {
++			t.Fatalf("opened context menu key was left to the system: %v", key.key)
++		}
++		tt.Frame()
++		if !menuShows(tt) {
++			t.Fatal("consumed key did not open context menu")
++		}
++	}
++	tt := coreNewTester(func(c *context) { coreButton(c, "No context menu") }, 400, 400)
++	tt.Click("No context menu")
++	if tt.rt.event(platform.SurfaceEvent{Kind: platform.KeyPressed, Key: platform.KeyF10, Mods: platform.ModShift}) {
++		t.Fatal("key without a context target was consumed")
++	}
++}
+diff --git a/internal/windows/gitowl_system_key_test.go b/internal/windows/gitowl_system_key_test.go
+new file mode 100644
+--- /dev/null
++++ b/internal/windows/gitowl_system_key_test.go
+@@ -0,0 +1,31 @@
++//go:build windows && (amd64 || arm64)
++
++package windows
++
++import (
++	"testing"
++
++	"github.com/egoist/mygo/internal/platform"
++)
++
++type gitowlKeyHandler struct {
++	platform.WindowHandler
++	taken bool
++}
++
++func (h *gitowlKeyHandler) SurfaceEvent(e platform.SurfaceEvent) bool {
++	return e.Kind == platform.KeyPressed && h.taken
++}
++
++func TestGitowlConsumedSystemKeySkipsDefaultMenu(t *testing.T) {
++	for _, taken := range []bool{false, true} {
++		h := &gitowlKeyHandler{taken: taken}
++		s := &surface{w: &window{h: h}}
++		// F10 is a named WM_SYSKEYDOWN. If content accepts it, passing it
++		// to DefWindowProc would arm the native application's main menu.
++		_, handled := s.message(0, wmSysKeyDown, 0x79, 0x44<<16)
++		if handled != taken {
++			t.Fatalf("taken=%v, handled=%v", taken, handled)
++		}
++	}
++}

@@ -18,8 +18,13 @@ const run = (...args: Array<string>) => {
   if (process.platform === 'darwin') {
     execFile('open', ['-n', join(__dirname, '../../..'), '--args', ...args], cb)
   } else if (process.platform === 'win32') {
-    const exeName = `GitHubDesktop${__DEV__ ? '-dev' : ''}.exe`
-    spawn(join(__dirname, `../../${exeName}`), args, {
+    // The packaged CLI still parses the original open/clone grammar, but only
+    // the MyGo owner may create or focus the original kernel in native builds.
+    const executable =
+      __APP_NAME__ === 'Gitowl'
+        ? join(__dirname, '../../Gitowl.exe')
+        : join(__dirname, `../../GitHubDesktop${__DEV__ ? '-dev' : ''}.exe`)
+    spawn(executable, args, {
       detached: true,
       stdio: 'ignore',
     })
@@ -36,12 +41,14 @@ const args = parse(process.argv.slice(2), {
   boolean: ['help'],
 })
 
+const commandName = __APP_NAME__ === 'Gitowl' ? 'gitowl' : 'github'
+
 const usage = (exitCode = 1): never => {
   process.stderr.write(
-    'GitHub Desktop CLI usage: \n' +
-      '  github                            Open the current directory\n' +
-      '  github open [path]                Open the provided path\n' +
-      '  github clone [-b branch] <url>    Clone the repository by url or name/owner\n' +
+    `${__APP_NAME__} CLI usage: \n` +
+      `  ${commandName}                            Open the current directory\n` +
+      `  ${commandName} open [path]                Open the provided path\n` +
+      `  ${commandName} clone [-b branch] <url>    Clone the repository by url or name/owner\n` +
       '                                    (ex torvalds/linux), optionally checking out\n' +
       '                                    the branch\n'
   )

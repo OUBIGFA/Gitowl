@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { About } from './about'
 import { getName, getVersion } from '../lib/app-proxy'
-import { IUpdateState, UpdateStatus } from '../lib/update-store'
+import { IUpdateState } from '../lib/update-store'
+import {
+  initialAboutTestState,
+  checkAboutTestUpdates,
+} from '../lib/dialog-development-actions'
 
 interface IAboutTestDialogProps {
   /**
@@ -30,14 +34,7 @@ export class AboutTestDialog extends React.Component<
     super(props)
 
     this.state = {
-      updateState: {
-        status: UpdateStatus.UpdateNotAvailable,
-        lastSuccessfulCheck: new Date(Date.now() - 1000 * 60 * 60),
-        isX64ToARM64ImmediateAutoUpdate: false,
-        newReleases: [],
-        prioritizeUpdate: false,
-        prioritizeUpdateInfoUrl: undefined,
-      },
+      updateState: initialAboutTestState(),
     }
   }
 
@@ -79,17 +76,8 @@ export class AboutTestDialog extends React.Component<
     })
   }
 
-  private onCheckForNonStaggeredUpdates = async () => {
-    this.setUpdateState({ status: UpdateStatus.CheckingForUpdates })
-    await this.delay(5000)
-    this.setUpdateState({ status: UpdateStatus.UpdateAvailable })
-    await this.delay(10000)
-
-    this.setUpdateState({
-      status: UpdateStatus.UpdateReady,
-      lastSuccessfulCheck: new Date(),
-    })
-  }
+  private onCheckForNonStaggeredUpdates = () =>
+    checkAboutTestUpdates(state => this.setUpdateState(state), this.delay)
 
   public componentWillUnmount(): void {
     if (this.delayTimeoutId !== null) {

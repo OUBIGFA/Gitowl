@@ -1,3 +1,4 @@
+import { displayDialogRelease } from '../lib/auxiliary-dialog-actions'
 import * as React from 'react'
 import { ReleaseNote, ReleaseSummary } from '../../models/release-notes'
 import { updateStore } from '../lib/update-store'
@@ -86,28 +87,7 @@ export class ReleaseNotes extends React.Component<IReleaseNotesProps, {}> {
    * If there is just one release, it returns it. If multiple, it merges the release notes.
    */
   private getDisplayRelease = () => {
-    const { newReleases } = this.props
-
-    const latestRelease = newReleases.at(0)
-    const oldestRelease = newReleases.at(-1)
-
-    if (
-      latestRelease === undefined ||
-      oldestRelease === undefined ||
-      latestRelease === oldestRelease
-    ) {
-      return latestRelease
-    }
-
-    return {
-      latestVersion: `${oldestRelease.latestVersion} - ${latestRelease.latestVersion}`,
-      datePublished: `${oldestRelease.datePublished} to ${latestRelease.datePublished}`,
-      enhancements: newReleases.flatMap(r => r.enhancements),
-      bugfixes: newReleases.flatMap(r => r.bugfixes),
-      pretext: newReleases.flatMap(r => r.pretext),
-      other: [],
-      thankYous: [],
-    }
+    return displayDialogRelease(this.props.newReleases)
   }
 
   private renderPretext = (pretext: ReadonlyArray<ReleaseNote>) => {

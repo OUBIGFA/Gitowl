@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { discardRetryOperation } from '../../native-kernel/operation-dialogs'
+import { PopupType } from '../../models/popup'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { Dispatcher } from '../dispatcher'
@@ -107,9 +109,15 @@ export class DiscardChangesRetryDialog extends React.Component<
 
     this.setState({ retrying: true })
 
-    await dispatcher.performRetry(retryAction)
-
-    this.props.onConfirmDiscardChangesChanged(this.state.confirmDiscardChanges)
-    this.props.onDismissed()
+    await discardRetryOperation(
+      dispatcher,
+      {
+        type: PopupType.DiscardChangesRetry,
+        retryAction,
+      },
+      this.state.confirmDiscardChanges,
+      this.props.onDismissed,
+      this.props.onConfirmDiscardChangesChanged
+    )
   }
 }

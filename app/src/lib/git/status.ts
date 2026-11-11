@@ -24,10 +24,12 @@ import { IAheadBehind } from '../../models/branch'
 import { fatalError } from '../../lib/fatal-error'
 import { isMergeHeadSet, isSquashMsgSet } from './merge'
 import { getBinaryPaths } from './diff'
-import { getRebaseInternalState } from './rebase'
+import {
+  getRebaseInternalState,
+  isCherryPickHeadFound,
+} from './operation-state'
 import { RebaseInternalState } from '../../models/rebase'
-import { isCherryPickHeadFound } from './cherry-pick'
-import { git } from '.'
+import { git } from './core'
 
 /** The encapsulation of the result from 'git status' */
 export interface IStatusResult {

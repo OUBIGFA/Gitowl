@@ -1,9 +1,19 @@
 import * as React from 'react'
 import { Account } from '../../models/account'
-import type {
-  CopilotQuotaSnapshots,
-  ICopilotQuotaSnapshot,
-} from '../../lib/stores/copilot-store'
+import type { CopilotQuotaSnapshots } from '../../lib/stores/copilot-store'
+import {
+  SnapshotKey,
+  ISnapshotDefinition,
+  IEditableSnapshot,
+  SnapshotTestDraft as ITestCopilotSnapshotCardDialogState,
+  snapshotDefinitions,
+  getDefaultSnapshots,
+  getInitialAccount,
+  getTestSnapshotAccount,
+  getTestSnapshots,
+  tokenBasedBillingTestPreset,
+  rateLimitTestPreset,
+} from './test-snapshot-controller'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 import { TextBox } from '../lib/text-box'
@@ -17,140 +27,8 @@ interface ITestCopilotSnapshotCardDialogProps {
   readonly onDismissed: () => void
 }
 
-type SnapshotKey =
-  | 'chat'
-  | 'completions'
-  | 'premium_interactions'
-  | 'session'
-  | 'weekly'
-
-interface ISnapshotDefinition {
-  readonly key: SnapshotKey
-  readonly label: string
-}
-
-const snapshotDefinitions: ReadonlyArray<ISnapshotDefinition> = [
-  { key: 'chat', label: 'Chat messages' },
-  { key: 'completions', label: 'Code completions' },
-  { key: 'premium_interactions', label: 'Premium requests / AI credits' },
-  { key: 'session', label: 'Session limits' },
-  { key: 'weekly', label: 'Weekly limits' },
-]
-
-interface IEditableSnapshot {
-  readonly enabled: boolean
-  readonly tokenBasedBilling: boolean
-  readonly isUnlimitedEntitlement: boolean
-  readonly entitlementRequests: string
-  readonly usedRequests: string
-  readonly usageAllowedWithExhaustedQuota: boolean
-  readonly remainingPercentage: string
-  readonly overage: string
-  readonly overageAllowedWithExhaustedQuota: boolean
-  readonly resetDate: string
-}
-
-interface IEditableSnapshots {
-  readonly chat: IEditableSnapshot
-  readonly completions: IEditableSnapshot
-  readonly premium_interactions: IEditableSnapshot
-  readonly session: IEditableSnapshot
-  readonly weekly: IEditableSnapshot
-}
-
-interface ITestCopilotSnapshotCardDialogState {
-  readonly login: string
-  readonly name: string
-  readonly endpoint: string
-  readonly avatarURL: string
-  readonly snapshots: IEditableSnapshots
-}
-
-function defaultSnapshot(
-  overrides: Partial<IEditableSnapshot> = {}
-): IEditableSnapshot {
-  return {
-    enabled: true,
-    tokenBasedBilling: false,
-    isUnlimitedEntitlement: false,
-    entitlementRequests: '100',
-    usedRequests: '25',
-    usageAllowedWithExhaustedQuota: false,
-    remainingPercentage: '75',
-    overage: '0',
-    overageAllowedWithExhaustedQuota: false,
-    resetDate: '',
-    ...overrides,
-  }
-}
-
-function getDefaultSnapshots(): IEditableSnapshots {
-  return {
-    chat: defaultSnapshot(),
-    completions: defaultSnapshot({ enabled: false }),
-    premium_interactions: defaultSnapshot({
-      entitlementRequests: '300',
-      usedRequests: '90',
-      remainingPercentage: '70',
-    }),
-    session: defaultSnapshot({
-      enabled: false,
-      entitlementRequests: '0',
-      usedRequests: '0',
-      remainingPercentage: '100',
-    }),
-    weekly: defaultSnapshot({
-      enabled: false,
-      entitlementRequests: '0',
-      usedRequests: '0',
-      remainingPercentage: '100',
-    }),
-  }
-}
-
-function parseNumber(value: string, fallback: number): number {
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : fallback
-}
-
 function checkboxValue(value: boolean): CheckboxValue {
   return value ? CheckboxValue.On : CheckboxValue.Off
-}
-
-function getResetDate(value: string): string | undefined {
-  const trimmedValue = value.trim()
-  return trimmedValue.length > 0 ? trimmedValue : undefined
-}
-
-function getSnapshot(snapshot: IEditableSnapshot): ICopilotQuotaSnapshot {
-  return {
-    tokenBasedBilling: snapshot.tokenBasedBilling,
-    isUnlimitedEntitlement: snapshot.isUnlimitedEntitlement,
-    entitlementRequests: parseNumber(snapshot.entitlementRequests, 0),
-    usedRequests: parseNumber(snapshot.usedRequests, 0),
-    usageAllowedWithExhaustedQuota: snapshot.usageAllowedWithExhaustedQuota,
-    remainingPercentage: parseNumber(snapshot.remainingPercentage, 100),
-    overage: parseNumber(snapshot.overage, 0),
-    overageAllowedWithExhaustedQuota: snapshot.overageAllowedWithExhaustedQuota,
-    resetDate: getResetDate(snapshot.resetDate),
-  }
-}
-
-function getInitialAccount(
-  accounts: ReadonlyArray<Account>
-): Pick<
-  ITestCopilotSnapshotCardDialogState,
-  'login' | 'name' | 'endpoint' | 'avatarURL'
-> {
-  const account = accounts.find(a => a.login.trim().length > 0)
-
-  return {
-    login: account?.login ?? 'mona',
-    name: account?.name ?? 'Mona Lisa',
-    endpoint: account?.endpoint ?? 'https://api.github.com',
-    avatarURL:
-      account?.avatarURL ?? 'https://avatars.githubusercontent.com/u/1',
-  }
 }
 
 export class TestCopilotSnapshotCardDialog extends React.Component<
@@ -205,33 +83,11 @@ export class TestCopilotSnapshotCardDialog extends React.Component<
   }
 
   private getAccount(): Account {
-    return new Account(
-      this.state.login.trim() || 'mona',
-      this.state.endpoint.trim() || 'https://api.github.com',
-      'fake-token',
-      [],
-      this.state.avatarURL.trim(),
-      1,
-      this.state.name.trim(),
-      'free',
-      'https://copilot-proxy.githubusercontent.com',
-      true,
-      [],
-      'COPILOT_INDIVIDUAL'
-    )
+    return getTestSnapshotAccount(this.state)
   }
 
   private getSnapshots(): CopilotQuotaSnapshots {
-    const snapshots = new Map<string, ICopilotQuotaSnapshot>()
-
-    for (const definition of snapshotDefinitions) {
-      const snapshot = this.state.snapshots[definition.key]
-      if (snapshot.enabled) {
-        snapshots.set(definition.key, getSnapshot(snapshot))
-      }
-    }
-
-    return snapshots
+    return getTestSnapshots(this.state.snapshots)
   }
 
   private renderAccountControls(): JSX.Element {
@@ -438,65 +294,10 @@ export class TestCopilotSnapshotCardDialog extends React.Component<
     }
 
   private onUseTokenBasedBillingPreset = () => {
-    this.setState({
-      snapshots: {
-        chat: defaultSnapshot({
-          tokenBasedBilling: true,
-          isUnlimitedEntitlement: true,
-          entitlementRequests: '-1',
-          usedRequests: '0',
-          remainingPercentage: '100',
-        }),
-        completions: defaultSnapshot({
-          tokenBasedBilling: true,
-          isUnlimitedEntitlement: true,
-          entitlementRequests: '-1',
-          usedRequests: '0',
-          remainingPercentage: '100',
-        }),
-        premium_interactions: defaultSnapshot({
-          tokenBasedBilling: true,
-          entitlementRequests: '12.5',
-          usedRequests: '2.5',
-          remainingPercentage: '80',
-        }),
-        session: defaultSnapshot({
-          enabled: false,
-          tokenBasedBilling: true,
-          entitlementRequests: '0',
-          usedRequests: '0',
-          remainingPercentage: '100',
-        }),
-        weekly: defaultSnapshot({
-          enabled: false,
-          tokenBasedBilling: true,
-          entitlementRequests: '0',
-          usedRequests: '0',
-          remainingPercentage: '100',
-        }),
-      },
-    })
+    this.setState({ snapshots: tokenBasedBillingTestPreset() })
   }
 
   private onUseRateLimitPreset = () => {
-    const resetDate = new Date(Date.now() + 45 * 60 * 1000).toISOString()
-    this.setState({
-      snapshots: {
-        ...getDefaultSnapshots(),
-        session: defaultSnapshot({
-          enabled: true,
-          entitlementRequests: '0',
-          usedRequests: '0',
-          remainingPercentage: '35',
-          resetDate,
-        }),
-        weekly: defaultSnapshot({
-          enabled: true,
-          entitlementRequests: '0',
-          usedRequests: '0',
-          remainingPercentage: '92',
-        }),
-      },
-    })
+    this.setState({ snapshots: rateLimitTestPreset() })
   }
 }

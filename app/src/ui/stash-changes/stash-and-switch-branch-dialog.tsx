@@ -1,15 +1,14 @@
 import * as React from 'react'
+import { switchBranchOperation } from '../../native-kernel/operation-dialogs'
 import { Dialog, DialogContent, DialogFooter } from '../dialog'
 import { Repository } from '../../models/repository'
 import { Dispatcher } from '../dispatcher'
 import { VerticalSegmentedControl } from '../lib/vertical-segmented-control'
 import { Row } from '../lib/row'
 import { Branch } from '../../models/branch'
-import { UncommittedChangesStrategy } from '../../models/uncommitted-changes-strategy'
 import { Octicon } from '../octicons'
 import * as octicons from '../octicons/octicons.generated'
 import { PopupType } from '../../models/popup'
-import { startTimer } from '../lib/timing'
 import { OkCancelButtonGroup } from '../dialog/ok-cancel-button-group'
 
 enum StashAction {
@@ -136,37 +135,31 @@ export class StashAndSwitchBranch extends React.Component<
       selectedStashAction === StashAction.StashOnCurrentBranch &&
       hasAssociatedStash
     ) {
-      dispatcher.showPopup({
-        type: PopupType.ConfirmOverwriteStash,
-        repository,
-        branchToCheckout,
-      })
-      return
+      return switchBranchOperation(
+        dispatcher,
+        {
+          type: PopupType.StashAndSwitchBranch,
+          repository,
+          branchToCheckout,
+        },
+        hasAssociatedStash,
+        false,
+        this.props.onDismissed
+      )
     }
 
     this.setState({ isStashingChanges: true })
 
-    const timer = startTimer('stash and checkout', repository)
-    try {
-      if (selectedStashAction === StashAction.StashOnCurrentBranch) {
-        await dispatcher.checkoutBranch(
-          repository,
-          branchToCheckout,
-          UncommittedChangesStrategy.StashOnCurrentBranch
-        )
-      } else if (selectedStashAction === StashAction.MoveToNewBranch) {
-        // attempt to checkout the branch without creating a stash entry
-        await dispatcher.checkoutBranch(
-          repository,
-          branchToCheckout,
-          UncommittedChangesStrategy.MoveToNewBranch
-        )
-      }
-    } finally {
-      timer.done()
-      this.setState({ isStashingChanges: false }, () => {
-        this.props.onDismissed()
-      })
-    }
+    await switchBranchOperation(
+      dispatcher,
+      {
+        type: PopupType.StashAndSwitchBranch,
+        repository,
+        branchToCheckout,
+      },
+      hasAssociatedStash,
+      selectedStashAction === StashAction.MoveToNewBranch,
+      () => this.setState({ isStashingChanges: false }, this.props.onDismissed)
+    )
   }
 }

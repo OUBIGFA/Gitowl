@@ -1,4 +1,4 @@
-import { IMenuItem } from '../../lib/menu-item'
+import { WorkspaceMenuItem as IMenuItem } from '../lib/workspace-menu'
 
 interface IPullRequestContextMenuConfig {
   onViewPullRequestOnGitHub?: () => void
@@ -13,6 +13,7 @@ export function generatePullRequestContextMenuItems(
 
   if (onViewPullRequestOnGitHub !== undefined) {
     items.push({
+      labelKey: 'workspace.viewPR',
       label: 'View Pull Request on GitHub',
       action: () => onViewPullRequestOnGitHub(),
     })
@@ -20,6 +21,7 @@ export function generatePullRequestContextMenuItems(
 
   if (onCheckoutInNewWorktree !== undefined) {
     items.push({
+      labelKey: 'workspace.checkoutWorktree',
       label: __DARWIN__
         ? 'Checkout in New Worktree…'
         : 'Checkout in new worktree…',

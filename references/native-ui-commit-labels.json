@@ -1,0 +1,213 @@
+{
+  "commit.options": {
+    "en": "Commit options",
+    "zh-Hans": "提交选项",
+    "zh-Hant": "提交選項"
+  },
+  "commit.mode": {
+    "en": "Save method",
+    "zh-Hans": "保存方式",
+    "zh-Hant": "儲存方式"
+  },
+  "commit.manual": {
+    "en": "Write the commit message",
+    "zh-Hans": "自己填写提交说明",
+    "zh-Hant": "自行填寫提交說明"
+  },
+  "commit.assisted": {
+    "en": "Group and commit with Copilot",
+    "zh-Hans": "用 Copilot 分组并提交",
+    "zh-Hant": "用 Copilot 分組並提交"
+  },
+  "commit.amend": {
+    "en": "Amend the latest commit",
+    "zh-Hans": "修订最近一次提交",
+    "zh-Hant": "修訂最近一次提交"
+  },
+  "commit.amendSave": {
+    "en": "Save amendment",
+    "zh-Hans": "保存修订",
+    "zh-Hant": "儲存修訂"
+  },
+  "commit.assistedSave": {
+    "en": "Group and save",
+    "zh-Hans": "分组并保存",
+    "zh-Hant": "分組並儲存"
+  },
+  "commit.skipHooks": {
+    "en": "Bypass commit hooks",
+    "zh-Hans": "跳过提交钩子",
+    "zh-Hant": "略過提交掛鉤"
+  },
+  "commit.signOff": {
+    "en": "Add Signed-off-by trailer",
+    "zh-Hans": "添加 Signed-off-by 尾注",
+    "zh-Hant": "加入 Signed-off-by 尾註"
+  },
+  "commit.allowEmpty": {
+    "en": "Allow an empty commit",
+    "zh-Hans": "允许空提交",
+    "zh-Hant": "允許空提交"
+  },
+  "commit.pushAfter": {
+    "en": "Push after assisted commits",
+    "zh-Hans": "协助提交后推送",
+    "zh-Hant": "協助提交後推送"
+  },
+  "commit.pushNotice": {
+    "en": "This opt-in applies only to assisted commits. Generating a message never commits or pushes.",
+    "zh-Hans": "此选项仅用于协助提交。生成说明不会自动提交或推送。",
+    "zh-Hant": "此選項僅用於協助提交。產生說明不會自動提交或推送。"
+  },
+  "commit.coAuthors": {
+    "en": "Show co-authors",
+    "zh-Hans": "显示共同作者",
+    "zh-Hant": "顯示共同作者"
+  },
+  "commit.findAuthor": {
+    "en": "Find a GitHub co-author",
+    "zh-Hans": "查找 GitHub 共同作者",
+    "zh-Hant": "尋找 GitHub 共同作者"
+  },
+  "commit.chooseAuthor": {
+    "en": "Choose a co-author",
+    "zh-Hans": "选择共同作者",
+    "zh-Hant": "選擇共同作者"
+  },
+  "commit.addAuthor": { "en": "Add", "zh-Hans": "添加", "zh-Hant": "加入" },
+  "commit.removeAuthor": {
+    "en": "Remove co-author",
+    "zh-Hans": "移除共同作者",
+    "zh-Hant": "移除共同作者"
+  },
+  "commit.searching": {
+    "en": "Searching co-authors…",
+    "zh-Hans": "正在查找共同作者…",
+    "zh-Hant": "正在尋找共同作者…"
+  },
+  "commit.unresolved": {
+    "en": "Not resolved",
+    "zh-Hans": "尚未确认身份",
+    "zh-Hant": "尚未確認身分"
+  },
+  "commit.checkingRules": {
+    "en": "Checking repository rules…",
+    "zh-Hans": "正在检查仓库规则…",
+    "zh-Hant": "正在檢查儲存庫規則…"
+  },
+  "commit.rulesBlocked": {
+    "en": "The message or author does not meet repository rules. Review the commit options and identity.",
+    "zh-Hans": "说明或作者不符合仓库规则。请检查提交选项及身份。",
+    "zh-Hant": "說明或作者不符合儲存庫規則。請檢查提交選項及身分。"
+  },
+  "commit.summaryHint": {
+    "en": "Keep details in the description.",
+    "zh-Hans": "摘要保持简短，详细内容放入说明。",
+    "zh-Hant": "摘要保持簡短，詳細內容放入說明。"
+  },
+  "commit.assistedNotice": {
+    "en": "Copilot groups the selected changes into local commits. Review the selected files and options before saving.",
+    "zh-Hans": "Copilot 会将所选改动分组为本地提交。保存前请检查所选文件和选项。",
+    "zh-Hant": "Copilot 會將所選變更分組為本機提交。儲存前請檢查所選檔案和選項。"
+  },
+  "commit.cancelAssisted": {
+    "en": "Cancel safely",
+    "zh-Hans": "安全取消",
+    "zh-Hant": "安全取消"
+  },
+  "commit.retryAssisted": {
+    "en": "Retry recovery",
+    "zh-Hans": "重试恢复",
+    "zh-Hant": "重試復原"
+  },
+  "commit.dismissAssisted": {
+    "en": "Dismiss",
+    "zh-Hans": "关闭提示",
+    "zh-Hant": "關閉提示"
+  },
+  "commit.details": {
+    "en": "Inspect error",
+    "zh-Hans": "查看错误",
+    "zh-Hant": "查看錯誤"
+  },
+  "commit.progress": {
+    "en": "View commit output",
+    "zh-Hans": "查看提交输出",
+    "zh-Hant": "查看提交輸出"
+  },
+  "commit.phase.awaiting-consent": {
+    "en": "Waiting for confirmation",
+    "zh-Hans": "等待确认",
+    "zh-Hant": "等待確認"
+  },
+  "commit.phase.preparing": {
+    "en": "Preparing",
+    "zh-Hans": "准备中",
+    "zh-Hant": "準備中"
+  },
+  "commit.phase.capturing": {
+    "en": "Capturing selected changes",
+    "zh-Hans": "捕获所选改动",
+    "zh-Hant": "擷取所選變更"
+  },
+  "commit.phase.analyzing": {
+    "en": "Grouping changes",
+    "zh-Hans": "分析改动分组",
+    "zh-Hant": "分析變更分組"
+  },
+  "commit.phase.summarizing-selection": {
+    "en": "Summarizing the selection",
+    "zh-Hans": "整理所选改动",
+    "zh-Hant": "整理所選變更"
+  },
+  "commit.phase.validating": {
+    "en": "Validating the plan",
+    "zh-Hans": "验证提交方案",
+    "zh-Hant": "驗證提交方案"
+  },
+  "commit.phase.finishing": {
+    "en": "Finishing",
+    "zh-Hans": "正在完成",
+    "zh-Hant": "正在完成"
+  },
+  "commit.phase.committing": {
+    "en": "Creating local commits",
+    "zh-Hans": "创建本地提交",
+    "zh-Hant": "建立本機提交"
+  },
+  "commit.phase.rolling-back": {
+    "en": "Restoring safely",
+    "zh-Hans": "正在安全恢复",
+    "zh-Hant": "正在安全復原"
+  },
+  "commit.phase.refreshing": {
+    "en": "Refreshing changes",
+    "zh-Hans": "正在刷新改动",
+    "zh-Hant": "正在重新整理變更"
+  },
+  "commit.phase.closing": {
+    "en": "Settling the operation",
+    "zh-Hans": "确认操作结果",
+    "zh-Hant": "確認操作結果"
+  },
+  "commit.phase.preparing-push": {
+    "en": "Preparing the requested push",
+    "zh-Hans": "准备已请求的推送",
+    "zh-Hant": "準備已請求的推送"
+  },
+  "commit.phase.pushing": {
+    "en": "Pushing",
+    "zh-Hans": "正在推送",
+    "zh-Hant": "正在推送"
+  },
+  "commit.phase.push-error": {
+    "en": "Local commits saved; push needs attention",
+    "zh-Hans": "本地提交已保存，推送需要处理",
+    "zh-Hant": "本機提交已儲存，推送需要處理"
+  },
+  "commit.phase.error": {
+    "en": "Recovery needs attention",
+    "zh-Hans": "恢复过程需要处理",
+    "zh-Hant": "復原過程需要處理"
+  }
+}

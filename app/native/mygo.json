@@ -1,0 +1,16 @@
+{
+  "name": "Gitowl",
+  "identifier": "io.github.oubigfa.gitowl",
+  "version": "0.0.1",
+  "icon": "../static/logos/gitowl/logo.png",
+  "resources": [
+    "../static/logos/gitowl/logo.png",
+    "../../output/native-runtime/desktop-kernel",
+    "../../output/native-runtime/build-info.json"
+  ],
+  "out": "../../output/native",
+  "urlSchemes": ["gitowl", "gitowl-auth"],
+  "windows": { "installerInclude": "installer.nsh" },
+  "i18n": { "dir": "locales", "source": "en" },
+  "linux": { "webview": false }
+}
