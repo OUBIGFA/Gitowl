@@ -32,11 +32,14 @@ export async function trustMissingRepository(
   repository: Repository,
   unsafePath: string | undefined
 ) {
-  if (!unsafePath) return
+  if (!unsafePath) {
+    return
+  }
   await addSafeDirectory(unsafePath)
   const type = await inspectMissingRepository(repository)
-  if (type.kind !== 'unsafe')
+  if (type.kind !== 'unsafe') {
     await checkMissingRepository(dispatcher, repository)
+  }
 }
 
 export async function cloneMissingRepository(
@@ -44,7 +47,9 @@ export async function cloneMissingRepository(
   repository: Repository
 ) {
   const cloneURL = missingRepositoryCloneURL(repository)
-  if (!cloneURL) return
+  if (!cloneURL) {
+    return
+  }
   try {
     await dispatcher.cloneAgain(cloneURL, repository.path)
   } catch (error) {

@@ -455,6 +455,8 @@
     }
   },
   "requiredField": "{label} (required)",
+  "requiredFieldEmpty": "This field cannot be empty.",
+  "quitWaitingForWork": "{count, plural, one {Waiting for # operation to finish. Gitowl will quit when it is done.} other {Waiting for # operations to finish. Gitowl will quit when they are done.}}",
   "saveProviderFirst": "Save the connection before managing models",
   "matchedFiles": "{matched} of {total} files match",
   "noMatchingFiles": "No files match these filters",

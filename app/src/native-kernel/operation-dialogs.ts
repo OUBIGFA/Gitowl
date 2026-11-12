@@ -52,10 +52,10 @@ import { sanitizedRefName } from '../lib/sanitize-ref-name'
 import { getAccountForCopilotConflictResolution } from '../lib/get-account-for-repository'
 import { enableCopilotConflictResolution } from '../lib/feature-flag'
 import {
-  NativeDialogModule,
-  NativeDialogPresentation,
+  INativeDialogModule,
+  INativeDialogPresentation,
   NativeDialogField,
-  NativeDialogAction,
+  INativeDialogAction,
   dialogValues,
   dialogString,
   dialogBoolean,
@@ -460,7 +460,7 @@ const action = (
   id: string,
   label: string,
   destructive = false
-): NativeDialogAction => ({
+): INativeDialogAction => ({
   id,
   labelKey: k(label),
   primary: id === 'submit' || id === 'continue',
@@ -476,7 +476,9 @@ function repositoryState(
   state: IAppState
 ): IRepositoryState {
   const owned = ownerRepositoryStates.get(popup)
-  if (owned !== undefined) return owned()
+  if (owned !== undefined) {
+    return owned()
+  }
   const selected = state.selectedState
   if (
     selected?.type !== SelectionType.Repository ||
@@ -728,7 +730,7 @@ function hasUnresolvedSkipped(p: OperationConflictPresentation) {
 function multiPresentation(
   popup: Of<PopupType.MultiCommitOperation>,
   state: IAppState
-): Pick<NativeDialogPresentation, 'fields' | 'actions' | 'descriptionKey'> {
+): Pick<INativeDialogPresentation, 'fields' | 'actions' | 'descriptionKey'> {
   const rs = repositoryState(popup, state)
   const op = rs.multiCommitOperationState
   if (op === null) {
@@ -746,7 +748,10 @@ function multiPresentation(
   ]
   // Branch operations have no commit range until the original preview runs.
   // An empty read-only editor suggests a missing required input to the user.
-  if ('commits' in op.operationDetail && op.operationDetail.commits.length > 0) {
+  if (
+    'commits' in op.operationDetail &&
+    op.operationDetail.commits.length > 0
+  ) {
     fields.push({
       id: 'commits',
       labelKey: k('commits'),
@@ -898,7 +903,7 @@ function multiPresentation(
               p.workingDirectory,
               op.step.conflictState.manualResolutions
             ).length === 0
-      const actions: NativeDialogAction[] = [
+      const actions: INativeDialogAction[] = [
         { ...action('continue', 'continue'), disabled: !canContinue },
         action('resolve', 'applyChoices'),
         action('openFile', 'openFile'),
@@ -989,11 +994,13 @@ function operationActionFields(
     .map(f => f.id)
 }
 
-function project(popup: Popup, state: IAppState): NativeDialogPresentation {
+function project(popup: Popup, state: IAppState): INativeDialogPresentation {
   try {
     return projectOperation(popup, state)
   } catch (error) {
-    if (!(error instanceof OperationOwnerUnavailable)) throw error
+    if (!(error instanceof OperationOwnerUnavailable)) {
+      throw error
+    }
     // Do not let a missing owner's form suppress every other kernel snapshot.
     // No operation is fabricated; the existing original cancel stays available.
     return {
@@ -1012,11 +1019,11 @@ function project(popup: Popup, state: IAppState): NativeDialogPresentation {
 function projectOperation(
   popup: Popup,
   state: IAppState
-): NativeDialogPresentation {
+): INativeDialogPresentation {
   if (!types.includes(popup.type)) {
     throw new Error('Wrong operation dialog type')
   }
-  const base: NativeDialogPresentation = {
+  const base: INativeDialogPresentation = {
     popupID: popup.id ?? null,
     type: popup.type,
     supported: true,
@@ -2185,7 +2192,7 @@ const types: ReadonlyArray<PopupType> = [
   PopupType.CopilotConflictResolutionAlwaysNudge,
 ]
 
-export const operationDialogs: NativeDialogModule = {
+export const operationDialogs: INativeDialogModule = {
   types,
   project,
   reply,

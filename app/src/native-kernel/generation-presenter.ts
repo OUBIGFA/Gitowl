@@ -140,14 +140,18 @@ export function parseGenerationCommand(
     default:
       return null
   }
-  if (!valid) throw new Error('Invalid generation command parameters')
+  if (!valid) {
+    throw new Error('Invalid generation command parameters')
+  }
   return value as unknown as NativeGenerationCommand
 }
 
 export function projectGenerationSettings(
   settings: IAppState['commitGeneration']
 ): KernelGenerationSettings | null {
-  if (settings === undefined) return null
+  if (settings === undefined) {
+    return null
+  }
   return {
     providers: settings.providers.map(provider => ({
       id: provider.id,

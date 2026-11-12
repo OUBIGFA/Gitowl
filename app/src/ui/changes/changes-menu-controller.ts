@@ -1,6 +1,6 @@
 import * as Path from 'path'
 import { EOL } from 'os'
-import { WorkspaceMenuItem } from '../lib/workspace-menu'
+import { IWorkspaceMenuItem } from '../lib/workspace-menu'
 import {
   WorkingDirectoryFileChange,
   WorkingDirectoryStatus,
@@ -20,7 +20,7 @@ import {
   CopySelectedRelativePathsLabel,
 } from '../lib/context-menu'
 
-export interface ChangesMenuConfig {
+export interface IChangesMenuConfig {
   readonly repository: Repository
   readonly workingDirectory: WorkingDirectoryStatus
   readonly selectedFileIDs: ReadonlyArray<string>
@@ -40,10 +40,10 @@ export interface ChangesMenuConfig {
 /** The original changes-list policy. In particular a right-click outside a
  * multi-selection acts on that file alone; rebase exposes only safe actions. */
 export function generateChangesContextMenu(
-  config: ChangesMenuConfig,
+  config: IChangesMenuConfig,
   file: WorkingDirectoryFileChange,
   rebase: boolean
-): ReadonlyArray<WorkspaceMenuItem> {
+): ReadonlyArray<IWorkspaceMenuItem> {
   const { path, status } = file
   const ids = config.selectedFileIDs.includes(file.id)
     ? config.selectedFileIDs
@@ -53,8 +53,8 @@ export function generateChangesContextMenu(
     return found === null || found === undefined ? [] : [found]
   })
   const paths = rebase ? [path] : selected.map(f => f.path)
-  const items: WorkspaceMenuItem[] = []
-  const discard = (): WorkspaceMenuItem => ({
+  const items: IWorkspaceMenuItem[] = []
+  const discard = (): IWorkspaceMenuItem => ({
     labelKey: config.askForConfirmationOnDiscardChanges
       ? 'workspace.discardConfirm'
       : 'workspace.discard',
@@ -70,8 +70,9 @@ export function generateChangesContextMenu(
       (config.askForConfirmationOnDiscardChanges ? '…' : ''),
     action: () => config.onDiscard(paths),
   })
-  if (!rebase || status.kind === AppFileStatusKind.Untracked)
+  if (!rebase || status.kind === AppFileStatusKind.Untracked) {
     items.push(discard(), { type: 'separator' })
+  }
   if (!rebase) {
     const enabled = Path.basename(path) !== '.gitignore'
     if (paths.length === 1) {
@@ -84,7 +85,7 @@ export function generateChangesContextMenu(
         enabled,
       })
       const folders = path.split('/').slice(0, -1)
-      if (folders.length > 0)
+      if (folders.length > 0) {
         items.push({
           labelKey: 'workspace.ignoreFolder',
           label: __DARWIN__
@@ -103,6 +104,7 @@ export function generateChangesContextMenu(
             }
           }),
         })
+      }
     } else if (paths.length > 1) {
       items.push({
         labelKey: 'workspace.ignoreSelected',
@@ -120,7 +122,7 @@ export function generateChangesContextMenu(
     const extensions = Array.from(
       new Set(paths.map(p => Path.extname(p)).filter(e => e.length > 0))
     )
-    for (const extension of extensions.slice(0, 5))
+    for (const extension of extensions.slice(0, 5)) {
       items.push({
         labelKey: 'workspace.ignoreExtension',
         labelData: [extension],
@@ -129,7 +131,8 @@ export function generateChangesContextMenu(
           : `Ignore all ${extension} files (add to .gitignore)`,
         action: () => config.onIgnorePattern(`*${extension}`),
       })
-    if (paths.length > 1)
+    }
+    if (paths.length > 1) {
       items.push(
         { type: 'separator' },
         {
@@ -151,6 +154,7 @@ export function generateChangesContextMenu(
           },
         }
       )
+    }
     items.push({ type: 'separator' })
   }
   const multi = !rebase && paths.length > 1

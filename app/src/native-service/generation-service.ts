@@ -197,17 +197,15 @@ export class GenerationService {
 
   public settings() {
     const models = [
-      ...this.providers
-        .getEnabledModels()
-        .map(m => ({
-          selection: {
-            kind: 'custom' as const,
-            providerId: m.providerId,
-            modelId: m.modelId,
-          },
-          sourceName: m.providerName,
-          modelName: m.modelName,
-        })),
+      ...this.providers.getEnabledModels().map(m => ({
+        selection: {
+          kind: 'custom' as const,
+          providerId: m.providerId,
+          modelId: m.modelId,
+        },
+        sourceName: m.providerName,
+        modelName: m.modelName,
+      })),
       ...this.state.copilotCatalogs.flatMap(c =>
         c.models
           .filter(m => m.enabled && m.available)

@@ -24,18 +24,18 @@ import {
   getWorktreeDisplayName,
   getWorktreeDescription,
 } from '../models/worktree'
-import type { WorkspaceMenuItem } from '../ui/lib/workspace-menu'
+import type { IWorkspaceMenuItem } from '../ui/lib/workspace-menu'
 import type {
   WorkspaceMenuTarget,
-  WorkspaceFileFilter,
+  IWorkspaceFileFilter,
 } from './workspace-protocol'
-import type { NativeRepositoryReference } from './desktop-presenter'
+import type { INativeRepositoryReference } from './desktop-presenter'
 import { buildWorkspaceMenu } from './workspace-presenter'
 import {
   workspaceBannerID,
   workspaceReorderSelection,
   workspaceNavigationFilters,
-  WorkspaceNavigationFilters,
+  IWorkspaceNavigationFilters,
   workspaceComparison,
   selectedWorkspaceTextDiff,
   workspaceDiffPresentation,
@@ -45,7 +45,7 @@ import { getConflictedFiles } from '../lib/status'
 import { MultiCommitOperationStepKind } from '../models/multi-commit-operation'
 import { workspaceDiffExpansionEnabled } from '../ui/diff/diff-menu-controller'
 import { getTextDiffWithBottomDummyHunk } from '../ui/diff/text-diff-expansion'
-import { projectDiffSelection, KernelDiffSelection } from './line-selection'
+import { projectDiffSelection, IKernelDiffSelection } from './line-selection'
 import { applyFilters } from '../ui/changes/filter-changes-logic'
 import { filterListItems } from '../ui/lib/filter-list-items'
 
@@ -68,27 +68,27 @@ export function visibleWorkingDirectoryFiles(
   ).map(({ item }) => item.change)
 }
 
-export interface KernelWorkspaceMenuItem {
+export interface IKernelWorkspaceMenuItem {
   readonly labelKey: string
   readonly data: ReadonlyArray<string>
   readonly enabled: boolean
   readonly separator: boolean
   readonly checked?: boolean
-  readonly children: ReadonlyArray<KernelWorkspaceMenuItem>
+  readonly children: ReadonlyArray<IKernelWorkspaceMenuItem>
 }
-export interface KernelWorkspaceMenu {
+export interface IKernelWorkspaceMenu {
   readonly target: WorkspaceMenuTarget
   readonly lease: string
-  readonly items: ReadonlyArray<KernelWorkspaceMenuItem>
+  readonly items: ReadonlyArray<IKernelWorkspaceMenuItem>
 }
-export interface KernelWorkspaceBranch {
+export interface IKernelWorkspaceBranch {
   readonly ref: string
   readonly name: string
   readonly remote: boolean
   readonly current: boolean
   readonly tip: string
 }
-export interface KernelWorkspaceBanner {
+export interface IKernelWorkspaceBanner {
   readonly id: number
   readonly type: string
   readonly labelKey: string
@@ -97,8 +97,8 @@ export interface KernelWorkspaceBanner {
   readonly timeout: number
   readonly dismissable: boolean
 }
-export interface KernelWorkspaceDTO {
-  readonly repository: NativeRepositoryReference | null
+export interface IKernelWorkspaceDTO {
+  readonly repository: INativeRepositoryReference | null
   readonly navigation:
     | ''
     | 'branches'
@@ -106,12 +106,12 @@ export interface KernelWorkspaceDTO {
     | 'worktrees'
     | 'repositories'
   readonly currentBranchRef: string | null
-  readonly filters: WorkspaceNavigationFilters
+  readonly filters: IWorkspaceNavigationFilters
   readonly locked: boolean
   readonly checkoutInProgress: boolean
   readonly branches: ReadonlyArray<{
     readonly group: string
-    readonly items: ReadonlyArray<KernelWorkspaceBranch>
+    readonly items: ReadonlyArray<IKernelWorkspaceBranch>
   }>
   readonly pullRequests: ReadonlyArray<{
     readonly number: number
@@ -144,7 +144,7 @@ export interface KernelWorkspaceDTO {
     readonly operationDisabled: boolean
     readonly previewStatus: string | null
     readonly rebaseCommits: number
-    readonly branches: ReadonlyArray<KernelWorkspaceBranch>
+    readonly branches: ReadonlyArray<IKernelWorkspaceBranch>
   }
   readonly historySelectionContiguous: boolean
   /** Original GitStore commits not on the upstream (or on no remote). */
@@ -164,11 +164,11 @@ export interface KernelWorkspaceDTO {
       readonly status: string
     }>
   } | null
-  readonly filesFilter: WorkspaceFileFilter
+  readonly filesFilter: IWorkspaceFileFilter
   readonly showFilesFilter: boolean
   readonly visibleFileIDs: ReadonlyArray<string>
-  readonly menus: ReadonlyArray<KernelWorkspaceMenu>
-  readonly banner: KernelWorkspaceBanner | null
+  readonly menus: ReadonlyArray<IKernelWorkspaceMenu>
+  readonly banner: IKernelWorkspaceBanner | null
   readonly conflict: {
     readonly kind: string
     readonly identity: string
@@ -183,7 +183,7 @@ export interface KernelWorkspaceDTO {
     readonly prepared: boolean
     readonly canExpand: boolean
     readonly expandedText: string | null
-    readonly selection: KernelDiffSelection | null
+    readonly selection: IKernelDiffSelection | null
   } | null
   readonly hideWhitespace: boolean
   readonly sideBySide: boolean
@@ -202,11 +202,12 @@ export function workspaceLocked(
 
 /** Only presentation metadata crosses the boundary, never callbacks or roles. */
 export function projectContextMenuItems(
-  items: ReadonlyArray<WorkspaceMenuItem>
-): KernelWorkspaceMenuItem[] {
+  items: ReadonlyArray<IWorkspaceMenuItem>
+): IKernelWorkspaceMenuItem[] {
   return items.map(item => {
-    if (item.type !== 'separator' && item.labelKey === undefined)
+    if (item.type !== 'separator' && item.labelKey === undefined) {
       throw new Error('Workspace menu label lacks a translation key')
+    }
     return {
       labelKey: item.labelKey ?? '',
       data: item.labelData ?? [],
@@ -222,8 +223,8 @@ export function workspaceMenuDTO(
   repository: Repository,
   state: IRepositoryState,
   target: WorkspaceMenuTarget,
-  items: ReadonlyArray<WorkspaceMenuItem>
-): KernelWorkspaceMenu {
+  items: ReadonlyArray<IWorkspaceMenuItem>
+): IKernelWorkspaceMenu {
   const projected = projectContextMenuItems(items)
   const tip = state.branchesState.tip
   const head =
@@ -255,8 +256,10 @@ export function workspaceMenuDTO(
   return { target, lease, items: projected }
 }
 
-function projectBanner(banner: Banner | null): KernelWorkspaceBanner | null {
-  if (banner === null) return null
+function projectBanner(banner: Banner | null): IKernelWorkspaceBanner | null {
+  if (banner === null) {
+    return null
+  }
   let data: string[] = []
   let actions: string[] = []
   let timeout = 0
@@ -317,7 +320,9 @@ function projectBanner(banner: Banner | null): KernelWorkspaceBanner | null {
       actions = ['support']
       break
   }
-  if (dismissable) actions.push('dismiss')
+  if (dismissable) {
+    actions.push('dismiss')
+  }
   const detail =
     banner.type === BannerType.SuccessfulMerge ||
     banner.type === BannerType.BranchAlreadyUpToDate
@@ -340,7 +345,7 @@ function projectBanner(banner: Banner | null): KernelWorkspaceBanner | null {
 
 /** Whitelisted view-only state. Raw Account, callback, JSX, Map, and retry
  * continuation objects deliberately have no route into this wire contract. */
-export function projectNativeWorkspace(app: IAppState): KernelWorkspaceDTO {
+export function projectNativeWorkspace(app: IAppState): IKernelWorkspaceDTO {
   const selected =
     app.selectedState?.type === SelectionType.Repository
       ? app.selectedState
@@ -349,7 +354,7 @@ export function projectNativeWorkspace(app: IAppState): KernelWorkspaceDTO {
   const repository = selected?.repository
   const tip = state?.branchesState.tip
   const current = tip?.kind === TipState.Valid ? tip.branch : null
-  const branchView = (b: Branch): KernelWorkspaceBranch => ({
+  const branchView = (b: Branch): IKernelWorkspaceBranch => ({
     ref: b.ref,
     name: b.name,
     remote: b.type === BranchType.Remote,
@@ -429,7 +434,7 @@ export function projectNativeWorkspace(app: IAppState): KernelWorkspaceDTO {
     conflictStep === MultiCommitOperationStepKind.ShowConflicts ||
     conflictStep === MultiCommitOperationStepKind.ShowCopilotConflicts ||
     conflictStep === MultiCommitOperationStepKind.HideConflicts
-  const menus: KernelWorkspaceMenu[] = []
+  const menus: IKernelWorkspaceMenu[] = []
   if (repository !== undefined && state !== undefined) {
     const targets: WorkspaceMenuTarget[] = [
       ...state.branchesState.allBranches
@@ -453,7 +458,7 @@ export function projectNativeWorkspace(app: IAppState): KernelWorkspaceDTO {
       })),
       { kind: 'changes', id: '' },
     ]
-    for (const target of targets)
+    for (const target of targets) {
       menus.push(
         workspaceMenuDTO(
           repository,
@@ -462,6 +467,7 @@ export function projectNativeWorkspace(app: IAppState): KernelWorkspaceDTO {
           buildWorkspaceMenu(app, repository, state, target)
         )
       )
+    }
   }
   return {
     repository:

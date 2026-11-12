@@ -95,6 +95,14 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 		t.Fatal(err)
 	}
 	a.core = core
+	// A failed kernel action surfaces only as a generic RPC error in the view;
+	// report the original popup so intermittent failures carry their cause.
+	t.Cleanup(func() {
+		if t.Failed() && a.coreSnapshot != nil && a.coreSnapshot.CurrentPopup != nil {
+			p := a.coreSnapshot.CurrentPopup
+			t.Logf("original popup at failure: type=%s title=%q content=%+v causes=%+v", p.Type, p.Title, p.Content, p.Causes)
+		}
+	})
 	defer func() {
 		// A failed test may leave its own rejecting hook awaiting a UI choice.
 		// Settle that original callback explicitly before closing the fixture,

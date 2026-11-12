@@ -33,7 +33,7 @@ import {
   checkAboutTestUpdates,
 } from '../ui/lib/dialog-development-actions'
 import {
-  SnapshotTestDraft,
+  ISnapshotTestDraft,
   IEditableSnapshot,
   snapshotDefinitions,
   getInitialAccount,
@@ -106,10 +106,10 @@ import {
 import { supportsRerunningIndividualOrFailedChecks } from '../lib/endpoint-capabilities'
 import { getPullRequestCommitRef } from '../models/pull-request'
 import {
-  NativeDialogModule,
-  NativeDialogPresentation,
+  INativeDialogModule,
+  INativeDialogPresentation,
   NativeDialogField,
-  NativeDialogAction,
+  INativeDialogAction,
   dialogValues,
   dialogString,
   dialogBoolean,
@@ -161,7 +161,7 @@ const types = [
   ...developmentTypes,
 ] as const
 
-interface DevelopmentSession {
+interface IDevelopmentSession {
   values: Record<string, string>
   about: IUpdateState
   timer?: ReturnType<typeof setTimeout>
@@ -178,14 +178,14 @@ interface DevelopmentSession {
   dateTime: string
   tokenBusy: boolean
   tokenRequest: number
-  snapshot: SnapshotTestDraft
+  snapshot: ISnapshotTestDraft
   error: string | null
   messageKey: string | null
 }
 
 function developmentSession(
   accounts: ReadonlyArray<Account>
-): DevelopmentSession {
+): IDevelopmentSession {
   return {
     values: {
       cliKind: 'open-repository',
@@ -220,7 +220,7 @@ function isDevelopmentPopup(popup: Popup) {
 }
 
 /** UI-only state previously held in React, never a second account, Git or PR store. */
-interface Session {
+interface ISession {
   changed: () => void
   disposed: boolean
   dispose?: () => void
@@ -239,11 +239,11 @@ interface Session {
   bypassed: Set<string>
   expandedSecrets: Set<string>
   links: ReadonlyArray<{ label: string; url: string }>
-  development?: DevelopmentSession
+  development?: IDevelopmentSession
 }
-const sessions = new WeakMap<Popup, Session>()
+const sessions = new WeakMap<Popup, ISession>()
 
-function initialSession(popup: Popup, state?: IAppState): Session {
+function initialSession(popup: Popup, state?: IAppState): ISession {
   const checks =
     popup.type === PopupType.PullRequestChecksFailed ? popup.checks : []
   return {
@@ -555,7 +555,7 @@ function button(
   primary = false,
   destructive = false,
   disabled = false
-): NativeDialogAction {
+): INativeDialogAction {
   return { id, labelKey: key(id), primary, destructive, disabled }
 }
 function selectedRepository(state: IAppState) {
@@ -671,13 +671,13 @@ function auxiliaryActionFields(
 }
 
 /** All production types have an explicit field whitelist and original footer precedence. */
-function project(popup: Popup, state: IAppState): NativeDialogPresentation {
+function project(popup: Popup, state: IAppState): INativeDialogPresentation {
   const session = sessions.get(popup) ?? initialSession(popup, state)
   if (isDevelopmentPopup(popup)) {
     return projectDevelopmentDialog(popup, state, session)
   }
   const fields: NativeDialogField[] = []
-  let actions: NativeDialogAction[] = [button('close', true)]
+  let actions: INativeDialogAction[] = [button('close', true)]
   let titleKey = key(`${popup.type}.title`)
   let descriptionKey = key(`${popup.type}.description`)
   const confirm = (id: string, destructive = false, disabled = false) => {
@@ -1435,7 +1435,7 @@ function project(popup: Popup, state: IAppState): NativeDialogPresentation {
   }
 }
 
-async function updateTestNotificationPermission(session: Session) {
+async function updateTestNotificationPermission(session: ISession) {
   const permission = await getNotificationsPermission()
   if (!session.disposed) {
     session.development!.permission = permission
@@ -1445,7 +1445,7 @@ async function updateTestNotificationPermission(session: Session) {
 
 async function loadTestTokenDetails(
   runtime: AppRuntime,
-  session: Session,
+  session: ISession,
   change?: { readonly expiresAt: number | undefined }
 ) {
   const d = session.development!
@@ -1494,7 +1494,7 @@ async function loadTestTokenDetails(
 
 function notificationTestItems(
   popup: Extract<Popup, { type: PopupType.TestNotifications }>,
-  d: DevelopmentSession
+  d: IDevelopmentSession
 ) {
   const step = d.flow?.steps[d.stepResults.size]
   if (step === TestNotificationStepKind.SelectPullRequest) {
@@ -1524,7 +1524,7 @@ function notificationTestItems(
 async function prepareNotificationTest(
   runtime: AppRuntime,
   popup: Extract<Popup, { type: PopupType.TestNotifications }>,
-  session: Session
+  session: ISession
 ): Promise<void> {
   const d = session.development!
   const request = ++d.notificationRequest
@@ -1588,8 +1588,8 @@ async function prepareNotificationTest(
 function projectDevelopmentDialog(
   popup: Popup,
   state: IAppState,
-  session: Session
-): NativeDialogPresentation {
+  session: ISession
+): INativeDialogPresentation {
   const fields: NativeDialogField[] = []
   let actions = [button('close', true)]
   const base = {
@@ -1942,7 +1942,7 @@ async function replyDevelopmentDialog(
   popup: Popup,
   action: string,
   input: unknown,
-  session: Session
+  session: ISession
 ) {
   const d = session.development!
   const view = projectDevelopmentDialog(
@@ -2620,12 +2620,12 @@ async function reply(
         const check = session.checks.find(
           check => check.id === session.selectedCheckID
         )!
-        const number = choice(
+        const stepNumber = choice(
           fields.step,
           (check.actionJobSteps ?? []).map(step => String(step.number))
         )
         const step = check.actionJobSteps!.find(
-          step => String(step.number) === number
+          step => String(step.number) === stepNumber
         )!
         const url = getCheckRunStepURL(
           check,
@@ -2895,7 +2895,7 @@ async function reply(
   throw new Error('Invalid native auxiliary action')
 }
 
-export const auxiliaryDialogs: NativeDialogModule = {
+export const auxiliaryDialogs: INativeDialogModule = {
   types,
   project,
   reply,

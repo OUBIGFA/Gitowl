@@ -49,6 +49,31 @@ func TestModelRowsKeepScaledTextSeparated(t *testing.T) {
 	}
 }
 
+// The list's overlay scrollbar sits on its right edge; trailing status text
+// must stay clear of it so the last word is never painted over.
+func TestModelStatusStaysClearOfTheScrollbar(t *testing.T) {
+	a := newApp(nil, nil)
+	defer a.close()
+	models := make([]backend.ProviderModel, 40)
+	for i := range models {
+		models[i] = backend.ProviderModel{ID: fmt.Sprintf("model-%02d", i), Name: fmt.Sprintf("Model %02d", i), Available: true}
+	}
+	var list ui.ListState
+	tt := ui.NewTester(func(c *ui.Context) {
+		setWorkspaceTheme(c)
+		ui.Column(c).Fill().Children(func() { a.modelCatalogView(c, locales.In(c.Locale()), models, &list, func(string, bool) {}) })
+	}, 900, 620)
+	tt.SetLocale("en")
+	tt.Advance(time.Second)
+	status, ok := tt.AccessByRole(ui.RoleText, "Not enabled")
+	if !ok {
+		t.Fatal("model status is missing")
+	}
+	if right := status.Bounds.X + status.Bounds.W; float32(900)-right < 12 {
+		t.Fatalf("status reaches the scrollbar lane: ends at %v of 900", right)
+	}
+}
+
 func TestProviderSaveAcknowledgesOnlySubmittedDraftAfterNavigation(t *testing.T) {
 	for _, existing := range []bool{false, true} {
 		for _, newer := range []bool{false, true} {

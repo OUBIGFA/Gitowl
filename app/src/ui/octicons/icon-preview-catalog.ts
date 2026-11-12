@@ -1,6 +1,6 @@
 /** Library metadata only. The native host embeds the same registered npm SVG
  * assets; no SVG paths, markup, file paths or React trees cross the protocol. */
-export interface IconPreviewEntry {
+export interface IIconPreviewEntry {
   readonly id: string
   readonly name: string
   readonly height: number
@@ -19,7 +19,7 @@ type OcticonsLibrary = Record<
   }
 >
 
-export function getIconPreviewCatalog(): ReadonlyArray<IconPreviewEntry> {
+export function getIconPreviewCatalog(): ReadonlyArray<IIconPreviewEntry> {
   const icons: OcticonsLibrary = require('@primer/octicons')
   return Object.keys(icons)
     .sort()

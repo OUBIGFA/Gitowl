@@ -24,7 +24,9 @@ type KernelMenuDTO struct {
 }
 
 func (k *Kernel) AcknowledgeRepositoryListFocus(ctx context.Context) (KernelResult, error) {
-	return k.command(ctx, struct { Name string `json:"name"` }{"presentation.repository-list-focused"})
+	return k.command(ctx, struct {
+		Name string `json:"name"`
+	}{"presentation.repository-list-focused"})
 }
 
 func (k *Kernel) ReportResizableFocus(ctx context.Context, active bool) (KernelResult, error) {

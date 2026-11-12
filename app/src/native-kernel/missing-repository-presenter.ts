@@ -17,7 +17,7 @@ export type MissingRepositoryAction =
   | 'clone'
   | 'remove'
   | 'trust'
-export interface KernelMissingRepository {
+export interface IKernelMissingRepository {
   readonly repository: {
     readonly id: number
     readonly path: string
@@ -35,7 +35,7 @@ export interface KernelMissingRepository {
 export class NativeMissingRepositoryPresenter {
   private repository: Repository | null = null
   private generation = 0
-  private view: KernelMissingRepository | null = null
+  private view: IKernelMissingRepository | null = null
 
   public constructor(
     private readonly runtime: AppRuntime,
@@ -48,7 +48,7 @@ export class NativeMissingRepositoryPresenter {
     this.view = null
   }
 
-  public project(state: IAppState): KernelMissingRepository | null {
+  public project(state: IAppState): IKernelMissingRepository | null {
     const selected = state.selectedState
     if (selected?.type !== SelectionType.MissingRepository) {
       this.dispose()
@@ -84,7 +84,9 @@ export class NativeMissingRepositoryPresenter {
     // must not update a newly selected repository or linked worktree.
     void inspectMissingRepository(repository).then(
       type => {
-        if (!this.owns(repository, generation)) return
+        if (!this.owns(repository, generation)) {
+          return
+        }
         this.view = {
           ...this.view!,
           checking: false,
@@ -93,7 +95,9 @@ export class NativeMissingRepositoryPresenter {
         this.changed()
       },
       error => {
-        if (!this.owns(repository, generation)) return
+        if (!this.owns(repository, generation)) {
+          return
+        }
         this.view = { ...this.view!, checking: false, error: String(error) }
         this.changed()
       }
@@ -161,8 +165,9 @@ export class NativeMissingRepositoryPresenter {
           break
         case 'trust': {
           const shownPath = this.view.unsafePath
-          if (!shownPath)
+          if (!shownPath) {
             throw new Error('There is no detected unsafe directory to trust')
+          }
           const detected = await inspectMissingRepository(repository)
           if (
             !this.owns(repository, generation) ||
@@ -178,8 +183,9 @@ export class NativeMissingRepositoryPresenter {
         }
       }
     } catch (error) {
-      if (this.owns(repository, generation))
+      if (this.owns(repository, generation)) {
         this.view = { ...this.view!, error: String(error) }
+      }
       throw error
     } finally {
       if (this.owns(repository, generation)) {

@@ -16,11 +16,14 @@ body:
     id: proposed-solution
     attributes:
       label: Proposed solution
-      description: Explain how the proposal preserves or extends the upstream feature entry points.
+      description:
+        Explain how the proposal preserves or extends the upstream feature entry
+        points.
     validations:
       required: true
   - type: textarea
     id: additional-context
     attributes:
       label: Additional context
-      description: Include screenshots, mockups, links, or other relevant context.
+      description:
+        Include screenshots, mockups, links, or other relevant context.

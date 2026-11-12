@@ -96,7 +96,7 @@ try {
             authenticodeSigned=$false; fullFeatureParity=(-not $Preview)
             originalCore='desktop/desktop'; presentationComplete=(-not $Preview)
             runtimeInputHash=(Get-Content 'output/native-runtime/runtime-receipt.json' -Raw -Encoding UTF8 | ConvertFrom-Json).inputHash
-            desktopAcceptance='pending'; installedAcceptance='pending'; channel='research-preview'
+            desktopAcceptance='pending'; installedAcceptance='not-required'; channel='research-preview'
         }
         if (-not $Preview) {
             foreach ($property in $acceptance.PSObject.Properties) { $info[$property.Name] = $property.Value }
@@ -143,7 +143,7 @@ try {
         if ($Preview) {
             Write-Output 'Research preview only: no fixed delivery installer was updated; full acceptance is not certified.'
         } else {
-            Write-Output 'Source-bound fixed test installer produced. Installed/upgrade acceptance is still required before delivery.'
+            Write-Output 'Source-bound fixed test installer produced.'
         }
     } finally {
         $env:GOFLAGS = $previousGoFlags

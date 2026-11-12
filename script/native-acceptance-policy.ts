@@ -986,8 +986,8 @@ export type AcceptanceReceipt = {
   readonly review: Artifact
 }
 
-/** No acceptance file is generated here. Successful validation authorizes only
- * packaging this source snapshot; installed/upgrade acceptance is a later check. */
+/** No acceptance file is generated here. Successful validation authorizes
+ * packaging this source snapshot. */
 export async function validateAcceptance(root: string, receiptPath: string) {
   check(isEvidencePath(receiptPath), 'Acceptance receipt must remain ignored')
   const acceptance = (await evidenceJSON(
@@ -1075,7 +1075,8 @@ export async function validateAcceptance(root: string, receiptPath: string) {
     nativeExecutableSha256: commands.get('native-build')!.executable!.sha256,
     uiExecutableSha256: commands.get('native-ui-build')!.executable!.sha256,
     desktopAcceptance: 'source-bound-parent-review',
-    installedAcceptance: 'pending',
+    // Installed/upgrade lifecycle testing is not a delivery gate (owner decision).
+    installedAcceptance: 'not-required',
   }
 }
 

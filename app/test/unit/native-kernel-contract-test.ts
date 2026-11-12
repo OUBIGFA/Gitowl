@@ -273,8 +273,9 @@ describe('native kernel contract', () => {
         ...command,
         repository: { ...command.repository, url: 'https://example.invalid' },
       },
-    ])
+    ]) {
       assert.throws(() => parseKernelCommand(value), KernelProtocolError)
+    }
   })
 
   it('projects original date preferences and localized relative history labels', t => {
@@ -285,8 +286,11 @@ describe('native kernel contract', () => {
         ['dateFormat', oldDate],
         ['timeFormat', oldTime],
       ]) {
-        if (value === null) localStorage.removeItem(key!)
-        else localStorage.setItem(key!, value!)
+        if (value === null) {
+          localStorage.removeItem(key!)
+        } else {
+          localStorage.setItem(key!, value!)
+        }
       }
     })
     setDateFormatPreference('yyyy-MM-dd')

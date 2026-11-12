@@ -163,6 +163,15 @@ export function hasRepositoryGitOperationAccess(path: string): boolean {
   return repository !== undefined && hasAccess(repository)
 }
 
+/** Whether any admitted or waiting Git operation still uses this repository. */
+export function hasRepositoryGitOperations(path: string): boolean {
+  const repository = lookup(path)
+  return (
+    repository !== undefined &&
+    (repository.operations.size > 0 || repository.waiters > 0)
+  )
+}
+
 /** Reject competing Desktop mutations, including non-Git work preceding a command. */
 export function assertRepositoryGitAvailable(path: string): void {
   if (isRepositoryGitPaused(path)) {

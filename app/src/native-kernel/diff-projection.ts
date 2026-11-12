@@ -1,6 +1,6 @@
 import { DiffType, IDiff } from '../models/diff'
 import type { Popup } from '../models/popup'
-import type { KernelDiff } from './protocol'
+import type { IKernelDiff } from './protocol'
 import { projectKernelImage } from './image-presentation'
 import { parseRepositoryIdentifier } from '../lib/remote-parsing'
 
@@ -9,8 +9,10 @@ import { parseRepositoryIdentifier } from '../lib/remote-parsing'
 export function projectKernelDiff(
   diff: IDiff | null,
   owner?: Popup
-): KernelDiff | null {
-  if (diff === null) return null
+): IKernelDiff | null {
+  if (diff === null) {
+    return null
+  }
   switch (diff.kind) {
     case DiffType.Text:
     case DiffType.LargeText:

@@ -31,10 +31,10 @@ const navigationFilters = new Map<
   string,
   {
     readonly foldout: Foldout | null
-    readonly filters: WorkspaceNavigationFilters
+    readonly filters: IWorkspaceNavigationFilters
   }
 >()
-export interface WorkspaceNavigationFilters {
+export interface IWorkspaceNavigationFilters {
   readonly branches: string
   readonly pullRequests: string
   readonly worktrees: string
@@ -43,11 +43,13 @@ export interface WorkspaceNavigationFilters {
 export function workspaceNavigationFilters(
   path: string,
   foldout: Foldout | null = null
-): WorkspaceNavigationFilters {
+): IWorkspaceNavigationFilters {
   const saved = navigationFilters.get(path)
   // BranchesContainer/WorktreeList are unmounted when the original foldout
   // closes. A new foldout object is a new filter session, even on the same repo.
-  if (foldout !== null && saved?.foldout === foldout) return saved.filters
+  if (foldout !== null && saved?.foldout === foldout) {
+    return saved.filters
+  }
   return {
     branches: '',
     pullRequests: '',
@@ -57,7 +59,7 @@ export function workspaceNavigationFilters(
 }
 export function setWorkspaceNavigationFilter(
   path: string,
-  scope: keyof WorkspaceNavigationFilters,
+  scope: keyof IWorkspaceNavigationFilters,
   text: string,
   foldout: Foldout | null
 ) {
@@ -71,7 +73,9 @@ export function workspaceConflictIdentity(
   state: IRepositoryState
 ): string | null {
   const conflict = state.changesState.conflictState
-  if (conflict === null) return null
+  if (conflict === null) {
+    return null
+  }
   const tip = state.branchesState.tip
   const head =
     tip.kind === TipState.Valid
@@ -114,7 +118,9 @@ export function selectedWorkspaceDiff(state: IRepositoryState) {
 
 export function selectedWorkspaceTextDiff(state: IRepositoryState) {
   const selected = selectedWorkspaceDiff(state)
-  if (selected?.diff.kind !== DiffType.Text) return null
+  if (selected?.diff.kind !== DiffType.Text) {
+    return null
+  }
   const { file, diff } = selected
   const tip = state.branchesState.tip
   const revision =
@@ -133,13 +139,13 @@ export function selectedWorkspaceTextDiff(state: IRepositoryState) {
       .digest('hex'),
   }
 }
-export interface WorkspaceDiffPresentation {
+export interface IWorkspaceDiffPresentation {
   readonly identity: string
   readonly fileID: string
   readonly contents: IFileContents
   readonly expanded: ITextDiff | null
 }
-const diffViews = new Map<string, WorkspaceDiffPresentation>()
+const diffViews = new Map<string, IWorkspaceDiffPresentation>()
 export function workspaceDiffPresentation(
   path: string,
   state: IRepositoryState
@@ -154,12 +160,12 @@ export function workspaceDiffPresentation(
 }
 export function setWorkspaceDiffPresentation(
   path: string,
-  view: WorkspaceDiffPresentation
+  view: IWorkspaceDiffPresentation
 ) {
   diffViews.set(path, view)
 }
 
-export interface WorkspaceComparePresentation {
+export interface IWorkspaceComparePresentation {
   readonly identity: string
   readonly operation:
     | MultiCommitOperationKind.Merge
@@ -167,7 +173,7 @@ export interface WorkspaceComparePresentation {
     | MultiCommitOperationKind.Rebase
   readonly preview: RebasePreview | null
 }
-const comparisonViews = new Map<string, WorkspaceComparePresentation>()
+const comparisonViews = new Map<string, IWorkspaceComparePresentation>()
 export function workspaceComparisonIdentity(state: IRepositoryState) {
   const tip = state.branchesState.tip
   const form = state.compareState.formState
@@ -183,7 +189,7 @@ export function workspaceComparisonIdentity(state: IRepositoryState) {
 export function workspaceComparison(
   path: string,
   state: IRepositoryState
-): WorkspaceComparePresentation {
+): IWorkspaceComparePresentation {
   const identity = workspaceComparisonIdentity(state)
   const view = comparisonViews.get(path)
   return view?.identity === identity
@@ -192,7 +198,7 @@ export function workspaceComparison(
 }
 export function setWorkspaceComparison(
   path: string,
-  view: WorkspaceComparePresentation
+  view: IWorkspaceComparePresentation
 ) {
   comparisonViews.set(path, view)
 }
@@ -206,6 +212,9 @@ export function setWorkspaceReorderSelection(
   path: string,
   shas: ReadonlyArray<string>
 ) {
-  if (shas.length === 0) reorderSelections.delete(path)
-  else reorderSelections.set(path, [...shas])
+  if (shas.length === 0) {
+    reorderSelections.delete(path)
+  } else {
+    reorderSelections.set(path, [...shas])
+  }
 }

@@ -1,7 +1,7 @@
 import { Emitter } from 'event-kit'
 import type { AppRuntime } from '../ui/app-runtime'
 import { executeRepositoryMenu } from './repository-menu'
-import type { NativeRepositoryReference } from './desktop-presenter'
+import type { INativeRepositoryReference } from './desktop-presenter'
 import {
   AppMenuController,
   AppMenuPresentationAction,
@@ -15,7 +15,7 @@ import labels from '../../../references/native-ui-menu-labels.json'
 
 /** Data-only menu projection. No closures, raw application state or account
  * objects leave the kernel. IDs always address the original Electron menu. */
-export interface KernelMenuItem {
+export interface IKernelMenuItem {
   readonly id: string
   readonly type: 'normal' | 'submenu' | 'separator' | 'checkbox' | 'radio'
   readonly labelKey?: string
@@ -26,10 +26,10 @@ export interface KernelMenuItem {
   readonly accelerator?: string
   readonly accessKey?: string
   readonly role?: string
-  readonly items?: ReadonlyArray<KernelMenuItem>
+  readonly items?: ReadonlyArray<IKernelMenuItem>
 }
-export interface KernelMenuDTO {
-  readonly items: ReadonlyArray<KernelMenuItem>
+export interface IKernelMenuDTO {
+  readonly items: ReadonlyArray<IKernelMenuItem>
 }
 
 const normalize = (value: string) => value.replace(/&/g, '').toLowerCase()
@@ -149,7 +149,7 @@ export class NativeMenuPresenter {
   }
 
   public executeRepositoryMenu(
-    reference: NativeRepositoryReference,
+    reference: INativeRepositoryReference,
     lease: string,
     path: ReadonlyArray<number>
   ) {
@@ -162,14 +162,14 @@ export class NativeMenuPresenter {
     )
   }
 
-  public getState(): KernelMenuDTO {
+  public getState(): IKernelMenuDTO {
     const state = this.runtime.appStore.getState()
     const policy = getMenuState(state)
     const project = (
       menu: IMenu,
       parentEnabled = true,
       parentVisible = true
-    ): KernelMenuItem[] =>
+    ): IKernelMenuItem[] =>
       menu.items.map(item => {
         const visible = parentVisible && item.visible
         if (item.type === 'separator') {
@@ -221,7 +221,7 @@ export class NativeMenuPresenter {
    * IPC path. The original click handler selects push/force-push/etc itself. */
   public async execute(id: string): Promise<void> {
     let admitted = false
-    const visit = (items: ReadonlyArray<KernelMenuItem>) => {
+    const visit = (items: ReadonlyArray<IKernelMenuItem>) => {
       for (const item of items) {
         if (
           item.id === id &&

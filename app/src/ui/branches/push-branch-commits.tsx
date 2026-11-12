@@ -11,9 +11,12 @@ import {
 } from '../lib/auxiliary-dialog-actions'
 
 interface IPushBranchCommitsProps {
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by push dialog actions
   readonly dispatcher: Dispatcher
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by push dialog actions
   readonly repository: Repository
   readonly branch: Branch
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by push dialog actions
   readonly onConfirm: (repository: Repository, branch: Branch) => void
   readonly onDismissed: () => void
 

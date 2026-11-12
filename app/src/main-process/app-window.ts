@@ -29,7 +29,7 @@ import {
 import { addTrustedIPCSender } from './trusted-ipc-sender'
 import { getUpdaterGUID } from '../lib/get-updater-guid'
 import { CLIAction } from '../lib/cli-action'
-import type { NativeWindowPresentation } from '../native-kernel/main-transport'
+import type { INativeWindowPresentation } from '../native-kernel/main-transport'
 
 export class AppWindow {
   private window: Electron.BrowserWindow
@@ -45,7 +45,9 @@ export class AppWindow {
   // See https://github.com/desktop/desktop/pull/11162
   private shouldMaximizeOnShow = false
 
-  public constructor(private readonly nativePresentation?: NativeWindowPresentation) {
+  public constructor(
+    private readonly nativePresentation?: INativeWindowPresentation
+  ) {
     const savedWindowState = windowStateKeeper({
       defaultWidth: this.minWidth,
       defaultHeight: this.minHeight,
@@ -181,7 +183,10 @@ export class AppWindow {
     })
 
     this.window.webContents.once('did-finish-load', () => {
-      if (process.env.NODE_ENV === 'development' && this.nativePresentation === undefined) {
+      if (
+        process.env.NODE_ENV === 'development' &&
+        this.nativePresentation === undefined
+      ) {
         this.window.webContents.openDevTools()
       }
 
@@ -225,8 +230,12 @@ export class AppWindow {
     // have an IPC round trip to get that information from the main process.
     const localeCountryCode = app.getLocaleCountryCode() ?? ''
     this.window.loadURL(
-      encodePathAsUrl(__dirname, this.nativePresentation === undefined ? 'index.html' : 'native-kernel.html') +
-        `#lc=${encodeURIComponent(localeCountryCode)}`
+      encodePathAsUrl(
+        __dirname,
+        this.nativePresentation === undefined
+          ? 'index.html'
+          : 'native-kernel.html'
+      ) + `#lc=${encodeURIComponent(localeCountryCode)}`
     )
 
     nativeTheme.addListener('updated', () => {
@@ -270,12 +279,16 @@ export class AppWindow {
   }
 
   public isMinimized() {
-    return this.nativePresentation?.getState().minimized ?? this.window.isMinimized()
+    return (
+      this.nativePresentation?.getState().minimized ?? this.window.isMinimized()
+    )
   }
 
   /** Is the window currently visible? */
   public isVisible() {
-    return this.nativePresentation?.getState().visible ?? this.window.isVisible()
+    return (
+      this.nativePresentation?.getState().visible ?? this.window.isVisible()
+    )
   }
 
   public restore() {
@@ -287,7 +300,9 @@ export class AppWindow {
   }
 
   public isFocused() {
-    return this.nativePresentation?.getState().focused ?? this.window.isFocused()
+    return (
+      this.nativePresentation?.getState().focused ?? this.window.isFocused()
+    )
   }
 
   public focus() {
@@ -533,11 +548,16 @@ export class AppWindow {
   }
 
   public getCurrentWindowState() {
-    return this.nativePresentation?.getState().state ?? getWindowState(this.window)
+    return (
+      this.nativePresentation?.getState().state ?? getWindowState(this.window)
+    )
   }
 
   public getCurrentWindowZoomFactor() {
-    return this.nativePresentation?.getState().zoom ?? this.window.webContents.zoomFactor
+    return (
+      this.nativePresentation?.getState().zoom ??
+      this.window.webContents.zoomFactor
+    )
   }
 
   public setWindowZoomFactor(zoomFactor: number) {
@@ -549,6 +569,12 @@ export class AppWindow {
    * Method to show the save dialog and return the first file path it returns.
    */
   public async showSaveDialog(options: Electron.SaveDialogOptions) {
+    if (this.nativePresentation !== undefined) {
+      return (
+        (await this.nativePresentation.showFileDialog('save', options))[0] ??
+        null
+      )
+    }
     const { canceled, filePath } = await dialog.showSaveDialog(
       this.window,
       options
@@ -560,6 +586,12 @@ export class AppWindow {
    * Method to show the open dialog and return the first file path it returns.
    */
   public async showOpenDialog(options: Electron.OpenDialogOptions) {
+    if (this.nativePresentation !== undefined) {
+      return (
+        (await this.nativePresentation.showFileDialog('open', options))[0] ??
+        null
+      )
+    }
     const { filePaths } = await dialog.showOpenDialog(this.window, options)
     return filePaths.length > 0 ? filePaths[0] : null
   }

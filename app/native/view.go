@@ -200,6 +200,7 @@ func (a *app) workspaceNotices(c *ui.Context, tx locales.Messages) {
 		a.workspaceOverlayView(c)
 		a.workspaceConflictControls(c)
 	}
+	a.quitPendingView(c, tx)
 	if a.serviceErr != nil {
 		showError(c, tx.FailedService(a.serviceErr.Error()))
 	} else if a.coreSnapshot != nil && a.coreSnapshot.Welcome {

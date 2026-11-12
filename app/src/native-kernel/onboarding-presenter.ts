@@ -11,7 +11,7 @@ import {
   saveConfiguredGitAuthor,
 } from '../ui/lib/git-author-configuration'
 
-export interface KernelSignInView {
+export interface IKernelSignInView {
   readonly kind: 'EndpointEntry' | 'Authentication' | 'Success'
   readonly loading: boolean
   readonly error: string | null
@@ -23,7 +23,7 @@ export interface KernelSignInView {
 /** Neither OAuth state, callbacks, account objects nor tokens are view data. */
 export function projectSignInView(
   state: SignInState | null
-): KernelSignInView | null {
+): IKernelSignInView | null {
   if (state === null) {
     return null
   }
@@ -52,7 +52,7 @@ export function projectSignInView(
   }
 }
 
-export interface KernelOnboardingView {
+export interface IKernelOnboardingView {
   readonly step: WelcomeStep
   readonly loading: boolean
   readonly globalName: string | null
@@ -91,7 +91,7 @@ export class NativeOnboardingPresenter {
     this.emitter.emit('update')
   }
 
-  public getState(): KernelOnboardingView | null {
+  public getState(): IKernelOnboardingView | null {
     const state = this.runtime.appStore.getState()
     if (!state.showWelcomeFlow) {
       return null

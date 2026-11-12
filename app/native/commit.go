@@ -9,7 +9,7 @@ import (
 // A submitted Git write is not undone by canceling its response waiter. Keep
 // normal window/app shutdown from killing the service before it reports an outcome.
 func (a *app) guardWrite(event *mygo.Preventable) {
-	if a.savingVersion || a.core != nil && (a.corePending != 0 || a.core.CriticalInFlight() != 0) {
+	if a.quitBlocked() {
 		event.PreventDefault()
 	}
 }

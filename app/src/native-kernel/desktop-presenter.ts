@@ -26,7 +26,7 @@ import {
 } from './onboarding-presenter'
 import {
   executeImagePresentationCommand,
-  NativeImagePresentationCommand,
+  INativeImagePresentationCommand,
 } from './image-presentation'
 import {
   executeGenerationCommand,
@@ -41,7 +41,7 @@ import {
 import type { NativeCommitCommand } from './commit-protocol'
 import { NativeMenuPresenter } from './menu-presenter'
 import type { MenuEvent } from '../main-process/menu/menu-event'
-import type { NativeWorkspaceCommand } from './workspace-protocol'
+import type { INativeWorkspaceCommand } from './workspace-protocol'
 import { executeNativeWorkspaceCommand } from './workspace-presenter'
 import { visibleWorkingDirectoryFiles } from './workspace-projection'
 import { WelcomeStep } from '../ui/welcome/welcome-step'
@@ -51,7 +51,7 @@ import {
 } from './missing-repository-presenter'
 
 /** Worktrees share IDs, so the canonical path is part of every frontend reference. */
-export interface NativeRepositoryReference {
+export interface INativeRepositoryReference {
   readonly id: number
   readonly path: string
 }
@@ -125,7 +125,7 @@ export class DesktopPresenter {
   }
 
   public recoverMissingRepository(
-    reference: NativeRepositoryReference,
+    reference: INativeRepositoryReference,
     action: MissingRepositoryAction
   ) {
     return this.missing.execute(reference, action)
@@ -141,7 +141,7 @@ export class DesktopPresenter {
     return projectRepositoryMenus(this.getState())
   }
   public executeRepositoryMenu(
-    reference: NativeRepositoryReference,
+    reference: INativeRepositoryReference,
     lease: string,
     path: ReadonlyArray<number>
   ) {
@@ -188,7 +188,7 @@ export class DesktopPresenter {
     return this.runtime.dispatcher.resetSignInState()
   }
 
-  public getRepository(reference: NativeRepositoryReference): Repository {
+  public getRepository(reference: INativeRepositoryReference): Repository {
     const repository = this.getSelectableRepository(reference)
     if (!(repository instanceof Repository)) {
       throw new Error('This repository is still being cloned')
@@ -197,7 +197,7 @@ export class DesktopPresenter {
   }
 
   public getSelectableRepository(
-    reference: NativeRepositoryReference
+    reference: INativeRepositoryReference
   ): Repository | CloningRepository {
     const state = this.getState()
     const candidates = [
@@ -217,7 +217,7 @@ export class DesktopPresenter {
   }
 
   private files(
-    reference: NativeRepositoryReference,
+    reference: INativeRepositoryReference,
     ids: ReadonlyArray<string>
   ) {
     const repository = this.getRepository(reference)
@@ -249,20 +249,20 @@ export class DesktopPresenter {
     return this.runtime.dispatcher.addRepositories(paths)
   }
 
-  public selectRepository(reference: NativeRepositoryReference) {
+  public selectRepository(reference: INativeRepositoryReference) {
     return this.runtime.dispatcher.selectRepository(
       this.getSelectableRepository(reference)
     )
   }
 
-  public refreshRepository(reference: NativeRepositoryReference) {
+  public refreshRepository(reference: INativeRepositoryReference) {
     return this.runtime.dispatcher.refreshRepository(
       this.getRepository(reference)
     )
   }
 
   public changeSection(
-    reference: NativeRepositoryReference,
+    reference: INativeRepositoryReference,
     section: RepositorySectionTab
   ) {
     return this.runtime.dispatcher.changeRepositorySection(
@@ -272,7 +272,7 @@ export class DesktopPresenter {
   }
 
   public selectWorkingDirectoryFiles(
-    reference: NativeRepositoryReference,
+    reference: INativeRepositoryReference,
     ids: ReadonlyArray<string>
   ) {
     const { repository, files } = this.files(reference, ids)
@@ -283,7 +283,7 @@ export class DesktopPresenter {
   }
 
   public changeFileIncluded(
-    reference: NativeRepositoryReference,
+    reference: INativeRepositoryReference,
     ids: ReadonlyArray<string>,
     included: boolean
   ) {
@@ -296,7 +296,7 @@ export class DesktopPresenter {
   }
 
   public changeFileLineSelection(
-    reference: NativeRepositoryReference,
+    reference: INativeRepositoryReference,
     id: string,
     selection: DiffSelection
   ) {
@@ -313,7 +313,7 @@ export class DesktopPresenter {
   }
 
   public executeImagePresentationCommand(
-    command: NativeImagePresentationCommand
+    command: INativeImagePresentationCommand
   ) {
     return executeImagePresentationCommand(this.runtime.dispatcher, command)
   }
@@ -322,7 +322,7 @@ export class DesktopPresenter {
     return executeGenerationCommand(this.runtime, command)
   }
 
-  public executeWorkspaceCommand(command: NativeWorkspaceCommand) {
+  public executeWorkspaceCommand(command: INativeWorkspaceCommand) {
     return executeNativeWorkspaceCommand(
       this.runtime,
       command.repository === null
@@ -349,8 +349,9 @@ export class DesktopPresenter {
         if (
           command.mode === 'copilot' &&
           this.commit.getState()?.assistedAvailable !== true
-        )
+        ) {
           throw new Error('Copilot assisted commits are not available')
+        }
         dispatcher.setCommitMode(repository, command.mode)
         return {}
       case 'commit.coAuthors.show':
@@ -372,14 +373,16 @@ export class DesktopPresenter {
         if (
           this.commit.getState()?.canCommit !== true ||
           this.commit.getState()?.mode !== 'copilot'
-        )
+        ) {
           throw new Error(
             'Review the assisted commit selection and options before saving'
           )
+        }
         return { assisted: await this.commit.createAssisted(repository) }
       case 'commit.progress':
-        if (state.subscribeToCommitOutput === null)
+        if (state.subscribeToCommitOutput === null) {
           throw new Error('Commit output is no longer available')
+        }
         await dispatcher.showPopup({
           type: PopupType.CommitProgress,
           subscribeToCommitOutput: state.subscribeToCommitOutput,
@@ -387,8 +390,9 @@ export class DesktopPresenter {
         return {}
       default: {
         const run = state.changesState.assistedCommit
-        if (!('runId' in run) || run.runId !== command.runID)
+        if (!('runId' in run) || run.runId !== command.runID) {
           throw new Error('This assisted commit run is no longer current')
+        }
         switch (command.name) {
           case 'commit.assisted.cancel':
             dispatcher.cancelCopilotAssistedCommits(repository, command.runID)
@@ -415,8 +419,9 @@ export class DesktopPresenter {
             )
             return {}
           case 'commit.assisted.details':
-            if (run.kind !== 'error' && run.kind !== 'push-error')
+            if (run.kind !== 'error' && run.kind !== 'push-error') {
               throw new Error('There is no assisted commit error to inspect')
+            }
             await dispatcher.showPopup({
               type: PopupType.Error,
               error: run.error,
@@ -429,7 +434,7 @@ export class DesktopPresenter {
   }
 
   public includeDiffLines(
-    reference: NativeRepositoryReference,
+    reference: INativeRepositoryReference,
     fileID: string,
     identity: string,
     ids: ReadonlyArray<number>,
@@ -446,7 +451,7 @@ export class DesktopPresenter {
   }
 
   public changeIncludeAllFiles(
-    reference: NativeRepositoryReference,
+    reference: INativeRepositoryReference,
     included: boolean
   ) {
     return this.runtime.dispatcher.changeIncludeAllFiles(
@@ -456,7 +461,7 @@ export class DesktopPresenter {
   }
 
   public setCommitMessage(
-    reference: NativeRepositoryReference,
+    reference: INativeRepositoryReference,
     message: ICommitMessage
   ) {
     return this.runtime.dispatcher.setCommitMessage(
@@ -466,14 +471,14 @@ export class DesktopPresenter {
   }
 
   public commitIncludedChanges(
-    reference: NativeRepositoryReference,
+    reference: INativeRepositoryReference,
     context: ICommitContext
   ) {
     return this.commit.createManual(this.getRepository(reference), context)
   }
 
   public generateCommitMessage(
-    reference: NativeRepositoryReference,
+    reference: INativeRepositoryReference,
     ids: ReadonlyArray<string>,
     overrideExistingMessage: boolean
   ) {
@@ -489,24 +494,24 @@ export class DesktopPresenter {
       : this.runtime.dispatcher.generateCommitMessage(repository, files)
   }
 
-  public cancelGenerateCommitMessage(reference: NativeRepositoryReference) {
+  public cancelGenerateCommitMessage(reference: INativeRepositoryReference) {
     return this.runtime.dispatcher.cancelGenerateCommitMessage(
       this.getRepository(reference)
     )
   }
 
-  public fetch(reference: NativeRepositoryReference) {
+  public fetch(reference: INativeRepositoryReference) {
     return this.runtime.dispatcher.fetch(
       this.getRepository(reference),
       FetchType.UserInitiatedTask
     )
   }
 
-  public pull(reference: NativeRepositoryReference) {
+  public pull(reference: INativeRepositoryReference) {
     return this.runtime.dispatcher.pull(this.getRepository(reference))
   }
 
-  public push(reference: NativeRepositoryReference) {
+  public push(reference: INativeRepositoryReference) {
     const repository = this.getRepository(reference)
     const { branchesState, aheadBehind } =
       this.runtime.repositoryStateManager.get(repository)
@@ -519,7 +524,7 @@ export class DesktopPresenter {
       : this.runtime.dispatcher.push(repository)
   }
 
-  public loadNextCommitBatch(reference: NativeRepositoryReference) {
+  public loadNextCommitBatch(reference: INativeRepositoryReference) {
     return this.runtime.dispatcher.loadNextCommitBatch(
       this.getRepository(reference)
     )
@@ -528,7 +533,7 @@ export class DesktopPresenter {
   /** Read visible row metadata with Desktop's exact rename/binary/merge parser.
    * This presentation read never changes AppStore's commit/file selection. */
   public async readHistorySummaries(
-    reference: NativeRepositoryReference,
+    reference: INativeRepositoryReference,
     shas: ReadonlyArray<string>
   ) {
     const repository = this.getRepository(reference)
@@ -558,7 +563,7 @@ export class DesktopPresenter {
   }
 
   public changeCommitSelection(
-    reference: NativeRepositoryReference,
+    reference: INativeRepositoryReference,
     shas: ReadonlyArray<string>,
     contiguous: boolean
   ) {
@@ -570,14 +575,14 @@ export class DesktopPresenter {
   }
 
   public loadChangedFilesForCurrentSelection(
-    reference: NativeRepositoryReference
+    reference: INativeRepositoryReference
   ) {
     return this.runtime.dispatcher.loadChangedFilesForCurrentSelection(
       this.getRepository(reference)
     )
   }
 
-  public selectHistoryFile(reference: NativeRepositoryReference, id: string) {
+  public selectHistoryFile(reference: INativeRepositoryReference, id: string) {
     const repository = this.getRepository(reference)
     const file = this.runtime.repositoryStateManager
       .get(repository)

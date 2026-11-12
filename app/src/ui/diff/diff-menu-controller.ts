@@ -7,7 +7,7 @@ import {
   DiffHunkExpansionType,
 } from '../../models/diff'
 import { PopupType } from '../../models/popup'
-import { WorkspaceMenuItem } from '../lib/workspace-menu'
+import { IWorkspaceMenuItem } from '../lib/workspace-menu'
 
 /** Both toolkits keep the original patch/selection together through the
  * confirmation; expanded display coordinates must never be used as a patch. */
@@ -52,8 +52,10 @@ export function generateDiffExpansionMenuItem(
   expanded: boolean,
   onExpand: () => void,
   onCollapse: () => void
-): WorkspaceMenuItem | null {
-  if (!canExpand) return null
+): IWorkspaceMenuItem | null {
+  if (!canExpand) {
+    return null
+  }
   return expanded
     ? {
         labelKey: 'workspace.collapseExpanded',

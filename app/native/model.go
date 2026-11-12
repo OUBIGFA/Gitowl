@@ -34,6 +34,9 @@ type app struct {
 	windowPreferenceErr   error
 	prepareTray           func(bool) error
 	quitting              bool
+	quitDeferred          bool
+	requestQuit           func()
+	showWindow            func()
 	backend               backend.Backend
 	// The production native launch uses the original Desktop kernel. These are
 	// immutable view snapshots and queued presentation requests, not another
@@ -138,6 +141,7 @@ type app struct {
 	browsing          bool
 	browseErr         error
 	chooseDirectory   func(title, path string) ([]string, error)
+	chooseFile        func(backend.KernelFileDialog) ([]string, error)
 	setLocale         func(string)
 	localeOverride    func() string
 	syncMenu          func()

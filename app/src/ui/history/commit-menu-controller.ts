@@ -2,9 +2,9 @@ import { Commit, CommitOneLine } from '../../models/commit'
 import { GitHubRepository } from '../../models/github-repository'
 import { getDotComAPIEndpoint } from '../../lib/api'
 import { writeClipboardText } from '../main-process-proxy'
-import { WorkspaceMenuItem } from '../lib/workspace-menu'
+import { IWorkspaceMenuItem } from '../lib/workspace-menu'
 
-export interface CommitMenuConfig {
+export interface ICommitMenuConfig {
   readonly gitHubRepository: GitHubRepository | null
   readonly localCommitSHAs: ReadonlyArray<string>
   readonly tagsToPush?: ReadonlyArray<string>
@@ -37,11 +37,11 @@ export interface CommitMenuConfig {
  * unpushed-tag restrictions. The frontend supplies presentation-only reorder
  * selection; the original Dispatcher performs the eventual operation. */
 export function generateCommitContextMenu(
-  config: CommitMenuConfig,
+  config: ICommitMenuConfig,
   row: number,
   commit: Commit,
   selected: ReadonlyArray<Commit>
-): WorkspaceMenuItem[] {
+): IWorkspaceMenuItem[] {
   const idle =
     config.isMultiCommitOperationInProgress === false &&
     config.isAssistedCommitRepositoryLocked !== true
@@ -58,14 +58,14 @@ export function generateCommitContextMenu(
     action: () => void,
     enabled = true,
     data: string[] = []
-  ): WorkspaceMenuItem => ({
+  ): IWorkspaceMenuItem => ({
     labelKey: `workspace.${key}`,
     label,
     action,
     enabled,
     labelData: data,
   })
-  if (selected.length > 1)
+  if (selected.length > 1) {
     return [
       item(
         'cherryPickMany',
@@ -95,15 +95,17 @@ export function generateCommitContextMenu(
         [String(selected.length)]
       ),
     ]
+  }
   const local = config.localCommitSHAs.includes(commit.sha)
-  const items: WorkspaceMenuItem[] = []
-  if (config.canAmendCommits === true && row === 0)
+  const items: IWorkspaceMenuItem[] = []
+  if (config.canAmendCommits === true && row === 0) {
     items.push(
       item('amend', __DARWIN__ ? 'Amend Commit…' : 'Amend commit…', () =>
         config.onAmendCommit?.(commit, local)
       )
     )
-  if (config.canUndoCommits === true && local && row === 0)
+  }
+  if (config.canUndoCommits === true && local && row === 0) {
     items.push(
       item(
         'undoCommit',
@@ -112,6 +114,7 @@ export function generateCommitContextMenu(
         config.onUndoCommit !== undefined
       )
     )
+  }
   items.push(
     item(
       'reset',

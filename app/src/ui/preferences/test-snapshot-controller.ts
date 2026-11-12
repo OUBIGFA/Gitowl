@@ -27,7 +27,7 @@ export interface IEditableSnapshot {
 export type IEditableSnapshots = Readonly<
   Record<SnapshotKey, IEditableSnapshot>
 >
-export interface SnapshotTestDraft {
+export interface ISnapshotTestDraft {
   readonly login: string
   readonly name: string
   readonly endpoint: string
@@ -108,7 +108,7 @@ function getSnapshot(snapshot: IEditableSnapshot): ICopilotQuotaSnapshot {
 }
 export function getInitialAccount(
   accounts: ReadonlyArray<Account>
-): Omit<SnapshotTestDraft, 'snapshots'> {
+): Omit<ISnapshotTestDraft, 'snapshots'> {
   const account = accounts.find(a => a.login.trim().length > 0)
   return {
     login: account?.login ?? 'mona',
@@ -119,7 +119,7 @@ export function getInitialAccount(
   }
 }
 export function getTestSnapshotAccount(
-  draft: Omit<SnapshotTestDraft, 'snapshots'>
+  draft: Omit<ISnapshotTestDraft, 'snapshots'>
 ): Account {
   return new Account(
     draft.login.trim() || 'mona',

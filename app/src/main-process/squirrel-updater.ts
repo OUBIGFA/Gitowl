@@ -39,12 +39,18 @@ export function handleSquirrelEvent(eventName: string): Promise<void> | null {
 
 /** MyGo owns shortcuts and installation. Its installer invokes only the
  * original CLI helpers, never the Squirrel lifecycle or its Update.exe. */
-export function handleNativeCLIEvent(argv: ReadonlyArray<string>): Promise<void> | null {
-  if (__APP_NAME__ !== 'Gitowl') return null
-  const event = argv.find(arg =>
-    arg === '--gitowl-install-cli' || arg === '--gitowl-uninstall-cli'
+export function handleNativeCLIEvent(
+  argv: ReadonlyArray<string>
+): Promise<void> | null {
+  if (__APP_NAME__ !== 'Gitowl') {
+    return null
+  }
+  const event = argv.find(
+    arg => arg === '--gitowl-install-cli' || arg === '--gitowl-uninstall-cli'
   )
-  if (event === undefined) return null
+  if (event === undefined) {
+    return null
+  }
   process.env.GITOWL_NATIVE_CORE = '1'
   return event === '--gitowl-install-cli'
     ? installWindowsCLI()
@@ -75,7 +81,9 @@ export async function installWindowsCLI(): Promise<void> {
     log.error('Failed inserting bin path into PATH environment variable', e)
     // The installer must report a failed registration instead of announcing a
     // successful install with an unusable command. Preserve upstream handling.
-    if (process.env.GITOWL_NATIVE_CORE === '1') throw e
+    if (process.env.GITOWL_NATIVE_CORE === '1') {
+      throw e
+    }
   }
 }
 
@@ -87,7 +95,9 @@ export async function uninstallWindowsCLI() {
     return setPathSegments(pathsWithoutBinPath)
   } catch (e) {
     log.error('Failed removing bin path from PATH environment variable', e)
-    if (process.env.GITOWL_NATIVE_CORE === '1') throw e
+    if (process.env.GITOWL_NATIVE_CORE === '1') {
+      throw e
+    }
   }
 }
 

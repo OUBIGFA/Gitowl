@@ -36,7 +36,7 @@ export type AppMenuPresentationAction =
   | 'increase-active-resizable-width'
   | 'decrease-active-resizable-width'
 
-export interface AppMenuPresentation {
+export interface IAppMenuPresentation {
   readonly perform: (action: AppMenuPresentationAction) => void
   readonly showTestUI: (name: TestMenuEvent) => Promise<unknown> | void
 }
@@ -50,7 +50,7 @@ export class AppMenuController {
   public constructor(
     private readonly dispatcher: Dispatcher,
     private readonly getState: () => IAppState,
-    private readonly presentation: AppMenuPresentation
+    private readonly presentation: IAppMenuPresentation
   ) {}
 
   public handleEvent(name: MenuEvent): Promise<unknown> | void {
@@ -167,7 +167,10 @@ export class AppMenuController {
           ? this.dispatcher.createStashForCurrentBranch(repository)
           : undefined
       case 'show-preferences':
-        return this.dispatcher.showPopup({ type: PopupType.Preferences, initialSelectedTab: PreferencesTab.Appearance })
+        return this.dispatcher.showPopup({
+          type: PopupType.Preferences,
+          initialSelectedTab: PreferencesTab.Appearance,
+        })
       case 'open-working-directory':
         return selected === null
           ? undefined
@@ -417,7 +420,9 @@ export class AppMenuController {
     const latest = this.getState().repositories.find(
       r => r.id === repository.id && r.path === repository.path
     )
-    if (!(latest instanceof Repository)) return
+    if (!(latest instanceof Repository)) {
+      return
+    }
     return this.dispatcher.showPopup({
       type: PopupType.RepositorySettings,
       repository: latest,
@@ -435,27 +440,34 @@ export class AppMenuController {
   public viewRepositoryOnGitHub(
     repository: Repository | CloningRepository | null
   ) {
-    if (!(repository instanceof Repository)) return
+    if (!(repository instanceof Repository)) {
+      return
+    }
     const url = getGitHubHtmlUrl(repository)
-    if (url) return this.dispatcher.openInBrowser(url)
+    if (url) {
+      return this.dispatcher.openInBrowser(url)
+    }
     return undefined
   }
 
   public openRepositoryInShell(repository: Repository | CloningRepository) {
-    if (repository instanceof Repository)
+    if (repository instanceof Repository) {
       return this.dispatcher.openShell(repository.path)
+    }
     return undefined
   }
 
   public openRepositoryInEditor(repository: Repository | CloningRepository) {
-    if (repository instanceof Repository)
+    if (repository instanceof Repository) {
       return this.dispatcher.openInExternalEditor(repository.path)
+    }
     return undefined
   }
 
   public revealRepository(repository: Repository | CloningRepository) {
-    if (repository instanceof Repository)
+    if (repository instanceof Repository) {
       return shell.showFolderContents(repository.path)
+    }
   }
 
   public changeRepositoryAlias(repository: Repository) {

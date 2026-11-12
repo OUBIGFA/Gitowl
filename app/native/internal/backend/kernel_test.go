@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 func kernelPipes(t *testing.T, event func(KernelEvent)) (*Kernel, peer) {
@@ -160,6 +161,9 @@ func TestKernelCancellationDoesNotFabricateBusinessCancellation(t *testing.T) {
 	if result := receive(t, call); !errors.Is(result.err, context.Canceled) {
 		t.Fatalf("waiter cancellation: %+v", result)
 	}
+	previous := closeSettleTimeout
+	closeSettleTimeout = 20 * time.Millisecond
+	defer func() { closeSettleTimeout = previous }()
 	if k.InFlight() != 1 || !errors.Is(k.Close(), ErrBusy) {
 		t.Fatal("unresolved original action no longer guarded shutdown")
 	}
@@ -175,6 +179,36 @@ func TestKernelCancellationDoesNotFabricateBusinessCancellation(t *testing.T) {
 	}
 	if k.InFlight() != 0 {
 		t.Fatal("late original outcome was not settled")
+	}
+}
+
+func TestKernelCloseWaitsForAdmittedWorkBeforeShutdown(t *testing.T) {
+	k, p := kernelPipes(t, nil)
+	call := kernelCall(func() (KernelResult, error) { return k.State(context.Background()) })
+	original := p.request(t)
+	closed := make(chan error, 1)
+	go func() { closed <- k.Close() }()
+	time.Sleep(50 * time.Millisecond)
+	select {
+	case err := <-closed:
+		t.Fatalf("Close gave up on a loaded kernel instead of waiting: %v", err)
+	default:
+	}
+	p.result(t, original.ID, KernelResult{Snapshot: emptyKernelSnapshot(1)})
+	if result := receive(t, call); result.err != nil {
+		t.Fatal(result.err)
+	}
+	request := p.request(t)
+	if request.Method != "kernel.shutdown" {
+		t.Fatalf("shutdown was not requested after work settled: %+v", request)
+	}
+	p.result(t, request.ID, map[string]bool{"quitting": true})
+	if _, err := p.input.ReadByte(); !errors.Is(err, io.EOF) {
+		t.Fatalf("parent stdin did not close: %v", err)
+	}
+	p.output.Close()
+	if err := receive(t, closed); err != nil {
+		t.Fatal(err)
 	}
 }
 

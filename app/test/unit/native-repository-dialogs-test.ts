@@ -152,7 +152,9 @@ function selectedRepository() {
 }
 
 async function waitForRepositories(check: () => boolean) {
-  if (check()) return
+  if (check()) {
+    return
+  }
   await new Promise<void>((resolve, reject) => {
     const timer = setTimeout(() => {
       subscription.dispose()
@@ -280,7 +282,9 @@ describe('native repository dialogs with the original kernel', () => {
         runtime.repositoryStateManager.get(b).remote?.url,
         'https://example.invalid/menu-target.git'
       )
-      if (popup.id !== undefined) runtime.dispatcher.closePopupById(popup.id)
+      if (popup.id !== undefined) {
+        runtime.dispatcher.closePopupById(popup.id)
+      }
       await runtime.dispatcher.changeRepositoryAlias(b, 'Renamed target')
       await waitForRepositories(() =>
         runtime.appStore
@@ -309,8 +313,9 @@ describe('native repository dialogs with the original kernel', () => {
       assert.ok(aliasPopup?.type === PopupType.ChangeRepositoryAlias)
       assert.equal(aliasPopup.repository.path, b.path)
       assert.equal(selectedRepository().id, a.id)
-      if (aliasPopup.id !== undefined)
+      if (aliasPopup.id !== undefined) {
         runtime.dispatcher.closePopupById(aliasPopup.id)
+      }
       await runtime.dispatcher.removeRepository(b, false)
       await waitForRepositories(
         () =>

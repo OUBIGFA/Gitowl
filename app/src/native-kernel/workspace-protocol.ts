@@ -1,4 +1,4 @@
-import type { NativeRepositoryReference } from './desktop-presenter'
+import type { INativeRepositoryReference } from './desktop-presenter'
 import { isRecord } from '../lib/is-record'
 
 export type WorkspaceMenuTarget =
@@ -10,7 +10,7 @@ export type WorkspaceMenuTarget =
   | { readonly kind: 'commit'; readonly id: string }
   | { readonly kind: 'changes'; readonly id: '' }
 
-export interface WorkspaceFileFilter {
+export interface IWorkspaceFileFilter {
   readonly filterText: string
   readonly isIncludedInCommit: boolean
   readonly isExcludedFromCommit: boolean
@@ -68,7 +68,7 @@ export type NativeWorkspaceAction =
       readonly sha: string
       readonly fileID: string
     }
-  | { readonly type: 'files.filter'; readonly filter: WorkspaceFileFilter }
+  | { readonly type: 'files.filter'; readonly filter: IWorkspaceFileFilter }
   | {
       readonly type: 'menu'
       readonly target: WorkspaceMenuTarget
@@ -97,9 +97,9 @@ export type NativeWorkspaceAction =
       readonly value: boolean
     }
 
-export interface NativeWorkspaceCommand {
+export interface INativeWorkspaceCommand {
   readonly name: 'workspace.action'
-  readonly repository: NativeRepositoryReference | null
+  readonly repository: INativeRepositoryReference | null
   readonly action: NativeWorkspaceAction
 }
 
@@ -114,8 +114,10 @@ const strings = (v: unknown): v is string[] =>
 
 export function parseNativeWorkspaceCommand(
   value: Record<string, unknown>
-): NativeWorkspaceCommand | null {
-  if (value.name !== 'workspace.action') return null
+): INativeWorkspaceCommand | null {
+  if (value.name !== 'workspace.action') {
+    return null
+  }
   const { repository, action } = value
   if (
     !keys(value, ['name', 'repository', 'action']) ||
@@ -126,8 +128,9 @@ export function parseNativeWorkspaceCommand(
         !keys(repository, ['id', 'path']) ||
         !integer(repository.id) ||
         !text(repository.path))
-  )
+  ) {
     throw new Error('Invalid workspace command')
+  }
   const exact = (allowed: string[]) => keys(action, ['type', ...allowed])
   let valid = false
   switch (action.type) {
@@ -287,6 +290,8 @@ export function parseNativeWorkspaceCommand(
         typeof action.value === 'boolean'
       break
   }
-  if (!valid) throw new Error('Invalid workspace action parameters')
-  return value as unknown as NativeWorkspaceCommand
+  if (!valid) {
+    throw new Error('Invalid workspace action parameters')
+  }
+  return value as unknown as INativeWorkspaceCommand
 }

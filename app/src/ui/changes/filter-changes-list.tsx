@@ -110,6 +110,7 @@ interface IFilterChangesListProps {
   ) => void
   readonly onCreateCommit: (context: ICommitContext) => Promise<boolean>
   readonly onDiscardChanges: (file: WorkingDirectoryFileChange) => void
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by changes menu controller
   readonly askForConfirmationOnDiscardChanges: boolean
   readonly askForConfirmationOnCommitFilteredChanges: boolean
   readonly focusCommitMessage: boolean
@@ -131,6 +132,7 @@ interface IFilterChangesListProps {
    *
    * @param path The path of the file relative to the root of the repository
    */
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by changes menu controller
   readonly onOpenItem: (path: string) => void
 
   /**
@@ -184,9 +186,11 @@ interface IFilterChangesListProps {
   readonly autocompletionProviders: ReadonlyArray<IAutocompletionProvider<any>>
 
   /** Called when the given file should be ignored. */
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by changes menu controller
   readonly onIgnoreFile: (pattern: string | string[]) => void
 
   /** Called when the given pattern should be ignored. */
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by changes menu controller
   readonly onIgnorePattern: (pattern: string | string[]) => void
 
   /**
@@ -205,6 +209,7 @@ interface IFilterChangesListProps {
   readonly coAuthors: ReadonlyArray<Author>
 
   /** The name of the currently selected external editor */
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by changes menu controller
   readonly externalEditorLabel?: string
 
   readonly stashEntry: IStashEntry | null

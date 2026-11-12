@@ -1,9 +1,29 @@
 {
-  "operation.kind.Merge": { "en": "Merge", "zh-Hans": "合并", "zh-Hant": "合併" },
-  "operation.kind.Rebase": { "en": "Rebase", "zh-Hans": "变基", "zh-Hant": "重訂基底" },
-  "operation.kind.Cherry-pick": { "en": "Cherry-pick", "zh-Hans": "挑选提交", "zh-Hant": "揀選提交" },
-  "operation.kind.Squash": { "en": "Squash commits", "zh-Hans": "压缩提交", "zh-Hant": "壓縮提交" },
-  "operation.kind.Reorder": { "en": "Reorder commits", "zh-Hans": "调整提交顺序", "zh-Hant": "調整提交順序" },
+  "operation.kind.Merge": {
+    "en": "Merge",
+    "zh-Hans": "合并",
+    "zh-Hant": "合併"
+  },
+  "operation.kind.Rebase": {
+    "en": "Rebase",
+    "zh-Hans": "变基",
+    "zh-Hant": "重訂基底"
+  },
+  "operation.kind.Cherry-pick": {
+    "en": "Cherry-pick",
+    "zh-Hans": "挑选提交",
+    "zh-Hant": "揀選提交"
+  },
+  "operation.kind.Squash": {
+    "en": "Squash commits",
+    "zh-Hans": "压缩提交",
+    "zh-Hant": "壓縮提交"
+  },
+  "operation.kind.Reorder": {
+    "en": "Reorder commits",
+    "zh-Hans": "调整提交顺序",
+    "zh-Hant": "調整提交順序"
+  },
   "operation.repositoryUnavailable": {
     "en": "The repository for this dialog is no longer available. Cancel this dialog and reopen the operation from its repository.",
     "zh-Hans": "此对话框所属的仓库已不可用。请取消对话框，再从对应仓库重新打开操作。",

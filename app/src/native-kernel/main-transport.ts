@@ -9,7 +9,7 @@ import type { NativeWindowAction } from './protocol'
 import type { WindowState } from '../lib/window-state'
 
 /** Window facts come from the actual native presenter, not a hidden browser. */
-export interface NativeWindowState {
+export interface INativeWindowState {
   readonly visible: boolean
   readonly focused: boolean
   readonly minimized: boolean
@@ -23,9 +23,13 @@ export type NativeKernelFailurePhase =
   | 'renderer'
   | 'main'
 
-export interface NativeWindowPresentation {
+export interface INativeWindowPresentation {
+  showFileDialog(
+    kind: 'open' | 'save',
+    options: Electron.OpenDialogOptions | Electron.SaveDialogOptions
+  ): Promise<ReadonlyArray<string>>
   action(action: NativeWindowAction): void
-  getState(): NativeWindowState
+  getState(): INativeWindowState
   setZoom(factor: number): void
   fail(phase: NativeKernelFailurePhase): void
 }
@@ -34,7 +38,7 @@ function validID(id: unknown): id is number {
   return typeof id === 'number' && Number.isSafeInteger(id) && id > 0
 }
 
-function windowState(value: unknown): NativeWindowState | undefined {
+function windowState(value: unknown): INativeWindowState | undefined {
   if (
     !isRecord(value) ||
     typeof value.visible !== 'boolean' ||
@@ -64,7 +68,7 @@ function windowState(value: unknown): NativeWindowState | undefined {
  * which retain sender validation. This class owns transport IDs and window
  * facts only, never Git operations, accounts or recovery decisions.
  */
-export class NativeKernelTransport implements NativeWindowPresentation {
+export class NativeKernelTransport implements INativeWindowPresentation {
   private renderer: WebContents | undefined
   private attached = false
   private ready = false
@@ -73,7 +77,7 @@ export class NativeKernelTransport implements NativeWindowPresentation {
     ReturnType<typeof parseKernelCommand>
   >()
   private readonly pending = new Set<number>()
-  private state: NativeWindowState = {
+  private state: INativeWindowState = {
     visible: false,
     focused: false,
     minimized: false,
@@ -86,6 +90,14 @@ export class NativeKernelTransport implements NativeWindowPresentation {
   private failed = false
   private writes = 0
   private quitStarted = false
+  private nextDialogID = 0
+  private readonly dialogs = new Map<
+    number,
+    {
+      resolve: (paths: ReadonlyArray<string>) => void
+      reject: (error: Error) => void
+    }
+  >()
 
   public constructor(
     private readonly input: Readable,
@@ -115,8 +127,9 @@ export class NativeKernelTransport implements NativeWindowPresentation {
       this.quitWhenSettled()
     })
     ipcMain.on('native-kernel-presentation-action', (event, action) => {
-      if (event.sender !== this.renderer || this.failed || this.outputError)
+      if (event.sender !== this.renderer || this.failed || this.outputError) {
         return
+      }
       // Toolkit-only actions travel in FIFO order, not a replayable snapshot.
       this.send({
         jsonrpc: '2.0',
@@ -196,7 +209,7 @@ export class NativeKernelTransport implements NativeWindowPresentation {
     this.send({ jsonrpc: '2.0', method: 'window.action', params: { action } })
   }
 
-  public getState(): NativeWindowState {
+  public getState(): INativeWindowState {
     return this.state
   }
 
@@ -204,8 +217,60 @@ export class NativeKernelTransport implements NativeWindowPresentation {
     this.send({ jsonrpc: '2.0', method: 'window.zoom', params: { factor } })
   }
 
+  /** The visible MyGo window owns system pickers; the hidden renderer only
+   * consumes their original result. Replies bypass the waiting command queue. */
+  public showFileDialog(
+    kind: 'open' | 'save',
+    options: Electron.OpenDialogOptions | Electron.SaveDialogOptions
+  ): Promise<ReadonlyArray<string>> {
+    if (this.inputClosed || this.failed || this.outputError) {
+      return Promise.resolve([])
+    }
+    return new Promise((resolve, reject) => {
+      const id = ++this.nextDialogID
+      this.dialogs.set(id, { resolve, reject })
+      this.send({
+        jsonrpc: '2.0',
+        method: 'dialog.request',
+        params: { id, kind, options },
+      })
+    })
+  }
+
+  private receiveDialogResult(id: number, value: unknown): void {
+    if (
+      !isRecord(value) ||
+      !validID(value.id) ||
+      !Array.isArray(value.paths) ||
+      !value.paths.every(path => typeof path === 'string') ||
+      (value.error !== null && typeof value.error !== 'string') ||
+      !this.dialogs.has(value.id)
+    ) {
+      this.send({
+        jsonrpc: '2.0',
+        id,
+        error: { code: -32602, message: 'Invalid native dialog result' },
+      })
+      return
+    }
+    const pending = this.dialogs.get(value.id)!
+    this.dialogs.delete(value.id)
+    if (value.error !== null) {
+      pending.reject(new Error(value.error))
+    } else {
+      pending.resolve(value.paths)
+    }
+    this.send({ jsonrpc: '2.0', id, result: { received: true } })
+  }
+
   private stopAdmission(): void {
     this.inputClosed = true
+    // No user can answer a picker after the presenter is gone. Cancel only
+    // these presentation waits; admitted Git operations still settle normally.
+    for (const pending of this.dialogs.values()) {
+      pending.resolve([])
+    }
+    this.dialogs.clear()
     this.lines?.close()
     // Readline pauses the stream when closed. Drain without admitting more
     // commands so the parent's acknowledged shutdown can release its pipe.
@@ -362,6 +427,10 @@ export class NativeKernelTransport implements NativeWindowPresentation {
         }
         if (message.method === 'kernel.windowState') {
           this.updateWindowState(id, message.params)
+          continue
+        }
+        if (message.method === 'kernel.dialogResult') {
+          this.receiveDialogResult(id, message.params)
           continue
         }
         if (message.method !== 'kernel.command') {

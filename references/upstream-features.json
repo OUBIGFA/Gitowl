@@ -519,7 +519,7 @@
       "symbol": "RequestChannels",
       "member": "native-kernel-presentation-action",
       "category": "ipc-request",
-      "signature": "(action: AppMenuPresentationAction) => void"
+      "signature": "( action: AppMenuPresentationAction ) => void"
     },
     {
       "id": "RequestChannels:native-kernel-request",
@@ -527,7 +527,7 @@
       "symbol": "RequestChannels",
       "member": "native-kernel-request",
       "category": "ipc-request",
-      "signature": "(request: NativeKernelRequest) => void"
+      "signature": "(request: INativeKernelRequest) => void"
     },
     {
       "id": "RequestChannels:native-kernel-response",
@@ -543,7 +543,7 @@
       "symbol": "RequestChannels",
       "member": "native-kernel-state",
       "category": "ipc-request",
-      "signature": "(snapshot: NativeKernelSnapshot) => void"
+      "signature": "(snapshot: INativeKernelSnapshot) => void"
     },
     {
       "id": "RequestChannels:native-theme-updated",

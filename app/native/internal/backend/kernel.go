@@ -270,6 +270,7 @@ type KernelFailure struct {
 // KernelEvent is emitted in wire order. A handler only schedules UI-thread
 // work and must not synchronously call the client from its reader goroutine.
 type KernelEvent struct {
+	Dialog             *KernelFileDialog
 	Snapshot           *KernelSnapshot
 	WindowAction       string
 	PresentationAction string
@@ -423,6 +424,12 @@ func validateKernelSnapshot(snapshot KernelSnapshot) error {
 func (k *Kernel) receiveEvent(method string, params json.RawMessage) error {
 	var event KernelEvent
 	switch method {
+	case "dialog.request":
+		var dialog KernelFileDialog
+		if err := json.Unmarshal(params, &dialog); err != nil || dialog.ID <= 0 || (dialog.Kind != "open" && dialog.Kind != "save") {
+			return &ProtocolError{"invalid native file dialog"}
+		}
+		event.Dialog = &dialog
 	case "kernel.state":
 		var snapshot KernelSnapshot
 		if err := json.Unmarshal(params, &snapshot); err != nil {
@@ -683,14 +690,28 @@ func (k *Kernel) WindowState(ctx context.Context, state KernelWindowState) error
 	return nil
 }
 
+func (k *Kernel) prioritizeTree() {
+	if k.service != nil && k.service.owned.prioritize != nil {
+		k.service.owned.prioritize()
+	}
+}
+
+// Close timeouts are variables so tests can shorten them.
+var (
+	closeSettleTimeout = 60 * time.Second
+	closeExitTimeout   = 30 * time.Second
+)
+
 // Close requires settled operations, atomically stops further admissions, and
 // requests normal original-kernel shutdown. Unlike the research Service.Close,
 // it never kills a process with an unresolved write or pretends one was canceled.
 func (k *Kernel) Close() error {
-	// Window close cancels its image players first. Drain only those read-only
-	// replies off the UI thread; never wait out or abandon a critical Git write.
-	deadline := time.Now().Add(20 * time.Second)
-	for k.client.InFlight() != 0 && k.client.CriticalInFlight() == 0 && time.Now().Before(deadline) {
+	// The UI defers quitting until admitted work settles, so this normally
+	// finds nothing in flight. Other exits (session end, a late canceled
+	// reply) still wait for real replies off the UI thread instead of refusing
+	// shutdown or abandoning a Git write; only then is admission stopped.
+	deadline := time.Now().Add(closeSettleTimeout)
+	for k.client.InFlight() != 0 && time.Now().Before(deadline) {
 		time.Sleep(time.Millisecond)
 	}
 	k.mu.Lock()
@@ -709,11 +730,17 @@ func (k *Kernel) Close() error {
 	}
 	k.closing = true
 	k.mu.Unlock()
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	// A loaded kernel may flush stores and stop many repository watchers
+	// before exiting; that is slower than one RPC round trip.
+	ctx, cancel := context.WithTimeout(context.Background(), closeExitTimeout)
 	defer cancel()
 	var out struct {
 		Quitting bool `json:"quitting"`
 	}
+	// Quitting is user-blocking work: whatever priority Chromium or Windows
+	// chose for the hidden kernel tree, restore normal scheduling while it
+	// flushes, so a saturated set of efficient cores cannot starve the exit.
+	k.prioritizeTree()
 	err := k.client.call(ctx, "kernel.shutdown", nil, &out, true, false)
 	if err == nil && !out.Quitting {
 		err = k.client.invalid("kernel.shutdown", "shutdown was not acknowledged")
@@ -731,16 +758,26 @@ func (k *Kernel) Close() error {
 			if k.service != nil {
 				done = k.service.waitDone
 			}
-			select {
-			case <-done:
-				if k.service != nil && k.service.waitErr != nil {
-					err = errors.Join(err, k.service.exitError())
+			ticker := time.NewTicker(250 * time.Millisecond)
+			defer ticker.Stop()
+		wait:
+			for {
+				select {
+				case <-done:
+					if k.service != nil && k.service.waitErr != nil {
+						err = errors.Join(err, k.service.exitError())
+					}
+					if terminal := k.client.Err(); terminal != nil && !errors.Is(terminal, ErrDisconnected) {
+						err = errors.Join(err, terminal)
+					}
+					break wait
+				case <-ticker.C:
+					// Chromium starts and reprioritizes children while quitting.
+					k.prioritizeTree()
+				case <-ctx.Done():
+					err = errors.Join(err, errors.New("Desktop kernel did not finish its acknowledged shutdown in time; its settled process tree ends with Gitowl"))
+					break wait
 				}
-				if terminal := k.client.Err(); terminal != nil && !errors.Is(terminal, ErrDisconnected) {
-					err = errors.Join(err, terminal)
-				}
-			case <-ctx.Done():
-				err = errors.Join(err, errors.New("Desktop kernel did not finish its acknowledged shutdown; it was not force-killed"))
 			}
 		}
 	}

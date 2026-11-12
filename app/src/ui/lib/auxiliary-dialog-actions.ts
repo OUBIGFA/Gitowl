@@ -32,7 +32,7 @@ import {
 } from '../secret-scanning/bypass-reason'
 import type { ISecretScanResult } from '../secret-scanning/push-protection-error-dialog'
 
-export interface PushBranchDialogProps {
+export interface IPushBranchDialogProps {
   readonly dispatcher: Dispatcher
   readonly repository: Repository
   readonly branch: Branch
@@ -43,7 +43,7 @@ export interface PushBranchDialogProps {
 /** Original publish/push-then-PR continuation, including its finally-unlock.
  * The Dispatcher owns push failures/recovery; no invented success or retry. */
 export async function submitPushBranchDialog(
-  props: PushBranchDialogProps,
+  props: IPushBranchDialogProps,
   setPushing: (value: boolean) => void
 ) {
   setPushing(true)
@@ -57,7 +57,7 @@ export async function submitPushBranchDialog(
 }
 
 /** Only the published/ahead branch footer offers creating without pushing. */
-export function createPullRequestWithoutPush(props: PushBranchDialogProps) {
+export function createPullRequestWithoutPush(props: IPushBranchDialogProps) {
   props.onConfirm(props.repository, props.branch)
   props.onDismissed()
 }

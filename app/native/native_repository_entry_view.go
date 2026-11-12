@@ -54,6 +54,7 @@ func renderRepositoryEntryFields(c *ui.Context, popup *backend.KernelPopupPresen
 						Disabled(form.busy || f.Disabled).ReadOnly(f.ReadOnly).Placeholder(f.Placeholder).OnChange(func() { changed(f) })
 					button("choose", false)
 				})
+				nativeRequiredEmptyHint(c, f, form.values[f.ID].text)
 			}).Shrink(0)
 		}
 	}

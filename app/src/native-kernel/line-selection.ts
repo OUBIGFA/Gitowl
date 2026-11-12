@@ -3,10 +3,10 @@ import type { AppRuntime } from '../ui/app-runtime'
 import { ChangesSelectionKind } from '../lib/app-state'
 import { DiffLineType, DiffType } from '../models/diff'
 import type { IRepositoryState } from '../lib/app-state'
-import type { NativeRepositoryReference } from './desktop-presenter'
+import type { INativeRepositoryReference } from './desktop-presenter'
 import { Repository } from '../models/repository'
 
-export interface KernelDiffSelection {
+export interface IKernelDiffSelection {
   readonly identity: string
   readonly fileID: string
   readonly showCheckMarks: boolean
@@ -23,27 +23,31 @@ export interface KernelDiffSelection {
 export function projectDiffSelection(
   state: IRepositoryState,
   showCheckMarks: boolean
-): KernelDiffSelection | null {
+): IKernelDiffSelection | null {
   const selection = state.changesState.selection
   if (
     selection.kind !== ChangesSelectionKind.WorkingDirectory ||
     selection.diff?.kind !== DiffType.Text ||
     selection.selectedFileIDs.length !== 1
-  )
+  ) {
     return null
+  }
   const file = state.changesState.workingDirectory.files.find(
     file => file.id === selection.selectedFileIDs[0]
   )
-  if (file === undefined) return null
+  if (file === undefined) {
+    return null
+  }
   let oldBufferLine = 0
   let newBufferLine = 0
-  const lines: KernelDiffSelection['lines'][number][] = []
+  const lines: IKernelDiffSelection['lines'][number][] = []
   for (const hunk of selection.diff.hunks) {
     for (const line of hunk.lines) {
       const old = line.oldLineNumber === null ? null : oldBufferLine++
       const current = line.newLineNumber === null ? null : newBufferLine++
-      if (!line.isIncludeableLine() || line.originalLineNumber === null)
+      if (!line.isIncludeableLine() || line.originalLineNumber === null) {
         continue
+      }
       lines.push({
         id: line.originalLineNumber,
         kind: line.type === DiffLineType.Add ? 'add' : 'delete',
@@ -90,13 +94,15 @@ export function includeDiffLines(
     file => file.id === fileID
   )!
   let selection = file.selection
-  for (const id of ids) selection = selection.withLineSelection(id, included)
+  for (const id of ids) {
+    selection = selection.withLineSelection(id, included)
+  }
   return runtime.dispatcher.changeFileLineSelection(repository, file, selection)
 }
 
-export interface IncludeDiffLinesCommand {
+export interface IIncludeDiffLinesCommand {
   readonly name: 'repository.lines.include'
-  readonly repository: NativeRepositoryReference
+  readonly repository: INativeRepositoryReference
   readonly fileID: string
   readonly identity: string
   readonly lineIDs: ReadonlyArray<number>

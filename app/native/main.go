@@ -132,6 +132,7 @@ func run(entry, electron, initialPath, profile string, initialLaunch nativeLaunc
 		a.chooseDirectory = func(title, path string) ([]string, error) {
 			return mygo.Dialog.Open(mygo.OpenDialogOptions{Parent: win, Title: title, DefaultPath: path, Directory: true})
 		}
+		a.chooseFile = func(request backend.KernelFileDialog) ([]string, error) { return showNativeFileDialog(win, request) }
 		a.coreWindowState = func() backend.KernelWindowState {
 			state := "normal"
 			if win.IsFullScreen() {
@@ -179,6 +180,7 @@ func run(entry, electron, initialPath, profile string, initialLaunch nativeLaunc
 		}
 		var tray *mygo.Tray
 		showWindow := func() { win.Show(); win.Restore(); win.Focus() }
+		a.showWindow, a.requestQuit = showWindow, mygo.App.Quit
 		trayMenu := func() *mygo.Menu {
 			tx := locales.In(mygo.App.Locale())
 			return mygo.NewMenu([]*mygo.MenuItem{

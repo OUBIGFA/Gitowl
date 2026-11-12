@@ -15,9 +15,14 @@ func (a *app) workspaceTitleControls(c *ui.Context) {
 	if workspace == nil || workspace.Repository == nil {
 		return
 	}
-	branch := workspaceLabel(c.Locale(), "workspace.detached")
-	if a.coreSnapshot.Selected != nil && a.coreSnapshot.Selected.Branch != nil {
-		branch = *a.coreSnapshot.Selected.Branch
+	// The original dropdown has no label while the tip is still unknown (it
+	// hides itself); only a real detached HEAD reports a commit, so a project
+	// that is still loading must not read as detached.
+	branch := ""
+	if selected := a.coreSnapshot.Selected; selected != nil && selected.Branch != nil {
+		branch = *selected.Branch
+	} else if selected != nil && selected.HeadSHA != nil {
+		branch = workspaceLabel(c.Locale(), "workspace.detached")
 	}
 	renderWorkspaceTitleControls(c, &a.nativeWorkspaceState, workspace, branch, !a.ready || a.workspacePending > 0, a.workspaceAction)
 }
@@ -56,10 +61,16 @@ func toggleWorkspaceNavigation(state *nativeWorkspaceState, target string, send 
 func renderWorkspaceTitleControls(c *ui.Context, state *nativeWorkspaceState, workspace *backend.KernelWorkspace, branch string, busy bool, send func(backend.KernelWorkspaceAction)) {
 	label := func(key string) string { return workspaceLabel(c.Locale(), "workspace."+key) }
 	disabled := busy || workspace.Locked || workspace.CheckoutInProgress
-	branchAnchor := ui.ButtonBase(c.Key("workspace-branches")).Height(32).MaxWidth(200).Padding(6, 8).Gap(8).Label(label("branches")).Tooltip(branch).Disabled(disabled)
+	tooltip := branch
+	if branch == "" {
+		disabled, tooltip = true, label("branches")
+	}
+	branchAnchor := ui.ButtonBase(c.Key("workspace-branches")).Height(32).MaxWidth(200).Padding(6, 8).Gap(8).Label(label("branches")).Tooltip(tooltip).Disabled(disabled)
 	quietSurface(c, branchAnchor).Children(func() {
 		ui.Icon(c, icons["git-branch"]).FontSize(18).Shrink(0)
-		ui.Text(c, branch).SingleLine().MinWidth(0).Grow(1)
+		if branch != "" {
+			ui.Text(c, branch).SingleLine().MinWidth(0).Grow(1)
+		}
 		ui.Icon(c, icons["chevron-down"]).FontSize(14).Shrink(0)
 	}).OnClick(func() { toggleWorkspaceNavigation(state, "branches", send) })
 	branchAnchor.PopoverMenu(func(m *ui.Menu) {

@@ -40,6 +40,7 @@ import { projectKernelState } from '../../src/native-kernel/state-projection'
 import { executeKernelCommand } from '../../src/native-kernel/execute-command'
 import { parseKernelCommand } from '../../src/native-kernel/command-validation'
 import { captureClipboardWrites } from '../helpers/ui/electron'
+import { hasRepositoryGitOperations } from '../../src/lib/git/repository-operation'
 
 // The standard unit-platform seam only. Git/AppStore/Dispatcher and their
 // conflict/stash/checkout contracts are real and share one original runtime.
@@ -68,7 +69,9 @@ describe(
     after(() => window.close())
 
     async function until(predicate: () => boolean) {
-      if (predicate()) return
+      if (predicate()) {
+        return
+      }
       await new Promise<void>((resolve, reject) => {
         const timer = setTimeout(() => {
           subscription.dispose()
@@ -110,10 +113,11 @@ describe(
       const view = () => projectNativeWorkspace(runtime.appStore.getState())
       t.after(async () => {
         runtime.dispatcher.clearBanner()
-        while (runtime.appStore.getState().currentPopup !== null)
+        while (runtime.appStore.getState().currentPopup !== null) {
           runtime.dispatcher.closePopupById(
             runtime.appStore.getState().currentPopup!.id!
           )
+        }
         if (
           runtime.appStore
             .getState()
@@ -353,6 +357,14 @@ describe(
           retryDelay: 50,
         })
       )
+      // Move the repository while Desktop is quiet. Selecting it starts
+      // background reads; on Windows, renaming the directory under a running
+      // Git process fails that read with Permission denied, which would be a
+      // different scenario from an externally moved idle repository.
+      for (let quiet = 0; quiet < 3; ) {
+        await new Promise(resolve => setTimeout(resolve, 50))
+        quiet = hasRepositoryGitOperations(f.path) ? 0 : quiet + 1
+      }
       await rename(f.path, moved)
       await runtime.dispatcher.refreshRepository(f.repository)
       await until(
@@ -476,7 +488,7 @@ describe(
           path: [0],
           callback: 'run',
         },
-      ])
+      ]) {
         assert.throws(() =>
           parseNativeWorkspaceCommand({
             name: 'workspace.action',
@@ -484,6 +496,7 @@ describe(
             action,
           })
         )
+      }
     })
 
     it('projects and constructs every offered menu without mutating the original section, draft or selection', async t => {
@@ -505,8 +518,9 @@ describe(
       try {
         for (let i = 0; i < 10; i++) {
           const projection = projectNativeWorkspace(app)
-          for (const menu of projection.menus)
+          for (const menu of projection.menus) {
             buildWorkspaceMenu(app, f.repository, state, menu.target, runtime)
+          }
         }
         assert.equal(updates, 0)
         assert.equal(f.state(), state)
@@ -1275,18 +1289,19 @@ describe(
           JSON.stringify(projected).includes('DESCRIPTION-NOT-SERIALIZED'),
           false
         )
-        if (projected.actions.includes('undo'))
+        if (projected.actions.includes('undo')) {
           await f.act({ type: 'banner', id: projected.id, action: 'undo' })
-        else if (!projected.dismissable) {
+        } else if (!projected.dismissable) {
           await assert.rejects(
             f.act({ type: 'banner', id: projected.id, action: 'dismiss' }),
             /conflict dialog/
           )
           await f.act({ type: 'banner', id: projected.id, action: 'open' })
-          while (runtime.appStore.getState().currentPopup !== null)
+          while (runtime.appStore.getState().currentPopup !== null) {
             runtime.dispatcher.closePopupById(
               runtime.appStore.getState().currentPopup!.id!
             )
+          }
         }
       }
       assert.equal(called, 6)

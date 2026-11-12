@@ -1,9 +1,9 @@
-import type { NativeRepositoryReference } from './desktop-presenter'
+import type { INativeRepositoryReference } from './desktop-presenter'
 import type { CommitOptions } from '../lib/app-state'
 import { isRecord } from '../lib/is-record'
 
 type RepositoryCommand = {
-  readonly repository: NativeRepositoryReference
+  readonly repository: INativeRepositoryReference
 }
 export type NativeCommitCommand = RepositoryCommand &
   (

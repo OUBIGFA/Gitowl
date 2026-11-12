@@ -14,8 +14,16 @@ mock.module('registry-js', {
     enumerateValues: () => [
       { name: 'Path', type: 'REG_EXPAND_SZ', data: userPath },
     ],
-    setValue: (_hive: string, _key: string, _name: string, _type: string, value: string) => {
-      if (registryFailure) throw new Error('registry denied')
+    setValue: (
+      _hive: string,
+      _key: string,
+      _name: string,
+      _type: string,
+      value: string
+    ) => {
+      if (registryFailure) {
+        throw new Error('registry denied')
+      }
       userPath = value
     },
   },
@@ -53,12 +61,18 @@ it('native install, upgrade and uninstall maintain only the Gitowl CLI entry', a
       /Could not set the PATH environment variable/
     )
     Object.assign(globalThis, { __APP_NAME__: 'GitHub Desktop' })
-    assert.equal(lifecycle.handleNativeCLIEvent(['app', '--gitowl-install-cli']), null)
+    assert.equal(
+      lifecycle.handleNativeCLIEvent(['app', '--gitowl-install-cli']),
+      null
+    )
   } finally {
     registryFailure = false
     Object.assign(globalThis, { __APP_NAME__: previousName })
     Object.defineProperty(process, 'execPath', { value: previousExecutable })
-    if (previousMode === undefined) delete process.env.GITOWL_NATIVE_CORE
-    else process.env.GITOWL_NATIVE_CORE = previousMode
+    if (previousMode === undefined) {
+      delete process.env.GITOWL_NATIVE_CORE
+    } else {
+      process.env.GITOWL_NATIVE_CORE = previousMode
+    }
   }
 })

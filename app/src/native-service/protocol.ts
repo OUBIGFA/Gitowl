@@ -4,7 +4,7 @@ import { isRecord } from '../lib/is-record'
 import { ServiceError } from './service-error'
 
 /** Local RPC services receive one cancellation scope per submitted request. */
-export interface NativeRPCService {
+export interface INativeRPCService {
   invoke(
     method: string,
     params: unknown,
@@ -34,7 +34,7 @@ function isRequest(
 
 /** Validate once at the process boundary; no arbitrary command endpoint exists. */
 export async function handleRequest(
-  service: NativeRPCService,
+  service: INativeRPCService,
   request: unknown,
   signal?: AbortSignal
 ) {
@@ -73,7 +73,7 @@ export async function handleRequest(
 export async function serve(
   input: Readable,
   output: Writable,
-  service: NativeRPCService
+  service: INativeRPCService
 ) {
   const active = new Map<number, AbortController>()
   const pending = new Set<Promise<void>>()

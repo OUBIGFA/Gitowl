@@ -406,7 +406,7 @@ it('validates the complete isolated source/runtime/command/review evidence graph
   const accepted = await validateAcceptance(f.root, f.acceptanceRef.path)
   assert.equal(accepted.sourceDigest, f.source.sourceDigest)
   assert.equal(accepted.sourceTree, (await git(f.root, ['write-tree'])).trim())
-  assert.equal(accepted.installedAcceptance, 'pending')
+  assert.equal(accepted.installedAcceptance, 'not-required')
   assert.equal(accepted.identifier, 'io.github.oubigfa.gitowl')
 })
 

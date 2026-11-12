@@ -251,3 +251,43 @@ func TestWorkspaceNativeBannerDeadlineAndConflictActions(t *testing.T) {
 		t.Fatal("conflict did not reopen the original continuation")
 	}
 }
+
+// Only a real detached HEAD may read as detached. While the original tip is
+// still unknown (a project is loading) the branch control shows no state.
+func TestWorkspaceBranchLabelFollowsOriginalTipState(t *testing.T) {
+	main, sha := "main", "0123456789abcdef0123456789abcdef01234567"
+	detached := workspaceLabel("en", "workspace.detached")
+	for _, tc := range []struct {
+		name         string
+		branch, head *string
+		want         string
+		disabled     bool
+	}{
+		{"unknown", nil, nil, "", true},
+		{"detached", nil, &sha, detached, false},
+		{"valid", &main, &sha, main, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			a := newApp(nil, nil)
+			defer a.close()
+			a.ready = true
+			a.coreSnapshot = &backend.KernelSnapshot{Workspace: workspaceFixture(), Selected: &backend.KernelSelected{Branch: tc.branch, HeadSHA: tc.head}}
+			tt := ui.NewTester(func(c *ui.Context) {
+				setWorkspaceTheme(c)
+				ui.Row(c).FillWidth().Gap(8).Children(func() { a.workspaceTitleControls(c) })
+			}, 900, 620)
+			tt.SetLocale("en")
+			tt.Advance(time.Second)
+			if tc.name != "detached" && tt.HasText(detached) {
+				t.Fatalf("%s tip reads as detached: %v", tc.name, tt.Texts())
+			}
+			if tc.want != "" && !tt.HasText(tc.want) {
+				t.Fatalf("missing branch label %q: %v", tc.want, tt.Texts())
+			}
+			control, ok := tt.AccessByRole(ui.RoleButton, workspaceLabel("en", "workspace.branches"))
+			if !ok || control.Disabled != tc.disabled {
+				t.Fatalf("branch control disabled=%v, want %v", control.Disabled, tc.disabled)
+			}
+		})
+	}
+}

@@ -12,7 +12,7 @@ import labels from '../../../references/native-ui-settings-labels.json'
 import { Account } from '../../src/models/account'
 import type { IBYOKModel } from '../../src/lib/copilot/byok'
 import type { AppRuntime } from '../../src/ui/app-runtime'
-import type { NativeDialogModule } from '../../src/native-kernel/dialog-module'
+import type { INativeDialogModule } from '../../src/native-kernel/dialog-module'
 import { Popup, PopupType } from '../../src/models/popup'
 import { PreferencesTab } from '../../src/models/preferences'
 import { ApplicationTheme } from '../../src/ui/lib/application-theme'
@@ -46,7 +46,7 @@ const priorElectron = Object.getOwnPropertyDescriptor(
   'electron'
 )
 let runtime: AppRuntime
-let dialogs: NativeDialogModule
+let dialogs: INativeDialogModule
 let mountSettings: typeof import('../../src/native-kernel/settings-dialogs').mountSettingsDialog
 let dir: string
 let globalConfig: string
@@ -127,7 +127,10 @@ async function git(path: string, args: string[]) {
 describe('native settings partition with original core', () => {
   it('keeps preference edits disabled until the original initial load completes', async () => {
     const p = await popup({ type: PopupType.Preferences })
-    assert.ok(view(p).fields.every(f => f.disabled), 'initial inputs must wait for loading')
+    assert.ok(
+      view(p).fields.every(f => f.disabled),
+      'initial inputs must wait for loading'
+    )
     assert.equal(view(p).actions.find(a => a.id === 'change')?.disabled, true)
     await reply(p, 'load')
     assert.equal(field(p, 'tab').disabled, undefined)
@@ -186,8 +189,17 @@ describe('native settings partition with original core', () => {
         ?.find(page => page.id === 'prompts')
         ?.fields.some(field => field.id === 'confirmForcePush')
     )
-    assert.equal(layoutPages?.find(page => page.id === 'git')?.fields.find(field => field.id === 'committerName')?.value, 'Fixture Author')
-    assert.ok(layoutPages?.find(page => page.id === 'appearance')?.fields.find(field => field.id === 'theme')?.changeAction)
+    assert.equal(
+      layoutPages
+        ?.find(page => page.id === 'git')
+        ?.fields.find(field => field.id === 'committerName')?.value,
+      'Fixture Author'
+    )
+    assert.ok(
+      layoutPages
+        ?.find(page => page.id === 'appearance')
+        ?.fields.find(field => field.id === 'theme')?.changeAction
+    )
     const expected: Record<string, string[]> = {
       accounts: ['account'],
       integrations: [
@@ -242,8 +254,15 @@ describe('native settings partition with original core', () => {
     await reply(p, 'navigate', { tab: 'appearance' })
     assert.equal(field(p, 'tab').value, 'appearance')
     assert.equal(view(p).error, error)
-    assert.equal(view(p).layoutPages?.find(page => page.id === 'git')?.fields.find(f => f.id === 'committerName')?.value, '<>')
-    await assert.rejects(reply(p, 'navigate', { tab: 'git', committerName: 'Unexpected' }))
+    assert.equal(
+      view(p)
+        .layoutPages?.find(page => page.id === 'git')
+        ?.fields.find(f => f.id === 'committerName')?.value,
+      '<>'
+    )
+    await assert.rejects(
+      reply(p, 'navigate', { tab: 'git', committerName: 'Unexpected' })
+    )
     await assert.rejects(reply(p, 'change', { notificationsEnabled: 'true' }))
     await reply(p, 'change', { committerName: 'Restored author' })
     await reply(p, 'navigate', { tab: 'git' })
@@ -401,7 +420,10 @@ describe('native settings partition with original core', () => {
   it('keeps all labels/choices translated and never projects account tokens or missing model fallbacks', async () => {
     const checkLabels = (p: Popup) => {
       const dto = view(p)
-      const fields = [...dto.fields, ...(dto.layoutPages?.flatMap(page => page.fields) ?? [])]
+      const fields = [
+        ...dto.fields,
+        ...(dto.layoutPages?.flatMap(page => page.fields) ?? []),
+      ]
       for (const action of dto.actions) {
         assert.ok(
           Array.isArray(action.fields),

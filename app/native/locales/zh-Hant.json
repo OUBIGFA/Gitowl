@@ -361,6 +361,8 @@
   "popupWorking": "請稍候…",
   "popupReplyFailed": "未能完成操作。請查看詳細資料後重試。",
   "requiredField": "{label}（必填）",
+  "requiredFieldEmpty": "此項不能為空。",
+  "quitWaitingForWork": "{count, plural, other {正在等待 # 項操作完成，完成後 Gitowl 將自動結束。}}",
   "saveProviderFirst": "先儲存連線，再管理模型",
   "matchedFiles": "符合 {matched} / {total} 個檔案",
   "noMatchingFiles": "沒有符合篩選條件的檔案",

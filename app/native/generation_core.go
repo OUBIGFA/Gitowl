@@ -74,7 +74,7 @@ func coreCustomSelectionValid(settings *backend.KernelGenerationSettings) bool {
 // in the original renderer. Their completion applies the original snapshot;
 // the callback receipt only drives editor state, never a second provider cache.
 func (a *app) changeCoreGenerationSettings(call func(context.Context, *backend.Kernel) (backend.KernelResult, error), after func(backend.GenerationSettings)) {
-	if a.core == nil || a.closed || !a.ready || a.generationSettingsBusy || a.composerLocked() || a.corePending > 0 {
+	if a.core == nil || a.closed || a.quitDeferred || !a.ready || a.generationSettingsBusy || a.composerLocked() || a.corePending > 0 {
 		return
 	}
 	a.generationSettingsSeq++

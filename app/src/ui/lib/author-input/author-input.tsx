@@ -5,11 +5,7 @@ import {
   AutocompletingInput,
   UserHit,
 } from '../../autocompletion'
-import {
-  Author,
-  isKnownAuthor,
-  UnknownAuthor,
-} from '../../../models/author'
+import { Author, isKnownAuthor, UnknownAuthor } from '../../../models/author'
 import { authorFromUserHit } from './author-from-hit'
 import memoizeOne from 'memoize-one'
 import { FocusContainer } from '../focus-container'

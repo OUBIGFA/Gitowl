@@ -1,51 +1,54 @@
-import type { NativeMediaCommand, KernelMediaChunk } from './media-presentation'
-import type { KernelRepositoryMenu } from './repository-menu'
 import type {
-  KernelMissingRepository,
+  INativeMediaCommand,
+  IKernelMediaChunk,
+} from './media-presentation'
+import type { IKernelRepositoryMenu } from './repository-menu'
+import type {
+  IKernelMissingRepository,
   MissingRepositoryAction,
 } from './missing-repository-presenter'
 import type { ICommitContext } from '../models/commit'
 import type { ICommitMessage } from '../models/commit-message'
-import type { NativeRepositoryReference } from './desktop-presenter'
+import type { INativeRepositoryReference } from './desktop-presenter'
 import type { KernelPopupDTO } from './popup-presenter'
 import type {
-  KernelOnboardingView,
-  KernelSignInView,
+  IKernelOnboardingView,
+  IKernelSignInView,
 } from './onboarding-presenter'
 import type { WelcomeStep } from '../ui/welcome/welcome-step'
-import type { NativeWorkspaceCommand } from './workspace-protocol'
-import type { KernelWorkspaceDTO } from './workspace-projection'
+import type { INativeWorkspaceCommand } from './workspace-protocol'
+import type { IKernelWorkspaceDTO } from './workspace-projection'
 import type { NativeCommitCommand } from './commit-protocol'
 import type {
   KernelCommitView,
   KernelAssistedReceipt,
 } from './commit-presenter'
-import type { KernelMenuDTO } from './menu-presenter'
+import type { IKernelMenuDTO } from './menu-presenter'
 import type {
   NativeGenerationCommand,
   KernelGenerationSettings,
 } from './generation-presenter'
 import type {
-  IncludeDiffLinesCommand,
-  KernelDiffSelection,
+  IIncludeDiffLinesCommand,
+  IKernelDiffSelection,
 } from './line-selection'
 import type {
-  NativeImagePresentationCommand,
-  NativeImagePresentation,
-  KernelImage,
+  INativeImagePresentationCommand,
+  INativeImagePresentation,
+  IKernelImage,
 } from './image-presentation'
 import type { ApplicationTheme } from '../ui/lib/application-theme'
 import type { CLIAction } from '../lib/cli-action'
 
 /** Only presentation requests are admitted; no reflected Dispatcher methods. */
 export type NativeKernelCommand =
-  | NativeMediaCommand
-  | NativeWorkspaceCommand
-  | NativeImagePresentationCommand
+  | INativeMediaCommand
+  | INativeWorkspaceCommand
+  | INativeImagePresentationCommand
   | NativeCommitCommand
   | { readonly name: 'menu.execute'; readonly id: string }
   | NativeGenerationCommand
-  | IncludeDiffLinesCommand
+  | IIncludeDiffLinesCommand
   | { readonly name: 'presentation.commit-message-focused' }
   | { readonly name: 'presentation.resizable-focus'; readonly active: boolean }
   | { readonly name: 'presentation.repository-list-focused' }
@@ -54,94 +57,94 @@ export type NativeKernelCommand =
   | { readonly name: 'repositories.filter'; readonly text: string }
   | {
       readonly name: 'repository.menu'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
       readonly lease: string
       readonly path: ReadonlyArray<number>
     }
   | {
       readonly name: 'repository.select'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
     }
   | {
       readonly name: 'repository.refresh'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
     }
   | {
       readonly name: 'repository.missing'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
       readonly action: MissingRepositoryAction
     }
   | {
       readonly name: 'repository.section'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
       readonly section: 'changes' | 'history'
     }
   | {
       readonly name: 'repository.files.select'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
       readonly fileIDs: ReadonlyArray<string>
     }
   | {
       readonly name: 'repository.files.include'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
       readonly fileIDs: ReadonlyArray<string>
       readonly included: boolean
     }
   | {
       readonly name: 'repository.files.includeAll'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
       readonly included: boolean
     }
   | {
       readonly name: 'repository.message'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
       readonly message: ICommitMessage
     }
   | {
       readonly name: 'repository.commit'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
       readonly context: ICommitContext
     }
   | {
       readonly name: 'repository.generate'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
       readonly fileIDs: ReadonlyArray<string>
       readonly overrideExistingMessage: boolean
     }
   | {
       readonly name: 'repository.generate.cancel'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
     }
   | {
       readonly name: 'repository.fetch'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
     }
   | {
       readonly name: 'repository.pull'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
     }
   | {
       readonly name: 'repository.push'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
     }
   | {
       readonly name: 'history.loadNext'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
     }
   | {
       readonly name: 'history.summaries'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
       readonly shas: ReadonlyArray<string>
     }
   | {
       readonly name: 'history.select'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
       readonly shas: ReadonlyArray<string>
       readonly contiguous: boolean
     }
   | {
       readonly name: 'history.file.select'
-      readonly repository: NativeRepositoryReference
+      readonly repository: INativeRepositoryReference
       readonly fileID: string
     }
   | { readonly name: 'popup.reply'; readonly reply: unknown }
@@ -162,12 +165,12 @@ export type NativeKernelCommand =
   | { readonly name: 'launch.url'; readonly url: string }
   | { readonly name: 'welcome.unlockGit' }
 
-export interface NativeKernelRequest {
+export interface INativeKernelRequest {
   readonly id: number
   readonly command: NativeKernelCommand
 }
 
-export interface KernelRepository extends NativeRepositoryReference {
+export interface IKernelRepository extends INativeRepositoryReference {
   readonly name: string
   readonly alias: string | null
   readonly missing: boolean
@@ -185,7 +188,7 @@ export interface KernelRepository extends NativeRepositoryReference {
   }
 }
 
-export interface KernelFile {
+export interface IKernelFile {
   readonly id: string
   readonly path: string
   readonly status: string
@@ -194,7 +197,7 @@ export interface KernelFile {
   readonly isSubmodule: boolean
 }
 
-export interface KernelDiff {
+export interface IKernelDiff {
   readonly kind:
     | 'text'
     | 'large-text'
@@ -203,8 +206,8 @@ export interface KernelDiff {
     | 'submodule'
     | 'unrenderable'
   readonly text?: string
-  readonly previous?: KernelImage
-  readonly current?: KernelImage
+  readonly previous?: IKernelImage
+  readonly current?: IKernelImage
   readonly submodule?: {
     readonly path: string
     readonly url: string | null
@@ -220,7 +223,7 @@ export interface KernelDiff {
 }
 
 /** Whitelisted view state only; never serialize a raw IAppState or Account. */
-export interface NativeKernelSnapshot extends NativeImagePresentation {
+export interface INativeKernelSnapshot extends INativeImagePresentation {
   readonly protocol: 1
   readonly core: 'desktop/desktop'
   /** Remains false until all frontend contracts have been implemented and accepted. */
@@ -233,10 +236,10 @@ export interface NativeKernelSnapshot extends NativeImagePresentation {
     readonly tabSize: number
   }
   readonly commitGeneration?: KernelGenerationSettings | null
-  readonly menu?: KernelMenuDTO
-  readonly workspace?: KernelWorkspaceDTO
-  readonly repositories: ReadonlyArray<KernelRepository>
-  readonly repositoryMenus?: ReadonlyArray<KernelRepositoryMenu>
+  readonly menu?: IKernelMenuDTO
+  readonly workspace?: IKernelWorkspaceDTO
+  readonly repositories: ReadonlyArray<IKernelRepository>
+  readonly repositoryMenus?: ReadonlyArray<IKernelRepositoryMenu>
   readonly repositoryFilter?: {
     readonly text: string
     readonly paths: ReadonlyArray<string>
@@ -247,16 +250,16 @@ export interface NativeKernelSnapshot extends NativeImagePresentation {
     readonly name: string
     readonly copilotEnabled: boolean
   }>
-  readonly missingRepository?: KernelMissingRepository | null
+  readonly missingRepository?: IKernelMissingRepository | null
   readonly cloningRepository?: {
-    readonly repository: KernelRepository
+    readonly repository: IKernelRepository
     readonly progress: {
       readonly value: number
       readonly description: string | null
     }
   } | null
   readonly selected: {
-    readonly repository: KernelRepository
+    readonly repository: IKernelRepository
     readonly section: 'changes' | 'history'
     readonly branch: string | null
     readonly upstream: string | null
@@ -265,12 +268,12 @@ export interface NativeKernelSnapshot extends NativeImagePresentation {
     readonly forcePushRecommended?: boolean
     readonly ahead: number
     readonly behind: number
-    readonly files: ReadonlyArray<KernelFile>
+    readonly files: ReadonlyArray<IKernelFile>
     readonly selectedFileIDs: ReadonlyArray<string>
     readonly message: ICommitMessage
     readonly commitView?: KernelCommitView | null
-    readonly diff: KernelDiff | null
-    readonly diffSelection?: KernelDiffSelection | null
+    readonly diff: IKernelDiff | null
+    readonly diffSelection?: IKernelDiffSelection | null
     readonly history: ReadonlyArray<{
       readonly sha: string
       readonly shortSha: string
@@ -286,7 +289,7 @@ export interface NativeKernelSnapshot extends NativeImagePresentation {
       readonly tags: ReadonlyArray<string>
     }>
     readonly historySelection: ReadonlyArray<string>
-    readonly historyFiles: ReadonlyArray<KernelFile>
+    readonly historyFiles: ReadonlyArray<IKernelFile>
     readonly historyFileID: string | null
     readonly historyLinesAdded: number
     readonly historyLinesDeleted: number
@@ -304,8 +307,8 @@ export interface NativeKernelSnapshot extends NativeImagePresentation {
   readonly bannerType: string | null
   readonly foldoutType: number | null
   readonly welcome: boolean
-  readonly onboarding: KernelOnboardingView | null
-  readonly signIn: KernelSignInView | null
+  readonly onboarding: IKernelOnboardingView | null
+  readonly signIn: IKernelSignInView | null
   readonly errorCount: number
 }
 
@@ -313,11 +316,11 @@ export type NativeKernelResponse =
   | {
       readonly id: number
       readonly result: {
-        readonly mediaChunk?: KernelMediaChunk
-        readonly snapshot: NativeKernelSnapshot
+        readonly mediaChunk?: IKernelMediaChunk
+        readonly snapshot: INativeKernelSnapshot
         readonly committed?: boolean
         readonly assisted?: KernelAssistedReceipt
-        readonly addedRepositories?: ReadonlyArray<NativeRepositoryReference>
+        readonly addedRepositories?: ReadonlyArray<INativeRepositoryReference>
       }
     }
   | {

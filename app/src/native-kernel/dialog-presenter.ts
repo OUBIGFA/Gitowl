@@ -7,13 +7,13 @@ import { operationDialogs, mountOperationDialog } from './operation-dialogs'
 import { repositoryDialogs, mountRepositoryDialog } from './repository-dialogs'
 import { settingsDialogs, mountSettingsDialog } from './settings-dialogs'
 import type {
-  NativeDialogModule,
-  NativeDialogPresentation,
-  NativeDialogReply,
+  INativeDialogModule,
+  INativeDialogPresentation,
+  INativeDialogReply,
 } from './dialog-module'
 import { isRecord } from '../lib/is-record'
 
-const modules: ReadonlyArray<NativeDialogModule> = [
+const modules: ReadonlyArray<INativeDialogModule> = [
   auxiliaryDialogs,
   operationDialogs,
   repositoryDialogs,
@@ -21,10 +21,12 @@ const modules: ReadonlyArray<NativeDialogModule> = [
 ]
 
 /** One explicit owner for each original PopupType; never Dispatcher reflection. */
-const owners = new Map<PopupType, NativeDialogModule>()
+const owners = new Map<PopupType, INativeDialogModule>()
 for (const module of modules) {
   for (const type of module.types) {
-    if (owners.has(type)) throw new Error('Duplicate native dialog partition')
+    if (owners.has(type)) {
+      throw new Error('Duplicate native dialog partition')
+    }
     owners.set(type, module)
   }
 }
@@ -37,7 +39,7 @@ export function isNativeDialog(type: PopupType): boolean {
 export function projectNativeDialog(
   popup: Popup,
   state: IAppState
-): NativeDialogPresentation | null {
+): INativeDialogPresentation | null {
   return owners.get(popup.type)?.project(popup, state) ?? null
 }
 
@@ -45,7 +47,7 @@ export function projectNativeDialog(
 export function parseNativeDialogReply(
   popup: Popup,
   value: unknown
-): NativeDialogReply {
+): INativeDialogReply {
   if (
     !isRecord(value) ||
     value.popupID !== popup.id ||
@@ -57,22 +59,26 @@ export function parseNativeDialogReply(
   ) {
     throw new Error('Invalid native dialog reply')
   }
-  return value as unknown as NativeDialogReply
+  return value as unknown as INativeDialogReply
 }
 
 export async function replyNativeDialog(
   runtime: AppRuntime,
   popup: Popup,
-  reply: NativeDialogReply
+  reply: INativeDialogReply
 ): Promise<void> {
   const owner = owners.get(popup.type)
-  if (owner === undefined) throw new Error('Unsupported native dialog')
+  if (owner === undefined) {
+    throw new Error('Unsupported native dialog')
+  }
   await owner.reply(runtime, popup, reply.action, reply.values)
 }
 
 export function cancelNativeDialog(runtime: AppRuntime, popup: Popup) {
   const owner = owners.get(popup.type)
-  if (owner === undefined) throw new Error('Unsupported native dialog')
+  if (owner === undefined) {
+    throw new Error('Unsupported native dialog')
+  }
   return owner.cancel(runtime, popup)
 }
 
@@ -94,16 +100,22 @@ export class NativeDialogLifecycle {
   private changed = () => {
     // A mount can synchronously emit (e.g. update status). Defer until every
     // owner is recorded, and coalesce progress chunks without re-entrant sync.
-    if (this.disposed || this.pendingChange) return
+    if (this.disposed || this.pendingChange) {
+      return
+    }
     this.pendingChange = true
     queueMicrotask(() => {
       this.pendingChange = false
-      if (!this.disposed) this.onChange()
+      if (!this.disposed) {
+        this.onChange()
+      }
     })
   }
 
   public sync(state: IAppState) {
-    if (this.disposed) return
+    if (this.disposed) {
+      return
+    }
     const present = new Set(state.allPopups)
     for (const [popup, subscription] of this.mounted) {
       if (!present.has(popup)) {
@@ -113,7 +125,9 @@ export class NativeDialogLifecycle {
     }
     for (const popup of present) {
       const owner = owners.get(popup.type)
-      if (owner === undefined || this.mounted.has(popup)) continue
+      if (owner === undefined || this.mounted.has(popup)) {
+        continue
+      }
       const mount =
         owner === auxiliaryDialogs
           ? mountAuxiliaryDialog
@@ -128,7 +142,9 @@ export class NativeDialogLifecycle {
 
   public dispose() {
     this.disposed = true
-    for (const subscription of this.mounted.values()) subscription.dispose()
+    for (const subscription of this.mounted.values()) {
+      subscription.dispose()
+    }
     this.mounted.clear()
   }
 }

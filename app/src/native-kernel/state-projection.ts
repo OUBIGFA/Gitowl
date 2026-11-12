@@ -5,7 +5,7 @@ import { filterListItems } from '../ui/lib/filter-list-items'
 import { formatDate } from '../lib/format-date'
 import { getRelativeTimeInfoFromDate } from '../lib/relative-time-info'
 import { withMediaProjection } from './media-presentation'
-import type { KernelMissingRepository } from './missing-repository-presenter'
+import type { IKernelMissingRepository } from './missing-repository-presenter'
 import {
   ForcePushBranchState,
   getCurrentBranchForcePushState,
@@ -28,21 +28,24 @@ import type { Commit } from '../models/commit'
 import { projectImagePresentation } from './image-presentation'
 import { projectNativeWorkspace } from './workspace-projection'
 import type { KernelCommitView } from './commit-presenter'
-import type { KernelMenuDTO } from './menu-presenter'
+import type { IKernelMenuDTO } from './menu-presenter'
 import { projectGenerationSettings } from './generation-presenter'
 import { projectDiffSelection } from './line-selection'
 import { projectKernelPopup } from './popup-presenter'
-import { projectSignInView, KernelOnboardingView } from './onboarding-presenter'
+import {
+  projectSignInView,
+  IKernelOnboardingView,
+} from './onboarding-presenter'
 import { resolveCommitGenerationAccount } from '../lib/commit-generation/generation-account'
 import type {
-  KernelFile,
-  KernelRepository,
-  NativeKernelSnapshot,
+  IKernelFile,
+  IKernelRepository,
+  INativeKernelSnapshot,
 } from './protocol'
 
 function repositoryView(
   repository: Repository | CloningRepository
-): KernelRepository {
+): IKernelRepository {
   if (repository instanceof CloningRepository) {
     return {
       id: repository.id,
@@ -68,7 +71,7 @@ function repositoryView(
 
 function fileView(
   file: WorkingDirectoryFileChange | CommittedFileChange
-): KernelFile {
+): IKernelFile {
   const selection =
     file instanceof WorkingDirectoryFileChange
       ? file.selection.getSelectionType()
@@ -123,7 +126,9 @@ function historyCommitView(commit: Commit, preferAbsoluteDates: boolean) {
         : info.relativeText,
       absolute: info.absoluteText,
     }
-    if (!preferAbsoluteDates) dateRefreshAfter = info.duration
+    if (!preferAbsoluteDates) {
+      dateRefreshAfter = info.duration
+    }
   }
   return {
     sha: commit.sha,
@@ -150,11 +155,11 @@ function selectedRepositoryState(state: IAppState) {
 export function projectKernelState(
   state: IAppState,
   revision: number,
-  onboarding: KernelOnboardingView | null = null,
+  onboarding: IKernelOnboardingView | null = null,
   commitView: KernelCommitView | null = null,
-  menu?: KernelMenuDTO,
-  missingRepository: KernelMissingRepository | null = null
-): NativeKernelSnapshot {
+  menu?: IKernelMenuDTO,
+  missingRepository: IKernelMissingRepository | null = null
+): INativeKernelSnapshot {
   // The same local state the original repository list shows per item.
   const repositories = state.repositories.map(repository => {
     const view = repositoryView(repository)

@@ -9,29 +9,45 @@ import (
 func TestLaunchCommandsPreserveOriginalDispatcherActions(t *testing.T) {
 	for _, test := range []struct {
 		name string
-		call func(*Kernel) <-chan struct{ result KernelResult; err error }
+		call func(*Kernel) <-chan struct {
+			result KernelResult
+			err    error
+		}
 		want string
 	}{
 		{
 			name: "open repository",
-				call: func(k *Kernel) <-chan struct{ result KernelResult; err error } {
-					return kernelCall(func() (KernelResult, error) { return k.OpenFromCLI(context.Background(), `C:\work\repo`) })
-				},
-				want: `{"name":"launch.cli","action":{"kind":"open-repository","path":"C:\\work\\repo"}}`,
+			call: func(k *Kernel) <-chan struct {
+				result KernelResult
+				err    error
+			} {
+				return kernelCall(func() (KernelResult, error) { return k.OpenFromCLI(context.Background(), `C:\work\repo`) })
+			},
+			want: `{"name":"launch.cli","action":{"kind":"open-repository","path":"C:\\work\\repo"}}`,
 		},
 		{
 			name: "clone branch",
-			call: func(k *Kernel) <-chan struct{ result KernelResult; err error } {
-				return kernelCall(func() (KernelResult, error) { return k.CloneFromCLI(context.Background(), "https://github.com/example/project", "feature") })
-				},
-				want: `{"name":"launch.cli","action":{"kind":"clone-url","url":"https://github.com/example/project","branch":"feature"}}`,
+			call: func(k *Kernel) <-chan struct {
+				result KernelResult
+				err    error
+			} {
+				return kernelCall(func() (KernelResult, error) {
+					return k.CloneFromCLI(context.Background(), "https://github.com/example/project", "feature")
+				})
 			},
+			want: `{"name":"launch.cli","action":{"kind":"clone-url","url":"https://github.com/example/project","branch":"feature"}}`,
+		},
 		{
 			name: "application URL",
-			call: func(k *Kernel) <-chan struct{ result KernelResult; err error } {
-				return kernelCall(func() (KernelResult, error) { return k.DispatchApplicationURL(context.Background(), "gitowl-auth://oauth?code=one&state=two") })
-				},
-				want: `{"name":"launch.url","url":"gitowl-auth://oauth?code=one\u0026state=two"}`,
+			call: func(k *Kernel) <-chan struct {
+				result KernelResult
+				err    error
+			} {
+				return kernelCall(func() (KernelResult, error) {
+					return k.DispatchApplicationURL(context.Background(), "gitowl-auth://oauth?code=one&state=two")
+				})
+			},
+			want: `{"name":"launch.url","url":"gitowl-auth://oauth?code=one\u0026state=two"}`,
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {

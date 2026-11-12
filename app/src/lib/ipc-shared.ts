@@ -1,8 +1,8 @@
 import type { AppMenuPresentationAction } from '../ui/app-menu-controller'
 import type {
-  NativeKernelRequest,
+  INativeKernelRequest,
   NativeKernelResponse,
-  NativeKernelSnapshot,
+  INativeKernelSnapshot,
 } from '../native-kernel/protocol'
 import { IMenuItemState } from './menu-update'
 import { MenuIDs } from '../models/menu-ids'
@@ -34,10 +34,12 @@ type NativeKernelInitializationFailure = 'initialization'
  * the two over the untyped IPC framework.
  */
 export type RequestChannels = {
-  'native-kernel-request': (request: NativeKernelRequest) => void
+  'native-kernel-request': (request: INativeKernelRequest) => void
   'native-kernel-response': (response: NativeKernelResponse) => void
-  'native-kernel-state': (snapshot: NativeKernelSnapshot) => void
-  'native-kernel-presentation-action': (action: AppMenuPresentationAction) => void
+  'native-kernel-state': (snapshot: INativeKernelSnapshot) => void
+  'native-kernel-presentation-action': (
+    action: AppMenuPresentationAction
+  ) => void
   'native-kernel-failure': (phase: NativeKernelInitializationFailure) => void
   'select-all-window-contents': () => void
   'dialog-did-open': () => void

@@ -21,6 +21,16 @@ if (nativeKernelMode) {
   mkdirSync(kernelData, { recursive: true })
   app.setPath('userData', kernelData)
   app.setName('Gitowl')
+  // The kernel window is hidden, yet it serves the visible native window.
+  // Chromium otherwise treats its processes as background work: renderers
+  // drop to IDLE_PRIORITY_CLASS and every non-blocking child gets EcoQoS.
+  // When efficient cores are saturated those processes starve, and quitting
+  // stalls in Chromium's bounded wait for the network service to flush.
+  app.commandLine.appendSwitch('disable-renderer-backgrounding')
+  app.commandLine.appendSwitch(
+    'disable-features',
+    'UseEcoQoSForBackgroundProcess'
+  )
   process.env.GITOWL_NATIVE_CORE = '1'
   // Keep the original credential/session algorithms, but give this product its
   // own keytar resource names. Disposable test profiles never touch a user's

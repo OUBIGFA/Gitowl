@@ -57,7 +57,7 @@ func newCoreApp(core *backend.Kernel, logo ui.ImageSource) *app {
 }
 
 func (a *app) queueCore(operation nativeOperation) {
-	if a.closed || a.core == nil {
+	if a.closed || a.core == nil || a.quitDeferred {
 		return
 	}
 	a.corePending++
@@ -271,6 +271,25 @@ func (a *app) receiveCoreEvent(event backend.KernelEvent) {
 	if a.closed {
 		return
 	}
+	if event.Dialog != nil {
+		request, choose, core, ctx := *event.Dialog, a.chooseFile, a.core, a.ctx
+		go func() {
+			var paths []string
+			var err error
+			if choose == nil {
+				err = errors.New("native file picker is unavailable")
+			} else {
+				paths, err = choose(request)
+			}
+			if replyErr := core.ReplyFileDialog(ctx, request.ID, paths, err); replyErr != nil {
+				a.update(func() {
+					if !a.closed {
+						a.openErr = replyErr
+					}
+				})
+			}
+		}()
+	}
 	if event.Snapshot != nil {
 		a.applyCoreSnapshot(*event.Snapshot)
 	}
@@ -335,7 +354,7 @@ func (a *app) selectCoreRepository(reference backend.KernelRepositoryReference) 
 // Refresh and remote tasks can remain in flight while the UI reviews or edits;
 // they don't block the ordered draft/include queue or their own modal replies.
 func (a *app) runCoreTask(call func() (backend.KernelResult, error), complete func(backend.KernelResult, error)) {
-	if a.closed || a.core == nil {
+	if a.closed || a.core == nil || a.quitDeferred {
 		return
 	}
 	a.corePending++

@@ -171,7 +171,10 @@ export async function captureSourceTreeEvidence(
   const revision = (await git(root, ['rev-parse', 'HEAD'])).trim()
   requireCondition(/^[a-f0-9]{40,64}$/.test(revision), 'Invalid Git revision')
   const sourceTree = (await git(root, ['write-tree'])).trim()
-  requireCondition(/^[a-f0-9]{40,64}$/.test(sourceTree), 'Invalid Git source tree')
+  requireCondition(
+    /^[a-f0-9]{40,64}$/.test(sourceTree),
+    'Invalid Git source tree'
+  )
   const inputs = {
     schemaVersion: 1 as const,
     revision,

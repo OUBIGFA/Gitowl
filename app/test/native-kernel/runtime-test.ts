@@ -8,7 +8,7 @@ import { join, resolve } from 'path'
 import { exec } from 'dugite'
 import type {
   NativeKernelCommand,
-  NativeKernelSnapshot,
+  INativeKernelSnapshot,
 } from '../../src/native-kernel/protocol'
 
 async function git(path: string, args: string[]) {
@@ -27,9 +27,9 @@ function kernelClient(
   >()
   const lines = createInterface({ input: child.stdout })
   let id = 0
-  let latest: NativeKernelSnapshot | undefined
-  const observers = new Set<(state: NativeKernelSnapshot) => void>()
-  const observe = (state: NativeKernelSnapshot) => {
+  let latest: INativeKernelSnapshot | undefined
+  const observers = new Set<(state: INativeKernelSnapshot) => void>()
+  const observe = (state: INativeKernelSnapshot) => {
     if (latest !== undefined && state.revision < latest.revision) {
       return
     }
@@ -106,17 +106,17 @@ function kernelClient(
   return {
     request: async (
       command: NativeKernelCommand
-    ): Promise<NativeKernelSnapshot & { committed?: boolean }> => {
+    ): Promise<INativeKernelSnapshot & { committed?: boolean }> => {
       const result = await call('kernel.command', command)
       return { ...result.snapshot, committed: result.committed }
     },
-    waitForState: (predicate: (state: NativeKernelSnapshot) => boolean) =>
-      new Promise<NativeKernelSnapshot>((resolve, reject) => {
+    waitForState: (predicate: (state: INativeKernelSnapshot) => boolean) =>
+      new Promise<INativeKernelSnapshot>((resolve, reject) => {
         if (latest && predicate(latest)) {
           resolve(latest)
           return
         }
-        const listener = (state: NativeKernelSnapshot) => {
+        const listener = (state: INativeKernelSnapshot) => {
           if (!predicate(state)) {
             return
           }

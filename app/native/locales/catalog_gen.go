@@ -3750,6 +3750,26 @@ func (msgs Messages) RequiredField(label string) string {
 	return Catalog.Format(msgs.locale, "requiredField", map[string]any{"label": label})
 }
 
+// RequiredFieldEmpty says "This field cannot be empty."
+// in the language the app shows.
+func RequiredFieldEmpty() string { return In(i18n.Locale()).RequiredFieldEmpty() }
+
+// RequiredFieldEmpty says "This field cannot be empty."
+// in the language of msgs.
+func (msgs Messages) RequiredFieldEmpty() string {
+	return Catalog.Format(msgs.locale, "requiredFieldEmpty", nil)
+}
+
+// QuitWaitingForWork says "{count, plural, one {Waiting for # operation to finish. Gitowl will quit when it is done.} other {Waiting for # opera…"
+// in the language the app shows.
+func QuitWaitingForWork(count int) string { return In(i18n.Locale()).QuitWaitingForWork(count) }
+
+// QuitWaitingForWork says "{count, plural, one {Waiting for # operation to finish. Gitowl will quit when it is done.} other {Waiting for # opera…"
+// in the language of msgs.
+func (msgs Messages) QuitWaitingForWork(count int) string {
+	return Catalog.Format(msgs.locale, "quitWaitingForWork", map[string]any{"count": count})
+}
+
 // SaveProviderFirst says "Save the connection before managing models"
 // in the language the app shows.
 func SaveProviderFirst() string { return In(i18n.Locale()).SaveProviderFirst() }

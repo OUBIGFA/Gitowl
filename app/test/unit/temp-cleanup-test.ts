@@ -19,28 +19,49 @@ mock.module('fs/promises', {
   },
 })
 let createTempDirectory: typeof import('../helpers/temp').createTempDirectory
-before(async () => { ({ createTempDirectory } = await import('../helpers/temp')) })
-
-it('finishes busy fixture cleanup while UI timers are suspended', { timeout: 1000 }, async t => {
-  t.mock.method(window, 'setTimeout', () => 0)
-  failures = 1
-  calls = 0
-  let cleanup: (() => Promise<void>) | undefined
-  await createTempDirectory({ after: (fn: () => Promise<void>) => { cleanup = fn } } as unknown as TestContext)
-  assert.ok(cleanup)
-  await cleanup()
-  assert.equal(calls, 2)
+before(async () => {
+  ;({ createTempDirectory } = await import('../helpers/temp'))
 })
 
-it('preserves cleanup errors and bounds busy retries', { timeout: 1000 }, async () => {
-  for (const [code, expectedCalls] of [['EACCES', 1], ['EBUSY', 7]] as const) {
-    failureCode = code
-    failures = 100
+it(
+  'finishes busy fixture cleanup while UI timers are suspended',
+  { timeout: 1000 },
+  async t => {
+    t.mock.method(window, 'setTimeout', () => 0)
+    failures = 1
     calls = 0
     let cleanup: (() => Promise<void>) | undefined
-    await createTempDirectory({ after: (fn: () => Promise<void>) => { cleanup = fn } } as unknown as TestContext)
+    await createTempDirectory({
+      after: (fn: () => Promise<void>) => {
+        cleanup = fn
+      },
+    } as unknown as TestContext)
     assert.ok(cleanup)
-    await assert.rejects(cleanup(), { code })
-    assert.equal(calls, expectedCalls)
+    await cleanup()
+    assert.equal(calls, 2)
   }
-})
+)
+
+it(
+  'preserves cleanup errors and bounds busy retries',
+  { timeout: 1000 },
+  async () => {
+    for (const [code, expectedCalls] of [
+      ['EACCES', 1],
+      ['EBUSY', 7],
+    ] as const) {
+      failureCode = code
+      failures = 100
+      calls = 0
+      let cleanup: (() => Promise<void>) | undefined
+      await createTempDirectory({
+        after: (fn: () => Promise<void>) => {
+          cleanup = fn
+        },
+      } as unknown as TestContext)
+      assert.ok(cleanup)
+      await assert.rejects(cleanup(), { code })
+      assert.equal(calls, expectedCalls)
+    }
+  }
+)

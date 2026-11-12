@@ -36,13 +36,13 @@ import { createCommitURL } from '../lib/commit-url'
 import { setNumber } from '../lib/local-storage'
 import { UnsupportedOSBannerDismissedAtKey } from '../ui/banners/unsupported-os-state'
 import { openFile } from '../ui/lib/open-file'
-import { WorkspaceMenuItem } from '../ui/lib/workspace-menu'
+import { IWorkspaceMenuItem } from '../ui/lib/workspace-menu'
 import { generateBranchContextMenuItems } from '../ui/branches/branch-list-item-context-menu'
 import { generatePullRequestContextMenuItems } from '../ui/branches/pull-request-list-item-context-menu'
 import { generateWorktreeContextMenuItems } from '../ui/worktrees/worktree-list-item-context-menu'
 import { generateChangesContextMenu } from '../ui/changes/changes-menu-controller'
 import {
-  CommitMenuConfig,
+  ICommitMenuConfig,
   generateCommitContextMenu,
 } from '../ui/history/commit-menu-controller'
 import { generateHistoryFileContextMenu } from '../ui/history/history-file-menu-controller'
@@ -72,7 +72,7 @@ import {
 import { continueOperation, confirmAbortOperation } from './operation-dialogs'
 import {
   NativeWorkspaceAction,
-  NativeWorkspaceCommand,
+  INativeWorkspaceCommand,
   WorkspaceMenuTarget,
 } from './workspace-protocol'
 import { discardWorkspaceDiffSelection } from '../ui/diff/diff-menu-controller'
@@ -97,15 +97,17 @@ import {
 } from './newworkspace'
 
 function required<T>(value: T | undefined | null, name: string): T {
-  if (value === undefined || value === null)
+  if (value === undefined || value === null) {
     throw new Error(`The ${name} changed; refresh the workspace`)
+  }
   return value
 }
 
 function commitsFor(state: IRepositoryState, shas: ReadonlyArray<string>) {
   return shas.map(sha => {
-    if (!state.compareState.commitSHAs.includes(sha))
+    if (!state.compareState.commitSHAs.includes(sha)) {
       throw new Error('The history selection is no longer available')
+    }
     return required(state.commitLookup.get(sha), 'commit')
   })
 }
@@ -127,7 +129,7 @@ export function buildWorkspaceMenu(
   state: IRepositoryState,
   target: WorkspaceMenuTarget,
   runtime?: AppRuntime
-): ReadonlyArray<WorkspaceMenuItem> {
+): ReadonlyArray<IWorkspaceMenuItem> {
   const dispatcher = () => required(runtime, 'kernel runtime').dispatcher
   const editor = app.useCustomEditor
     ? undefined
@@ -137,9 +139,13 @@ export function buildWorkspaceMenu(
   const open = (path: string) =>
     openFile(Path.join(repository.path, path), dispatcher())
   const viewCommit = (sha: string, path?: string) => {
-    if (repository.gitHubRepository === null) return
+    if (repository.gitHubRepository === null) {
+      return
+    }
     const url = createCommitURL(repository.gitHubRepository, sha, path)
-    if (url !== null) return dispatcher().openInBrowser(url)
+    if (url !== null) {
+      return dispatcher().openInBrowser(url)
+    }
     return
   }
   switch (target.kind) {
@@ -213,8 +219,9 @@ export function buildWorkspaceMenu(
         workspaceLocked(repository, state) ||
         (state.changesState.conflictState !== null &&
           isRebaseConflictState(state.changesState.conflictState))
-      )
+      ) {
         return []
+      }
       const hasChanges = state.changesState.workingDirectory.files.length > 0
       return [
         {
@@ -246,7 +253,9 @@ export function buildWorkspaceMenu(
       ]
     }
     case 'file': {
-      if (state.isCommitting || workspaceLocked(repository, state)) return []
+      if (state.isCommitting || workspaceLocked(repository, state)) {
+        return []
+      }
       const file = required(
         state.changesState.workingDirectory.files.find(f => f.id === target.id),
         'file'
@@ -339,7 +348,7 @@ export function buildWorkspaceMenu(
       const selected = commitsFor(state, state.commitSelection.shas)
       const form = state.compareState.formState
       const history = form.kind === HistoryTabMode.History
-      const config: CommitMenuConfig = {
+      const config: ICommitMenuConfig = {
         gitHubRepository: repository.gitHubRepository,
         localCommitSHAs: state.localCommitSHAs,
         tagsToPush: state.tagsToPush ?? [],
@@ -386,8 +395,9 @@ export function buildWorkspaceMenu(
         onViewCommitOnGitHub: viewCommit,
         onCherryPick: commits => {
           const tip = state.branchesState.tip
-          if (tip.kind !== TipState.Valid)
+          if (tip.kind !== TipState.Valid) {
             throw new Error('A branch is required to start cherry-picking')
+          }
           dispatcher().initializeMultiCommitOperation(
             repository,
             {
@@ -429,7 +439,9 @@ export function buildWorkspaceMenu(
         const copy = generateCommitContextMenu(config, row, commit, [
           commit,
         ]).find(item => item.labelKey === 'workspace.copySHA')
-        if (copy !== undefined) items.push({ type: 'separator' }, copy)
+        if (copy !== undefined) {
+          items.push({ type: 'separator' }, copy)
+        }
       }
       return items
     }
@@ -441,10 +453,12 @@ export function buildWorkspaceMenu(
 export async function executeNativeWorkspaceCommand(
   runtime: AppRuntime,
   resolvedRepository: Repository | null,
-  command: NativeWorkspaceCommand | NativeWorkspaceAction
+  command: INativeWorkspaceCommand | NativeWorkspaceAction
 ) {
   const action = 'name' in command ? command.action : command
-  if (action.type === 'banner') return executeWorkspaceBanner(runtime, action)
+  if (action.type === 'banner') {
+    return executeWorkspaceBanner(runtime, action)
+  }
   const repository = required(resolvedRepository, 'repository')
   const dispatcher = runtime.dispatcher
   const app = runtime.appStore.getState()
@@ -456,8 +470,9 @@ export async function executeNativeWorkspaceCommand(
     )
   const stash = (sha?: string) => {
     const entry = required(state.changesState.stashEntry, 'stash')
-    if (sha !== undefined && sha !== entry.stashSha)
+    if (sha !== undefined && sha !== entry.stashSha) {
       throw new Error('The stash changed; review it again before continuing')
+    }
     return entry
   }
   switch (action.type) {
@@ -467,8 +482,9 @@ export async function executeNativeWorkspaceCommand(
         selected?.file.id !== action.fileID ||
         selected.diff.kind !== DiffType.Submodule ||
         selected.diff.url === null
-      )
+      ) {
         throw new Error('The submodule changed; select it again')
+      }
       // Resolve the original fullPath here; the native frontend cannot submit
       // another path or turn a removed historical submodule into an opener.
       dispatcher.incrementMetric('openSubmoduleFromDiffCount')
@@ -480,8 +496,9 @@ export async function executeNativeWorkspaceCommand(
     case 'conflicts.open':
     case 'conflicts.continue':
     case 'conflicts.abort': {
-      if (workspaceConflictIdentity(state) !== action.identity)
+      if (workspaceConflictIdentity(state) !== action.identity) {
         throw new Error('The conflict operation changed; review it again')
+      }
       // Original status loading reconstructs restart-time merge/rebase/cherry-
       // pick flow. Never synthesize its branch/commit state in this presenter.
       await dispatcher.refreshRepository(repository)
@@ -521,7 +538,9 @@ export async function executeNativeWorkspaceCommand(
           repository,
         })
       }
-      if (action.type === 'conflicts.open') return
+      if (action.type === 'conflicts.open') {
+        return
+      }
       const props = {
         dispatcher,
         repository,
@@ -529,27 +548,33 @@ export async function executeNativeWorkspaceCommand(
         workingDirectory: latest.changesState.workingDirectory,
         conflictState: latest.changesState.conflictState,
       }
-      if (action.type === 'conflicts.abort') return confirmAbortOperation(props)
+      if (action.type === 'conflicts.abort') {
+        return confirmAbortOperation(props)
+      }
       const conflict = required(props.conflictState, 'conflict state')
       if (
         latest.isCommitting ||
         workspaceLocked(repository, latest) ||
         getConflictedFiles(props.workingDirectory, conflict.manualResolutions)
           .length > 0
-      )
+      ) {
         throw new Error('Resolve all conflicts before continuing')
+      }
       return continueOperation(props)
     }
     case 'navigation.open':
-      if (workspaceLocked(repository, state))
+      if (workspaceLocked(repository, state)) {
         throw new Error('Repository operations are locked')
-      if (action.target === 'worktrees')
+      }
+      if (action.target === 'worktrees') {
         return dispatcher.showFoldout({ type: FoldoutType.Worktree })
+      }
       if (
         action.target === 'pullRequests' &&
         !isRepositoryWithGitHubRepository(repository)
-      )
+      ) {
         throw new Error('This repository has no GitHub pull requests')
+      }
       await dispatcher.changeBranchesTab(
         action.target === 'pullRequests'
           ? BranchesTab.PullRequests
@@ -561,21 +586,25 @@ export async function executeNativeWorkspaceCommand(
         action.target === 'worktrees'
           ? FoldoutType.Worktree
           : FoldoutType.Branch
-      if (app.currentFoldout?.type !== type) return
+      if (app.currentFoldout?.type !== type) {
+        return
+      }
       if (
         type === FoldoutType.Branch &&
         (app.selectedBranchesTab === BranchesTab.PullRequests &&
           isRepositoryWithGitHubRepository(repository)) !==
           (action.target === 'pullRequests')
-      )
+      ) {
         return
+      }
       return dispatcher.closeFoldout(type)
     }
     case 'navigation.filter':
-      if (action.scope === 'compare')
+      if (action.scope === 'compare') {
         return dispatcher.updateCompareForm(repository, {
           filterText: action.text,
         })
+      }
       setWorkspaceNavigationFilter(
         repository.path,
         action.scope,
@@ -584,12 +613,14 @@ export async function executeNativeWorkspaceCommand(
       )
       return
     case 'pullRequest.refresh':
-      if (!isRepositoryWithGitHubRepository(repository))
+      if (!isRepositoryWithGitHubRepository(repository)) {
         throw new Error('This repository has no GitHub pull requests')
+      }
       return dispatcher.refreshPullRequests(repository)
     case 'branch.checkout':
-      if (workspaceLocked(repository, state))
+      if (workspaceLocked(repository, state)) {
         throw new Error('Repository operations are locked')
+      }
       return checkoutWorkspaceBranch(dispatcher, repository, branch(action.ref))
     case 'branch.create':
       return dispatcher.showPopup({
@@ -598,8 +629,9 @@ export async function executeNativeWorkspaceCommand(
         initialName: action.initialName,
       })
     case 'pullRequest.checkout': {
-      if (!isRepositoryWithGitHubRepository(repository))
+      if (!isRepositoryWithGitHubRepository(repository)) {
         throw new Error('This repository has no GitHub pull requests')
+      }
       const pr = required(
         state.branchesState.openPullRequests.find(
           p => p.pullRequestNumber === action.number
@@ -641,8 +673,9 @@ export async function executeNativeWorkspaceCommand(
     case 'compare.operation': {
       const form = state.compareState.formState
       const tip = state.branchesState.tip
-      if (form.kind !== HistoryTabMode.Compare || tip.kind !== TipState.Valid)
+      if (form.kind !== HistoryTabMode.Compare || tip.kind !== TipState.Valid) {
         throw new Error('No branch comparison is selected')
+      }
       const operation =
         action.operation === 'rebase'
           ? MultiCommitOperationKind.Rebase
@@ -684,8 +717,9 @@ export async function executeNativeWorkspaceCommand(
           state.compareState.mergeStatus,
           form.aheadBehind.behind
         )
-      )
+      ) {
         throw new Error('This comparison cannot be updated')
+      }
       await dispatchCompareOperation(
         dispatcher,
         repository,
@@ -725,8 +759,9 @@ export async function executeNativeWorkspaceCommand(
         state.compareState.formState.kind !== HistoryTabMode.History ||
         workspaceLocked(repository, state) ||
         state.multiCommitOperationState !== null
-      )
+      ) {
         throw new Error('Commits cannot be reordered now')
+      }
       const commits = commitsFor(state, action.shas)
       const base =
         action.beforeSHA === null
@@ -737,7 +772,9 @@ export async function executeNativeWorkspaceCommand(
         base === null ? 0 : state.compareState.commitSHAs.indexOf(base.sha) + 1,
         action.shas
       )
-      if (plan === null) return
+      if (plan === null) {
+        return
+      }
       setWorkspaceReorderSelection(repository.path, [])
       return reorderWorkspaceCommits(
         dispatcher,
@@ -769,8 +806,9 @@ export async function executeNativeWorkspaceCommand(
       )
     case 'stash.file': {
       const entry = stash(action.sha)
-      if (entry.files.kind !== StashedChangesLoadStates.Loaded)
+      if (entry.files.kind !== StashedChangesLoadStates.Loaded) {
         throw new Error('Stash files are still loading')
+      }
       return dispatcher.selectStashedFile(
         repository,
         required(
@@ -806,18 +844,23 @@ export async function executeNativeWorkspaceCommand(
         action.target,
         items
       )
-      if (projected.lease !== action.lease)
+      if (projected.lease !== action.lease) {
         throw new Error('This context menu changed; open it again')
-      let menu: ReadonlyArray<WorkspaceMenuItem> = items
-      let item: WorkspaceMenuItem | undefined
+      }
+      let menu: ReadonlyArray<IWorkspaceMenuItem> = items
+      let item: IWorkspaceMenuItem | undefined
       for (let i = 0; i < action.path.length; i++) {
         item = menu[action.path[i]]
-        if (item === undefined || item.enabled === false)
+        if (item === undefined || item.enabled === false) {
           throw new Error('This menu action is not available')
-        if (i < action.path.length - 1) menu = required(item.submenu, 'submenu')
+        }
+        if (i < action.path.length - 1) {
+          menu = required(item.submenu, 'submenu')
+        }
       }
-      if (item?.action === undefined)
+      if (item?.action === undefined) {
         throw new Error('This menu entry is not an action')
+      }
       return item.action()
     }
     case 'diff.prepare':
@@ -832,7 +875,9 @@ export async function executeNativeWorkspaceCommand(
         // Preparation is background presentation read-ahead. Selecting another
         // file can supersede it before its queued request runs; unlike an
         // explicit expand/discard action it must not raise a Git error popup.
-        if (action.type === 'diff.prepare') return
+        if (action.type === 'diff.prepare') {
+          return
+        }
         throw new Error('The diff changed; open the menu again')
       }
       let view = workspaceDiffPresentation(repository.path, state)
@@ -845,7 +890,9 @@ export async function executeNativeWorkspaceCommand(
           latest?.identity !== selected.identity ||
           latest.file.id !== selected.file.id
         ) {
-          if (action.type === 'diff.prepare') return
+          if (action.type === 'diff.prepare') {
+            return
+          }
           throw new Error('The diff changed while loading its contents')
         }
         view = {
@@ -855,13 +902,16 @@ export async function executeNativeWorkspaceCommand(
           expanded: null,
         }
       }
-      if (action.type === 'diff.collapse') view = { ...view, expanded: null }
+      if (action.type === 'diff.collapse') {
+        view = { ...view, expanded: null }
+      }
       if (action.type === 'diff.expand') {
         if (
           !view.contents.canBeExpanded ||
           view.contents.newContents.length === 0
-        )
+        ) {
           throw new Error('This file cannot be expanded')
+        }
         const diff =
           getTextDiffWithBottomDummyHunk(
             selected.diff,
@@ -870,8 +920,9 @@ export async function executeNativeWorkspaceCommand(
             view.contents.newContents.length
           ) ?? selected.diff
         const expanded = expandWholeTextDiff(diff, view.contents.newContents)
-        if (expanded === undefined)
+        if (expanded === undefined) {
           throw new Error('The current file contents do not match this patch')
+        }
         view = { ...view, expanded }
       }
       setWorkspaceDiffPresentation(repository.path, view)
@@ -889,10 +940,11 @@ export async function executeNativeWorkspaceCommand(
         action.lineIDs.some(
           id => !projection.lines.some(line => line.id === id)
         )
-      )
+      ) {
         throw new Error(
           'The diff changed; review the current patch before discarding lines'
         )
+      }
       const file = required(
         state.changesState.workingDirectory.files.find(
           f => f.id === action.fileID
@@ -903,11 +955,13 @@ export async function executeNativeWorkspaceCommand(
       if (
         selectionState.kind !== ChangesSelectionKind.WorkingDirectory ||
         selectionState.diff?.kind !== DiffType.Text
-      )
+      ) {
         throw new Error('The diff is unavailable')
+      }
       let selection = file.selection.withSelectNone()
-      for (const id of action.lineIDs)
+      for (const id of action.lineIDs) {
         selection = selection.withLineSelection(id, true)
+      }
       return discardWorkspaceDiffSelection(
         dispatcher,
         repository,
@@ -943,15 +997,17 @@ function executeWorkspaceBanner(
 ) {
   const { dispatcher } = runtime
   const banner = runtime.appStore.getState().currentBanner
-  if (banner === null || workspaceBannerID(banner) !== action.id)
+  if (banner === null || workspaceBannerID(banner) !== action.id) {
     throw new Error('This banner has been replaced')
+  }
   if (
     action.action === 'support' &&
     banner.type === BannerType.OSVersionNoLongerSupported
-  )
+  ) {
     return dispatcher.openInBrowser(
       'https://docs.github.com/en/desktop/installing-and-configuring-github-desktop/overview/supported-operating-systems'
     )
+  }
   if (action.action === 'dismiss') {
     if (
       [
@@ -960,40 +1016,52 @@ function executeWorkspaceBanner(
         BannerType.CherryPickConflictsFound,
         BannerType.ConflictsFound,
       ].includes(banner.type)
-    )
+    ) {
       throw new Error('Reopen the conflict dialog to continue')
-    if (banner.type === BannerType.OSVersionNoLongerSupported)
+    }
+    if (banner.type === BannerType.OSVersionNoLongerSupported) {
       setNumber(UnsupportedOSBannerDismissedAtKey, Date.now())
+    }
     return dispatcher.clearBanner()
   }
   switch (banner.type) {
     case BannerType.MergeConflictsFound:
-      if (action.action !== 'open') break
+      if (action.action !== 'open') {
+        break
+      }
       dispatcher.clearBanner()
       dispatcher.showPopup(banner.popup)
       dispatcher.incrementMetric('mergeConflictsDialogReopenedCount')
       return
     case BannerType.RebaseConflictsFound:
-      if (action.action !== 'open') break
+      if (action.action !== 'open') {
+        break
+      }
       dispatcher.clearBanner()
       banner.onOpenDialog()
       dispatcher.incrementMetric('rebaseConflictsDialogReopenedCount')
       return
     case BannerType.CherryPickConflictsFound:
     case BannerType.ConflictsFound:
-      if (action.action !== 'open') break
+      if (action.action !== 'open') {
+        break
+      }
       dispatcher.clearBanner()
       banner.onOpenConflictsDialog()
       return
     case BannerType.SuccessfulCherryPick:
     case BannerType.SuccessfulSquash:
     case BannerType.SuccessfulReorder:
-      if (action.action !== 'undo') break
+      if (action.action !== 'undo') {
+        break
+      }
       dispatcher.clearBanner()
       banner.onUndo()
       return
     case BannerType.OpenThankYouCard:
-      if (action.action === 'open') return banner.onOpenCard()
+      if (action.action === 'open') {
+        return banner.onOpenCard()
+      }
       if (action.action === 'throwAway') {
         dispatcher.clearBanner()
         return banner.onThrowCardAway()

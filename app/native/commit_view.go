@@ -8,7 +8,17 @@ import (
 // The composer is a single canvas sibling of the overview/review page. Its
 // stable keys preserve native editing state while that page is replaced.
 func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
-	ui.Column(c.Key("commit-form:"+a.repo.Path)).Shrink(0).FillWidth().Margin(16, 0, 0, 0).Padding(12).Gap(8).
+	_, height := c.Size()
+	// Reviewing a file at a short window: the diff is what is being read. The
+	// actions wrap to two rows there, so tighten the spacing above them (every
+	// label stays) to keep a usable code viewport. Padding is unchanged so Save
+	// keeps its exact position when review opens.
+	compact := a.reviewingFile && height < 700
+	margin, gap := float32(16), float32(8)
+	if compact {
+		margin, gap = 6, 6
+	}
+	ui.Column(c.Key("commit-form:"+a.repo.Path)).Shrink(0).FillWidth().Margin(margin, 0, 0, 0).Padding(12).Gap(gap).
 		Border(1, c.Theme().Border).Radius(12).Background(c.Theme().Surface).
 		OnShortcut(ui.Ctrl, ui.KeyEnter, a.saveVersion).Children(func() {
 		// Sources and output language remain visible; they are negotiated and
@@ -44,7 +54,6 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 				a.coreFocusTarget = ""
 			}
 			var description ui.CollapsibleParts
-			_, height := c.Size()
 			inlineHint := vm != nil && vm.SummaryLengthWarning && a.reviewingFile && height < 700
 			ui.Row(c).FillWidth().Gap(12).Children(func() {
 				description = ui.CollapsibleBase(c.Key("description-disclosure"), &a.descriptionOpen)
@@ -73,6 +82,9 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 					// The diff is what is being read; two lines keep the
 					// description at hand without taking its room.
 					editorHeight = c.Theme().Rem(52.0 / 15)
+				}
+				if compact {
+					editorHeight = c.Theme().Rem(40.0 / 15)
 				}
 				ui.TextArea(c.Key("commit-description"), &a.commitDescription).FillWidth().Height(editorHeight).MinHeight(editorHeight).MaxHeight(editorHeight).Padding(10, 12).
 					Placeholder(tx.DescriptionPlaceholder()).Label(tx.VersionDescription()).KeepScrollbars(true).Disabled(a.composerLocked()).OnChange(a.generationDraftEdited)
@@ -110,7 +122,7 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 		if vm != nil && vm.Mode == "copilot" {
 			ui.Text(c, caption).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted).SingleLine().Tooltip(caption).Role(ui.RoleStatus)
 		}
-		ui.Row(c.Key("composer-actions")).FillWidth().Gap(8).AlignItems(ui.Center).Wrap().Children(func() {
+		ui.Row(c.Key("composer-actions")).FillWidth().Gap(gap).AlignItems(ui.Center).Wrap().Children(func() {
 			if a.core != nil && (vm == nil || vm.Mode != "copilot") {
 				a.coreGenerationMenu(c, tx)
 			}

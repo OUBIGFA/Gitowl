@@ -2,6 +2,9 @@ import assert from 'node:assert/strict'
 import { it, mock } from 'node:test'
 
 class WindowBoundary {
+  public static getAllWindows() {
+    return []
+  }
   public shown = 0
   public events: unknown[][] = []
   public webContents = {
@@ -13,9 +16,6 @@ class WindowBoundary {
   }
   public show() {
     this.shown++
-  }
-  public static getAllWindows() {
-    return []
   }
 }
 

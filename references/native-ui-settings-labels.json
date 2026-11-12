@@ -1,19 +1,79 @@
 {
-  "settings.group.copilotAccount": { "en": "Account and access", "zh-Hans": "账户与访问", "zh-Hant": "帳戶與存取" },
-  "settings.group.interface": { "en": "Interface", "zh-Hans": "界面", "zh-Hant": "介面" },
-  "settings.group.formatting": { "en": "Dates and numbers", "zh-Hans": "日期与数字", "zh-Hant": "日期與數字" },
-  "settings.group.author": { "en": "Commit author", "zh-Hans": "提交作者", "zh-Hant": "提交作者" },
-  "settings.group.hooks": { "en": "Git hooks", "zh-Hans": "Git 钩子", "zh-Hant": "Git 掛鉤" },
-  "settings.group.generation": { "en": "Commit messages", "zh-Hans": "提交说明", "zh-Hant": "提交說明" },
-  "settings.group.removal": { "en": "Removing and discarding", "zh-Hans": "删除与丢弃", "zh-Hant": "刪除與捨棄" },
-  "settings.group.changes": { "en": "Commits and branches", "zh-Hans": "提交与分支", "zh-Hant": "提交與分支" },
-  "settings.group.authentication": { "en": "Authentication", "zh-Hans": "身份验证", "zh-Hant": "身分驗證" },
-  "settings.group.application": { "en": "Application", "zh-Hans": "应用行为", "zh-Hant": "應用程式行為" },
-  "settings.notificationsDenied": { "en": "System notification permission is denied. Enable it in Notification Settings.", "zh-Hans": "系统未允许显示通知。请在系统通知设置中启用。", "zh-Hant": "系統未允許顯示通知。請在系統通知設定中啟用。" },
-  "settings.notificationsConfigure": { "en": "Check that system notifications are enabled for Gitowl.", "zh-Hans": "请确认系统已允许 Gitowl 显示通知。", "zh-Hant": "請確認系統已允許 Gitowl 顯示通知。" },
-  "settings.notificationGrant": { "en": "Grant notification permission", "zh-Hans": "允许显示通知", "zh-Hant": "允許顯示通知" },
-  "settings.notificationSettings": { "en": "Open system notification settings", "zh-Hans": "打开系统通知设置", "zh-Hant": "開啟系統通知設定" },
-  "settings.noExternalEditor": { "en": "No built-in editor selected", "zh-Hans": "未选择内置编辑器", "zh-Hant": "未選擇內建編輯器" },
+  "settings.group.copilotAccount": {
+    "en": "Account and access",
+    "zh-Hans": "账户与访问",
+    "zh-Hant": "帳戶與存取"
+  },
+  "settings.group.interface": {
+    "en": "Interface",
+    "zh-Hans": "界面",
+    "zh-Hant": "介面"
+  },
+  "settings.group.formatting": {
+    "en": "Dates and numbers",
+    "zh-Hans": "日期与数字",
+    "zh-Hant": "日期與數字"
+  },
+  "settings.group.author": {
+    "en": "Commit author",
+    "zh-Hans": "提交作者",
+    "zh-Hant": "提交作者"
+  },
+  "settings.group.hooks": {
+    "en": "Git hooks",
+    "zh-Hans": "Git 钩子",
+    "zh-Hant": "Git 掛鉤"
+  },
+  "settings.group.generation": {
+    "en": "Commit messages",
+    "zh-Hans": "提交说明",
+    "zh-Hant": "提交說明"
+  },
+  "settings.group.removal": {
+    "en": "Removing and discarding",
+    "zh-Hans": "删除与丢弃",
+    "zh-Hant": "刪除與捨棄"
+  },
+  "settings.group.changes": {
+    "en": "Commits and branches",
+    "zh-Hans": "提交与分支",
+    "zh-Hant": "提交與分支"
+  },
+  "settings.group.authentication": {
+    "en": "Authentication",
+    "zh-Hans": "身份验证",
+    "zh-Hant": "身分驗證"
+  },
+  "settings.group.application": {
+    "en": "Application",
+    "zh-Hans": "应用行为",
+    "zh-Hant": "應用程式行為"
+  },
+  "settings.notificationsDenied": {
+    "en": "System notification permission is denied. Enable it in Notification Settings.",
+    "zh-Hans": "系统未允许显示通知。请在系统通知设置中启用。",
+    "zh-Hant": "系統未允許顯示通知。請在系統通知設定中啟用。"
+  },
+  "settings.notificationsConfigure": {
+    "en": "Check that system notifications are enabled for Gitowl.",
+    "zh-Hans": "请确认系统已允许 Gitowl 显示通知。",
+    "zh-Hant": "請確認系統已允許 Gitowl 顯示通知。"
+  },
+  "settings.notificationGrant": {
+    "en": "Grant notification permission",
+    "zh-Hans": "允许显示通知",
+    "zh-Hant": "允許顯示通知"
+  },
+  "settings.notificationSettings": {
+    "en": "Open system notification settings",
+    "zh-Hans": "打开系统通知设置",
+    "zh-Hant": "開啟系統通知設定"
+  },
+  "settings.noExternalEditor": {
+    "en": "No built-in editor selected",
+    "zh-Hans": "未选择内置编辑器",
+    "zh-Hant": "未選擇內建編輯器"
+  },
   "settings.title.Preferences": {
     "en": "Settings",
     "zh-Hans": "设置",

@@ -37,6 +37,7 @@ export class AppStartup {
   private readonly subscriptions = new CompositeDisposable()
   private readonly intervals: Array<ReturnType<typeof setInterval>> = []
   private started = false
+  private globalLFSFilters: Promise<void> | null = null
   private disposed = false
 
   public constructor(
@@ -110,6 +111,15 @@ export class AppStartup {
     ipcRenderer.removeListener('certificate-error', this.onCertificateError)
   }
 
+  /**
+   * Settles when the startup `git lfs install --skip-repo` has finished writing
+   * the global Git config. The original store reports its own errors; this
+   * only orders later Git work after those writes.
+   */
+  public globalConfigSettled(): Promise<void> {
+    return this.globalLFSFilters ?? Promise.resolve()
+  }
+
   /** Call after renderer-ready; not before loading the original initial state. */
   public async start() {
     if (this.started || this.disposed) {
@@ -120,7 +130,7 @@ export class AppStartup {
     void this.appStore.loadEmoji()
     this.reportStats()
     this.intervals.push(setInterval(() => this.reportStats(), FourHours))
-    void this.dispatcher.installGlobalLFSFilters(false)
+    this.globalLFSFilters = this.dispatcher.installGlobalLFSFilters(false)
 
     // The Electron Squirrel feed cannot update a MyGo/NSIS installation. Until
     // Gitowl publishes its own registered MyGo feed, no native auto-check is

@@ -24,3 +24,6 @@ gemoji
 *.md
 app/static/logos/prod/**/*.json
 app/static/logos/dev/**/*.json
+
+# Verbatim third-party license material must stay byte-for-byte.
+third_party/licenses/

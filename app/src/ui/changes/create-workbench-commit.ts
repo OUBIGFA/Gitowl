@@ -20,7 +20,10 @@ export async function createWorkbenchCommit(
   context: ICommitContext
 ): Promise<boolean> {
   const oversizedFiles = await getLargeFilePaths(repository, workingDirectory)
-  const filesIgnoredByLFS = await filesNotTrackedByLFS(repository, oversizedFiles)
+  const filesIgnoredByLFS = await filesNotTrackedByLFS(
+    repository,
+    oversizedFiles
+  )
   if (filesIgnoredByLFS.length !== 0) {
     dispatcher.showPopup({
       type: PopupType.OversizedFiles,
@@ -31,7 +34,8 @@ export async function createWorkbenchCommit(
     return false
   }
   const conflictedFilesLeft = workingDirectory.files.filter(
-    file => isConflictedFile(file.status) &&
+    file =>
+      isConflictedFile(file.status) &&
       file.selection.getSelectionType() === DiffSelectionType.None
   )
   if (conflictedFilesLeft.length === 0) {
@@ -39,7 +43,8 @@ export async function createWorkbenchCommit(
     dispatcher.incrementMetric('unguidedConflictedMergeCompletionCount')
   }
   const conflictedFilesSelected = workingDirectory.files.filter(
-    file => isConflictedFile(file.status) &&
+    file =>
+      isConflictedFile(file.status) &&
       hasUnresolvedConflicts(file.status) &&
       file.selection.getSelectionType() !== DiffSelectionType.None
   )

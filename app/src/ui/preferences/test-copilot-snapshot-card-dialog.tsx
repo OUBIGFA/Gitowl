@@ -5,7 +5,7 @@ import {
   SnapshotKey,
   ISnapshotDefinition,
   IEditableSnapshot,
-  SnapshotTestDraft as ITestCopilotSnapshotCardDialogState,
+  ISnapshotTestDraft as ITestCopilotSnapshotCardDialogState,
   snapshotDefinitions,
   getDefaultSnapshots,
   getInitialAccount,

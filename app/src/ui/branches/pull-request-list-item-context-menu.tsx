@@ -1,4 +1,4 @@
-import { WorkspaceMenuItem as IMenuItem } from '../lib/workspace-menu'
+import { IWorkspaceMenuItem as IMenuItem } from '../lib/workspace-menu'
 
 interface IPullRequestContextMenuConfig {
   onViewPullRequestOnGitHub?: () => void

@@ -3,7 +3,7 @@ import { ImageDiffType, Image } from '../models/diff'
 import { registerKernelMedia } from './media-presentation'
 import type { Dispatcher } from '../ui/dispatcher/dispatcher'
 
-export interface KernelImage {
+export interface IKernelImage {
   readonly contents: string
   readonly mediaType: string
   readonly bytes: number
@@ -13,9 +13,9 @@ export interface KernelImage {
 
 // Original Image objects are immutable. Cache only their bounded display DTO,
 // so progress snapshots do not rerun the original off-DOM DDS GPU conversion.
-const imageViews = new WeakMap<Image, KernelImage>()
+const imageViews = new WeakMap<Image, IKernelImage>()
 
-export function projectKernelImage(image: Image, owner?: object): KernelImage {
+export function projectKernelImage(image: Image, owner?: object): IKernelImage {
   const cached = imageViews.get(image)
   if (cached !== undefined) {
     if (cached.mediaID !== undefined) {
@@ -28,7 +28,7 @@ export function projectKernelImage(image: Image, owner?: object): KernelImage {
     }
     return cached
   }
-  let view: KernelImage = {
+  let view: IKernelImage = {
     contents: image.contents,
     mediaType: image.mediaType,
     bytes: image.bytes,
@@ -56,18 +56,18 @@ export function projectKernelImage(image: Image, owner?: object): KernelImage {
 }
 
 /** Global AppStore preference: never derived from the selected repository. */
-export interface NativeImagePresentation {
+export interface INativeImagePresentation {
   readonly imageDiffType: ImageDiffType
 }
 
-export interface NativeImagePresentationCommand {
+export interface INativeImagePresentationCommand {
   readonly name: 'imageDiff.type'
   readonly imageDiffType: ImageDiffType
 }
 
 export function projectImagePresentation(
   state: IAppState
-): NativeImagePresentation {
+): INativeImagePresentation {
   return { imageDiffType: state.imageDiffType }
 }
 
@@ -75,7 +75,7 @@ export function projectImagePresentation(
  * invalid image command must fail instead of being coerced to another mode. */
 export function parseImagePresentationCommand(
   value: Record<string, unknown>
-): NativeImagePresentationCommand | null {
+): INativeImagePresentationCommand | null {
   if (value.name !== 'imageDiff.type') {
     return null
   }
@@ -90,14 +90,14 @@ export function parseImagePresentationCommand(
   ) {
     throw new Error('Invalid image diff presentation command')
   }
-  return value as unknown as NativeImagePresentationCommand
+  return value as unknown as INativeImagePresentationCommand
 }
 
 /** Parent execute-command hook, after its ordinary readiness/revision checks.
  * _changeImageDiffType owns localStorage['image-diff-type'] and emits state. */
 export function executeImagePresentationCommand(
   dispatcher: Dispatcher,
-  command: NativeImagePresentationCommand
+  command: INativeImagePresentationCommand
 ): Promise<void> {
   return dispatcher.changeImageDiffType(command.imageDiffType)
 }

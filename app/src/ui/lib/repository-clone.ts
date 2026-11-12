@@ -15,7 +15,7 @@ import {
   isRepositoryAffectedByAssistedCommit,
 } from '../../lib/git/repository-operation'
 
-export interface RepositoryCloneRequest {
+export interface IRepositoryCloneRequest {
   readonly tab: CloneRepositoryTab
   readonly url: string
   readonly lastParsedIdentifier: IRepositoryIdentifier | null
@@ -104,7 +104,7 @@ export async function validateRepositoryClonePath(
 
 /** Original URL/wiki/selected-account clone-info resolution, not a new Git backend. */
 export async function resolveRepositoryCloneInfo(
-  request: RepositoryCloneRequest,
+  request: IRepositoryCloneRequest,
   accounts: ReadonlyArray<Account>
 ): Promise<IAPIRepositoryCloneInfo | null> {
   const { tab, url, lastParsedIdentifier, account } = request

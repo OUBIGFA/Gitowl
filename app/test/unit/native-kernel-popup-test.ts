@@ -960,8 +960,9 @@ describe(
         { ...valid, password: 'PASSWORD-SENTINEL\r' },
         { ...valid, secret: 'PASSWORD-SENTINEL' },
         { ...valid, storePassword: true },
-      ])
+      ]) {
         invalid(value)
+      }
       closeKernelPopup(runtime, popup.id)
       assert.equal(await promise, undefined)
     })
@@ -1100,8 +1101,9 @@ describe(
         ['user.email', 'popup@example.test'],
         ['commit.gpgSign', 'false'],
         ['core.hooksPath', hooks],
-      ])
+      ]) {
         await git(work, ['config', key, value])
+      }
       await writeFile(join(work, 'file.txt'), 'first\n')
       await git(work, ['add', 'file.txt'])
       await git(work, ['commit', '-m', 'first'])

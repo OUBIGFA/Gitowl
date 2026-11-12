@@ -20,8 +20,8 @@ import { isRecord } from '../lib/is-record'
 import { GitError as DugiteError } from 'dugite'
 
 import type {
-  NativeDialogPresentation,
-  NativeDialogReply,
+  INativeDialogPresentation,
+  INativeDialogReply,
 } from './dialog-module'
 import {
   cancelNativeDialog,
@@ -66,14 +66,14 @@ type PresentationState = Pick<
   'accounts' | 'askForConfirmationOnForcePush' | 'commitGeneration'
 >
 
-interface PopupDTO<T extends PopupType> {
+interface IPopupDTO<T extends PopupType> {
   /** The original AppStore id is opaque to the frontend; it is not a callback id. */
   readonly popupID: number | null
   readonly type: T
   readonly supported: true
 }
 
-interface ErrorContentDTO {
+interface IErrorContentDTO {
   readonly message: string
   readonly terminal: boolean
   readonly oversizedFiles?: ReadonlyArray<string>
@@ -86,35 +86,35 @@ type ErrorAction = 'close' | 'retry' | 'openPreferences' | 'openAction'
 
 /** No raw Popup, Repository, Error, Account, Buffer or callback crosses the wire. */
 export type KernelPopupDTO =
-  | (Omit<NativeDialogPresentation, 'type'> & {
+  | (Omit<INativeDialogPresentation, 'type'> & {
       readonly type: Exclude<PopupType, SupportedKernelPopupType>
     })
-  | PopupDTO<PopupType.SignIn>
-  | (PopupDTO<PopupType.AddSSHHost> & {
+  | IPopupDTO<PopupType.SignIn>
+  | (IPopupDTO<PopupType.AddSSHHost> & {
       readonly host: string
       readonly ip: string
       readonly keyType: string
       readonly fingerprint: string
     })
-  | (PopupDTO<PopupType.SSHKeyPassphrase> & { readonly keyPath: string })
-  | (PopupDTO<PopupType.SSHUserPassword> & { readonly username: string })
-  | (PopupDTO<PopupType.GenericGitAuthentication> & {
+  | (IPopupDTO<PopupType.SSHKeyPassphrase> & { readonly keyPath: string })
+  | (IPopupDTO<PopupType.SSHUserPassword> & { readonly username: string })
+  | (IPopupDTO<PopupType.GenericGitAuthentication> & {
       readonly remoteUrl: string
       /** null means editable; even an empty predetermined username is locked. */
       readonly username: string | null
     })
-  | (PopupDTO<PopupType.HookFailed> & {
+  | (IPopupDTO<PopupType.HookFailed> & {
       readonly hookName: string
       readonly terminalOutput: string
       readonly choices: ReadonlyArray<KernelHookResult>
     })
-  | (PopupDTO<PopupType.GenerateCommitMessageOverrideWarning> & {
+  | (IPopupDTO<PopupType.GenerateCommitMessageOverrideWarning> & {
       readonly showCopilotInstructionsTip: boolean
     })
-  | (PopupDTO<PopupType.GenerateCommitMessageDisclaimer> & {
+  | (IPopupDTO<PopupType.GenerateCommitMessageDisclaimer> & {
       readonly generationSource: 'copilot' | 'custom'
     })
-  | (PopupDTO<PopupType.RepositoryAccount> & {
+  | (IPopupDTO<PopupType.RepositoryAccount> & {
       readonly repositoryName: string
       readonly endpoint: string
       readonly assignedLogin: string | null
@@ -122,15 +122,15 @@ export type KernelPopupDTO =
       readonly selectedAccount?: IAccountIdentity
       readonly accounts: ReadonlyArray<IAccountIdentity>
     })
-  | (PopupDTO<PopupType.ConfirmForcePush> & {
+  | (IPopupDTO<PopupType.ConfirmForcePush> & {
       readonly upstreamBranch: string
       readonly askForConfirmationOnForcePush: boolean
     })
-  | PopupDTO<PopupType.PushNeedsPull>
-  | (PopupDTO<PopupType.Error> & {
+  | IPopupDTO<PopupType.PushNeedsPull>
+  | (IPopupDTO<PopupType.Error> & {
       readonly title: string
-      readonly content: ErrorContentDTO
-      readonly causes: ReadonlyArray<ErrorContentDTO>
+      readonly content: IErrorContentDTO
+      readonly causes: ReadonlyArray<IErrorContentDTO>
       readonly retryCloneName: string | null
       readonly choices: ReadonlyArray<ErrorAction>
     })
@@ -140,56 +140,56 @@ export type KernelPopupDTO =
       readonly supported: false
     }
 
-interface Reply<T extends SupportedKernelPopupType> {
+interface IReply<T extends SupportedKernelPopupType> {
   readonly popupID: number
   readonly type: T
 }
 
 export type KernelPopupReply =
-  | (Reply<SupportedKernelPopupType> & { readonly action: 'cancel' })
-  | (Reply<PopupType.AddSSHHost> & {
+  | (IReply<SupportedKernelPopupType> & { readonly action: 'cancel' })
+  | (IReply<PopupType.AddSSHHost> & {
       readonly action: 'submit'
       readonly addHost: boolean
     })
-  | (Reply<PopupType.SSHKeyPassphrase> & {
+  | (IReply<PopupType.SSHKeyPassphrase> & {
       readonly action: 'submit'
       readonly passphrase: string
       readonly storePassphrase: boolean
     })
-  | (Reply<PopupType.SSHUserPassword> & {
+  | (IReply<PopupType.SSHUserPassword> & {
       readonly action: 'submit'
       readonly password: string
       readonly storePassword: boolean
     })
-  | (Reply<PopupType.GenericGitAuthentication> & {
+  | (IReply<PopupType.GenericGitAuthentication> & {
       readonly action: 'submit'
       readonly username: string
       readonly password: string
     })
-  | (Reply<PopupType.HookFailed> & {
+  | (IReply<PopupType.HookFailed> & {
       readonly action: 'submit'
       readonly result: KernelHookResult
     })
-  | (Reply<PopupType.GenerateCommitMessageOverrideWarning> & {
+  | (IReply<PopupType.GenerateCommitMessageOverrideWarning> & {
       readonly action: 'submit'
       readonly confirmCommitMessageOverride: boolean
     })
-  | (Reply<PopupType.GenerateCommitMessageDisclaimer> & {
+  | (IReply<PopupType.GenerateCommitMessageDisclaimer> & {
       readonly action: 'submit'
     })
-  | (Reply<PopupType.RepositoryAccount> & {
+  | (IReply<PopupType.RepositoryAccount> & {
       readonly action: 'sign-in' | 'choose-another'
     })
-  | (Reply<PopupType.RepositoryAccount> & {
+  | (IReply<PopupType.RepositoryAccount> & {
       readonly action: 'submit'
       readonly account: IAccountIdentity
     })
-  | (Reply<PopupType.ConfirmForcePush> & {
+  | (IReply<PopupType.ConfirmForcePush> & {
       readonly action: 'submit'
       readonly askForConfirmationOnForcePush: boolean
     })
-  | (Reply<PopupType.PushNeedsPull> & { readonly action: 'submit' })
-  | (Reply<PopupType.Error> & {
+  | (IReply<PopupType.PushNeedsPull> & { readonly action: 'submit' })
+  | (IReply<PopupType.Error> & {
       readonly action: ErrorAction
       readonly contentIndex?: number
     })
@@ -214,7 +214,7 @@ function supported(type: PopupType): type is SupportedKernelPopupType {
   return supportedKernelPopupTypes.some(candidate => candidate === type)
 }
 
-function base<T extends PopupType>(popup: Popup & { type: T }): PopupDTO<T> {
+function base<T extends PopupType>(popup: Popup & { type: T }): IPopupDTO<T> {
   return { popupID: popup.id ?? null, type: popup.type, supported: true }
 }
 
@@ -233,7 +233,7 @@ function underlyingError(error: Error): Error {
   )
 }
 
-function errorContent(error: Error): ErrorContentDTO {
+function errorContent(error: Error): IErrorContentDTO {
   const underlying = underlyingError(error)
   if (underlying instanceof GitError && underlying.isRawMessage) {
     return { message: underlying.message, terminal: true }
@@ -277,7 +277,9 @@ function errorTitle(error: Error): string {
   const underlying = underlyingError(error)
   if (underlying instanceof CopilotError) {
     const info = getCopilotErrorDisplayInfo(underlying)
-    if (info !== null) return info.title
+    if (info !== null) {
+      return info.title
+    }
   }
   if (
     underlying instanceof GitError &&
@@ -357,7 +359,9 @@ export function projectKernelPopup(
   popup: Popup | null,
   state: PresentationState
 ): KernelPopupDTO | null {
-  if (popup === null) return null
+  if (popup === null) {
+    return null
+  }
   projectKernelMediaOwner(popup)
   switch (popup.type) {
     case PopupType.SignIn:
@@ -496,7 +500,9 @@ function currentPopup(state: PopupState, id: number): Popup {
   if (popup === null || popup.id !== id) {
     throw new KernelPopupError('unavailable')
   }
-  if (!supported(popup.type)) throw new KernelPopupError('unsupported')
+  if (!supported(popup.type)) {
+    throw new KernelPopupError('unsupported')
+  }
   return popup
 }
 
@@ -505,7 +511,9 @@ function parseReply(state: PopupState, value: unknown): KernelPopupReply {
     throw new KernelPopupError('invalid-reply')
   }
   const popup = currentPopup(state, value.popupID)
-  if (value.type !== popup.type) throw new KernelPopupError('invalid-reply')
+  if (value.type !== popup.type) {
+    throw new KernelPopupError('invalid-reply')
+  }
   const exact = (fields: ReadonlyArray<string>) =>
     only(value, ['popupID', 'type', 'action', ...fields])
   if (value.action === 'cancel' && exact([])) {
@@ -589,7 +597,9 @@ function parseReply(state: PopupState, value: unknown): KernelPopupReply {
         errorChoices(popup.error).some(action => action === value.action)
     }
   }
-  if (!valid) throw new KernelPopupError('invalid-reply')
+  if (!valid) {
+    throw new KernelPopupError('invalid-reply')
+  }
   return value as unknown as KernelPopupReply
 }
 
@@ -597,7 +607,7 @@ function parseReply(state: PopupState, value: unknown): KernelPopupReply {
 export function validateKernelPopupReply(
   runtime: KernelPopupRuntime,
   value: unknown
-): KernelPopupReply | NativeDialogReply {
+): KernelPopupReply | INativeDialogReply {
   const popup = runtime.appStore.getState().currentPopup
   if (popup !== null && isNativeDialog(popup.type)) {
     return parseNativeReply(popup, value)
@@ -605,11 +615,13 @@ export function validateKernelPopupReply(
   return parseReply(runtime.appStore.getState(), value)
 }
 
-function parseNativeReply(popup: Popup, value: unknown): NativeDialogReply {
+function parseNativeReply(popup: Popup, value: unknown): INativeDialogReply {
   if (!isRecord(value) || !popupID(value.popupID)) {
     throw new KernelPopupError('invalid-reply')
   }
-  if (value.popupID !== popup.id) throw new KernelPopupError('unavailable')
+  if (value.popupID !== popup.id) {
+    throw new KernelPopupError('unavailable')
+  }
   try {
     return parseNativeDialogReply(popup, value)
   } catch {
@@ -619,7 +631,7 @@ function parseNativeReply(popup: Popup, value: unknown): NativeDialogReply {
 
 function original<T extends SupportedKernelPopupType>(
   state: PopupState,
-  reply: Reply<T>
+  reply: IReply<T>
 ): Extract<Popup, { type: T }> {
   // parseReply already checked the id and discriminant in this same snapshot.
   return state.currentPopup as Extract<Popup, { type: T }>
@@ -657,11 +669,14 @@ export function closeKernelPopup(
   runtime: KernelPopupRuntime,
   id: unknown
 ): void | Promise<void> {
-  if (!popupID(id)) throw new KernelPopupError('invalid-reply')
+  if (!popupID(id)) {
+    throw new KernelPopupError('invalid-reply')
+  }
   const state = runtime.appStore.getState()
   const popup = state.currentPopup
-  if (popup === null || popup.id !== id)
+  if (popup === null || popup.id !== id) {
     throw new KernelPopupError('unavailable')
+  }
   if (isNativeDialog(popup.type)) {
     return cancelNativeDialog(runtime as AppRuntime, popup)
   }
@@ -707,14 +722,16 @@ export async function replyToKernelPopup(
       if (
         result.kind !== 'success' ||
         !runtime.appStore.getState().allPopups.includes(popup)
-      )
+      ) {
         return
+      }
       if (
         assigned
           ? !isSameAccount(result.account, identity)
           : result.account.endpoint !== endpoint
-      )
+      ) {
         return
+      }
       form.selected = result.account
       dispatcher.closePopup(PopupType.SignIn)
       if (assigned) {
@@ -789,7 +806,9 @@ export async function replyToKernelPopup(
       return
     }
     case PopupType.RepositoryAccount: {
-      if (reply.action !== 'submit') throw new KernelPopupError('invalid-reply')
+      if (reply.action !== 'submit') {
+        throw new KernelPopupError('invalid-reply')
+      }
       const popup = original(state, reply)
       const account = repositoryAccounts(popup, state.accounts).find(account =>
         isSameAccount(account, reply.account)

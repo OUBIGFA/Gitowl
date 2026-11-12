@@ -78,7 +78,11 @@ const FilterDirectoryIdentityCheck = [
 // The bundled Windows Git intentionally omits coreutils sleep. Use the test
 // runtime so delayed hooks and filters run on every supported platform.
 const hookDelay = (milliseconds: number) =>
-  bash.quoteCommand(process.execPath.replace(/\\/g, '/'), '-e', `setTimeout(() => {}, ${milliseconds})`)
+  bash.quoteCommand(
+    process.execPath.replace(/\\/g, '/'),
+    '-e',
+    `setTimeout(() => {}, ${milliseconds})`
+  )
 
 describe('git/assisted-commit', () => {
   beforeEach(() => setHooksEnvEnabled(false))

@@ -11,7 +11,8 @@ body:
     id: the-problem
     attributes:
       label: The problem
-      description: Describe what you tried, what happened, and any visible error message.
+      description:
+        Describe what you tried, what happened, and any visible error message.
     validations:
       required: true
   - type: input

@@ -1,8 +1,8 @@
-import { readKernelMedia, KernelMediaChunk } from './media-presentation'
+import { readKernelMedia, IKernelMediaChunk } from './media-presentation'
 import { RepositorySectionTab } from '../lib/app-state'
 import {
   DesktopPresenter,
-  NativeRepositoryReference,
+  INativeRepositoryReference,
 } from './desktop-presenter'
 import type { KernelAssistedReceipt } from './commit-presenter'
 import type { NativeKernelCommand } from './protocol'
@@ -12,10 +12,10 @@ export async function executeKernelCommand(
   presenter: DesktopPresenter,
   command: NativeKernelCommand
 ): Promise<{
-  readonly mediaChunk?: KernelMediaChunk
+  readonly mediaChunk?: IKernelMediaChunk
   readonly committed?: boolean
   readonly assisted?: KernelAssistedReceipt
-  readonly addedRepositories?: ReadonlyArray<NativeRepositoryReference>
+  readonly addedRepositories?: ReadonlyArray<INativeRepositoryReference>
   readonly historySummaries?: ReadonlyArray<{
     readonly sha: string
     readonly fileCount: number

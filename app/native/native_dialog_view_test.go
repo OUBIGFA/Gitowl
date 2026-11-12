@@ -494,3 +494,40 @@ func TestWorktreeDialogKeepsPathChooserWithItsInput(t *testing.T) {
 		})
 	}
 }
+
+func TestAddRepositoryEmptyPathExplainsItselfAndKeepsChooser(t *testing.T) {
+	for _, locale := range []string{"en", "zh-Hans", "zh-Hant"} {
+		t.Run(locale, func(t *testing.T) {
+			popup := dialogFixture()
+			popup.Type, popup.TitleKey = "AddRepository", "repositoryDialog.AddRepository"
+			popup.Fields = []backend.KernelDialogField{{ID: "path", LabelKey: "repositoryDialog.path", Kind: "text", Value: "", Required: true, ChangeAction: "edit"}}
+			popup.Actions = []backend.KernelDialogAction{
+				{ID: "confirm", LabelKey: "repositoryDialog.addRepository", Primary: true, Disabled: true, Fields: []string{"path"}},
+				{ID: "cancel", LabelKey: "repositoryDialog.cancel"},
+				{ID: "choose", LabelKey: "repositoryDialog.choose", Fields: []string{"path"}},
+			}
+			var replies []backend.KernelPopupReply
+			var closes []int
+			tt := dialogTester(popup, &nativeDialogForm{}, locale, 1180, 900, &replies, &closes)
+			hint := locales.In(locale).RequiredFieldEmpty()
+			if !tt.HasText(hint) {
+				t.Fatalf("empty required path is not explained: %v", tt.Texts())
+			}
+			if err := tt.Click(nativeDialogLabel(locale, "repositoryDialog.choose")); err != nil {
+				t.Fatal(err)
+			}
+			if len(replies) != 1 || replies[0].Action != "choose" || replies[0].Values["path"] != "" {
+				t.Fatalf("chooser must stay available for an empty path: %+v", replies)
+			}
+			typed := dialogTester(popup, &nativeDialogForm{}, locale, 1180, 900, &replies, &closes)
+			if err := typed.Click(nativeDialogLabel(locale, "repositoryDialog.path")); err != nil {
+				t.Fatal(err)
+			}
+			typed.Type("C:/projects/example")
+			typed.Frame()
+			if typed.HasText(hint) {
+				t.Fatal("hint must disappear once a path is entered")
+			}
+		})
+	}
+}

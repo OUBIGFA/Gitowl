@@ -69,7 +69,9 @@ func TestNativeDialogImageDiffFollowsOptionsAndRejectsClosedDecode(t *testing.T)
 		}
 	}
 	flush()
-	if value.diffState.imageOpacity != 1 { t.Fatal("PR lost the original initial opacity") }
+	if value.diffState.imageOpacity != 1 {
+		t.Fatal("PR lost the original initial opacity")
+	}
 	if value.diffState.imageError != nil || value.diffState.imagePrepared == nil {
 		t.Fatalf("PR image not decoded: %v", value.diffState.imageError)
 	}

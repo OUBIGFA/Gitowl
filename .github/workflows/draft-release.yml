@@ -12,8 +12,8 @@ on:
           - production
       ref:
         description:
-          'Branch or tag to release from (default: main for beta, latest
-          beta tag for production). Use for hotfixes.'
+          'Branch or tag to release from (default: main for beta, latest beta
+          tag for production). Use for hotfixes.'
         required: false
         type: string
       dry-run:

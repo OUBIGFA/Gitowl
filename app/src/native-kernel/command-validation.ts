@@ -2,7 +2,7 @@ import { parseNativeMediaCommand } from './media-presentation'
 import type { ICommitContext } from '../models/commit'
 import type { ICommitMessage } from '../models/commit-message'
 import type { NativeKernelCommand } from './protocol'
-import type { NativeRepositoryReference } from './desktop-presenter'
+import type { INativeRepositoryReference } from './desktop-presenter'
 import { parseNativeWorkspaceCommand } from './workspace-protocol'
 import { parseCommitCommand } from './commit-protocol'
 import { parseImagePresentationCommand } from './image-presentation'
@@ -42,7 +42,7 @@ function stringArray(value: unknown): value is ReadonlyArray<string> {
 
 function repositoryReference(
   value: unknown
-): value is NativeRepositoryReference {
+): value is INativeRepositoryReference {
   return (
     isRecord(value) &&
     hasOnly(value, ['id', 'path']) &&
@@ -118,7 +118,9 @@ function cliAction(value: unknown): boolean {
 
 /** Validate the complete wire shape before the presenter can resolve a command. */
 export function parseKernelCommand(value: unknown): NativeKernelCommand {
-  if (!isRecord(value) || !safeString(value.name)) throw invalidRequest()
+  if (!isRecord(value) || !safeString(value.name)) {
+    throw invalidRequest()
+  }
   const name = value.name
   if (name === 'media.frame.read') {
     try {
@@ -130,7 +132,9 @@ export function parseKernelCommand(value: unknown): NativeKernelCommand {
   if (name === 'imageDiff.type') {
     try {
       const image = parseImagePresentationCommand(value)
-      if (image !== null) return image
+      if (image !== null) {
+        return image
+      }
     } catch {
       throw invalidParams()
     }
@@ -143,7 +147,9 @@ export function parseKernelCommand(value: unknown): NativeKernelCommand {
     } catch {
       throw invalidParams()
     }
-    if (generation === null) throw unknownCommand()
+    if (generation === null) {
+      throw unknownCommand()
+    }
     return generation
   }
   if (name.startsWith('commit.')) {
@@ -153,7 +159,9 @@ export function parseKernelCommand(value: unknown): NativeKernelCommand {
     } catch {
       throw invalidParams()
     }
-    if (commit === null) throw unknownCommand()
+    if (commit === null) {
+      throw unknownCommand()
+    }
     return commit
   }
   if (name === 'workspace.action') {
@@ -163,7 +171,9 @@ export function parseKernelCommand(value: unknown): NativeKernelCommand {
     } catch {
       throw invalidParams()
     }
-    if (workspace === null) throw unknownCommand()
+    if (workspace === null) {
+      throw unknownCommand()
+    }
     return workspace
   }
   const commonRepository = () => repositoryReference(value.repository)
@@ -338,7 +348,11 @@ export function parseKernelCommand(value: unknown): NativeKernelCommand {
     }
   }
   const result = command()
-  if (result === null) throw unknownCommand()
-  if (!result) throw invalidParams()
+  if (result === null) {
+    throw unknownCommand()
+  }
+  if (!result) {
+    throw invalidParams()
+  }
   return value as NativeKernelCommand
 }

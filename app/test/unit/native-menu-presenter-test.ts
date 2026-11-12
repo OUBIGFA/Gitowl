@@ -4,7 +4,7 @@ import { EventEmitter } from 'events'
 import { ipcRenderer } from 'electron'
 import {
   NativeMenuPresenter,
-  KernelMenuItem,
+  IKernelMenuItem,
 } from '../../src/native-kernel/menu-presenter'
 import { buildDefaultMenuTemplate } from '../../src/main-process/menu/build-default-menu'
 import { executableMenuItem } from '../../src/main-process/menu/executable-menu-item'
@@ -51,7 +51,7 @@ function electronMenu(
     })),
   } as unknown as Electron.Menu
 }
-function flatten(items: ReadonlyArray<KernelMenuItem>): KernelMenuItem[] {
+function flatten(items: ReadonlyArray<IKernelMenuItem>): IKernelMenuItem[] {
   return items.flatMap(item => [item, ...flatten(item.items ?? [])])
 }
 const base: MenuLabelsEvent = {

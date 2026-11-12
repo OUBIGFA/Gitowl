@@ -616,8 +616,17 @@ func renderNativeDialogField(c *ui.Context, field backend.KernelDialogField, for
 			if field.Sensitive {
 				input.Password()
 			}
+			nativeRequiredEmptyHint(c, field, value.text)
 		}
 	}).Shrink(0)
+}
+
+// The original kernel only disables submission for an empty required field;
+// say why beside the field instead of leaving a silently unavailable action.
+func nativeRequiredEmptyHint(c *ui.Context, field backend.KernelDialogField, text string) {
+	if field.Required && !field.ReadOnly && strings.TrimSpace(text) == "" {
+		ui.Text(c.Key("required-empty"), locales.In(c.Locale()).RequiredFieldEmpty()).TextColor(c.Theme().TextMuted).FontSize(c.Theme().Rem(14.0 / 15)).Role(ui.RoleStatus)
+	}
 }
 
 func renderNativeDialogSelect(c *ui.Context, field backend.KernelDialogField, value *string, disabled bool) ui.Element {

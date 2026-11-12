@@ -5,7 +5,7 @@ import { before, describe, it, mock } from 'node:test'
 import type { WebContents } from 'electron'
 import type {
   NativeKernelResponse,
-  NativeKernelSnapshot,
+  INativeKernelSnapshot,
 } from '../../src/native-kernel/protocol'
 
 // Only the Electron IPC hardware boundary is replaced. The production parser,
@@ -40,13 +40,13 @@ type WireMessage = {
   id?: number | null
   method?: string
   result?: {
-    snapshot?: NativeKernelSnapshot
+    snapshot?: INativeKernelSnapshot
     committed?: boolean
     quitting?: boolean
   }
   error?: { code: number; message: string }
 }
-const snapshot: NativeKernelSnapshot = {
+const snapshot: INativeKernelSnapshot = {
   protocol: 1,
   core: 'desktop/desktop',
   presentationComplete: false,
@@ -127,12 +127,58 @@ function harness(holdOutcome = false) {
 }
 
 describe('native kernel transport lifecycle', () => {
+  it('routes a folder picker with an empty initial path to the visible native host', async () => {
+    const h = harness()
+    const selected = h.transport.showFileDialog('open', {
+      defaultPath: '',
+      properties: ['openDirectory', 'createDirectory'],
+    })
+    await h.waitForMessages(messages =>
+      messages.some(message => message.method === 'dialog.request')
+    )
+    const request = h.messages.find(
+      message => message.method === 'dialog.request'
+    ) as any
+    assert.equal(request.params.options.defaultPath, '')
+    assert.deepEqual(request.params.options.properties, [
+      'openDirectory',
+      'createDirectory',
+    ])
+    h.input.write(
+      line(1, 'kernel.dialogResult', {
+        id: request.params.id,
+        paths: ['C:/projects/example'],
+        error: null,
+      })
+    )
+    assert.deepEqual(await selected, ['C:/projects/example'])
+    h.input.end()
+  })
+
+  it('settles an abandoned native picker when the presenter disconnects', async () => {
+    const h = harness()
+    const selected = h.transport.showFileDialog('save', {
+      defaultPath: 'patch.diff',
+    })
+    h.input.end()
+    assert.deepEqual(await selected, [])
+    await tick()
+    await tick()
+    assert.deepEqual(h.exits, [0])
+  })
+
   it('acknowledges shutdown and drains parent EOF before quitting with an owned input read', async () => {
     const h = harness()
     h.input.write(line(1, 'kernel.shutdown'))
-    await h.waitForMessages(messages => messages.some(message => message.result?.quitting))
+    await h.waitForMessages(messages =>
+      messages.some(message => message.result?.quitting)
+    )
     await tick()
-    assert.deepEqual(h.exits, [], 'the parent must release its pipe before Electron joins its I/O workers')
+    assert.deepEqual(
+      h.exits,
+      [],
+      'the parent must release its pipe before Electron joins its I/O workers'
+    )
     // Requests queued after shutdown are never dispatched, but the input must
     // keep draining so a Windows fd read can observe the parent closing it.
     h.input.end(line(2))

@@ -1,3 +1,4 @@
+import '../lib/hide-child-process-windows'
 import '../lib/logging/renderer/install'
 
 import * as Path from 'path'
@@ -114,6 +115,13 @@ ipcRenderer.on('native-kernel-request', (_, request) => {
   void (async () => {
     try {
       const command = parseKernelCommand(request.command)
+      // Startup rewrites the global Git config while commands are already
+      // admitted. On Windows a concurrent Git read or write of that file fails
+      // (Permission denied, or a silently skipped config write), so Git work
+      // waits for those writes. Media frames never touch Git.
+      if (command.name !== 'media.frame.read') {
+        await startup.globalConfigSettled()
+      }
       const result = await executeKernelCommand(presenter, command)
       respond({ id: request.id, result: { ...result, snapshot: snapshot() } })
     } catch (error) {

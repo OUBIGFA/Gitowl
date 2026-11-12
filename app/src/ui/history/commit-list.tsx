@@ -46,12 +46,15 @@ interface ICommitListProps {
   readonly selectedSHAs: ReadonlyArray<string>
 
   /** Whether or not commits in this list can be undone. */
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by commit menu controller
   readonly canUndoCommits?: boolean
 
   /** Whether or not commits in this list can be amended. */
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by commit menu controller
   readonly canAmendCommits?: boolean
 
   /** Whether or the user can reset to commits in this list. */
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by commit menu controller
   readonly canResetToCommits?: boolean
 
   /** The emoji lookup to render images inline */
@@ -76,17 +79,22 @@ interface ICommitListProps {
   readonly onScroll?: (start: number, end: number) => void
 
   /** Callback to fire to undo a given commit in the current repository */
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by commit menu controller
   readonly onUndoCommit?: (commit: Commit) => void
 
   /** Callback to fire to reset to a given commit in the current repository */
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by commit menu controller
   readonly onResetToCommit?: (commit: Commit) => void
 
   /** Callback to fire to revert a given commit in the current repository */
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by commit menu controller
   readonly onRevertCommit?: (commit: Commit) => void
 
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by commit menu controller
   readonly onAmendCommit?: (commit: Commit, isLocalCommit: boolean) => void
 
   /** Callback to fire to open a given commit on GitHub */
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by commit menu controller
   readonly onViewCommitOnGitHub?: (sha: string) => void
 
   /** Callback to fire to cancel a keyboard reordering operation */
@@ -96,18 +104,22 @@ interface ICommitListProps {
    * Callback to fire to create a branch from a given commit in the current
    * repository
    */
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by commit menu controller
   readonly onCreateBranch?: (commit: CommitOneLine) => void
 
   /**
    * Callback to fire to checkout the selected commit in the current
    * repository
    */
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by commit menu controller
   readonly onCheckoutCommit?: (commit: CommitOneLine) => void
 
   /** Callback to fire to open the dialog to create a new tag on the given commit */
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by commit menu controller
   readonly onCreateTag?: (targetCommitSha: string) => void
 
   /** Callback to fire to delete an unpushed tag */
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by commit menu controller
   readonly onDeleteTag?: (tagName: string) => void
 
   /**
@@ -125,9 +137,11 @@ interface ICommitListProps {
   ) => void
 
   /** Callback to fire to cherry picking the commit  */
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by commit menu controller
   readonly onCherryPick?: (commits: ReadonlyArray<CommitOneLine>) => void
 
   /** Callback to fire to start reordering commits with the keyboard */
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by commit menu controller
   readonly onKeyboardReorder?: (toReorder: ReadonlyArray<Commit>) => void
 
   /** Callback to fire to squashing commits  */
@@ -173,6 +187,7 @@ interface ICommitListProps {
   readonly onRemoveCommitDragElement?: () => void
 
   /** Whether reordering should be enabled on the commit list */
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by commit menu controller
   readonly disableReordering?: boolean
 
   /** Whether squashing should be enabled on the commit list */
@@ -758,7 +773,9 @@ export class CommitList extends React.Component<
         .filter((v): v is Commit => v !== null && v !== undefined)
         .map(c => c.sha)
     )
-    if (plan === null) return
+    if (plan === null) {
+      return
+    }
     const baseCommit =
       plan.baseSHA === null ? null : this.props.commitLookup.get(plan.baseSHA)
     this.props.onDropCommitInsertion(

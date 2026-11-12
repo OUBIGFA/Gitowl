@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import { PassThrough } from 'stream'
 import { createInterface } from 'readline'
-import { serve, NativeRPCService } from '../../src/native-service/protocol'
+import { serve, INativeRPCService } from '../../src/native-service/protocol'
 
 const request = (id: number, method: string) =>
   JSON.stringify({ jsonrpc: '2.0', id, method }) + '\n'
@@ -14,7 +14,7 @@ describe('native RPC cancellation', () => {
     const lines = createInterface({ input: output })
     const replies = lines[Symbol.asyncIterator]()
     let closed = 0
-    const service: NativeRPCService = {
+    const service: INativeRPCService = {
       invoke: async (method, _params, signal) => {
         if (method === 'slow') {
           await new Promise<void>((_resolve, reject) =>

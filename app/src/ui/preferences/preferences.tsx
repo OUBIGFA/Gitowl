@@ -68,6 +68,7 @@ import {
 export interface IPreferencesProps {
   readonly dispatcher: Dispatcher
   readonly accounts: ReadonlyArray<Account>
+  // eslint-disable-next-line react/no-unused-prop-types -- read via this.props by savePreferences
   readonly repository: Repository | null
   readonly onDismissed: () => void
   readonly useWindowsOpenSSH: boolean

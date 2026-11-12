@@ -1,6 +1,6 @@
 import * as Path from 'path'
 
-import { WorkspaceMenuItem as IMenuItem } from '../lib/workspace-menu'
+import { IWorkspaceMenuItem as IMenuItem } from '../lib/workspace-menu'
 import { writeClipboardText } from '../main-process-proxy'
 import { isRepositoryAffectedByAssistedCommit } from '../../lib/git/repository-operation'
 

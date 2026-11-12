@@ -16,7 +16,7 @@ import { writeGitDescription } from '../../lib/git/description'
 import { pathExists } from '../../lib/path-exists'
 import { CreateRepositoryError } from '../../lib/error-with-metadata'
 
-export interface RepositoryCreationOptions {
+export interface IRepositoryCreationOptions {
   readonly name: string
   readonly description: string
   readonly createWithReadme: boolean
@@ -34,7 +34,7 @@ export interface RepositoryCreationOptions {
 export async function createRepositoryCore(
   dispatcher: Dispatcher,
   fullPath: string,
-  options: RepositoryCreationOptions,
+  options: IRepositoryCreationOptions,
   postCreationError: (error: Error) => void,
   onValidPath: (valid: boolean) => void
 ): Promise<Repository | undefined> {

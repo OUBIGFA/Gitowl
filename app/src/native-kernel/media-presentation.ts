@@ -4,13 +4,13 @@ import type { Image as RepositoryImage } from '../models/diff'
 import { convertDDSImage } from '../ui/diff/image-diffs/dds-converter'
 
 /** Pixel presentation only. No filesystem, Git, account or network authority. */
-export interface NativeMediaCommand {
+export interface INativeMediaCommand {
   readonly name: 'media.frame.read'
   readonly mediaID: string
   readonly frame: number
   readonly offset: number
 }
-export interface KernelMediaChunk {
+export interface IKernelMediaChunk {
   readonly contents: string
   readonly offset: number
   readonly total: number
@@ -21,20 +21,20 @@ export interface KernelMediaChunk {
   /** -1 means repeat forever; otherwise repetitions after the first playback. */
   readonly repetitions: number
 }
-interface Pixels {
+interface IPixels {
   readonly data: Uint8Array
   readonly width: number
   readonly height: number
   readonly duration: number
 }
-interface Media {
+interface IMedia {
   readonly fingerprint: string
   readonly owners: Set<object>
   readonly image: RepositoryImage
   element?: HTMLImageElement
   decoder?: ImageDecoder
   initialization?: Promise<void>
-  frame?: { index: number; pixels: Promise<Pixels> }
+  frame?: { index: number; pixels: Promise<IPixels> }
   frames: number
   repetitions: number
   closed: boolean
@@ -42,7 +42,7 @@ interface Media {
 const ids = new WeakMap<RepositoryImage, string>()
 const fingerprints = new WeakMap<RepositoryImage, string>()
 const contentIDs = new Map<string, string>()
-const media = new Map<string, Media>()
+const media = new Map<string, IMedia>()
 let projected: Set<string> | null = null
 let projectedOwners: Map<object, Set<string>> | null = null
 
@@ -62,19 +62,24 @@ export function withMediaProjection<T>(
     projected = null
     projectedOwners = null
     for (const [id, entry] of media) {
-      for (const owner of entry.owners)
+      for (const owner of entry.owners) {
         if (
           !owners.includes(owner) ||
           (ownerImages.has(owner) && !ownerImages.get(owner)!.has(id))
-        )
+        ) {
           entry.owners.delete(owner)
+        }
+      }
       if (!seen.has(id) && entry.owners.size === 0) {
         entry.closed = true
         entry.decoder?.close()
-        if (entry.element) entry.element.src = ''
+        if (entry.element) {
+          entry.element.src = ''
+        }
         media.delete(id)
-        if (contentIDs.get(entry.fingerprint) === id)
+        if (contentIDs.get(entry.fingerprint) === id) {
           contentIDs.delete(entry.fingerprint)
+        }
       }
     }
   }
@@ -119,7 +124,9 @@ export function registerKernelMedia(
   if (owner !== undefined) {
     media.get(id)!.owners.add(owner)
     if (projectedOwners !== null) {
-      if (!projectedOwners.has(owner)) projectedOwners.set(owner, new Set())
+      if (!projectedOwners.has(owner)) {
+        projectedOwners.set(owner, new Set())
+      }
       projectedOwners.get(owner)!.add(id)
     }
   }
@@ -129,7 +136,7 @@ export function registerKernelMedia(
 
 export function parseNativeMediaCommand(
   value: Record<string, unknown>
-): NativeMediaCommand {
+): INativeMediaCommand {
   if (
     Object.keys(value).some(
       k => !['name', 'mediaID', 'frame', 'offset'].includes(k)
@@ -143,7 +150,7 @@ export function parseNativeMediaCommand(
   ) {
     throw new Error('Invalid image presentation request')
   }
-  return value as unknown as NativeMediaCommand
+  return value as unknown as INativeMediaCommand
 }
 
 // Bound copies before allocating RGBA buffers; decoder failures remain a local
@@ -157,12 +164,13 @@ function frameSize(width: number, height: number): number {
     height <= 0 ||
     !Number.isSafeInteger(size) ||
     size > 256 * 1024 * 1024
-  )
+  ) {
     throw new Error('Image exceeds the decoded preview memory budget')
+  }
   return size
 }
 
-async function initialize(entry: Media) {
+async function initialize(entry: IMedia) {
   const type = entry.image.mediaType
   // Chromium owns PNG/WebP/GIF animation compositing, disposal, timing and
   // repetition. No fcTL/ANMF parser or approximated first-frame animation.
@@ -177,7 +185,9 @@ async function initialize(entry: Media) {
     entry.decoder = new ImageDecoder({ data, type, preferAnimation: true })
     await entry.decoder.tracks.ready
     const track = entry.decoder.tracks.selectedTrack
-    if (track === null) throw new Error('Image has no display track')
+    if (track === null) {
+      throw new Error('Image has no display track')
+    }
     entry.frames = track.frameCount
     entry.repetitions = Number.isFinite(track.repetitionCount)
       ? track.repetitionCount
@@ -191,8 +201,9 @@ async function initialize(entry: Media) {
       )) ||
     (type === 'image/webp' &&
       Buffer.from(entry.image.contents, 'base64').includes(Buffer.from('ANIM')))
-  if (animationRequired && entry.decoder === undefined)
+  if (animationRequired && entry.decoder === undefined) {
     throw new Error('Chromium animation decoding is unavailable')
+  }
   if (entry.closed) {
     entry.decoder?.close()
     throw new Error('Image is no longer displayed')
@@ -207,10 +218,11 @@ function ddsImageURL(image: RepositoryImage): string {
   return convertDDSImage(raw)
 }
 
-async function pixels(entry: Media, index: number): Promise<Pixels> {
+async function pixels(entry: IMedia, index: number): Promise<IPixels> {
   await (entry.initialization ??= initialize(entry))
-  if (entry.closed || index >= entry.frames)
+  if (entry.closed || index >= entry.frames) {
     throw new Error('Image frame is no longer available')
+  }
   if (entry.decoder !== undefined) {
     const { image } = await entry.decoder.decode({
       frameIndex: index,
@@ -230,7 +242,9 @@ async function pixels(entry: Media, index: number): Promise<Pixels> {
         canvas.width = image.displayWidth
         canvas.height = image.displayHeight
         const context = canvas.getContext('2d', { willReadFrequently: true })
-        if (context === null) throw new Error('Image conversion is unavailable')
+        if (context === null) {
+          throw new Error('Image conversion is unavailable')
+        }
         context.drawImage(image, 0, 0, canvas.width, canvas.height)
         const rgba = context.getImageData(0, 0, canvas.width, canvas.height)
         return {
@@ -247,16 +261,18 @@ async function pixels(entry: Media, index: number): Promise<Pixels> {
         layout: [{ offset: 0, stride: width * 4 }],
       }
       const size = frameSize(width, height)
-      if (image.allocationSize(options) !== size)
+      if (image.allocationSize(options) !== size) {
         throw new Error('Unexpected Chromium image plane allocation')
+      }
       const data = new Uint8Array(size)
       const layout = await image.copyTo(data, options)
       if (
         layout.length !== 1 ||
         layout[0].offset !== 0 ||
         layout[0].stride !== width * 4
-      )
+      ) {
         throw new Error('Unexpected Chromium image plane layout')
+      }
       return { data, width, height, duration: image.duration ?? 100000 }
     } finally {
       image.close()
@@ -277,7 +293,9 @@ async function pixels(entry: Media, index: number): Promise<Pixels> {
   canvas.width = image.naturalWidth
   canvas.height = image.naturalHeight
   const context = canvas.getContext('2d', { willReadFrequently: true })
-  if (context === null) throw new Error('Image conversion is unavailable')
+  if (context === null) {
+    throw new Error('Image conversion is unavailable')
+  }
   context.drawImage(image, 0, 0)
   const rgba = context.getImageData(0, 0, canvas.width, canvas.height)
   entry.element = undefined
@@ -302,8 +320,9 @@ export function kernelMediaErrorMessage(error: unknown): string {
     'Unexpected Chromium image plane allocation',
     'Unexpected Chromium image plane layout',
   ])
-  if (error instanceof Error && messages.has(error.message))
+  if (error instanceof Error && messages.has(error.message)) {
     return error.message
+  }
   if (typeof DOMException !== 'undefined' && error instanceof DOMException) {
     const names = new Set([
       'EncodingError',
@@ -313,7 +332,9 @@ export function kernelMediaErrorMessage(error: unknown): string {
       'SecurityError',
       'NotSupportedError',
     ])
-    if (names.has(error.name)) return `Chromium image decoder: ${error.name}`
+    if (names.has(error.name)) {
+      return `Chromium image decoder: ${error.name}`
+    }
   }
   return 'The original image decoder could not display this image'
 }
@@ -321,15 +342,17 @@ export function kernelMediaErrorMessage(error: unknown): string {
 /** Bounded chunks never compete with a Git/recovery result for a 64 MiB frame.
  * The one decoded frame is cached until its next frame is requested. */
 export async function readKernelMedia(
-  command: NativeMediaCommand
-): Promise<KernelMediaChunk> {
+  command: INativeMediaCommand
+): Promise<IKernelMediaChunk> {
   const entry = media.get(command.mediaID)
-  if (entry === undefined || entry.closed)
+  if (entry === undefined || entry.closed) {
     throw new Error('Image is no longer displayed')
-  if (entry.frame?.index !== command.frame)
+  }
+  if (entry.frame?.index !== command.frame) {
     entry.frame = { index: command.frame, pixels: pixels(entry, command.frame) }
+  }
   const requestedFrame = entry.frame
-  let frame: Pixels
+  let frame: IPixels
   let timer: ReturnType<typeof setTimeout> | undefined
   try {
     frame = await Promise.race([
@@ -344,19 +367,24 @@ export async function readKernelMedia(
   } catch (error) {
     entry.closed = true
     entry.decoder?.close()
-    if (entry.element) entry.element.src = ''
+    if (entry.element) {
+      entry.element.src = ''
+    }
     entry.element = undefined
     entry.frame = undefined
     throw error
   } finally {
-    if (timer !== undefined) clearTimeout(timer)
+    if (timer !== undefined) {
+      clearTimeout(timer)
+    }
   }
   if (
     entry.closed ||
     media.get(command.mediaID) !== entry ||
     command.offset > frame.data.length
-  )
+  ) {
     throw new Error('Image is no longer displayed')
+  }
   const chunk = frame.data.subarray(
     command.offset,
     command.offset + 1024 * 1024
@@ -366,8 +394,9 @@ export async function readKernelMedia(
   if (
     command.offset + chunk.length === frame.data.length &&
     entry.frame === requestedFrame
-  )
+  ) {
     entry.frame = undefined
+  }
   return {
     contents: Buffer.from(
       chunk.buffer,

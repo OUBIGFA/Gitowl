@@ -1,3 +1,4 @@
+import '../lib/hide-child-process-windows'
 import { executableMenuItem } from './menu/executable-menu-item'
 import { nativeKernelInput, nativeKernelMode } from './native-mode'
 import '../lib/logging/main/install'
@@ -174,8 +175,11 @@ if (__WIN32__ && process.argv.length > 1) {
       () => app.quit(),
       e => {
         log.error('Failed handling installation event', e)
-        if (nativeEvent !== null) app.exit(1)
-        else app.quit()
+        if (nativeEvent !== null) {
+          app.exit(1)
+        } else {
+          app.quit()
+        }
       }
     )
   }

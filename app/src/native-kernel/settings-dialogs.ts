@@ -86,10 +86,10 @@ import {
   enableCopilotConflictResolution,
 } from '../lib/feature-flag'
 import {
-  NativeDialogModule,
-  NativeDialogPresentation,
+  INativeDialogModule,
+  INativeDialogPresentation,
   NativeDialogField,
-  NativeDialogAction,
+  INativeDialogAction,
   dialogValues,
   dialogString,
   dialogBoolean,
@@ -129,8 +129,8 @@ const options = (ids: ReadonlyArray<string>) =>
   ids.map(id => ({ id, label: key(`option.${id}`) }))
 const action = (
   id: string,
-  extra: Partial<NativeDialogAction> = {}
-): NativeDialogAction => ({ id, labelKey: key(id), ...extra })
+  extra: Partial<INativeDialogAction> = {}
+): INativeDialogAction => ({ id, labelKey: key(id), ...extra })
 
 const booleanPrefs = [
   'useWindowsOpenSSH',
@@ -182,7 +182,7 @@ const tabs = [
   'accessibility',
 ] as const
 
-interface ProviderDraft {
+interface IProviderDraft {
   name: string
   type: IBYOKProvider['type']
   baseUrl: string
@@ -193,7 +193,7 @@ interface ProviderDraft {
   models: ReadonlyArray<IBYOKModel>
   format: ConfiguredProvider['format']
 }
-interface Frame {
+interface IFrame {
   notificationPermission?: NotificationPermission
   busy: boolean
   loaded: boolean
@@ -205,13 +205,13 @@ interface Frame {
   account: string
   alias?: string
   generation?: IAppState['commitGeneration']
-  provider?: ProviderDraft
+  provider?: IProviderDraft
   model?: IBYOKModel
   selectedProvider: string
   selectedProviderModel: string
   sdk?: ConfiguredProvider | null
 }
-const frames = new WeakMap<Popup, Frame>()
+const frames = new WeakMap<Popup, IFrame>()
 // This metadata only identifies a native SDK edit on the ORIGINAL popup stack. No callback/state coordinator.
 const sdkPopups = new Map<number, ConfiguredProvider | null>()
 const observers = new WeakMap<Popup, () => void>()
@@ -313,7 +313,7 @@ function prefsInitial(
     preferAbsoluteDates: s.preferAbsoluteDates,
   }
 }
-function frame(p: Popup, s: IAppState): Frame {
+function frame(p: Popup, s: IAppState): IFrame {
   let f = frames.get(p)
   if (f !== undefined) {
     return f
@@ -474,7 +474,9 @@ function settingsActionFields(
     return []
   }
   if (popup.type === PopupType.Preferences) {
-    if (actionID === 'navigate') return ['tab']
+    if (actionID === 'navigate') {
+      return ['tab']
+    }
     if (['signOut', 'copilotSettings'].includes(actionID)) {
       return ['account']
     }
@@ -506,9 +508,9 @@ function settingsActionFields(
 
 // Project any original preference page without changing the active tab. The
 // sizing pass uses an isolated Frame copy and never sends values to native UI.
-function projectPreferencePage(s: IAppState, ps: IPreferencesState, f: Frame) {
+function projectPreferencePage(s: IAppState, ps: IPreferencesState, f: IFrame) {
   const fields: NativeDialogField[] = []
-  const actions: NativeDialogAction[] = []
+  const actions: INativeDialogAction[] = []
   switch (ps.selectedIndex) {
     case PreferencesTab.Accounts:
       fields.push(
@@ -689,8 +691,9 @@ function projectPreferencePage(s: IAppState, ps: IPreferencesState, f: Frame) {
         ) {
           actions.push(action('notificationGrant'))
         }
-        if (getNotificationSettingsUrl() !== null)
+        if (getNotificationSettingsUrl() !== null) {
           actions.push(action('notificationSettings'))
+        }
       }
       break
     case PreferencesTab.Prompts:
@@ -725,10 +728,10 @@ function projectPreferencePage(s: IAppState, ps: IPreferencesState, f: Frame) {
   return { fields, actions }
 }
 
-function project(p: Popup, s: IAppState): NativeDialogPresentation {
+function project(p: Popup, s: IAppState): INativeDialogPresentation {
   const f = frame(p, s)
   let fields: NativeDialogField[] = []
-  let actions: NativeDialogAction[] = []
+  const actions: INativeDialogAction[] = []
   let ps = f.prefs
   if (
     ps &&
@@ -1035,9 +1038,9 @@ function project(p: Popup, s: IAppState): NativeDialogPresentation {
     ...(f.busy || !f.loaded ? { disabled: true } : {}),
   })
   const presentAction = (
-    a: NativeDialogAction,
+    a: INativeDialogAction,
     pageFields: ReadonlyArray<NativeDialogField>
-  ): NativeDialogAction => ({
+  ): INativeDialogAction => ({
     ...a,
     fields: settingsActionFields(p, a.id, pageFields),
     ...(f.busy || (!f.loaded && a.id !== 'load' && a.id !== 'cancel')
@@ -1103,7 +1106,7 @@ function choice<T extends string>(
 }
 function applyPreferences(
   r: AppRuntime,
-  f: Frame,
+  f: IFrame,
   v: Readonly<Record<string, unknown>>
 ) {
   let ps = f.prefs!
@@ -1238,7 +1241,7 @@ function applyPreferences(
     )
   }
 }
-function prefsProps(r: AppRuntime, p: Popup, f: Frame): IPreferencesProps {
+function prefsProps(r: AppRuntime, p: Popup, f: IFrame): IPreferencesProps {
   const s = r.appStore.getState()
   const initial = f.initial!
   return {
@@ -1353,7 +1356,9 @@ async function reply(
     changed(p)
     if (tab === 'notifications' && supportsNotifications()) {
       f.notificationPermission = await getNotificationsPermission()
-      if (frames.has(p)) changed(p)
+      if (frames.has(p)) {
+        changed(p)
+      }
     }
     return
   }
@@ -1371,8 +1376,9 @@ async function reply(
         }
         r.dispatcher.fetchCopilotModels()
         r.dispatcher.fetchCopilotQuotaSnapshots()
-        if (supportsNotifications())
+        if (supportsNotifications()) {
           f.notificationPermission = await getNotificationsPermission()
+        }
       } else if (p.type === PopupType.RepositorySettings) {
         const remote = r.repositoryStateManager.get(p.repository).remote
         f.originalRemote = remote
@@ -1425,8 +1431,9 @@ async function reply(
       }
       switch (name) {
         case 'change':
-          if (v.tab === 'notifications' && supportsNotifications())
+          if (v.tab === 'notifications' && supportsNotifications()) {
             f.notificationPermission = await getNotificationsPermission()
+          }
           return
         case 'notificationGrant':
           await requestNotificationsPermission()
@@ -1434,7 +1441,9 @@ async function reply(
           return
         case 'notificationSettings': {
           const url = getNotificationSettingsUrl()
-          if (url !== null) await r.dispatcher.openInBrowser(url)
+          if (url !== null) {
+            await r.dispatcher.openInBrowser(url)
+          }
           return
         }
         case 'save':
@@ -1938,7 +1947,7 @@ async function cancel(r: AppRuntime, p: Popup) {
 }
 
 /** Native feature partition; callbacks and secrets never cross its JSON projection. Initial prefs/repo load is an explicit typed action. */
-export const settingsDialogs: NativeDialogModule = {
+export const settingsDialogs: INativeDialogModule = {
   types: [
     PopupType.Preferences,
     PopupType.RepositorySettings,

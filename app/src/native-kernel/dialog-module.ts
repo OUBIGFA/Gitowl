@@ -1,5 +1,5 @@
-import type { KernelImage } from './image-presentation'
-import type { KernelDiff } from './protocol'
+import type { IKernelImage } from './image-presentation'
+import type { IKernelDiff } from './protocol'
 import type { IAppState } from '../lib/app-state'
 import type { AppRuntime } from '../ui/app-runtime'
 import type { Popup, PopupType } from '../models/popup'
@@ -19,12 +19,12 @@ export type NativeDialogField = {
     | 'icons'
     | 'image'
     | 'diff'
-  readonly diff?: KernelDiff
+  readonly diff?: IKernelDiff
   readonly diffPath?: string
   readonly sideBySide?: boolean
   readonly imageDiffType?: number
   readonly iconLibrary?: 'octicons'
-  readonly image?: KernelImage
+  readonly image?: IKernelImage
   readonly value?: string | boolean | number
   readonly text?: string
   readonly placeholder?: string
@@ -42,7 +42,7 @@ export type NativeDialogField = {
   readonly changeAction?: string
 }
 
-export interface NativeDialogAction {
+export interface INativeDialogAction {
   readonly id: string
   readonly labelKey: string
   readonly primary?: boolean
@@ -53,7 +53,7 @@ export interface NativeDialogAction {
 }
 
 /** Text keys are translated by the native catalog; technical content remains original data. */
-export interface NativeDialogPresentation {
+export interface INativeDialogPresentation {
   readonly popupID: number | null
   readonly type: PopupType
   readonly supported: true
@@ -62,19 +62,19 @@ export interface NativeDialogPresentation {
   readonly descriptionKey?: string
   readonly description?: string
   readonly fields: ReadonlyArray<NativeDialogField>
-  readonly actions: ReadonlyArray<NativeDialogAction>
+  readonly actions: ReadonlyArray<INativeDialogAction>
   /** Safe complete page views let native navigate without a draft round trip. */
   readonly layoutPages?: ReadonlyArray<{
     readonly id: string
     readonly fields: ReadonlyArray<NativeDialogField>
-    readonly actions: ReadonlyArray<NativeDialogAction>
+    readonly actions: ReadonlyArray<INativeDialogAction>
   }>
   readonly error?: string | null
   readonly width?: number
   readonly height?: number
 }
 
-export interface NativeDialogReply {
+export interface INativeDialogReply {
   readonly popupID: number
   readonly type: PopupType
   readonly action: string
@@ -88,9 +88,9 @@ export interface NativeDialogReply {
  * never introduce a reduced backend, reflect arbitrary methods, or serialize
  * callbacks/tokens/raw state. The parent validates the opaque current popup ID.
  */
-export interface NativeDialogModule {
+export interface INativeDialogModule {
   readonly types: ReadonlyArray<PopupType>
-  project(popup: Popup, state: IAppState): NativeDialogPresentation
+  project(popup: Popup, state: IAppState): INativeDialogPresentation
   reply(
     runtime: AppRuntime,
     popup: Popup,

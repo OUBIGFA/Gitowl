@@ -54,6 +54,15 @@ func ResolveConfig(resources, userData, service, node string) (Config, error) {
 	return Config{Node: node, Service: service, UserData: userData}, nil
 }
 
+// ownedProcess is a started child together with its whole process tree.
+// prioritize restores normal scheduling for that tree and reports how many
+// processes it adjusted; it is a no-op where the platform has no such state.
+type ownedProcess struct {
+	wait       func() error
+	prioritize func() int
+	job        uintptr // Windows job handle, for inspection only
+}
+
 // Service owns the child and its transport. Closing stdin first gives Node its
 // normal EOF shutdown; a bounded fallback kills an unresponsive child and reaps
 // it. The UI calls Close after its event loop, never from a click handler.
@@ -64,6 +73,7 @@ type Service struct {
 	waitOnce    sync.Once
 	waitDone    chan struct{}
 	waitErr     error
+	owned       ownedProcess
 	close       sync.Once
 	closeErr    error
 	processName string
@@ -103,9 +113,11 @@ func startProcess(cmd *exec.Cmd, name string, notify func(string, json.RawMessag
 	if err != nil {
 		return nil, errors.Join(fmt.Errorf("repository stdout: %w", err), stdin.Close())
 	}
-	if err := cmd.Start(); err != nil {
+	owned, err := startOwnedCommand(cmd)
+	if err != nil {
 		return nil, errors.Join(fmt.Errorf("start %s %s: %w", name, cmd.Path, err), stdin.Close(), stdout.Close())
 	}
+	s.owned = owned
 	s.Client = newRPCClient(stdout, stdin, func() error {
 		// Read stdout to EOF before Wait closes the pipe, preserving the last
 		// complete response even when the child exits immediately afterward.
@@ -121,7 +133,7 @@ func startProcess(cmd *exec.Cmd, name string, notify func(string, json.RawMessag
 
 func (s *Service) wait() {
 	s.waitOnce.Do(func() {
-		s.waitErr = s.cmd.Wait()
+		s.waitErr = s.owned.wait()
 		close(s.waitDone)
 	})
 }

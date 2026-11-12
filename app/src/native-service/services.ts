@@ -7,19 +7,19 @@ import { RepositoryService } from './repository-service'
 import { GenerationService } from './generation-service'
 import { CopilotGateway } from './copilot-gateway'
 import { RemoteOperations } from './remote-operations'
-import { NativeRPCService } from './protocol'
+import { INativeRPCService } from './protocol'
 import { ServiceError } from './service-error'
 
-interface ProxyContext {
+interface IProxyContext {
   readonly origin: string | null
   readonly proxy: string | null
 }
 
 /** Compose upstream Git, official model SDKs and native-host platform services. */
-export class NativeServices implements NativeRPCService {
+export class NativeServices implements INativeRPCService {
   private readonly repositories = new RepositoryService()
   private generation: GenerationService | undefined
-  private readonly proxyContexts = new AsyncLocalStorage<ProxyContext>()
+  private readonly proxyContexts = new AsyncLocalStorage<IProxyContext>()
   private readonly remote = new RemoteOperations(async url => {
     const context = this.proxyContexts.getStore()
     if (!context || new URL(url).origin !== context.origin) {

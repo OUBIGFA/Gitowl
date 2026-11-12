@@ -55,10 +55,10 @@ import { checkBranchNameRules } from '../ui/lib/branch-name-rule-validation'
 import { startTimer } from '../ui/lib/timing'
 import { RepositorySettingsTab } from '../ui/repository-settings/settings-controller'
 import {
-  NativeDialogModule,
+  INativeDialogModule,
   NativeDialogField,
-  NativeDialogAction,
-  NativeDialogPresentation,
+  INativeDialogAction,
+  INativeDialogPresentation,
   dialogValues,
   dialogString,
   dialogBoolean,
@@ -231,7 +231,7 @@ const action = (
   label = id,
   primary = false,
   destructive = false
-): NativeDialogAction => ({ id, labelKey: key(label), primary, destructive })
+): INativeDialogAction => ({ id, labelKey: key(label), primary, destructive })
 
 function owned(popup: Popup): RepositoryPopup {
   if (!types.includes(popup.type as typeof types[number])) {
@@ -366,12 +366,12 @@ function draftFor(popup: RepositoryPopup, state: IAppState) {
 function project(
   popupInput: Popup,
   state: IAppState
-): NativeDialogPresentation {
+): INativeDialogPresentation {
   const popup = owned(popupInput)
   const draft = draftFor(popup, state)
   const v = draft.values
   const fields: NativeDialogField[] = []
-  let actions: NativeDialogAction[] = []
+  let actions: INativeDialogAction[] = []
   const repoState = repositoryState(popup, state)
   if ('repository' in popup) {
     fields.push(
@@ -1674,7 +1674,7 @@ async function reply(
 }
 
 /** Repository partition of the parent's single MyGo native dialog renderer. */
-export const repositoryDialogs: NativeDialogModule = {
+export const repositoryDialogs: INativeDialogModule = {
   types,
   project,
   reply,

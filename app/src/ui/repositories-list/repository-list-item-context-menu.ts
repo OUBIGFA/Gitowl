@@ -3,7 +3,7 @@ import {
   getRepositoryAccountIdentity,
 } from '../../models/repository'
 import { Account, isSameAccount } from '../../models/account'
-import { WorkspaceMenuItem as IMenuItem } from '../lib/workspace-menu'
+import { IWorkspaceMenuItem as IMenuItem } from '../lib/workspace-menu'
 import { Repositoryish } from './group-repositories'
 import { writeClipboardText } from '../main-process-proxy'
 import {

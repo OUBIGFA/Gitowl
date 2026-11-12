@@ -1,5 +1,5 @@
 import * as Path from 'path'
-import { WorkspaceMenuItem } from '../lib/workspace-menu'
+import { IWorkspaceMenuItem } from '../lib/workspace-menu'
 import { Repository } from '../../models/repository'
 import { CommittedFileChange } from '../../models/status'
 import { Commit } from '../../models/commit'
@@ -27,8 +27,8 @@ export function generateHistoryFileContextMenu(
   onOpenEditor: (path: string) => void,
   onOpenItem: (path: string) => void,
   onViewCommit: (sha: string, filePath: string) => void
-): WorkspaceMenuItem[] {
-  if (!fileExistsOnDisk)
+): IWorkspaceMenuItem[] {
+  if (!fileExistsOnDisk) {
     return [
       {
         labelKey: 'workspace.fileMissing',
@@ -38,6 +38,7 @@ export function generateHistoryFileContextMenu(
         enabled: false,
       },
     ]
+  }
   const enterprise =
     repository.gitHubRepository !== null &&
     repository.gitHubRepository.endpoint !== getDotComAPIEndpoint()

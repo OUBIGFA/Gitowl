@@ -19,8 +19,9 @@ export function planWorkspaceCommitInsertion(
   if (
     commitSHAs.length === 0 ||
     (baseIndex !== null && baseIndex > commitSHAs.length)
-  )
+  ) {
     return null
+  }
   const indexes = selectedSHAs.map(sha => commitSHAs.indexOf(sha)).sort()
   const contiguous = indexes.every(
     (value, i, array) => i === array.length - 1 || value === array[i + 1] - 1
@@ -30,8 +31,9 @@ export function planWorkspaceCommitInsertion(
     ((baseIndex === null && indexes[0] === 0) ||
       baseIndex === indexes[0] - 1 ||
       (baseIndex !== null && indexes.includes(baseIndex)))
-  )
+  ) {
     return null
+  }
   const maxIndex = Math.max(
     ...indexes,
     ...(baseIndex === null ? [] : [baseIndex])

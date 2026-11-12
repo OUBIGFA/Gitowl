@@ -425,7 +425,8 @@ func (a *app) modelCatalogView(c *ui.Context, tx locales.Messages, models []back
 	// measurement; actual rows scroll in the space left by the parameter form.
 	ui.List(c.Key("models"), list, len(models), func(i int) {
 		model := models[i]
-		ui.Row(c).MinHeight(56).FillWidth().MinWidth(0).Padding(4).Gap(8).Children(func() {
+		// The right inset keeps the overlay scrollbar off the status text.
+		ui.Row(c).MinHeight(56).FillWidth().MinWidth(0).Padding(4, 16, 4, 4).Gap(8).Children(func() {
 			enabled := model.Enabled
 			ui.Checkbox(c.Key("enable-model"), &enabled, "").Size(32, 32).Padding(8).Label(tx.EnableModel(model.Name)).
 				Tooltip(model.Name + " · " + model.ID).Disabled(a.configurationLocked() || !model.Available && !model.Enabled).

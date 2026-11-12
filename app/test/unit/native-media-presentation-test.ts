@@ -16,6 +16,9 @@ describe('bounded original image presentation', () => {
     const previous = Object.getOwnPropertyDescriptor(globalThis, 'ImageDecoder')
     const instances: Array<{ closed: boolean; data: Uint8Array }> = []
     class Decoder {
+      public static async isTypeSupported() {
+        return true
+      }
       public closed = false
       public tracks = {
         ready: Promise.resolve(),
@@ -25,9 +28,6 @@ describe('bounded original image presentation', () => {
       public constructor(options: { data: Uint8Array }) {
         this.data = options.data
         instances.push(this)
-      }
-      public static async isTypeSupported() {
-        return true
       }
       public async decode() {
         return {
@@ -57,8 +57,11 @@ describe('bounded original image presentation', () => {
     })
     t.after(() => {
       withMediaProjection(() => null)
-      if (previous) Object.defineProperty(globalThis, 'ImageDecoder', previous)
-      else Reflect.deleteProperty(globalThis, 'ImageDecoder')
+      if (previous) {
+        Object.defineProperty(globalThis, 'ImageDecoder', previous)
+      } else {
+        Reflect.deleteProperty(globalThis, 'ImageDecoder')
+      }
     })
     const owner = {}
     const a = new Image(
