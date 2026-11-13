@@ -336,10 +336,9 @@ func (a *app) workspaceNavigationView(c *ui.Context) {
 	}
 	label := func(key string) string { return workspaceLabel(c.Locale(), "workspace."+key) }
 	if a.tab == historyTab {
-		ui.Row(c.Key("workspace-compare-controls")).FillWidth().Gap(8).Wrap().Margin(0, 0, 12, 0).Children(func() {
-			// Keep the title and comparison entry on one baseline, leaving the
-			// vertical space to the records rather than a second toolbar.
-			ui.Text(c, locales.In(c.Locale()).History()).FontSize(c.Theme().Rem(22.0 / 15)).FontWeight(500).Grow(1).Role(ui.RoleHeading).Level(1)
+		ui.Row(c.Key("workspace-compare-controls")).FillWidth().Gap(8).Wrap().Margin(0, 0, 4, 0).Children(func() {
+			// The tab names the page. Only the comparison actions live here.
+			ui.Spacer(c)
 			anchor := quietButton(c.Key("workspace-compare"), label("compare"), "git-branch").OnClick(func() {
 				a.workspaceCompareOpen = !a.workspaceCompareOpen
 				a.workspaceAction(backend.KernelWorkspaceAction{Type: "compare.list", Value: a.workspaceCompareOpen})
@@ -455,7 +454,7 @@ func (a *app) workspaceHistoryList(c *ui.Context) {
 		sha := selected.HistorySelection[0]
 		a.workspaceHistorySummaries[sha] = backend.KernelHistorySummary{SHA: sha, FileCount: len(selected.HistoryFiles), LinesAdded: selected.HistoryLinesAdded, LinesDeleted: selected.HistoryLinesDeleted}
 	}
-	renderWorkspaceHistoryList(c, &a.nativeWorkspaceState, a.commitsList.list(), w, a.commits, a.coreSnapshot.Selected.HistorySelection, a.historyLoaded && !a.loadingHistory && a.historyErr == nil, a.workspaceAction, func(c *ui.Context) { a.workspaceHistoryReview(c) })
+	renderWorkspaceHistoryList(c, &a.nativeWorkspaceState, a.commitsList.list(), w, selected, a.commits, selected.HistorySelection, a.historyLoaded && !a.loadingHistory && a.historyErr == nil, a.workspaceAction, func(c *ui.Context) { a.workspaceHistoryReview(c) })
 	a.loadVisibleHistorySummaries()
 	if a.workspaceHistorySummaryError != nil {
 		ui.Text(c, a.workspaceHistorySummaryError.Error()).TextColor(c.Theme().Danger)

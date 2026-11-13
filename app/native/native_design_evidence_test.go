@@ -227,7 +227,7 @@ func TestHistoryDayHeadingsKeepSelectionAndStatisticsOnCommits(t *testing.T) {
 	tt := ui.NewTester(func(c *ui.Context) {
 		setWorkspaceTheme(c)
 		ui.Column(c).Fill().Children(func() {
-			renderWorkspaceHistoryList(c, &a.nativeWorkspaceState, a.commitsList.list(), a.coreSnapshot.Workspace, a.commits, selected, true, func(action backend.KernelWorkspaceAction) {
+			renderWorkspaceHistoryList(c, &a.nativeWorkspaceState, a.commitsList.list(), a.coreSnapshot.Workspace, a.coreSnapshot.Selected, a.commits, selected, true, func(action backend.KernelWorkspaceAction) {
 				selected = action.SHAs
 			}, nil)
 			a.loadVisibleHistorySummaries()

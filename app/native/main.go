@@ -9,6 +9,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"github.com/OUBIGFA/Gitowl/app/native/internal/backend"
 	"github.com/OUBIGFA/Gitowl/app/native/locales"
@@ -107,7 +108,7 @@ func run(entry, electron, initialPath, profile string, initialLaunch nativeLaunc
 		})
 		a.setCoreTheme = func(source string) { mygo.Theme.SetSource(mygo.ThemeSource(source)) }
 		a.update, a.setLocale, a.openExternal = win.Update, mygo.App.SetLocale, mygo.Shell.OpenExternal
-		a.localeOverride = mygo.App.LocaleOverride
+		a.localeOverride = mygo.App.ChosenLocale
 		a.settingsWorkArea = func() (float32, float32) {
 			outer, content := win.Bounds(), win.ContentBounds()
 			area := mygo.Screen.DisplayMatching(outer).WorkArea
@@ -179,7 +180,15 @@ func run(entry, electron, initialPath, profile string, initialLaunch nativeLaunc
 			subscribe(a.reportCoreWindowState)
 		}
 		var tray *mygo.Tray
-		showWindow := func() { win.Show(); win.Restore(); win.Focus() }
+		showWindow := func() {
+			// Restore only a minimized window. Repeated tray clicks must keep
+			// the user's maximized state and never resize an already open view.
+			if win.IsMinimized() {
+				win.Restore()
+			}
+			win.Show()
+			win.Focus()
+		}
 		a.showWindow, a.requestQuit = showWindow, mygo.App.Quit
 		trayMenu := func() *mygo.Menu {
 			tx := locales.In(mygo.App.Locale())
@@ -200,13 +209,43 @@ func run(entry, electron, initialPath, profile string, initialLaunch nativeLaunc
 			if tray != nil {
 				return nil
 			}
-			icon, err := loadLogoPNG(resources)
+			icon, err := loadTrayPNG(resources, mygo.Screen.PrimaryDisplay().ScaleFactor)
 			if err != nil {
 				return err
 			}
-			tray, err = mygo.NewTray(mygo.TrayOptions{ID: "io.github.oubigfa.gitowl", Icon: icon, ToolTip: "Gitowl", Menu: trayMenu()})
-			return err
+			tray, err = mygo.NewTray(mygo.TrayOptions{ID: "io.github.oubigfa.gitowl", Icon: icon, ToolTip: "Gitowl"})
+			if err != nil {
+				return err
+			}
+			// MyGo sends each Windows left-button release to OnClick, including
+			// both releases of a double click. Opening is idempotent; no delay or
+			// hide/show toggle is needed. Reserve the menu for a secondary click.
+			tray.OnClick(showWindow)
+			if runtime.GOOS == "linux" {
+				// AppIndicator requires a persistent menu; activation still opens.
+				tray.SetMenu(trayMenu())
+			} else {
+				tray.OnRightClick(func() {
+					tray.SetMenu(trayMenu())
+					defer tray.SetMenu(nil)
+					tray.PopUpMenu()
+				})
+			}
+			return nil
 		}
+		mygo.Screen.OnDisplaysChanged(func() {
+			if tray == nil {
+				return
+			}
+			icon, err := loadTrayPNG(resources, mygo.Screen.PrimaryDisplay().ScaleFactor)
+			if err == nil {
+				err = tray.SetIcon(icon, false)
+			}
+			if err != nil {
+				a.windowPreferenceErr = err
+				win.Invalidate()
+			}
+		})
 		if a.windowPreferences.CloseBehavior == closeWindowToTray {
 			if err := a.prepareTray(true); err != nil {
 				// A failed tray must never leave a hidden, unreachable application.
@@ -254,7 +293,7 @@ func run(entry, electron, initialPath, profile string, initialLaunch nativeLaunc
 		mygo.App.OnLocaleChanged(func(string) {
 			win.SetTitle(locales.AppName())
 			a.syncMenu()
-			if tray != nil {
+			if tray != nil && runtime.GOOS == "linux" {
 				tray.SetMenu(trayMenu())
 			}
 		})

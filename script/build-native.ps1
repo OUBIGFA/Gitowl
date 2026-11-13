@@ -51,16 +51,21 @@ try {
     if ($untracked) { throw 'Stage or ignore the remaining source files before packaging' }
     $sourceTree = (& git write-tree).Trim()
     Check-Exit 'Read staged source tree'
-    & python tools/check_repo.py
-    Check-Exit 'Repository boundaries'
-    & python -m unittest discover -s tests/repository -v
-    Check-Exit 'Repository tests'
-    & npm.cmd run check:features
-    Check-Exit 'Upstream feature declarations'
-    & npm.cmd run test:kernel
-    Check-Exit 'Original Desktop Electron kernel and native presentation tests'
-    & python tools/record_native_dependencies.py --check
-    Check-Exit 'Native dependency receipts'
+    # A fixed build already validated source-bound receipts for these exact
+    # checks on this staged tree; repeating them only adds time. A preview has
+    # no receipt and still runs them here.
+    if ($Preview) {
+        & python tools/check_repo.py
+        Check-Exit 'Repository boundaries'
+        & python -m unittest discover -s tests/repository -v
+        Check-Exit 'Repository tests'
+        & npm.cmd run check:features
+        Check-Exit 'Upstream feature declarations'
+        & npm.cmd run test:kernel
+        Check-Exit 'Original Desktop Electron kernel and native presentation tests'
+        & python tools/record_native_dependencies.py --check
+        Check-Exit 'Native dependency receipts'
+    }
     $patchedMod = (& python tools/prepare_mygo.py).Trim()
     Check-Exit 'Prepare verified MyGo patch'
     $previousGoFlags = $env:GOFLAGS
@@ -74,13 +79,15 @@ try {
         & npm.cmd run prepare:native-runtime
         Check-Exit 'Prepare checked runtime and licenses'
         $env:GITOWL_RUNTIME_SMOKE = Join-Path $root 'output/native-runtime/desktop-kernel'
-        Push-Location app/native
-        try {
-            & go test ./...
-            Check-Exit 'Native UI and transport tests'
-            & go test github.com/egoist/mygo/cmd/mygo -run 'Test(GitowlInstallerProcessMessages|GitowlInstallerRemoval|NSISCloseApp|NSISLanguage|NSISSourceLanguage|NSISHooks)$' -count=1
-            Check-Exit 'Installer language regression tests'
-        } finally { Pop-Location }
+        if ($Preview) {
+            Push-Location app/native
+            try {
+                & go test ./...
+                Check-Exit 'Native UI and transport tests'
+                & go test github.com/egoist/mygo/cmd/mygo -run 'Test(GitowlInstallerProcessMessages|GitowlInstallerRemoval|NSISCloseApp|NSISLanguage|NSISSourceLanguage|NSISHooks)$' -count=1
+                Check-Exit 'Installer language regression tests'
+            } finally { Pop-Location }
+        }
         $package = Join-Path $root "_temp/native-packages/$BuildNumber"
         if (Test-Path $package) { throw 'Choose a new internal build number; package directories are immutable' }
         # Preparation/tests may not silently replace the accepted runtime. Check

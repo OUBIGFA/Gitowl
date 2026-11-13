@@ -30,7 +30,10 @@ class NativeAcceptanceEntryTests(unittest.TestCase):
             root = Path(directory)
             result = self.run_entry(root)
             self.assertNotEqual(result.returncode, 0)
-            self.assertIn(b'complete Desktop kernel presentation parity', result.stderr)
+            self.assertIn(
+                b'complete Desktop kernel presentation parity',
+                result.stderr.replace(b'\r\n', b''),
+            )
             self.assertFalse((root / 'output').exists())
             self.assertFalse((root / '_temp').exists())
 

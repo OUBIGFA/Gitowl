@@ -141,7 +141,11 @@ def collect():
             used[module['Path']] = module
     for module in used.values():
         name, version = module['Path'], module['Version']
-        source = cache / (name + '@' + version)
+        # Go escapes uppercase module-path letters (ProtonMail ->
+        # !proton!mail); use the same canonical cache names as acceptance.
+        escaped = ''.join('!' + char.lower() if 'A' <= char <= 'Z' else char
+                          for char in name + '@' + version)
+        source = cache / escaped
         licenses = []
         for file in sorted(source.iterdir()):
             if file.is_file() and file.name.upper().split('.')[0] in ('LICENSE', 'LICENCE', 'COPYING', 'NOTICE', 'PATENTS'):

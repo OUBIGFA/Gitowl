@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import struct
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -22,7 +23,10 @@ class NativePackagingTests(unittest.TestCase):
             cwd=ROOT, capture_output=True,
         )
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn(b'complete Desktop kernel presentation parity', result.stderr)
+        self.assertIn(
+            b'complete Desktop kernel presentation parity',
+            result.stderr.replace(b'\r\n', b''),
+        )
         self.assertEqual(installer.read_bytes() if installer.is_file() else None, before)
 
     def test_preview_cannot_package_the_retired_research_runtime(self):
@@ -143,6 +147,26 @@ class NativePackagingTests(unittest.TestCase):
         research = json.loads((ROOT / 'third_party/research-sources.json').read_text(encoding='utf-8'))
         logo = research['product_logo']
         self.assertEqual(hashlib.sha256((ROOT / logo['tracked_source']).read_bytes()).hexdigest(), logo['sha256'])
+
+    def test_brand_icon_sizes_and_package_resources(self):
+        manifest = json.loads((ROOT / 'references/native-brand-icons.json').read_text(encoding='utf-8'))
+        self.assertEqual(hashlib.sha256((ROOT / manifest['source']).read_bytes()).hexdigest(), manifest['sourceSha256'])
+        sizes = set()
+        for asset in manifest['assets']:
+            data = (ROOT / asset['path']).read_bytes()
+            self.assertEqual(hashlib.sha256(data).hexdigest(), asset['sha256'])
+            if asset['path'].endswith('.png'):
+                self.assertEqual(data[:8], b'\x89PNG\r\n\x1a\n')
+                self.assertEqual(struct.unpack('>II', data[16:24]), (asset['size'], asset['size']))
+                sizes.add(asset['size'])
+            else:
+                reserved, kind, count = struct.unpack('<HHH', data[:6])
+                self.assertEqual((reserved, kind), (0, 1))
+                ico_sizes = {data[6 + 16 * i] or 256 for i in range(count)}
+        self.assertEqual(sizes, {16, 20, 24, 28, 32, 40, 48, 64, 96, 128, 192, 256, 512, 1024})
+        self.assertEqual(ico_sizes, {size for size in sizes if size <= 256})
+        config = json.loads((ROOT / 'app/native/mygo.json').read_text(encoding='utf-8'))
+        self.assertIn('../static/logos/gitowl/icons', config['resources'])
 
 
 if __name__ == '__main__':

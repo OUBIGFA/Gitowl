@@ -199,8 +199,8 @@ func TestNativeOpenStatusAndPatch(t *testing.T) {
 	if r.id != 1 || r.path != "first.txt" || r.commit != "" {
 		t.Fatalf("working-tree diff request: %+v", r)
 	}
-	if !h.tt.HasText("example") || !h.tt.HasText("Current changes") || !h.tt.HasText("1 changed file") || h.tt.HasText("@@ -7,2 +7,2 @@") {
-		t.Fatalf("overview did not lead with the real changes: %q", h.tt.Texts())
+	if !h.tt.HasText("example") || !h.tt.HasText("Changes") || !h.tt.HasText("Changed files") || h.tt.HasText("Current changes") || h.tt.HasText("1 changed file") || h.tt.HasText("@@ -7,2 +7,2 @@") {
+		t.Fatalf("overview did not keep the page hierarchy compact: %q", h.tt.Texts())
 	}
 	h.click(t, "Branch details")
 	if !h.tt.HasText("Branch: main") {

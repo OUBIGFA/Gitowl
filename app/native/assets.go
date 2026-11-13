@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 
@@ -21,11 +22,32 @@ func loadLogo(resources string) (ui.ImageSource, error) {
 }
 
 func loadLogoPNG(resources string) ([]byte, error) {
-	paths := []string{filepath.Join(resources, "logo.png")}
+	return loadBrandPNG(resources, "logo.png")
+}
+
+// The Windows notification area uses 16 DIPs, independently of the main
+// window's size/monitor. Pick its prefiltered pixel size at the taskbar's
+// scale instead of asking the shell to shrink the 992-pixel original.
+func trayIconSize(scale float64) int {
+	wanted := int(math.Round(16 * scale))
+	for _, size := range []int{16, 20, 24, 28, 32, 40, 48, 64, 96, 128, 192, 256} {
+		if size >= wanted {
+			return size
+		}
+	}
+	return 256
+}
+
+func loadTrayPNG(resources string, scale float64) ([]byte, error) {
+	return loadBrandPNG(resources, filepath.Join("icons", fmt.Sprintf("%d.png", trayIconSize(scale))))
+}
+
+func loadBrandPNG(resources, name string) ([]byte, error) {
+	paths := []string{filepath.Join(resources, name)}
 	if mygo.IsDev() {
 		paths = append(paths,
-			filepath.Join("..", "static", "logos", "gitowl", "logo.png"),
-			filepath.Join("app", "static", "logos", "gitowl", "logo.png"))
+			filepath.Join("..", "static", "logos", "gitowl", name),
+			filepath.Join("app", "static", "logos", "gitowl", name))
 	}
 	var missing error
 	for _, path := range paths {

@@ -1,4 +1,4 @@
-import { spawn } from 'child_process'
+import { execFileSync, spawn } from 'child_process'
 import { join, resolve } from 'path'
 import { readdir, readFile, stat } from 'fs/promises'
 import { parseEnv } from 'util'
@@ -39,10 +39,55 @@ if (!switchArgs.some(a => a.startsWith('--test-timeout'))) {
 }
 
 const projectRoot = join(import.meta.dirname, '..')
-const files =
+let files =
   fileArgs.length > 0
     ? await findTestFilesIn(fileArgs)
     : await findTestFilesIn([join(projectRoot, 'app', 'test', 'unit')])
+
+// The upstream assisted-commit suites drive real repositories and remotes for
+// about 90% of a full unit run. Run them when the current change set (against
+// the last delivered origin/main) touches the code they exercise, or when
+// GITOWL_UNIT_ALL=1. Any doubt about the change set runs them.
+const assistedTest = /[\\/]assisted-commit[^\\/]*-test\.tsx?$/
+const assistedSources = [
+  'app/src/lib/assisted-commit/',
+  'app/src/lib/git/',
+  'app/src/lib/stores/',
+  'app/src/lib/copilot',
+  'app/src/models/',
+  'app/test/helpers/',
+  'package-lock.json',
+  'app/package.json',
+  'app/package-lock.json',
+]
+function changedPaths() {
+  const run = args =>
+    execFileSync('git', args, { cwd: projectRoot, encoding: 'utf8' })
+      .split('\n')
+      .filter(Boolean)
+  return [
+    ...run(['diff', '--name-only', 'origin/main']),
+    ...run(['ls-files', '--others', '--exclude-standard']),
+  ]
+}
+if (fileArgs.length === 0 && process.env.GITOWL_UNIT_ALL !== '1') {
+  let changed = null
+  try {
+    changed = changedPaths()
+  } catch {}
+  const relevant =
+    changed === null ||
+    changed.some(
+      p => assistedTest.test(p) || assistedSources.some(s => p.startsWith(s))
+    )
+  if (!relevant) {
+    const skipped = files.filter(f => assistedTest.test(f))
+    files = files.filter(f => !assistedTest.test(f))
+    console.log(
+      `Skipping ${skipped.length} upstream assisted-commit test files: no change to the code they exercise (set GITOWL_UNIT_ALL=1 to run them).`
+    )
+  }
+}
 
 // I would _looooove_ to use the `--env-file` option, but it doesn't override
 // existing environment variables and we need to override some of them.

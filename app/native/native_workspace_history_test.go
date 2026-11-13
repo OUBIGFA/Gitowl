@@ -94,7 +94,7 @@ func TestHistorySelectionUsesASubtleSurface(t *testing.T) {
 		tt := ui.NewTester(func(c *ui.Context) {
 			setWorkspaceTheme(c)
 			ui.Column(c).Fill().Padding(24).Children(func() {
-				renderWorkspaceHistoryList(c, state, list, workspace, []backend.Commit{{SHA: "a", Summary: "Selected commit"}}, []string{"a"}, true, func(backend.KernelWorkspaceAction) {}, nil)
+				renderWorkspaceHistoryList(c, state, list, workspace, nil, []backend.Commit{{SHA: "a", Summary: "Selected commit"}}, []string{"a"}, true, func(backend.KernelWorkspaceAction) {}, nil)
 			})
 		}, 900, 620)
 		tt.SetDark(dark)
@@ -215,7 +215,7 @@ func TestWorkspaceHistoryPointerAndKeyboardUpdateTheSameSelection(t *testing.T) 
 	tt := ui.NewTester(func(c *ui.Context) {
 		setWorkspaceTheme(c)
 		ui.Column(c).Fill().Children(func() {
-			renderWorkspaceHistoryList(c, state, list, workspace, commits, selected, true, func(action backend.KernelWorkspaceAction) {
+			renderWorkspaceHistoryList(c, state, list, workspace, nil, commits, selected, true, func(action backend.KernelWorkspaceAction) {
 				if action.Type != "history.select" {
 					t.Fatalf("unexpected navigation command: %+v", action)
 				}
@@ -273,7 +273,7 @@ func TestHistoryRecordTitleSelectsWithSelectableDescription(t *testing.T) {
 	tt := ui.NewTester(func(c *ui.Context) {
 		setWorkspaceTheme(c)
 		ui.Column(c).Fill().Children(func() {
-			renderWorkspaceHistoryList(c, state, list, workspace, commits, selected, true, func(action backend.KernelWorkspaceAction) {
+			renderWorkspaceHistoryList(c, state, list, workspace, nil, commits, selected, true, func(action backend.KernelWorkspaceAction) {
 				if action.Type != "history.select" {
 					t.Fatalf("unexpected history action: %+v", action)
 				}
@@ -282,8 +282,8 @@ func TestHistoryRecordTitleSelectsWithSelectableDescription(t *testing.T) {
 		})
 	}, 900, 620)
 	tt.Advance(time.Second)
-	// Unselected, the description reads as one line.
-	if !tt.HasText(strings.ReplaceAll(body, "\n", " ")) {
+	// A compact preview retains the complete accessible description.
+	if !tt.HasText(body) {
 		t.Fatal("the actual history description is missing")
 	}
 	clickHistoryRecordTitle(t, tt, commits[0].Summary, 0)
@@ -293,5 +293,85 @@ func TestHistoryRecordTitleSelectsWithSelectableDescription(t *testing.T) {
 	clickHistoryRecordTitle(t, tt, commits[1].Summary, ui.Cmd)
 	if !slices.Equal(selected, []string{"a", "b"}) {
 		t.Fatalf("modifier title click did not preserve the first record: %v", selected)
+	}
+}
+
+// Selecting a record is a history operation, not consent to expand a long
+// description. Expansion is a separate, keyboard-accessible control.
+func TestHistoryDescriptionExpandsOnlyWhenRequested(t *testing.T) {
+	for _, locale := range []string{"en", "zh-Hans", "zh-Hant"} {
+		t.Run(locale, func(t *testing.T) {
+			a := designEvidenceApp(t, time.Now(), "history")
+			a.commits[0].Body = strings.Repeat("Keep each change with its author and its files.\n", 16)
+			a.coreSnapshot.Selected.History = a.commits
+			tt := ui.NewTester(func(c *ui.Context) {
+				setWorkspaceTheme(c)
+				ui.Column(c).Width(620).FillHeight().Padding(24).Children(func() { a.workspaceHistoryPage(c) })
+			}, 900, 620)
+			tt.SetLocale(locale)
+			tt.Advance(time.Second)
+			before, ok := tt.AccessByRole(ui.RoleListItem, a.commits[0].Summary)
+			if !ok {
+				t.Fatal("history record missing")
+			}
+			a.coreSnapshot.Selected.HistorySelection = []string{a.commits[0].SHA}
+			tt.Frame()
+			after, _ := tt.AccessByRole(ui.RoleListItem, a.commits[0].Summary)
+			if after.Bounds.H != before.Bounds.H {
+				t.Fatalf("selection expanded the description: before=%v after=%v", before.Bounds, after.Bounds)
+			}
+			expand := workspaceLabel(locale, "workspace.historyShowDescription")
+			if err := tt.Click(expand); err != nil {
+				t.Fatal(err)
+			}
+			tt.Frame()
+			expanded, _ := tt.AccessByRole(ui.RoleListItem, a.commits[0].Summary)
+			if expanded.Bounds.H <= after.Bounds.H || !tt.HasText(strings.TrimSpace(a.commits[0].Body)) {
+				t.Fatal("explicit expansion did not expose the full description")
+			}
+			// The collapse control remains at the start of the description,
+			// reachable even when the full text is taller than the viewport.
+			if err := tt.Click(workspaceLabel(locale, "workspace.historyHideDescription")); err != nil {
+				t.Fatal(err)
+			}
+			tt.Frame()
+			collapsed, _ := tt.AccessByRole(ui.RoleListItem, a.commits[0].Summary)
+			if collapsed.Bounds.H != before.Bounds.H {
+				t.Fatal("collapsing the description did not restore its compact record")
+			}
+		})
+	}
+}
+
+func TestHistorySyncLabelsDescribeReachabilityWithoutInventingPushOrPullEvents(t *testing.T) {
+	for _, scenario := range []struct {
+		name, mode, ref, label string
+		remote, local          bool
+	}{
+		{"unpushed", "history", "", "workspace.historyPendingPush", true, true},
+		{"on remote", "history", "", "workspace.historyOnRemote", true, false},
+		{"no remote", "history", "", "workspace.historyLocalOnly", false, true},
+		{"upstream behind", "behind", "origin/main", "workspace.historyPendingPull", true, false},
+		{"local branch comparison", "behind", "feature", "workspace.historyComparison", true, false},
+		{"other remote comparison", "behind", "upstream/main", "workspace.historyComparison", true, false},
+	} {
+		t.Run(scenario.name, func(t *testing.T) {
+			a := designEvidenceApp(t, time.Now(), "history")
+			a.commits = a.commits[:1]
+			a.coreSnapshot.Selected.HasRemote = scenario.remote
+			w := a.coreSnapshot.Workspace
+			w.LocalCommitSHAs = nil
+			if scenario.local {
+				w.LocalCommitSHAs = []string{a.commits[0].SHA}
+			}
+			w.Compare.Mode, w.Compare.Ref = scenario.mode, &scenario.ref
+			tt := designEvidenceTester(a, 900, 620, "zh-Hans", false)
+			label := workspaceLabel("zh-Hans", scenario.label)
+			tag := visibleControl(t, tt, label, 900, 620)
+			row, _ := tt.AccessByRole(ui.RoleListItem, a.commits[0].Summary)
+			if tag.Y < row.Bounds.Y || tag.Y+tag.H > row.Bounds.Y+row.Bounds.H {
+				t.Fatal("sync state is detached from the commit it describes")
+			}
+		})
 	}
 }

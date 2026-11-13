@@ -5,6 +5,7 @@
   "icon": "../static/logos/gitowl/logo.png",
   "resources": [
     "../static/logos/gitowl/logo.png",
+    "../static/logos/gitowl/icons",
     "../../output/native-runtime/desktop-kernel",
     "../../output/native-runtime/build-info.json"
   ],

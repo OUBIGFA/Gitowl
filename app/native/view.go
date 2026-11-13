@@ -272,13 +272,7 @@ func (a *app) noProject(c *ui.Context, tx locales.Messages) {
 }
 
 func (a *app) changesOverview(c *ui.Context, tx locales.Messages, colors workspaceColors) {
-	// The tab already shows the count; with saving available the selection
-	// row says how many of these files the version includes.
-	count := ""
-	if a.status != nil && !a.commitCapable {
-		count = tx.FileCount(len(a.status.Files))
-	}
-	taskTitle(c, tx.CurrentChanges(), count)
+	// The selected tab already names this page and shows its file count.
 	a.workspaceNavigationView(c)
 	if a.statusErr != nil {
 		showError(c, tx.FailedStatus(a.statusErr.Error()))
@@ -389,7 +383,6 @@ func (a *app) historyPage(c *ui.Context, tx locales.Messages) {
 		}
 		return
 	}
-	taskTitle(c, tx.History(), "")
 	a.workspaceNavigationView(c)
 	if a.loadingHistory {
 		ui.Text(c, tx.LoadingHistory()).TextColor(c.Theme().TextMuted).Margin(0, 0, 12, 0).Role(ui.RoleStatus)

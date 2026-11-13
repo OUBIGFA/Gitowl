@@ -29,6 +29,11 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 			caption = tx.SavingVersion()
 		} else if a.generating {
 			caption = tx.GeneratingMessage()
+		} else if vm != nil && vm.RulesPending {
+			// Every kernel refresh may check rules again. Reuse the existing
+			// single-line status slot so this transient state cannot resize the
+			// composer and displace the file viewport on return or tray restore.
+			caption = nativeDialogLabel(c.Locale(), "commit.checkingRules")
 		} else if a.generationNotice == generationStopped {
 			caption = tx.GenerationStopped()
 		} else if a.generationNotice == generationChanged {

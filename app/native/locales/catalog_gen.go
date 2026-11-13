@@ -14806,6 +14806,86 @@ func (msgs Messages) DialogLabel6770c11a155d43d5() string {
 	return Catalog.Format(msgs.locale, "dialogLabel_6770c11a155d43d5", nil)
 }
 
+// DialogLabel4bfa85f8a76d25f3 says "Expand"
+// in the language the app shows.
+func DialogLabel4bfa85f8a76d25f3() string { return In(i18n.Locale()).DialogLabel4bfa85f8a76d25f3() }
+
+// DialogLabel4bfa85f8a76d25f3 says "Expand"
+// in the language of msgs.
+func (msgs Messages) DialogLabel4bfa85f8a76d25f3() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_4bfa85f8a76d25f3", nil)
+}
+
+// DialogLabelA0b0b863cbd963e5 says "Collapse"
+// in the language the app shows.
+func DialogLabelA0b0b863cbd963e5() string { return In(i18n.Locale()).DialogLabelA0b0b863cbd963e5() }
+
+// DialogLabelA0b0b863cbd963e5 says "Collapse"
+// in the language of msgs.
+func (msgs Messages) DialogLabelA0b0b863cbd963e5() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_a0b0b863cbd963e5", nil)
+}
+
+// DialogLabelD4be4ac675c60cce says "Local · not pushed"
+// in the language the app shows.
+func DialogLabelD4be4ac675c60cce() string { return In(i18n.Locale()).DialogLabelD4be4ac675c60cce() }
+
+// DialogLabelD4be4ac675c60cce says "Local · not pushed"
+// in the language of msgs.
+func (msgs Messages) DialogLabelD4be4ac675c60cce() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_d4be4ac675c60cce", nil)
+}
+
+// DialogLabelB287f872d3244f1c says "Remote · not pulled"
+// in the language the app shows.
+func DialogLabelB287f872d3244f1c() string { return In(i18n.Locale()).DialogLabelB287f872d3244f1c() }
+
+// DialogLabelB287f872d3244f1c says "Remote · not pulled"
+// in the language of msgs.
+func (msgs Messages) DialogLabelB287f872d3244f1c() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_b287f872d3244f1c", nil)
+}
+
+// DialogLabel1df5311102802dab says "On remote"
+// in the language the app shows.
+func DialogLabel1df5311102802dab() string { return In(i18n.Locale()).DialogLabel1df5311102802dab() }
+
+// DialogLabel1df5311102802dab says "On remote"
+// in the language of msgs.
+func (msgs Messages) DialogLabel1df5311102802dab() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_1df5311102802dab", nil)
+}
+
+// DialogLabel43b19563707e87b2 says "Local only"
+// in the language the app shows.
+func DialogLabel43b19563707e87b2() string { return In(i18n.Locale()).DialogLabel43b19563707e87b2() }
+
+// DialogLabel43b19563707e87b2 says "Local only"
+// in the language of msgs.
+func (msgs Messages) DialogLabel43b19563707e87b2() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_43b19563707e87b2", nil)
+}
+
+// DialogLabel4f50226c6d0ea55b says "Compared branch"
+// in the language the app shows.
+func DialogLabel4f50226c6d0ea55b() string { return In(i18n.Locale()).DialogLabel4f50226c6d0ea55b() }
+
+// DialogLabel4f50226c6d0ea55b says "Compared branch"
+// in the language of msgs.
+func (msgs Messages) DialogLabel4f50226c6d0ea55b() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_4f50226c6d0ea55b", nil)
+}
+
+// DialogLabel591ce86b4d0ab5aa says "Changed files in: '{'0'}'"
+// in the language the app shows.
+func DialogLabel591ce86b4d0ab5aa() string { return In(i18n.Locale()).DialogLabel591ce86b4d0ab5aa() }
+
+// DialogLabel591ce86b4d0ab5aa says "Changed files in: '{'0'}'"
+// in the language of msgs.
+func (msgs Messages) DialogLabel591ce86b4d0ab5aa() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_591ce86b4d0ab5aa", nil)
+}
+
 // DialogLabel7923f8b33fc58e4a says "Show branch history"
 // in the language the app shows.
 func DialogLabel7923f8b33fc58e4a() string { return In(i18n.Locale()).DialogLabel7923f8b33fc58e4a() }

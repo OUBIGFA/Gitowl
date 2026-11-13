@@ -64,6 +64,9 @@ describe(
   () => {
     let runtime: AppRuntime
     const directories: string[] = []
+    // Teardown leases and deletes the fixtures; a background refresh that is
+    // still running then fails by design. Those are not test outcomes.
+    let tearingDown = false
 
     before(async () => {
       localStorage.clear()
@@ -79,7 +82,9 @@ describe(
       // Same original error subscription as native-kernel/renderer.ts. Without
       // it, AppStore failures have no presentation host to request recovery.
       runtime.appStore.onDidError(error => {
-        void runtime.dispatcher.postError(error)
+        if (!tearingDown) {
+          void runtime.dispatcher.postError(error)
+        }
       })
       await mkdir(root, { recursive: true })
     })
@@ -95,6 +100,7 @@ describe(
     })
 
     after(async () => {
+      tearingDown = true
       await runtime.appStore._selectRepository(null)
       const repositories = runtime.appStore
         .getState()

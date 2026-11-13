@@ -15,13 +15,11 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
-// historyRow is one list row: a day heading (commit < 0) or a commit. first
-// and last place a commit in its day, where the timeline starts and ends.
+// historyRow is one list row: a day heading (commit < 0) or a commit.
 type historyRow struct {
-	commit      int
-	day         string
-	date        time.Time
-	first, last bool
+	commit int
+	day    string
+	date   time.Time
 }
 
 // Commits arrive newest first. A heading starts each local calendar day, so
@@ -31,21 +29,14 @@ func historyRows(commits []backend.Commit) []historyRow {
 	rows := make([]historyRow, 0, len(commits)+8)
 	day := ""
 	for i, commit := range commits {
-		heading := i == 0
 		if parsed, err := time.Parse(time.RFC3339, commit.Date); err == nil {
 			local := parsed.Local()
 			if key := local.Format("2006-01-02"); key != day {
-				day, heading = key, true
+				day = key
 				rows = append(rows, historyRow{commit: -1, day: key, date: local})
 			}
 		}
-		if heading && len(rows) > 1 && rows[len(rows)-2].commit >= 0 {
-			rows[len(rows)-2].last = true
-		}
-		rows = append(rows, historyRow{commit: i, first: heading})
-	}
-	if len(rows) > 0 {
-		rows[len(rows)-1].last = true
+		rows = append(rows, historyRow{commit: i})
 	}
 	return rows
 }
@@ -102,7 +93,7 @@ func authorAvatar(c *ui.Context, name string) ui.Element {
 	for index := 0; index < len(name); index++ {
 		hue = (hue ^ uint32(name[index])) * 16777619
 	}
-	return ui.Avatar(c, name, nil).Size(28, 28).Shrink(0).Background(ui.Oklch(0.6, 0.06, float32(hue%360)))
+	return ui.Avatar(c, name, nil).Size(24, 24).Shrink(0).Background(ui.Oklch(0.6, 0.06, float32(hue%360)))
 }
 
 // A tag is a release landmark: a quiet pill beside the summary. A tag the
@@ -120,14 +111,32 @@ func historyTag(c *ui.Context, tx locales.Messages, tag string, unpushed bool, a
 	})
 }
 
-// Each record sits on a timeline of its day: the author's avatar on a thin
-// line, the summary beside it. Who and when follow on the second line with
-// the change size, file scope and SHA at its end; a commit not yet pushed says
-// so there. The description is one quiet line until its record is selected.
-// File names expand only from the file count; selecting a row is reserved for
-// history operations. MyGo owns the same Ctrl/Shift/arrow selection and
-// original context menus.
-func renderWorkspaceHistoryList(c *ui.Context, state *nativeWorkspaceState, listState *ui.ListState, workspace *backend.KernelWorkspace, commits []backend.Commit, shas []string, showEmpty bool, send func(backend.KernelWorkspaceAction), selectedContent func(*ui.Context)) {
+// Git remembers authors and reachability, not who clicked Push or Pull.
+// Labels therefore describe the original store's current sync facts. A
+// comparison against another local branch must never read as a remote pull.
+func historySync(workspace *backend.KernelWorkspace, selected *backend.KernelSelected, sha string) (key, icon string) {
+	if selected == nil {
+		return "", ""
+	}
+	if workspace.Compare.Mode == "behind" {
+		if selected.Upstream != nil && workspace.Compare.Ref != nil && *selected.Upstream == *workspace.Compare.Ref {
+			return "workspace.historyPendingPull", "arrow-down"
+		}
+		return "workspace.historyComparison", "git-branch"
+	}
+	if !selected.HasRemote {
+		return "workspace.historyLocalOnly", "history"
+	}
+	if slices.Contains(workspace.LocalCommitSHAs, sha) {
+		return "workspace.historyPendingPush", "arrow-up"
+	}
+	return "workspace.historyOnRemote", "check"
+}
+
+// One surface owns the title, author, description and changed files of a
+// commit. Selection keeps its size; only the explicit description/file
+// controls expand it. MyGo retains Ctrl/Shift/arrow selection and menus.
+func renderWorkspaceHistoryList(c *ui.Context, state *nativeWorkspaceState, listState *ui.ListState, workspace *backend.KernelWorkspace, selected *backend.KernelSelected, commits []backend.Commit, shas []string, showEmpty bool, send func(backend.KernelWorkspaceAction), selectedContent func(*ui.Context)) {
 	identity := workspace.Repository.Path + strings.Join(shas, "/")
 	if state.workspaceHistoryIdentity != identity {
 		state.workspaceHistorySelection.Clear()
@@ -186,62 +195,72 @@ func renderWorkspaceHistoryList(c *ui.Context, state *nativeWorkspaceState, list
 	c.SetTheme(&listTheme)
 	defer c.SetTheme(baseTheme)
 	small := c.Theme().Rem(14.0 / 15)
-	timeline := baseTheme.Background.Mix(baseTheme.Text, 0.14)
 	list := ui.List(c.Key("workspace-history-list"), listState, len(rows), func(i int) {
 		if rows[i].commit < 0 {
 			// The pinned heading needs the canvas color, or records show through.
-			ui.Row(c.Key("day:"+rows[i].day)).FillWidth().Padding(14, 16, 6, 12).Gap(12).AlignItems(ui.Center).Background(baseTheme.Background).Children(func() {
+			ui.Row(c.Key("day:"+rows[i].day)).FillWidth().Padding(12, 4, 2, 4).Gap(12).AlignItems(ui.Center).Background(baseTheme.Background).Children(func() {
 				ui.Text(c, historyDayLabel(c, rows[i].date)).FontSize(small).FontWeight(500).TextColor(baseTheme.Text).NoWrap().Role(ui.RoleHeading).Level(2)
-				ui.Box(c).Grow(1).Height(1).Background(baseTheme.Background.Mix(baseTheme.Text, 0.1))
 			})
 			return
 		}
-		position := rows[i]
-		commit := commits[position.commit]
+		commit := commits[rows[i].commit]
 		chosen := slices.Contains(shas, commit.SHA)
-		local := slices.Contains(workspace.LocalCommitSHAs, commit.SHA)
-		row := ui.Row(c.Key(commit.SHA)).FillWidth().Padding(0, 16, 0, 12).Gap(12).AlignItems(ui.Stretch).Label(commit.Summary)
+		surface, border := baseTheme.Surface, baseTheme.Background.Mix(baseTheme.Text, 0.14)
+		if chosen {
+			surface, border = baseTheme.Surface.Mix(baseTheme.Text, 0.045), baseTheme.Focus
+		}
+		if c.Preferences().HighContrast {
+			surface, border = baseTheme.Background, baseTheme.Text
+			if chosen {
+				border = baseTheme.Focus
+			}
+		}
+		row := ui.Column(c.Key(commit.SHA)).FillWidth().Padding(14, 16, 10, 16).Gap(10).Background(surface).Border(1, border).Radius(8).Label(commit.Summary)
 		row.Children(func() {
-			// The day's timeline: segments above and below the avatar join
-			// the records of one day and stop at its first and last.
-			ui.Column(c.Key("timeline")).Width(28).Shrink(0).AlignItems(ui.Center).Children(func() {
-				segment := func(key string, visible bool) ui.Element {
-					line := ui.Box(c.Key(key)).Width(2).Radius(1)
-					if visible {
-						line.Background(timeline)
-					}
-					return line
-				}
-				segment("above", !position.first).Height(12).Shrink(0)
+			ui.Text(c.Key("title"), commit.Summary).FillWidth().MinWidth(0).MaxLines(2).FontSize(c.Theme().Rem(17.0 / 15)).FontWeight(600).TextColor(baseTheme.Text).Tooltip(commit.Summary)
+			ui.Row(c.Key("author")).FillWidth().MinWidth(0).Gap(8).AlignItems(ui.Center).Children(func() {
 				authorAvatar(c, commit.AuthorName)
-				segment("below", !position.last).Grow(1).MinHeight(4)
+				ui.Text(c, commit.AuthorName).SingleLine().Grow(1).MinWidth(0).FontSize(small).TextColor(baseTheme.Text).Tooltip(commit.AuthorName + " <" + commit.AuthorEmail + ">")
+				when, full := historyTimeLabel(c, commit)
+				ui.Text(c, when).NoWrap().Shrink(0).FontSize(small).FontFeatures("tnum").TextColor(baseTheme.TextMuted).Tooltip(full)
+				if key, icon := historySync(workspace, selected, commit.SHA); key != "" {
+					color := baseTheme.TextMuted
+					if key == "workspace.historyPendingPush" || key == "workspace.historyPendingPull" {
+						color = baseTheme.Accent
+					}
+					label := workspaceLabel(locale, key)
+					ui.Row(c.Key("sync")).Shrink(0).Padding(3, 8).Gap(4).Radius(4).Background(color.Alpha(0.08)).AlignItems(ui.Center).Label(label).Children(func() {
+						ui.Icon(c, icons[icon]).FontSize(14).TextColor(color)
+						ui.Text(c, label).FontSize(small).TextColor(color).NoWrap()
+					})
+				}
 			})
-			ui.Column(c.Key("record")).Grow(1).MinWidth(0).Gap(2).Padding(10, 0, 12, 0).Children(func() {
-				ui.Row(c.Key("title")).FillWidth().MinWidth(0).MinHeight(24).Gap(8).AlignItems(ui.Center).Children(func() {
-					ui.Text(c, commit.Summary).SingleLine().Grow(1).MinWidth(0).FontSize(c.Theme().Rem(16.0 / 15)).FontWeight(500).Tooltip(commit.Summary)
-					if len(commit.Tags) > 0 {
-						ui.Row(c.Key("tags")).Shrink(0).Gap(6).Label(tx.CommitTags(strings.Join(commit.Tags, ", "))).Children(func() {
-							for index, tag := range commit.Tags {
-								if index == 2 && len(commit.Tags) > 3 {
-									ui.Badge(c, fmt.Sprintf("+%d", len(commit.Tags)-2)).Tooltip(strings.Join(commit.Tags[2:], ", "))
-									break
-								}
-								historyTag(c, tx, tag, slices.Contains(workspace.TagsToPush, tag), baseTheme.Accent)
-							}
-						})
+			if body := strings.TrimSpace(commit.Body); body != "" {
+				identity := workspace.Repository.Path + ":" + commit.SHA
+				expanded := state.workspaceHistoryDescription == identity
+				key, icon := "workspace.historyShowDescription", "chevron-right"
+				if expanded {
+					key, icon = "workspace.historyHideDescription", "chevron-down"
+				}
+				ui.Row(c.Key("description")).FillWidth().Gap(8).AlignItems(ui.Start).Children(func() {
+					text := ui.Text(c.Key("body"), body).Grow(1).MinWidth(0).FontSize(small).TextColor(baseTheme.TextMuted).Selectable()
+					if !expanded {
+						text.MaxLines(2)
 					}
+					quietButton(c.Key("description-toggle"), workspaceLabel(locale, key), icon).Shrink(0).MinHeight(26).FontSize(small).Expanded(expanded).OnClick(func() {
+						if expanded {
+							state.workspaceHistoryDescription = ""
+						} else {
+							state.workspaceHistoryDescription = identity
+						}
+					})
 				})
-				ui.Row(c.Key("metadata")).FillWidth().MinWidth(0).MinHeight(28).Gap(8).AlignItems(ui.Center).Children(func() {
-					when, full := historyTimeLabel(c, commit)
-					ui.Text(c, commit.AuthorName).SingleLine().Shrink(1).MinWidth(0).FontSize(small).Tooltip(commit.AuthorName + " <" + commit.AuthorEmail + ">")
-					ui.Text(c, when).NoWrap().Shrink(0).FontSize(small).FontFeatures("tnum").TextColor(baseTheme.TextMuted).Tooltip(full)
-					if local {
-						ui.Row(c.Key("not-pushed")).Shrink(0).Gap(3).AlignItems(ui.Center).Label(tx.NotPushed()).Children(func() {
-							ui.Icon(c, icons["arrow-up"]).FontSize(13).TextColor(baseTheme.Accent)
-							ui.Text(c, tx.NotPushed()).FontSize(small).TextColor(baseTheme.Accent).NoWrap()
-						})
-					}
-					ui.Spacer(c)
+			}
+			// The file scope and SHA share a footer within this same record.
+			// Expanded file names remain inside its border, never between two
+			// authors' records or in a disconnected details pane.
+			ui.Column(c.Key("changes")).FillWidth().Gap(6).Padding(6, 0, 0, 0).Border(1, baseTheme.Text.Alpha(0.1)).BorderWidth(1, 0, 0, 0).Children(func() {
+				ui.Row(c.Key("metadata")).FillWidth().MinWidth(0).MinHeight(28).Gap(8).Wrap().AlignItems(ui.Center).Children(func() {
 					if summary, ok := state.workspaceHistorySummaries[commit.SHA]; ok {
 						expanded := state.workspaceHistoryFilesSHA == commit.SHA
 						icon := "chevron-right"
@@ -250,13 +269,13 @@ func renderWorkspaceHistoryList(c *ui.Context, state *nativeWorkspaceState, list
 						}
 						// One control carries the commit's scope: its files and
 						// the size of its change, and opens the file list.
-						button := ui.ButtonBase(c.Key("history-file-count")).MinHeight(28).Padding(4, 8).Gap(8).Shrink(0).Label(tx.FileCount(summary.FileCount)).Expanded(expanded)
+						button := ui.ButtonBase(c.Key("history-file-count")).MinHeight(28).Padding(4, 4).Gap(8).Shrink(0).Label(tx.FileCount(summary.FileCount)).Description(workspaceLabel(locale, "workspace.historyFilesFor", commit.Summary)).Expanded(expanded)
 						quietSurface(c, button).Children(func() {
-							ui.Text(c, tx.FileCount(summary.FileCount)).FontSize(small).TextColor(baseTheme.TextMuted).NoWrap()
+							ui.Icon(c, icons[icon]).FontSize(14).TextColor(baseTheme.TextMuted)
+							ui.Text(c, tx.FileCount(summary.FileCount)).FontSize(small).TextColor(baseTheme.Text).NoWrap()
 							if summary.LinesAdded+summary.LinesDeleted > 0 {
 								changeStats(c, tx, summary.LinesAdded, summary.LinesDeleted)
 							}
-							ui.Icon(c, icons[icon]).FontSize(14).TextColor(baseTheme.TextMuted)
 						}).OnClick(func() {
 							if expanded {
 								state.workspaceHistoryFilesSHA = ""
@@ -269,6 +288,15 @@ func renderWorkspaceHistoryList(c *ui.Context, state *nativeWorkspaceState, list
 						})
 					} else {
 						ui.Text(c, tx.LoadingChangeset()).FontSize(small).TextColor(baseTheme.TextMuted).Role(ui.RoleStatus)
+					}
+					ui.Spacer(c)
+					if len(commit.Tags) > 0 {
+						ui.Row(c.Key("tags")).Shrink(0).Gap(4).Label(tx.CommitTags(strings.Join(commit.Tags, ", "))).Children(func() {
+							historyTag(c, tx, commit.Tags[0], slices.Contains(workspace.TagsToPush, commit.Tags[0]), baseTheme.Accent)
+							if len(commit.Tags) > 1 {
+								ui.Badge(c, fmt.Sprintf("+%d", len(commit.Tags)-1)).Tooltip(strings.Join(commit.Tags[1:], ", "))
+							}
+						})
 					}
 					if menu := workspaceMenu(workspace, "commit", commit.SHA); menu != nil {
 						for index, entry := range menu.Items {
@@ -286,19 +314,6 @@ func renderWorkspaceHistoryList(c *ui.Context, state *nativeWorkspaceState, list
 						}
 					}
 				})
-				if body := strings.TrimSpace(commit.Body); body != "" {
-					if !chosen {
-						// One line tells that a description exists and what it
-						// starts with; selecting the record shows all of it.
-						body = strings.Join(strings.FieldsFunc(body, func(r rune) bool { return r == '\n' || r == '\r' }), " ")
-					}
-					text := ui.Text(c.Key("body"), body).FillWidth().MaxWidth(c.Theme().Rem(52)).FontSize(small).TextColor(baseTheme.TextMuted).Selectable()
-					if chosen {
-						text.Margin(4, 0, 0, 0)
-					} else {
-						text.SingleLine()
-					}
-				}
 				if state.workspaceHistoryFilesSHA == commit.SHA && len(shas) == 1 && shas[0] == commit.SHA && selectedContent != nil {
 					selectedContent(c)
 				}
@@ -311,7 +326,7 @@ func renderWorkspaceHistoryList(c *ui.Context, state *nativeWorkspaceState, list
 			})
 		})
 		row.PopoverMenu(func(m *ui.Menu) { renderWorkspaceMenu(m, locale, workspaceMenu(workspace, "commit", commit.SHA), send) })
-	}).Grow(1).MinHeight(0).FillWidth().Label(workspaceLabel(locale, "workspace.history")).Children(func() {
+	}).Gap(10).Grow(1).MinHeight(0).FillWidth().Label(workspaceLabel(locale, "workspace.history")).Children(func() {
 		if len(commits) == 0 && showEmpty {
 			emptyStateIcon(c, "history", locales.In(locale).NoHistory())
 		}

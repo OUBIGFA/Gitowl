@@ -215,7 +215,8 @@
     "source": "provided by the user",
     "tracked_source": "app/static/logos/gitowl/logo.png",
     "sha256": "6049efa7d6375edbb72b867b6b39246b1763ae632cfbddd1450a595bb817dbd2",
-    "integration_status": "canonical source preserved; runtime icons and branding not yet migrated"
+    "integration_status": "canonical source preserved; native application and installer use it through MyGo; size-specific PNG and ICO assets are reproducible with npm run generate:native-icons",
+    "generated_assets": "references/native-brand-icons.json"
   },
   "toolchains": [
     {

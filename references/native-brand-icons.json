@@ -1,0 +1,82 @@
+{
+  "source": "app/static/logos/gitowl/logo.png",
+  "sourceSha256": "6049efa7d6375edbb72b867b6b39246b1763ae632cfbddd1450a595bb817dbd2",
+  "generator": "tools/generate-native-icons/main.go",
+  "resampling": "Catmull-Rom with premultiplied alpha; every size derives directly from the original",
+  "assets": [
+    {
+      "path": "app/static/logos/gitowl/icons/16.png",
+      "size": 16,
+      "sha256": "db8c63022a3c9c9dc45334e050a389e14f3f5cde9510109a531cb93a10c34ec4"
+    },
+    {
+      "path": "app/static/logos/gitowl/icons/20.png",
+      "size": 20,
+      "sha256": "d848d278eb18559b0373276be105fed8f76c71ce43404ae57cbba0107e571d9f"
+    },
+    {
+      "path": "app/static/logos/gitowl/icons/24.png",
+      "size": 24,
+      "sha256": "e7d355d57d076a7e3001a98b4d0ed76d2c2c9d7638a4cc564756e58c81a4a4e3"
+    },
+    {
+      "path": "app/static/logos/gitowl/icons/28.png",
+      "size": 28,
+      "sha256": "09523a56c360b2adb8b90f0ea5ebfd0585539d2f6d8bf74085457fbdeb7340f6"
+    },
+    {
+      "path": "app/static/logos/gitowl/icons/32.png",
+      "size": 32,
+      "sha256": "013238fe943f47500a518b70a20bfd838acf449b12a37c62453bbfb81c35ac49"
+    },
+    {
+      "path": "app/static/logos/gitowl/icons/40.png",
+      "size": 40,
+      "sha256": "2b5c3147be4ab817f67c0d8e2b09f179f2fa9cf1096d4c5eb0a3636cb4d427a2"
+    },
+    {
+      "path": "app/static/logos/gitowl/icons/48.png",
+      "size": 48,
+      "sha256": "089f2c71953c3be3bb552653a8e31303f270f0187acfe1f8bcbad1b3c2c0c12c"
+    },
+    {
+      "path": "app/static/logos/gitowl/icons/64.png",
+      "size": 64,
+      "sha256": "5461bdf54cb7f2ee890f61a103178b03045ce677d4cee126cbdad4070a93452b"
+    },
+    {
+      "path": "app/static/logos/gitowl/icons/96.png",
+      "size": 96,
+      "sha256": "fafe9f11e7dff289dfd7c799eb9a8426a041afd1426602d70888feda45bd25d5"
+    },
+    {
+      "path": "app/static/logos/gitowl/icons/128.png",
+      "size": 128,
+      "sha256": "7de90c73625f931062a28e0e360959069e4cf94037d5585a4848c3a18b54162e"
+    },
+    {
+      "path": "app/static/logos/gitowl/icons/192.png",
+      "size": 192,
+      "sha256": "9ed890c7fba91fb1d7b5fe900a7660ec630e4ee8566f7f2efed0474f867c4f7c"
+    },
+    {
+      "path": "app/static/logos/gitowl/icons/256.png",
+      "size": 256,
+      "sha256": "7fd92044b5c096ffe90cf033adab85a1ef149d5297e0ba5681016a48268ffe1b"
+    },
+    {
+      "path": "app/static/logos/gitowl/icons/512.png",
+      "size": 512,
+      "sha256": "f5aa1a8b3857bc8ec72876504c44c2ea7ae562b0f73b0dab108f4b9caa909c0c"
+    },
+    {
+      "path": "app/static/logos/gitowl/icons/1024.png",
+      "size": 1024,
+      "sha256": "bf7a4383347e495c586b226ec506616e6ccd71dc906cbef2816b708fa3b51572"
+    },
+    {
+      "path": "app/static/logos/gitowl/icons/gitowl.ico",
+      "sha256": "69e843e6ffdf5f1a24ec470dd4bfbf4bcc9f0f9a8351bfe988f99288d5e8008e"
+    }
+  ]
+}

@@ -178,9 +178,6 @@ func (a *app) nativeCommitStatus(c *ui.Context) {
 		return
 	}
 	label := func(key string) string { return nativeDialogLabel(c.Locale(), "commit."+key) }
-	if vm.RulesPending {
-		ui.Text(c, label("checkingRules")).FontSize(c.Theme().Rem(14.0 / 15)).Role(ui.RoleStatus).TextColor(c.Theme().TextMuted)
-	}
 	if vm.RulesBlocked {
 		ui.Text(c, label("rulesBlocked")).FontSize(c.Theme().Rem(14.0 / 15)).Role(ui.RoleAlert).TextColor(c.Theme().Danger)
 	}

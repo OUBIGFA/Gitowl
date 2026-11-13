@@ -627,6 +627,7 @@ export async function validateRuntime(root: string, reference: Artifact) {
     JSON.stringify(config.resources) ===
       JSON.stringify([
         '../static/logos/gitowl/logo.png',
+        '../static/logos/gitowl/icons',
         '../../output/native-runtime/desktop-kernel',
         '../../output/native-runtime/build-info.json',
       ]),
@@ -1089,6 +1090,7 @@ export function validateInstalledFileList(text: string) {
         'Gitowl.exe',
         'build-info.json',
         'desktop-kernel',
+        'icons',
         'logo.png',
       ]),
     'Invalid MyGo installed-file list'
@@ -1103,13 +1105,14 @@ export async function validatePackagedExecutable(
   metadata: string,
   build: string
 ) {
+  const buildTags = metadata.match(/-tags=([^\r\n]*)/)?.[1]?.split(',') ?? []
   check(
     metadata.includes('path\tgithub.com/OUBIGFA/Gitowl/app/native'),
     'Not the Gitowl native executable'
   )
   check(
-    /-tags=mygo_noinspector(?:\r?\n|$)/.test(metadata) &&
-      !/\be2e\b/.test(metadata) &&
+    buildTags.includes('mygo_noinspector') &&
+      !buildTags.includes('e2e') &&
       metadata.includes('-trimpath=true'),
     'Test harness/inspector or machine-local build paths in shipping executable'
   )
@@ -1152,6 +1155,7 @@ export async function validatePackagedAssets(
   const allowed = new Set([
     'Gitowl.exe',
     'desktop-kernel',
+    'icons',
     'logo.png',
     'build-info.json',
     'gitowl-setup-0.0.1-amd64.exe',

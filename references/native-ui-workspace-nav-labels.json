@@ -477,6 +477,46 @@
     "zh-Hans": "比较分支",
     "zh-Hant": "比較分支"
   },
+  "workspace.historyShowDescription": {
+    "en": "Expand",
+    "zh-Hans": "展开说明",
+    "zh-Hant": "展開說明"
+  },
+  "workspace.historyHideDescription": {
+    "en": "Collapse",
+    "zh-Hans": "收起说明",
+    "zh-Hant": "收合說明"
+  },
+  "workspace.historyPendingPush": {
+    "en": "Local · not pushed",
+    "zh-Hans": "本地待推送",
+    "zh-Hant": "本機待推送"
+  },
+  "workspace.historyPendingPull": {
+    "en": "Remote · not pulled",
+    "zh-Hans": "远端待拉取",
+    "zh-Hant": "遠端待提取"
+  },
+  "workspace.historyOnRemote": {
+    "en": "On remote",
+    "zh-Hans": "远端已有",
+    "zh-Hant": "遠端已有"
+  },
+  "workspace.historyLocalOnly": {
+    "en": "Local only",
+    "zh-Hans": "仅本地",
+    "zh-Hant": "僅本機"
+  },
+  "workspace.historyComparison": {
+    "en": "Compared branch",
+    "zh-Hans": "来自对比分支",
+    "zh-Hant": "來自比較分支"
+  },
+  "workspace.historyFilesFor": {
+    "en": "Changed files in: {0}",
+    "zh-Hans": "此提交的改动文件：{0}",
+    "zh-Hant": "此提交的變更檔案：{0}"
+  },
   "workspace.history": {
     "en": "Show branch history",
     "zh-Hans": "显示分支历史",

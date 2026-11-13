@@ -14,6 +14,7 @@
     "check:repo": "python tools/check_repo.py",
     "check:features": "python tools/generate_feature_inventory.py --check",
     "generate:native-locales": "node script/generate-native-dialog-locales.mjs && go -C app/native tool mygo generate",
+    "generate:native-icons": "go -C app/native run ../../tools/generate-native-icons/main.go",
     "check:native-locales": "node script/generate-native-dialog-locales.mjs --check && go -C app/native tool mygo i18n check",
     "test:repo": "python -m unittest discover -s tests/repository -v",
     "test": "node script/test.mjs",

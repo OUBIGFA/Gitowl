@@ -39,6 +39,7 @@ type nativeWorkspaceState struct {
 	workspaceFilesIdentity            string
 	workspaceFileCursor               int
 	workspaceHistoryIdentity          string
+	workspaceHistoryDescription       string
 	workspaceHistoryFilesSHA          string
 	workspaceHistoryCombinedFilesOpen bool
 	workspaceHistoryCursor            int

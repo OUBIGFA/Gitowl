@@ -134,11 +134,13 @@ async function fixture(t: { after: (fn: () => Promise<void>) => void }) {
     identifier: 'io.github.oubigfa.gitowl',
     resources: [
       '../static/logos/gitowl/logo.png',
+      '../static/logos/gitowl/icons',
       '../../output/native-runtime/desktop-kernel',
       '../../output/native-runtime/build-info.json',
     ],
   })
   await file('app/static/logos/gitowl/logo.png', 'public fixture logo')
+  await file('app/static/logos/gitowl/icons/16.png', 'public fixture tray icon')
   await git(root, ['add', '.'])
   await git(root, [
     '-c',
@@ -733,7 +735,7 @@ it('rejects worker self-attestation, pending findings, component screenshots and
 })
 
 it('validates the exact MyGo installed-file list, including no private or traversing entries', () => {
-  const valid = 'Gitowl.exe\nbuild-info.json\ndesktop-kernel\nlogo.png\n'
+  const valid = 'Gitowl.exe\nbuild-info.json\ndesktop-kernel\nicons\nlogo.png\n'
   validateInstalledFileList(valid)
   for (const invalid of [
     valid + 'profile\n',
@@ -771,7 +773,7 @@ it('checks trimmed Windows executable identity without requiring omitted linker 
     return Buffer.from(exe.generate())
   }
   const metadata =
-    'path\tgithub.com/OUBIGFA/Gitowl/app/native\n\tbuild\t-tags=mygo_noinspector\n\tbuild\t-trimpath=true\n'
+    'path\tgithub.com/OUBIGFA/Gitowl/app/native\n\tbuild\t-tags=mygo_nodownload,mygo_noinspector\n\tbuild\t-trimpath=true\n'
   await validatePackagedExecutable(make(), metadata, '20261109123456')
   await assert.rejects(
     validatePackagedExecutable(make('Other'), metadata, '20261109123456'),

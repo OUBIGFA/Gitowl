@@ -75,11 +75,14 @@ func TestWorkspaceOverviewReviewBackAcrossSizesAndLanguages(t *testing.T) {
 				h.tt.SetTitleBar(ui.TitleBar{Height: 48, Right: 138})
 				h.tt.SetLocale(tag)
 				tx := locales.In(tag)
-				for _, label := range []string{tx.OpenRepository(), tx.Changes(), tx.History(), tx.Settings(), tx.CurrentChanges(), tx.SelectedOfTotal(0, 2), tx.IncludeAll(), tx.CommitSummary(), tx.SaveVersion()} {
+				for _, label := range []string{tx.OpenRepository(), tx.Changes(), tx.History(), tx.Settings(), tx.SelectedOfTotal(0, 2), tx.IncludeAll(), tx.CommitSummary(), tx.SaveVersion()} {
 					visibleControl(t, h.tt, label, size.width, size.height)
 				}
 				for _, other := range []string{"en", "zh-Hans", "zh-Hant"} {
-					if other != tag && h.tt.HasText(locales.In(other).CurrentChanges()) {
+					if h.tt.HasText(locales.In(other).CurrentChanges()) {
+						t.Fatal("the changes page repeats its tab as a large heading")
+					}
+					if other != tag && h.tt.HasText(locales.In(other).IncludeAll()) {
 						t.Fatalf("mixed system languages: %q", h.tt.Texts())
 					}
 				}

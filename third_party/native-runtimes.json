@@ -150,6 +150,32 @@
   },
   "goModules": [
     {
+      "module": "github.com/ProtonMail/go-crypto",
+      "version": "v1.4.1",
+      "source": "https://pkg.go.dev/github.com/ProtonMail/go-crypto@v1.4.1",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/github.com_ProtonMail_go-crypto-LICENSE",
+          "sha256": "2d36597f7117c38b006835ae7f537487207d8ec407aa9d9980794b2030cbc067"
+        },
+        {
+          "path": "third_party/licenses/native/github.com_ProtonMail_go-crypto-PATENTS",
+          "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+        }
+      ]
+    },
+    {
+      "module": "github.com/cloudflare/circl",
+      "version": "v1.6.2",
+      "source": "https://pkg.go.dev/github.com/cloudflare/circl@v1.6.2",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/github.com_cloudflare_circl-LICENSE",
+          "sha256": "b0da1764fe4d13d610b695536fc3f2ebc362482d053a1cd258e36975bc6b97a7"
+        }
+      ]
+    },
+    {
       "module": "github.com/ebitengine/purego",
       "version": "v0.11.1",
       "source": "https://pkg.go.dev/github.com/ebitengine/purego@v0.11.1",
@@ -162,8 +188,8 @@
     },
     {
       "module": "github.com/egoist/mygo",
-      "version": "v0.8.3",
-      "source": "https://pkg.go.dev/github.com/egoist/mygo@v0.8.3",
+      "version": "v0.9.0",
+      "source": "https://pkg.go.dev/github.com/egoist/mygo@v0.9.0",
       "licenses": [
         {
           "path": "third_party/licenses/native/github.com_egoist_mygo-LICENSE",
@@ -179,6 +205,54 @@
         {
           "path": "third_party/licenses/native/github.com_go-text_typesetting-LICENSE",
           "sha256": "6b1bf94c77d7faa0ce94f8745595bfaf4c404f8b3873f5c2ce55ca15f8e44eca"
+        }
+      ]
+    },
+    {
+      "module": "github.com/klauspost/compress",
+      "version": "v1.18.6",
+      "source": "https://pkg.go.dev/github.com/klauspost/compress@v1.18.6",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/github.com_klauspost_compress-LICENSE",
+          "sha256": "0d9e582ee4bff57bf1189c9e514e6da7ce277f9cd3bc2d488b22fbb39a6d87cf"
+        }
+      ]
+    },
+    {
+      "module": "github.com/ulikunitz/xz",
+      "version": "v0.5.15",
+      "source": "https://pkg.go.dev/github.com/ulikunitz/xz@v0.5.15",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/github.com_ulikunitz_xz-LICENSE",
+          "sha256": "701cbcc144a7c865b072f27547e66ddbf17ac44a3bd21f71149ace02518f107c"
+        }
+      ]
+    },
+    {
+      "module": "go.digitalxero.dev/rpm",
+      "version": "v0.3.4",
+      "source": "https://pkg.go.dev/go.digitalxero.dev/rpm@v0.3.4",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/go.digitalxero.dev_rpm-LICENSE",
+          "sha256": "4bf8e0e57c748fc582142448427f95d5e0e9db2823607e403d3ea3ba04d6654d"
+        }
+      ]
+    },
+    {
+      "module": "golang.org/x/crypto",
+      "version": "v0.57.0",
+      "source": "https://pkg.go.dev/golang.org/x/crypto@v0.57.0",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/golang.org_x_crypto-LICENSE",
+          "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+        },
+        {
+          "path": "third_party/licenses/native/golang.org_x_crypto-PATENTS",
+          "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
         }
       ]
     },
@@ -213,6 +287,21 @@
       ]
     },
     {
+      "module": "golang.org/x/sys",
+      "version": "v0.48.0",
+      "source": "https://pkg.go.dev/golang.org/x/sys@v0.48.0",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/golang.org_x_sys-LICENSE",
+          "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+        },
+        {
+          "path": "third_party/licenses/native/golang.org_x_sys-PATENTS",
+          "sha256": "96f408bfae65bf137fc2525d3ecb030271c50c1e90799f87abf8846d8dd505cc"
+        }
+      ]
+    },
+    {
       "module": "golang.org/x/text",
       "version": "v0.43.0",
       "source": "https://pkg.go.dev/golang.org/x/text@v0.43.0",
@@ -240,11 +329,11 @@
     },
     {
       "path": "app/native/go.mod",
-      "sha256": "005fd433266336a662d282cc5a01c0366ca2c506713793511de7f8ba0b87a463"
+      "sha256": "0f2a710cc41b3be00398136d32b381f922216593b1072de884db36ba3ddc1b18"
     },
     {
       "path": "app/native/go.sum",
-      "sha256": "019ac5e1d8a1210b3fe2d8169014445aa818b7a73894f02de6b64d2df3577e2b"
+      "sha256": "0c7dbc04a56987898eb0aef7681ef7a20a5369c2f7409e11a434e84bcc58b39d"
     }
   ]
 }
