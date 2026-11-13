@@ -58,7 +58,7 @@ func TestNativeCommitFailureKeepsDraftAndDoesNotRetry(t *testing.T) {
 		t.Fatalf("whole-file commit request: %+v", r)
 	}
 	h.click(t, "Open project…")
-	h.click(t, "Save version")
+	h.click(t, "Saving local version…")
 	h.a.openRepository("C:/repos/other")
 	h.a.saveVersion()
 	if !h.a.savingVersion || h.a.openModal || h.a.repo.ID != 1 || !h.tt.HasText("Saving local version…") {

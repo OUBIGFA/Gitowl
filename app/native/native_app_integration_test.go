@@ -130,7 +130,16 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 			t.Error(err)
 		}
 	}()
-	tt := ui.NewTester(a.view, 1180, 760)
+	tt := ui.NewTester(func(c *ui.Context) {
+		seen := make(map[string]bool, len(a.commits))
+		for _, commit := range a.commits {
+			if seen[commit.SHA] {
+				t.Fatalf("history repeated a commit: commits=%+v pending=%d loading=%v", a.commits, a.corePending, a.loadingHistory)
+			}
+			seen[commit.SHA] = true
+		}
+		a.view(c)
+	}, 1180, 760)
 	settingsSize := [2]int{1180, 760}
 	requestedSize := [2]int{}
 	// Match the real host for every scenario that opens settings: the dialog
@@ -551,6 +560,9 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 	}
 	click(tx.History())
 	await(func() bool { return a.corePending == 0 && a.tab == historyTab && len(a.commits) > 0 })
+	if len(a.commits) != 2 || a.commits[0].SHA != runGit("-C", repo, "rev-parse", "HEAD") {
+		t.Fatalf("entering history did not refresh the original comparison after saving: %+v", a.commits)
+	}
 	clickHistoryRecordTitle(t, tt, a.commits[0].Summary, 0)
 	tt.Advance(time.Second)
 	await(func() bool {

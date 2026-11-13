@@ -25,11 +25,12 @@ type KernelRepositoryReference struct {
 
 type KernelRepository struct {
 	KernelRepositoryReference
-	Name    string  `json:"name"`
-	Alias   *string `json:"alias"`
-	Missing bool    `json:"missing"`
-	Login   *string `json:"login"`
-	Kind    string  `json:"kind"`
+	Name    string                 `json:"name"`
+	Alias   *string                `json:"alias"`
+	Missing bool                   `json:"missing"`
+	Login   *string                `json:"login"`
+	Account *KernelAccountIdentity `json:"account,omitempty"`
+	Kind    string                 `json:"kind"`
 	// Local is the original repository list's ahead/behind and change count.
 	Local *KernelRepositoryLocal `json:"local,omitempty"`
 }
@@ -123,6 +124,8 @@ type KernelPopup struct {
 	Type string `json:"type"`
 }
 
+// Only the original assignment identity crosses the presentation boundary.
+// Tokens and account storage remain in the Desktop kernel.
 type KernelAccountIdentity struct {
 	Endpoint string `json:"endpoint"`
 	Login    string `json:"login"`
@@ -271,6 +274,7 @@ type KernelFailure struct {
 // work and must not synchronously call the client from its reader goroutine.
 type KernelEvent struct {
 	Dialog             *KernelFileDialog
+	External           *KernelExternalRequest
 	Snapshot           *KernelSnapshot
 	WindowAction       string
 	PresentationAction string
@@ -424,6 +428,12 @@ func validateKernelSnapshot(snapshot KernelSnapshot) error {
 func (k *Kernel) receiveEvent(method string, params json.RawMessage) error {
 	var event KernelEvent
 	switch method {
+	case "external.open":
+		var request KernelExternalRequest
+		if err := json.Unmarshal(params, &request); err != nil || request.ID <= 0 || request.URL == "" || strings.ContainsRune(request.URL, '\x00') {
+			return &ProtocolError{"invalid native external URL request"}
+		}
+		event.External = &request
 	case "dialog.request":
 		var dialog KernelFileDialog
 		if err := json.Unmarshal(params, &dialog); err != nil || dialog.ID <= 0 || (dialog.Kind != "open" && dialog.Kind != "save") {

@@ -1,5 +1,6 @@
 import * as Path from 'path'
 import { existsSync } from 'fs'
+import memoizeOne from 'memoize-one'
 import type { AppRuntime } from '../ui/app-runtime'
 import {
   FoldoutType,
@@ -103,9 +104,17 @@ function required<T>(value: T | undefined | null, name: string): T {
   return value
 }
 
+// Match the original commit list's index: repeated membership/row lookups must
+// not scan the entire loaded history for every projected context menu.
+const historyIndex = memoizeOne(
+  (shas: ReadonlyArray<string>) =>
+    new Map(shas.map((sha, index) => [sha, index]))
+)
+
 function commitsFor(state: IRepositoryState, shas: ReadonlyArray<string>) {
+  const index = historyIndex(state.compareState.commitSHAs)
   return shas.map(sha => {
-    if (!state.compareState.commitSHAs.includes(sha)) {
+    if (!index.has(sha)) {
       throw new Error('The history selection is no longer available')
     }
     return required(state.commitLookup.get(sha), 'commit')
@@ -430,7 +439,10 @@ export function buildWorkspaceMenu(
             contextMenu
           ),
       }
-      const row = state.compareState.commitSHAs.indexOf(commit.sha)
+      const row = required(
+        historyIndex(state.compareState.commitSHAs).get(commit.sha),
+        'commit row'
+      )
       const items = generateCommitContextMenu(config, row, commit, selected)
       // A timeline row keeps its own copy entry during multi-selection. Reuse
       // the original single-commit action without changing AppStore selection

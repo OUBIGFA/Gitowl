@@ -153,6 +153,8 @@ func (a *app) applyCoreSnapshot(snapshot backend.KernelSnapshot) {
 	selected := snapshot.Selected
 	if selected == nil {
 		a.repo, a.status, a.changeset, a.commits = nil, nil, nil, nil
+		a.workspaceHistorySource, a.workspaceHistoryRows = nil, nil
+		a.workspaceHistoryScroll, a.workspaceHistoryScrollY = ui.ScrollState{}, 0
 		a.changeIndex, a.commitIndex, a.commitFileIndex = -1, -1, -1
 		a.clearDiff()
 		return
@@ -285,6 +287,21 @@ func (a *app) receiveCoreEvent(event backend.KernelEvent) {
 				a.update(func() {
 					if !a.closed {
 						a.openErr = replyErr
+					}
+				})
+			}
+		}()
+	}
+	if event.External != nil {
+		request, open, core, ctx := *event.External, a.openExternal, a.core, a.ctx
+		// MyGo dispatches Shell.OpenExternal on its native main thread. The
+		// visible process owns foreground permission; hidden Electron does not.
+		go func() {
+			opened := open != nil && open(request.URL) == nil
+			if err := core.ReplyExternal(ctx, request.ID, opened); err != nil {
+				a.update(func() {
+					if !a.closed {
+						a.openErr = err
 					}
 				})
 			}
@@ -726,18 +743,35 @@ func (a *app) coreProjectList(c *ui.Context, tx locales.Messages, colors workspa
 		ui.Spacer(c)
 		return
 	}
-	a.coreProjects.Key = func(i int) any { return repositories[i].Path }
-	a.coreProjects.Label = func(i int) string {
-		if repositories[i].Alias != nil {
-			return *repositories[i].Alias
+	rows := projectRows(repositories, a.coreSnapshot.Accounts)
+	firstProject := 0
+	for firstProject < len(rows) && rows[firstProject].repository == nil {
+		firstProject++
+	}
+	a.coreProjects.Key = func(i int) any {
+		if rows[i].repository != nil {
+			return rows[i].repository.Path
 		}
-		return repositories[i].Name
+		if rows[i].account == nil {
+			return "account:unassigned"
+		}
+		return "account:" + rows[i].account.Endpoint + "\x00" + rows[i].account.Login
+	}
+	a.coreProjects.Header = func(i int) bool { return rows[i].repository == nil }
+	a.coreProjects.Label = func(i int) string {
+		if rows[i].repository == nil {
+			return projectGroupLabel(c.Locale(), rows[i].account)
+		}
+		if rows[i].repository.Alias != nil {
+			return *rows[i].repository.Alias
+		}
+		return rows[i].repository.Name
 	}
 	a.coreProjects.Selected = &a.coreProjectCursor
 	canSelect := a.ready && !a.savingVersion && a.coreProjectFilterPending == 0
 	selectProject := func(i int) {
-		if canSelect && i >= 0 && i < len(repositories) {
-			a.selectCoreRepository(repositories[i].KernelRepositoryReference)
+		if canSelect && i >= 0 && i < len(rows) && rows[i].repository != nil {
+			a.selectCoreRepository(rows[i].repository.KernelRepositoryReference)
 		}
 	}
 	baseTheme := c.Theme()
@@ -747,8 +781,13 @@ func (a *app) coreProjectList(c *ui.Context, tx locales.Messages, colors workspa
 	}
 	c.SetTheme(&listTheme)
 	defer c.SetTheme(baseTheme)
-	list := ui.List(c.Key("kernel-projects"), &a.coreProjects, len(repositories), func(i int) {
-		repository := repositories[i]
+	list := ui.List(c.Key("kernel-projects"), &a.coreProjects, len(rows), func(i int) {
+		if rows[i].repository == nil {
+			label := projectGroupLabel(c.Locale(), rows[i].account)
+			ui.Text(c, label).FontSize(c.Theme().Rem(14.0/15)).FontWeight(500).TextColor(c.Theme().TextMuted).Padding(12, 10, 4, 10).FillWidth().SingleLine().Tooltip(label).Role(ui.RoleHeading).Level(2).Background(colors.rail)
+			return
+		}
+		repository := *rows[i].repository
 		name := repository.Name
 		if repository.Alias != nil {
 			name = *repository.Alias
@@ -772,15 +811,15 @@ func (a *app) coreProjectList(c *ui.Context, tx locales.Messages, colors workspa
 	// Arrow navigation focuses the native list, not its nested button. Give
 	// that focus owner the current row's same menu for Menu and Shift+F10.
 	list.PopoverMenu(func(m *ui.Menu) {
-		if i := a.coreProjectCursor; canSelect && i >= 0 && i < len(repositories) {
-			a.renderRepositoryMenu(m, c.Locale(), repositories[i].KernelRepositoryReference)
+		if i := a.coreProjectCursor; canSelect && i >= 0 && i < len(rows) && rows[i].repository != nil {
+			a.renderRepositoryMenu(m, c.Locale(), rows[i].repository.KernelRepositoryReference)
 		}
 	})
 	search.OnShortcut(0, ui.KeyDown, func() {
-		a.coreProjectCursor = 0
-		a.coreProjects.ScrollIntoView(0)
+		a.coreProjectCursor = firstProject
+		a.coreProjects.ScrollIntoView(firstProject)
 		a.coreProjects.Focus(c)
-	}).OnSubmit(func() { selectProject(0) })
+	}).OnSubmit(func() { selectProject(firstProject) })
 	if list.Submitted() {
 		selectProject(a.coreProjectCursor)
 	}

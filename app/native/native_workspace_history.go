@@ -138,7 +138,9 @@ func historySync(workspace *backend.KernelWorkspace, selected *backend.KernelSel
 // controls expand it. MyGo retains Ctrl/Shift/arrow selection and menus.
 func renderWorkspaceHistoryList(c *ui.Context, state *nativeWorkspaceState, listState *ui.ListState, workspace *backend.KernelWorkspace, selected *backend.KernelSelected, commits []backend.Commit, shas []string, showEmpty bool, send func(backend.KernelWorkspaceAction), selectedContent func(*ui.Context)) {
 	identity := workspace.Repository.Path + strings.Join(shas, "/")
-	if state.workspaceHistoryIdentity != identity {
+	// Keep pointer/keyboard feedback immediate while earlier ordered selections
+	// are returning. Once they settle (or a new project opens), follow the kernel.
+	if state.workspaceHistoryIdentity != identity && (state.workspaceHistoryIdentity == "" || state.workspaceHistorySelectionPending == 0) {
 		state.workspaceHistorySelection.Clear()
 		for _, sha := range shas {
 			state.workspaceHistorySelection.Add(sha)
@@ -149,12 +151,13 @@ func renderWorkspaceHistoryList(c *ui.Context, state *nativeWorkspaceState, list
 			state.workspaceHistoryFilesSHA = ""
 		}
 	}
-	rows := historyRows(commits)
-	// The statistics loader maps the list's visible rows back to commits.
-	state.workspaceHistoryRows = state.workspaceHistoryRows[:0]
-	for _, row := range rows {
-		state.workspaceHistoryRows = append(state.workspaceHistoryRows, row.commit)
+	// UI frames share one immutable history slice until the kernel replaces
+	// it. Group dates once per slice, not once for every pointer/scroll frame.
+	if len(state.workspaceHistorySource) != len(commits) || len(commits) > 0 && &state.workspaceHistorySource[0] != &commits[0] {
+		state.workspaceHistorySource = commits
+		state.workspaceHistoryRows = historyRows(commits)
 	}
+	rows := state.workspaceHistoryRows
 	listState.Key = func(i int) any {
 		if rows[i].commit < 0 {
 			return "day:" + rows[i].day
@@ -188,7 +191,7 @@ func renderWorkspaceHistoryList(c *ui.Context, state *nativeWorkspaceState, list
 	baseTheme := c.Theme()
 	listTheme := *baseTheme
 	if !c.Preferences().HighContrast {
-		selected := baseTheme.Background.Mix(baseTheme.Text, 0.05)
+		selected := baseTheme.Background.Mix(baseTheme.Text, 0.02)
 		listTheme.Accent, listTheme.InactiveAccent, listTheme.AccentText = selected, selected, baseTheme.Text
 		listTheme.SurfaceHover = baseTheme.Background.Mix(baseTheme.Text, 0.025)
 	}
@@ -204,10 +207,10 @@ func renderWorkspaceHistoryList(c *ui.Context, state *nativeWorkspaceState, list
 			return
 		}
 		commit := commits[rows[i].commit]
-		chosen := slices.Contains(shas, commit.SHA)
+		chosen := state.workspaceHistorySelection.Has(commit.SHA)
 		surface, border := baseTheme.Surface, baseTheme.Background.Mix(baseTheme.Text, 0.14)
 		if chosen {
-			surface, border = baseTheme.Surface.Mix(baseTheme.Text, 0.045), baseTheme.Focus
+			surface, border = baseTheme.Surface.Mix(baseTheme.Text, 0.015), baseTheme.Focus
 		}
 		if c.Preferences().HighContrast {
 			surface, border = baseTheme.Background, baseTheme.Text
@@ -326,7 +329,9 @@ func renderWorkspaceHistoryList(c *ui.Context, state *nativeWorkspaceState, list
 			})
 		})
 		row.PopoverMenu(func(m *ui.Menu) { renderWorkspaceMenu(m, locale, workspaceMenu(workspace, "commit", commit.SHA), send) })
-	}).Gap(10).Grow(1).MinHeight(0).FillWidth().Label(workspaceLabel(locale, "workspace.history")).Children(func() {
+		// MyGo draws native scrollbars over the container. Reserve their full hit
+		// area beside the rows, so neither the thumb nor dragging covers a record.
+	}).Gap(10).Padding(0, 20, 0, 0).ScrollbarStyle(ui.ScrollbarStyle{TrackWidth: 12}).KeepScrollbars(true).TrackScroll(&state.workspaceHistoryScroll).Grow(1).MinHeight(0).FillWidth().Label(workspaceLabel(locale, "workspace.history")).Children(func() {
 		if len(commits) == 0 && showEmpty {
 			emptyStateIcon(c, "history", locales.In(locale).NoHistory())
 		}
@@ -446,7 +451,7 @@ func (a *app) loadVisibleHistorySummaries() {
 	var shas []string
 	// Visible rows include day headings; only commit rows have statistics.
 	for row := max(0, first); row <= last && row < len(a.workspaceHistoryRows) && len(shas) < 32; row++ {
-		i := a.workspaceHistoryRows[row]
+		i := a.workspaceHistoryRows[row].commit
 		if i < 0 || i >= len(a.commits) {
 			continue
 		}
@@ -459,9 +464,11 @@ func (a *app) loadVisibleHistorySummaries() {
 	}
 	a.workspaceHistorySummaryLoading = true
 	core, ctx := a.core, a.ctx
-	a.queueCore(nativeOperation{
-		call: func() (backend.KernelResult, error) { return core.HistorySummaries(ctx, ref, shas) },
-		complete: func(result backend.KernelResult, err error) {
+	// Statistics are a read-only embellishment. They must not hold the ordered
+	// queue ahead of selecting another commit, switching projects or editing.
+	a.runCoreTask(
+		func() (backend.KernelResult, error) { return core.HistorySummaries(ctx, ref, shas) },
+		func(result backend.KernelResult, err error) {
 			a.workspaceHistorySummaryLoading = false
 			current, valid := a.coreReference()
 			if !valid || current != ref {
@@ -478,5 +485,29 @@ func (a *app) loadVisibleHistorySummaries() {
 				a.workspaceHistorySummaries[summary.SHA] = summary
 			}
 		},
-	})
+	)
+}
+
+// Match Desktop's scroll trigger and ten-commit threshold, excluding headings.
+// Activation and focus redraws must not eagerly page a short, cached history.
+// The existing loader guards pending requests and exhausted batches.
+func (a *app) loadHistoryNearBottom() {
+	scrollY := a.workspaceHistoryScroll.Y
+	if scrollY == a.workspaceHistoryScrollY {
+		return
+	}
+	a.workspaceHistoryScrollY = scrollY
+	w := a.nativeWorkspace()
+	if w == nil || w.Compare.Mode != "history" || !a.ready || !a.historyMore || a.loadingHistory || a.historyErr != nil || len(a.commits) == 0 {
+		return
+	}
+	_, last := a.commitsList.list().Visible()
+	for row := min(last, len(a.workspaceHistoryRows)-1); row >= 0; row-- {
+		if i := a.workspaceHistoryRows[row].commit; i >= 0 {
+			if len(a.commits)-1-i <= 10 {
+				a.loadCoreHistory()
+			}
+			return
+		}
+	}
 }

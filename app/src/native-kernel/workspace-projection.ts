@@ -11,6 +11,7 @@ import {
 import { Repository } from '../models/repository'
 import { BranchesTab } from '../models/branches-tab'
 import { Branch, BranchType } from '../models/branch'
+import type { Commit } from '../models/commit'
 import { TipState } from '../models/tip'
 import { Banner, BannerType } from '../models/banner'
 import { StashedChangesLoadStates } from '../models/stash-entry'
@@ -223,9 +224,18 @@ export function workspaceMenuDTO(
   repository: Repository,
   state: IRepositoryState,
   target: WorkspaceMenuTarget,
-  items: ReadonlyArray<IWorkspaceMenuItem>
+  items: ReadonlyArray<IWorkspaceMenuItem>,
+  context = workspaceMenuContext(repository, state)
 ): IKernelWorkspaceMenu {
   const projected = projectContextMenuItems(items)
+  const lease = createHash('sha256')
+    .update(context)
+    .update(JSON.stringify({ target, items: projected }))
+    .digest('hex')
+  return { target, lease, items: projected }
+}
+
+function workspaceMenuContext(repository: Repository, state: IRepositoryState) {
   const tip = state.branchesState.tip
   const head =
     tip.kind === TipState.Valid
@@ -235,26 +245,27 @@ export function workspaceMenuDTO(
       : tip.kind === TipState.Unborn
       ? tip.ref
       : null
-  const lease = createHash('sha256')
-    .update(
-      JSON.stringify({
-        repository: [repository.id, repository.path],
-        head,
-        target,
-        items: projected,
-        selection: state.commitSelection.shas,
-        files:
-          state.changesState.selection.kind ===
-          ChangesSelectionKind.WorkingDirectory
-            ? state.changesState.selection.selectedFileIDs
-            : [],
-        locked: workspaceLocked(repository, state),
-        committing: state.isCommitting,
-      })
-    )
-    .digest('hex')
-  return { target, lease, items: projected }
+  return JSON.stringify({
+    repository: [repository.id, repository.path],
+    head,
+    selection: state.commitSelection.shas,
+    files:
+      state.changesState.selection.kind ===
+      ChangesSelectionKind.WorkingDirectory
+        ? state.changesState.selection.selectedFileIDs
+        : [],
+    locked: workspaceLocked(repository, state),
+    committing: state.isCommitting,
+  })
 }
+
+// Cache only pure commit menu DTOs, never callbacks or file existence checks.
+// The context covers both original menu policy and lease eligibility. GitStore
+// replaces immutable Commit objects even when its commitLookup Map is reused.
+const historyMenus = new WeakMap<
+  Commit,
+  { context: string; row: number; menu: IKernelWorkspaceMenu }
+>()
 
 function projectBanner(banner: Banner | null): IKernelWorkspaceBanner | null {
   if (banner === null) {
@@ -436,6 +447,20 @@ export function projectNativeWorkspace(app: IAppState): IKernelWorkspaceDTO {
     conflictStep === MultiCommitOperationStepKind.HideConflicts
   const menus: IKernelWorkspaceMenu[] = []
   if (repository !== undefined && state !== undefined) {
+    const menuContext = workspaceMenuContext(repository, state)
+    const form = state.compareState.formState
+    const historyContext = JSON.stringify([
+      menuContext,
+      repository.gitHubRepository?.hash ?? null,
+      form.kind,
+      form.kind === HistoryTabMode.Compare ? form.comparisonMode : null,
+      state.localCommitSHAs,
+      state.tagsToPush,
+      state.multiCommitOperationState !== null,
+    ])
+    const rows = new Map(
+      state.compareState.commitSHAs.map((sha, row) => [sha, row])
+    )
     const targets: WorkspaceMenuTarget[] = [
       ...state.branchesState.allBranches
         .filter(b => !b.isDesktopForkRemoteBranch)
@@ -459,14 +484,25 @@ export function projectNativeWorkspace(app: IAppState): IKernelWorkspaceDTO {
       { kind: 'changes', id: '' },
     ]
     for (const target of targets) {
-      menus.push(
-        workspaceMenuDTO(
-          repository,
-          state,
-          target,
-          buildWorkspaceMenu(app, repository, state, target)
-        )
+      const commit =
+        target.kind === 'commit' ? state.commitLookup.get(target.id) : undefined
+      const row = rows.get(target.id) ?? -1
+      const cached = commit === undefined ? undefined : historyMenus.get(commit)
+      if (cached?.context === historyContext && cached.row === row) {
+        menus.push(cached.menu)
+        continue
+      }
+      const menu = workspaceMenuDTO(
+        repository,
+        state,
+        target,
+        buildWorkspaceMenu(app, repository, state, target),
+        menuContext
       )
+      menus.push(menu)
+      if (commit !== undefined) {
+        historyMenus.set(commit, { context: historyContext, row, menu })
+      }
     }
   }
   return {

@@ -4,6 +4,10 @@ import { groupRepositories } from '../ui/repositories-list/group-repositories'
 import { filterListItems } from '../ui/lib/filter-list-items'
 import { formatDate } from '../lib/format-date'
 import { getRelativeTimeInfoFromDate } from '../lib/relative-time-info'
+import {
+  getDateFormatPreference,
+  getTimeFormatPreference,
+} from '../models/formatting-preferences'
 import { withMediaProjection } from './media-presentation'
 import type { IKernelMissingRepository } from './missing-repository-presenter'
 import {
@@ -18,7 +22,7 @@ import {
 } from '../lib/app-state'
 import { Account } from '../models/account'
 import { CloningRepository } from '../models/cloning-repository'
-import { Repository } from '../models/repository'
+import { Repository, getRepositoryAccountIdentity } from '../models/repository'
 import { TipState } from '../models/tip'
 import {
   CommittedFileChange,
@@ -58,6 +62,7 @@ function repositoryView(
     }
   }
 
+  const account = getRepositoryAccountIdentity(repository)
   return {
     id: repository.id,
     path: repository.path,
@@ -65,6 +70,7 @@ function repositoryView(
     alias: repository.alias,
     missing: repository.missing,
     login: repository.login,
+    ...(account === null ? {} : { account }),
     kind: 'repository',
   }
 }
@@ -115,7 +121,43 @@ function headSHA(repositoryState: IRepositoryState): string | null {
     : null
 }
 
-function historyCommitView(commit: Commit, preferAbsoluteDates: boolean) {
+// Commit objects are immutable; GitStore replaces them when tags or metadata
+// change. Reuse their formatted presentation until the original relative-time
+// deadline or a formatting preference changes, including on focus refreshes.
+const historyViews = new WeakMap<
+  Commit,
+  {
+    format: string
+    refreshAt: number
+    view: ReturnType<typeof formatHistoryCommit>
+  }
+>()
+
+function historyCommitView(
+  commit: Commit,
+  preferAbsoluteDates: boolean,
+  format: string,
+  now: number
+) {
+  const cached = historyViews.get(commit)
+  if (cached?.format === format && now < cached.refreshAt) {
+    return cached.refreshAt === Infinity
+      ? cached.view
+      : { ...cached.view, dateRefreshAfter: cached.refreshAt - now }
+  }
+  const view = formatHistoryCommit(commit, preferAbsoluteDates)
+  historyViews.set(commit, {
+    format,
+    refreshAt:
+      view.dateRefreshAfter === undefined
+        ? Infinity
+        : now + view.dateRefreshAfter,
+    view,
+  })
+  return view
+}
+
+function formatHistoryCommit(commit: Commit, preferAbsoluteDates: boolean) {
   const dateLabels: Record<string, { text: string; absolute: string }> = {}
   let dateRefreshAfter: number | undefined
   for (const locale of ['en', 'zh-Hans', 'zh-Hant']) {
@@ -200,12 +242,26 @@ export function projectKernelState(
   const workingDirectory =
     repositoryState?.changesState.workingDirectory.files ?? []
   const historySHAs = repositoryState?.compareState.commitSHAs ?? []
+  const historyFormat = JSON.stringify([
+    state.preferAbsoluteDates,
+    getDateFormatPreference(),
+    getTimeFormatPreference(),
+    new Date().getTimezoneOffset(),
+  ])
+  const now = Date.now()
   const history = repositoryState
     ? historySHAs.flatMap(sha => {
         const commit = repositoryState.commitLookup.get(sha)
         return commit === undefined
           ? []
-          : [historyCommitView(commit, state.preferAbsoluteDates)]
+          : [
+              historyCommitView(
+                commit,
+                state.preferAbsoluteDates,
+                historyFormat,
+                now
+              ),
+            ]
       })
     : []
 

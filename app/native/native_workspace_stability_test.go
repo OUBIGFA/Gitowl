@@ -10,9 +10,8 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
-// Background rule checks are transient status, not additional content. A
-// refresh after tab navigation or restoring a window must keep the same list
-// viewport and composer geometry while still announcing that check.
+// Returning to the window must not alternate an idle shortcut with background
+// rule checks. Neither message belongs in the persistent composer.
 func TestRuleRefreshKeepsChangesLayoutStable(t *testing.T) {
 	for _, size := range [][2]int{{900, 620}, {1180, 760}, {1440, 900}} {
 		for _, locale := range []string{"en", "zh-Hans", "zh-Hant"} {
@@ -44,8 +43,8 @@ func TestRuleRefreshKeepsChangesLayoutStable(t *testing.T) {
 							a.coreSnapshot.Selected.CommitView.RulesPending = pending
 							tt.Frame()
 							checking := nativeDialogLabel(locale, "commit.checkingRules")
-							if tt.HasText(checking) != pending {
-								t.Fatalf("rule-check status does not reflect pending=%v", pending)
+							if tt.HasText(checking) || tt.HasText(tx.SaveShortcut()) {
+								t.Fatalf("background refresh displayed a changing composer caption: %q", tt.Texts())
 							}
 							for i, label := range labels {
 								after := visibleControl(t, tt, label, size[0], size[1])

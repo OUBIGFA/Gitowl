@@ -1,7 +1,11 @@
 package main
 
 import (
+	"bufio"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"math"
 	"slices"
 	"strings"
@@ -12,6 +16,30 @@ import (
 	"github.com/OUBIGFA/Gitowl/app/native/locales"
 	"github.com/egoist/mygo/ui"
 )
+
+func BenchmarkWorkspaceHistoryFrames(b *testing.B) {
+	for _, count := range []int{100, 10000} {
+		b.Run(fmt.Sprint(count), func(b *testing.B) {
+			commits := make([]backend.Commit, count)
+			for i := range commits {
+				commits[i] = backend.Commit{SHA: fmt.Sprintf("%040x", i), Summary: fmt.Sprintf("History record %d", i), AuthorName: "Fixture", Date: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Add(-time.Duration(i) * time.Minute).Format(time.RFC3339)}
+			}
+			state, list := &nativeWorkspaceState{}, &ui.ListState{}
+			workspace := &backend.KernelWorkspace{Repository: &backend.KernelRepositoryReference{Path: "fixture"}}
+			tt := ui.NewTester(func(c *ui.Context) {
+				ui.Column(c).Fill().Children(func() {
+					renderWorkspaceHistoryList(c, state, list, workspace, nil, commits, nil, true, func(backend.KernelWorkspaceAction) {}, nil)
+				})
+			}, 900, 620)
+			tt.Frame()
+			b.ReportAllocs()
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				tt.Frame()
+			}
+		})
+	}
+}
 
 func TestHistoryOverviewShowsCommitContentWithoutAnotherPage(t *testing.T) {
 	for _, size := range []struct{ width, height int }{{900, 620}, {1440, 900}} {
@@ -66,24 +94,74 @@ func TestHistoryOverviewShowsCommitContentWithoutAnotherPage(t *testing.T) {
 }
 
 func TestVisibleHistoryStatisticsIncludeTheLastRowAndReadOnlyOnce(t *testing.T) {
-	a := newApp(nil, nil)
-	defer a.close()
-	a.core, a.coreQueue = &backend.Kernel{}, make(chan nativeOperation, 8)
+	stdout, output := io.Pipe()
+	input, stdin := io.Pipe()
+	core := backend.NewKernel(stdout, stdin, nil)
+	a := newCoreApp(core, nil)
+	defer func() { a.close(); input.Close(); stdin.Close(); stdout.Close(); output.Close() }()
+	updates := make(chan func(), 8)
+	a.update = func(fn func()) { updates <- fn }
 	a.ready, a.tab = true, historyTab
 	ref := backend.KernelRepositoryReference{ID: 1, Path: "fixture"}
-	a.commits = []backend.Commit{{SHA: "only", Summary: "The only visible row"}}
-	a.coreSnapshot = &backend.KernelSnapshot{Selected: &backend.KernelSelected{Repository: backend.KernelRepository{KernelRepositoryReference: ref}}, Workspace: &backend.KernelWorkspace{Repository: &ref}}
+	a.commits = []backend.Commit{{SHA: "only", Summary: "The only visible row", Date: time.Now().Format(time.RFC3339)}}
+	a.repo = &backend.Repository{ID: 1, Path: "fixture", Name: "Fixture"}
+	a.coreSnapshot = &backend.KernelSnapshot{
+		Protocol: 1, Core: "desktop/desktop", Revision: 1,
+		Accounts: []backend.KernelAccount{}, Repositories: []backend.KernelRepository{}, Popups: []backend.KernelPopup{},
+		Selected:  &backend.KernelSelected{Repository: backend.KernelRepository{KernelRepositoryReference: ref}, Section: "history", History: a.commits, Files: []backend.KernelFile{}},
+		Workspace: &backend.KernelWorkspace{Repository: &ref},
+	}
+	requests := make(chan []byte, 1)
+	go func() { data, _ := bufio.NewReader(input).ReadBytes('\n'); requests <- data }()
 	tt := ui.NewTester(func(c *ui.Context) { ui.Column(c).Fill().Children(func() { a.workspaceHistoryList(c) }) }, 900, 620)
 	tt.Advance(time.Second)
-	if len(a.coreQueue) != 1 {
+	var request struct {
+		ID     int `json:"id"`
+		Params struct {
+			Name string   `json:"name"`
+			SHAs []string `json:"shas"`
+		} `json:"params"`
+	}
+	select {
+	case data := <-requests:
+		if err := json.Unmarshal(data, &request); err != nil || request.Params.Name != "history.summaries" || !slices.Equal(request.Params.SHAs, []string{"only"}) {
+			t.Fatalf("unexpected visible statistics request: %s / %v", data, err)
+		}
+	case <-time.After(time.Second):
 		t.Fatal("the final visible row never requested its statistics")
 	}
-	operation := <-a.coreQueue
-	operation.complete(backend.KernelResult{HistorySummaries: []backend.KernelHistorySummary{{SHA: "only", FileCount: 7, LinesAdded: 12}}}, nil)
-	tt.Frame() // The real queue invokes completion inside the window's update.
+	// Keep the statistics response pending. An ordinary user action must still
+	// reach the original operation queue without waiting for metadata reads.
+	acted := make(chan struct{})
+	a.queueCore(nativeOperation{call: func() (backend.KernelResult, error) {
+		close(acted)
+		return backend.KernelResult{}, errors.New("test I/O boundary")
+	}})
+	select {
+	case <-acted:
+	case <-time.After(time.Second):
+		t.Fatal("history statistics blocked the user's operation queue")
+	}
+	result := backend.KernelResult{Snapshot: *a.coreSnapshot, HistorySummaries: []backend.KernelHistorySummary{{SHA: "only", FileCount: 7, LinesAdded: 12}}}
+	data, err := json.Marshal(map[string]any{"jsonrpc": "2.0", "id": request.ID, "result": result})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = output.Write(append(data, '\n')); err != nil {
+		t.Fatal(err)
+	}
+	for a.corePending > 0 {
+		select {
+		case apply := <-updates:
+			apply()
+		case <-time.After(time.Second):
+			t.Fatal("statistics completion did not reach the native window")
+		}
+	}
+	tt.Frame()
 	tt.Advance(time.Second)
-	if len(a.coreQueue) != 0 || !tt.HasText(locales.In("en").FileCount(7)) {
-		t.Fatalf("statistics were reloaded or not shown: queued=%d data=%+v text=%q", len(a.coreQueue), a.workspaceHistorySummaries, tt.Texts())
+	if a.corePending != 0 || !tt.HasText(locales.In("en").FileCount(7)) {
+		t.Fatalf("statistics were reloaded or not shown: pending=%d data=%+v text=%q", a.corePending, a.workspaceHistorySummaries, tt.Texts())
 	}
 }
 
@@ -206,6 +284,81 @@ func TestWorkspaceHistoryOverviewRetainsLoadMore(t *testing.T) {
 	}
 }
 
+func TestWorkspaceHistoryLoadsNearTheBottomLikeUpstream(t *testing.T) {
+	for _, mode := range []string{"history", "ahead", "behind"} {
+		t.Run(mode, func(t *testing.T) {
+			a := newApp(nil, nil)
+			defer a.close()
+			a.core, a.coreQueue = &backend.Kernel{}, make(chan nativeOperation, 8)
+			a.ready, a.historyLoaded, a.historyMore, a.tab = true, true, true, historyTab
+			ref := backend.KernelRepositoryReference{ID: 1, Path: "fixture"}
+			a.repo = &backend.Repository{ID: 1, Path: ref.Path, Name: "Fixture"}
+			a.workspaceHistorySummaries = make(map[string]backend.KernelHistorySummary)
+			for i := 0; i < 60; i++ {
+				sha := fmt.Sprintf("%040x", i)
+				a.commits = append(a.commits, backend.Commit{SHA: sha, Summary: fmt.Sprintf("Commit %d", i), Date: time.Date(2024, 1, i+1, 0, 0, 0, 0, time.UTC).Format(time.RFC3339)})
+				a.workspaceHistorySummaries[sha] = backend.KernelHistorySummary{SHA: sha}
+			}
+			a.coreSnapshot = &backend.KernelSnapshot{Selected: &backend.KernelSelected{Repository: backend.KernelRepository{KernelRepositoryReference: ref}}, Workspace: &backend.KernelWorkspace{Repository: &ref, Compare: backend.KernelWorkspaceCompare{Mode: mode}}}
+			tt := ui.NewTester(func(c *ui.Context) {
+				ui.Column(c).Fill().Children(func() { a.workspaceHistoryList(c) })
+			}, 900, 620)
+			tt.Advance(time.Second)
+			if len(a.coreQueue) != 0 {
+				t.Fatal("history loaded older commits before scrolling near the bottom")
+			}
+			a.commitsList.list().ScrollIntoView(len(a.workspaceHistoryRows) - 1)
+			tt.Frame()
+			tt.Advance(time.Second)
+			if mode != "history" {
+				if len(a.coreQueue) != 0 {
+					t.Fatal("a complete comparison requested another history batch")
+				}
+				return
+			}
+			if len(a.coreQueue) != 1 || !a.loadingHistory {
+				t.Fatal("scrolling near the bottom must load exactly one batch through the original kernel")
+			}
+			tt.Advance(time.Second)
+			if len(a.coreQueue) != 1 {
+				t.Fatal("scroll frames repeated the pending history request")
+			}
+		})
+	}
+}
+
+func TestShortHistoryDoesNotPaginateOnActivation(t *testing.T) {
+	a := newApp(nil, nil)
+	defer a.close()
+	a.core, a.coreQueue = &backend.Kernel{}, make(chan nativeOperation, 8)
+	a.ready, a.historyLoaded, a.historyMore, a.tab = true, true, true, historyTab
+	ref := backend.KernelRepositoryReference{ID: 1, Path: "fixture"}
+	a.repo = &backend.Repository{ID: 1, Path: ref.Path}
+	a.commits = []backend.Commit{{SHA: "a", Summary: "Initial commit"}}
+	a.workspaceHistorySummaries = map[string]backend.KernelHistorySummary{"a": {}}
+	a.coreSnapshot = &backend.KernelSnapshot{Selected: &backend.KernelSelected{Repository: backend.KernelRepository{KernelRepositoryReference: ref}}, Workspace: &backend.KernelWorkspace{Repository: &ref, Compare: backend.KernelWorkspaceCompare{Mode: "history"}}}
+	tt := ui.NewTester(func(c *ui.Context) {
+		ui.Column(c).Fill().Children(func() { a.workspaceHistoryList(c) })
+	}, 900, 620)
+	tt.Advance(time.Second)
+	if len(a.coreQueue) != 0 {
+		t.Fatal("activating a short history requested a batch without scrolling")
+	}
+	// Focus/redraw is not a request for older history. The explicit control
+	// still works when the entire list fits in the viewport.
+	tt.Key(0, ui.KeyTab)
+	tt.Advance(time.Second)
+	if len(a.coreQueue) != 0 {
+		t.Fatal("focus frames requested older history")
+	}
+	if err := tt.Click(locales.In("en").LoadMore()); err != nil {
+		t.Fatal(err)
+	}
+	if len(a.coreQueue) != 1 || !a.loadingHistory {
+		t.Fatal("explicitly loading older commits did not reach the original kernel")
+	}
+}
+
 func TestWorkspaceHistoryPointerAndKeyboardUpdateTheSameSelection(t *testing.T) {
 	state := &nativeWorkspaceState{workspaceHistoryCursor: -1}
 	list := &ui.ListState{}
@@ -249,6 +402,60 @@ func TestWorkspaceHistoryPointerAndKeyboardUpdateTheSameSelection(t *testing.T) 
 	tt.Key(0, ui.KeyEnter)
 	if !slices.Equal(selected, []string{"b"}) {
 		t.Fatal("Enter changed the visible selection")
+	}
+}
+
+func TestHistorySelectionKeepsTheLatestClickWhileKernelReplies(t *testing.T) {
+	a := newApp(nil, nil)
+	defer a.close()
+	a.core, a.coreQueue = &backend.Kernel{}, make(chan nativeOperation, 8)
+	a.ready, a.tab = true, historyTab
+	ref := backend.KernelRepositoryReference{ID: 1, Path: "fixture"}
+	a.repo = &backend.Repository{ID: 1, Path: ref.Path}
+	a.commits = []backend.Commit{{SHA: "a", Summary: "First commit"}, {SHA: "b", Summary: "Second commit"}, {SHA: "c", Summary: "Third commit"}}
+	a.workspaceHistorySummaries = map[string]backend.KernelHistorySummary{"a": {}, "b": {}, "c": {}}
+	selected := &backend.KernelSelected{Repository: backend.KernelRepository{KernelRepositoryReference: ref}, HistorySelection: []string{"a"}}
+	a.coreSnapshot = &backend.KernelSnapshot{Selected: selected, Workspace: &backend.KernelWorkspace{Repository: &ref}}
+	tt := ui.NewTester(func(c *ui.Context) { ui.Column(c).Fill().Children(func() { a.workspaceHistoryList(c) }) }, 900, 620)
+	tt.Frame()
+	for _, label := range []string{"Second commit", "Third commit"} {
+		if err := tt.Click(label); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if a.workspaceHistorySelectionPending != 2 {
+		t.Fatal("both clicks must still use the original ordered kernel actions")
+	}
+	// The first click's reply arrives while the second one is still pending.
+	a.workspaceHistorySelectionPending--
+	selected.HistorySelection = []string{"b"}
+	tt.Frame()
+	if !a.workspaceHistorySelection.Has("c") || a.workspaceHistorySelection.Has("b") {
+		t.Fatal("an earlier kernel reply moved the visible selection back")
+	}
+	a.workspaceHistorySelectionPending--
+	selected.HistorySelection = []string{"c"}
+	tt.Frame()
+	if !a.workspaceHistorySelection.Has("c") {
+		t.Fatal("the completed original selection was not preserved")
+	}
+	// Once settled, an external selection change still follows the kernel.
+	selected.HistorySelection = []string{"a"}
+	tt.Frame()
+	if !a.workspaceHistorySelection.Has("a") || a.workspaceHistorySelection.Has("c") {
+		t.Fatal("the view stopped following the original kernel after settling")
+	}
+	if err := tt.Click("Second commit"); err != nil {
+		t.Fatal(err)
+	}
+	for len(a.coreQueue) > 1 {
+		<-a.coreQueue
+	}
+	failed := <-a.coreQueue
+	failed.complete(backend.KernelResult{}, errors.New("selection failed"))
+	tt.Frame()
+	if !a.workspaceHistorySelection.Has("a") || a.workspaceHistorySelection.Has("b") {
+		t.Fatal("a failed selection did not restore the original kernel selection")
 	}
 }
 

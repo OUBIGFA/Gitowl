@@ -456,6 +456,7 @@ func (a *app) workspaceHistoryList(c *ui.Context) {
 	}
 	renderWorkspaceHistoryList(c, &a.nativeWorkspaceState, a.commitsList.list(), w, selected, a.commits, selected.HistorySelection, a.historyLoaded && !a.loadingHistory && a.historyErr == nil, a.workspaceAction, func(c *ui.Context) { a.workspaceHistoryReview(c) })
 	a.loadVisibleHistorySummaries()
+	a.loadHistoryNearBottom()
 	if a.workspaceHistorySummaryError != nil {
 		ui.Text(c, a.workspaceHistorySummaryError.Error()).TextColor(c.Theme().Danger)
 		quietButton(c, locales.In(c.Locale()).Refresh(), "refresh-cw").OnClick(func() { a.workspaceHistorySummaryError = nil; a.loadVisibleHistorySummaries() })

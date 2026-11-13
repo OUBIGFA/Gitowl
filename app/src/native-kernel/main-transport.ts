@@ -91,6 +91,8 @@ export class NativeKernelTransport implements INativeWindowPresentation {
   private writes = 0
   private quitStarted = false
   private nextDialogID = 0
+  private nextExternalID = 0
+  private readonly external = new Map<number, (opened: boolean) => void>()
   private readonly dialogs = new Map<
     number,
     {
@@ -237,6 +239,43 @@ export class NativeKernelTransport implements INativeWindowPresentation {
     })
   }
 
+  /** Launch from the visible native process, which owns foreground permission.
+   * The original shell/OAuth caller keeps its boolean result and continuation. */
+  public openExternal(url: string): Promise<boolean> {
+    if (this.inputClosed || this.failed || this.outputError) {
+      return Promise.resolve(false)
+    }
+    return new Promise(resolve => {
+      const id = ++this.nextExternalID
+      this.external.set(id, resolve)
+      this.send({
+        jsonrpc: '2.0',
+        method: 'external.open',
+        params: { id, url },
+      })
+    })
+  }
+
+  private receiveExternalResult(id: number, value: unknown): void {
+    if (
+      !isRecord(value) ||
+      !validID(value.id) ||
+      typeof value.opened !== 'boolean' ||
+      !this.external.has(value.id)
+    ) {
+      this.send({
+        jsonrpc: '2.0',
+        id,
+        error: { code: -32602, message: 'Invalid native browser result' },
+      })
+      return
+    }
+    const complete = this.external.get(value.id)!
+    this.external.delete(value.id)
+    complete(value.opened)
+    this.send({ jsonrpc: '2.0', id, result: { received: true } })
+  }
+
   private receiveDialogResult(id: number, value: unknown): void {
     if (
       !isRecord(value) ||
@@ -271,6 +310,10 @@ export class NativeKernelTransport implements INativeWindowPresentation {
       pending.resolve([])
     }
     this.dialogs.clear()
+    for (const complete of this.external.values()) {
+      complete(false)
+    }
+    this.external.clear()
     this.lines?.close()
     // Readline pauses the stream when closed. Drain without admitting more
     // commands so the parent's acknowledged shutdown can release its pipe.
@@ -431,6 +474,10 @@ export class NativeKernelTransport implements INativeWindowPresentation {
         }
         if (message.method === 'kernel.dialogResult') {
           this.receiveDialogResult(id, message.params)
+          continue
+        }
+        if (message.method === 'kernel.externalResult') {
+          this.receiveExternalResult(id, message.params)
           continue
         }
         if (message.method !== 'kernel.command') {

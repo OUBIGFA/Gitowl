@@ -10,6 +10,8 @@ import {
 } from '../../src/models/diff'
 import { TipState } from '../../src/models/tip'
 import { Repository } from '../../src/models/repository'
+import { GitHubRepository } from '../../src/models/github-repository'
+import { Owner } from '../../src/models/owner'
 import { CloningRepository } from '../../src/models/cloning-repository'
 import { RepositoryStateCache } from '../../src/lib/stores/repository-state-cache'
 import { updateStore } from '../../src/ui/lib/update-store'
@@ -169,6 +171,159 @@ function fixture(): Pick<
 }
 
 describe('native kernel contract', () => {
+  it('projects the assigned account identity rather than the repository owner', () => {
+    const app = fixture() as IAppState
+    const repository = new Repository(
+      'C:/organization-project',
+      10,
+      new GitHubRepository(
+        'project',
+        new Owner('organization', 'https://work.example/api/v3', 1),
+        1
+      ),
+      false,
+      null,
+      {},
+      false,
+      undefined,
+      undefined,
+      'alice'
+    )
+    const snapshot = projectKernelState(
+      { ...app, repositories: [repository] },
+      1
+    )
+    assert.deepEqual(snapshot.repositories[0].account, {
+      endpoint: 'https://work.example/api/v3',
+      login: 'alice',
+    })
+    assert.equal(
+      JSON.stringify(snapshot.repositories).includes('TOKEN-SENTINEL'),
+      false
+    )
+  })
+
+  it('refreshes cached history menus when tags, selection or local reachability change', () => {
+    const app = fixture() as IAppState
+    const selected = app.selectedState as Extract<
+      NonNullable<IAppState['selectedState']>,
+      { type: SelectionType.Repository }
+    >
+    const state = selected.state
+    const sha = state.compareState.commitSHAs[0]
+    const commit = state.commitLookup.get(sha)!
+    const items = (value: IAppState) =>
+      projectKernelState(value, 1).workspace!.menus.find(
+        m => m.target.kind === 'commit' && m.target.id === sha
+      )!.items
+    assert.equal(
+      items(app).find(i => i.labelKey === 'workspace.deleteTagNamed')?.enabled,
+      false
+    )
+    const changed = {
+      ...app,
+      selectedState: {
+        ...selected,
+        state: { ...state, tagsToPush: ['v1'], localCommitSHAs: [sha] },
+      },
+    }
+    assert.equal(
+      items(changed).find(i => i.labelKey === 'workspace.deleteTagNamed')
+        ?.enabled,
+      true
+    )
+    assert.equal(
+      items(changed).find(i => i.labelKey === 'workspace.undoCommit')?.enabled,
+      true
+    )
+    // GitStore retains the lookup Map while replacing a commit's tag data.
+    state.commitLookup.set(
+      sha,
+      new Commit(
+        commit.sha,
+        commit.shortSha,
+        commit.summary,
+        commit.body,
+        commit.author,
+        commit.committer,
+        commit.parentSHAs,
+        commit.trailers,
+        []
+      )
+    )
+    assert.equal(
+      items(changed).some(i => i.labelKey === 'workspace.deleteTagNamed'),
+      false
+    )
+    assert.equal(
+      items(changed).find(i => i.labelKey === 'workspace.copyTags')?.enabled,
+      false
+    )
+  })
+
+  it('keeps a loaded history responsive during repeated focus snapshots', t => {
+    const app = fixture() as IAppState
+    assert.equal(app.selectedState!.type, SelectionType.Repository)
+    const selected = app.selectedState as Extract<
+      NonNullable<IAppState['selectedState']>,
+      { type: SelectionType.Repository }
+    >
+    const commits = Array.from({ length: 10000 }, (_, i) => {
+      const identity = new CommitIdentity(
+        'History fixture',
+        'history@example.invalid',
+        new Date(Date.UTC(2024, 0, 1) - i * 60000)
+      )
+      const sha = i.toString(16).padStart(40, '0')
+      return new Commit(
+        sha,
+        sha.slice(0, 7),
+        `Commit ${i}`,
+        '',
+        identity,
+        identity,
+        [],
+        [],
+        []
+      )
+    })
+    const state: IAppState = {
+      ...app,
+      selectedState: {
+        ...selected,
+        state: {
+          ...selected.state,
+          compareState: {
+            ...selected.state.compareState,
+            commitSHAs: commits.map(c => c.sha),
+          },
+          commitLookup: new Map(commits.map(c => [c.sha, c])),
+        },
+      },
+    }
+    projectKernelState(state, 1)
+    const durations = Array.from({ length: 3 }, (_, i) => {
+      const start = performance.now()
+      const snapshot = projectKernelState(
+        { ...state, appIsFocused: i % 2 === 0 },
+        i + 2
+      )
+      assert.equal(snapshot.selected!.history.length, 10000)
+      return performance.now() - start
+    }).sort((a, b) => a - b)
+    t.diagnostic(
+      `10000 loaded commits: median focus snapshot ${durations[1].toFixed(
+        1
+      )} ms`
+    )
+    // This deliberately generous bound catches rebuilding every date/menu on
+    // focus, not individual frame scheduling noise on a shared Windows runner.
+    assert.ok(
+      durations[1] < 100,
+      `focus projection blocked for ${durations[1].toFixed(1)} ms`
+    )
+  })
+
   it('projects original clone progress without exporting the remote URL', () => {
     const state = fixture() as IAppState
     const repository = new CloningRepository(

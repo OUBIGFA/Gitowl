@@ -175,6 +175,11 @@ export interface IKernelRepository extends INativeRepositoryReference {
   readonly alias: string | null
   readonly missing: boolean
   readonly login: string | null
+  /** Original assigned identity; a repository's organization is not an account. */
+  readonly account?: {
+    readonly endpoint: string
+    readonly login: string
+  } | null
   readonly kind: 'repository' | 'cloning'
   /**
    * The original repository list's local state: the current branch's

@@ -171,6 +171,8 @@ func (a *app) applyWorkspaceSnapshot(snapshot backend.KernelSnapshot, changedRep
 		a.workspacePreparedDiffID = ""
 	}
 	if changedRepository {
+		a.workspaceHistorySource, a.workspaceHistoryRows = nil, nil
+		a.workspaceHistoryScroll, a.workspaceHistoryScrollY = ui.ScrollState{}, 0
 		a.workspaceHistorySummaries = nil
 		a.workspaceHistorySummaryError = nil
 		a.workspaceBranchOpen, a.workspaceWorktreeOpen, a.workspacePROpen, a.workspaceCompareOpen = false, false, false, false

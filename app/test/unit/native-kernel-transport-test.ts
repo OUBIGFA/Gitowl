@@ -127,6 +127,34 @@ function harness(holdOutcome = false) {
 }
 
 describe('native kernel transport lifecycle', () => {
+  it('opens an external URL through the foreground native host and awaits its result', async () => {
+    const h = harness()
+    const url = 'https://github.com/login/oauth/authorize?state=fixture'
+    const opened = h.transport.openExternal(url)
+    await h.waitForMessages(messages =>
+      messages.some(message => message.method === 'external.open')
+    )
+    const request = h.messages.find(
+      message => message.method === 'external.open'
+    ) as any
+    assert.equal(request.params.url, url)
+    h.input.write(
+      line(1, 'kernel.externalResult', { id: request.params.id, opened: true })
+    )
+    assert.equal(await opened, true)
+    h.input.end()
+  })
+
+  it('does not report a browser launch as successful after the native host disconnects', async () => {
+    const h = harness()
+    const opened = h.transport.openExternal('https://github.com/login')
+    h.input.end()
+    assert.equal(await opened, false)
+    await tick()
+    await tick()
+    assert.deepEqual(h.exits, [0])
+  })
+
   it('routes a folder picker with an empty initial path to the visible native host', async () => {
     const h = harness()
     const selected = h.transport.showFileDialog('open', {

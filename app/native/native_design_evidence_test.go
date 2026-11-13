@@ -209,9 +209,9 @@ func TestChangesAndReviewLayoutAcrossLanguagesAppearancesAndSizes(t *testing.T) 
 	}
 }
 
-// Day headings are list rows too. They must not be selectable, must not shift
-// which commit an arrow key reaches, and must not be asked for statistics.
-func TestHistoryDayHeadingsKeepSelectionAndStatisticsOnCommits(t *testing.T) {
+// Day headings must not be selectable or shift which commit an arrow reaches.
+// The real pipe regression separately checks their exclusion from statistics.
+func TestHistoryDayHeadingsKeepSelectionOnCommits(t *testing.T) {
 	now := time.Now()
 	a := newApp(nil, nil)
 	defer a.close()
@@ -230,15 +230,11 @@ func TestHistoryDayHeadingsKeepSelectionAndStatisticsOnCommits(t *testing.T) {
 			renderWorkspaceHistoryList(c, &a.nativeWorkspaceState, a.commitsList.list(), a.coreSnapshot.Workspace, a.coreSnapshot.Selected, a.commits, selected, true, func(action backend.KernelWorkspaceAction) {
 				selected = action.SHAs
 			}, nil)
-			a.loadVisibleHistorySummaries()
 		})
 	}, 900, 620)
 	tt.Advance(time.Second)
 	if !tt.HasText("Today") {
 		t.Fatalf("the newest day has no heading: %q", tt.Texts())
-	}
-	if len(a.coreQueue) != 1 {
-		t.Fatalf("statistics requests: %d", len(a.coreQueue))
 	}
 	if err := tt.Click("Newest commit"); err != nil {
 		t.Fatal(err)

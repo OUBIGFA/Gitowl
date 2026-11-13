@@ -31,7 +31,7 @@ func TestComposerSecondaryTextFollowsSystemTextScale(t *testing.T) {
 	h.a.repo = &backend.Repository{ID: 1, Name: "example"}
 	h.a.status = &backend.Status{Files: []backend.File{{Path: "first.txt", Status: "Modified"}}}
 	h.tt.SetSize(1440, 900)
-	label := locales.In("en").SaveShortcut()
+	label := locales.In("en").SelectedOfTotal(0, 1)
 	h.tt.Frame()
 	normal, ok := h.tt.AccessByRole(ui.RoleStatus, label)
 	if !ok {

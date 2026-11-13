@@ -1,4 +1,9 @@
 {
+  "workspace.unassignedProjects": {
+    "en": "Unassigned",
+    "zh-Hans": "未分配账号",
+    "zh-Hant": "未指派帳號"
+  },
   "workspace.copyRepoName": {
     "en": "Copy project name",
     "zh-Hans": "复制项目名称",

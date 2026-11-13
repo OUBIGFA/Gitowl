@@ -261,14 +261,18 @@ export class DesktopPresenter {
     )
   }
 
-  public changeSection(
+  public async changeSection(
     reference: INativeRepositoryReference,
     section: RepositorySectionTab
   ) {
-    return this.runtime.dispatcher.changeRepositorySection(
-      this.getRepository(reference),
-      section
-    )
+    const repository = this.getRepository(reference)
+    if (section === RepositorySectionTab.History) {
+      // CompareSidebar initializes on mount upstream. The native view has no
+      // React mount, so refresh its original comparison before exposing rows
+      // or allowing pagination against a history from before the last commit.
+      await this.runtime.dispatcher.initializeCompare(repository)
+    }
+    return this.runtime.dispatcher.changeRepositorySection(repository, section)
   }
 
   public selectWorkingDirectoryFiles(

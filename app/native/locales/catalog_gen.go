@@ -13826,6 +13826,16 @@ func (msgs Messages) DialogLabelD0e51b28344ab87d() string {
 	return Catalog.Format(msgs.locale, "dialogLabel_d0e51b28344ab87d", nil)
 }
 
+// DialogLabel84fb3dd51be94eb8 says "Unassigned"
+// in the language the app shows.
+func DialogLabel84fb3dd51be94eb8() string { return In(i18n.Locale()).DialogLabel84fb3dd51be94eb8() }
+
+// DialogLabel84fb3dd51be94eb8 says "Unassigned"
+// in the language of msgs.
+func (msgs Messages) DialogLabel84fb3dd51be94eb8() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_84fb3dd51be94eb8", nil)
+}
+
 // DialogLabel8dbedb8503d1b004 says "Copy project name"
 // in the language the app shows.
 func DialogLabel8dbedb8503d1b004() string { return In(i18n.Locale()).DialogLabel8dbedb8503d1b004() }

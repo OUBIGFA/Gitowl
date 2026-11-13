@@ -138,6 +138,22 @@ func (a *app) generationChoices(c *ui.Context, tx locales.Messages) {
 }
 
 func (a *app) generationErrors(c *ui.Context, tx locales.Messages) {
+	// User-initiated outcomes belong with generation feedback, never in the
+	// persistent file-count caption. Background refreshes have no notice here.
+	if a.generationErr == nil {
+		message := ""
+		switch a.generationNotice {
+		case generationStopped:
+			message = tx.GenerationStopped()
+		case generationChanged:
+			message = tx.GenerationChanged()
+		case generationFilled:
+			message = tx.GenerationFilled()
+		}
+		if message != "" {
+			ui.Text(c, message).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted).Role(ui.RoleStatus)
+		}
+	}
 	if a.generationErr != nil {
 		summary := tx.GenerationFailed()
 		if generationRPCCode(a.generationErr) == -32022 {

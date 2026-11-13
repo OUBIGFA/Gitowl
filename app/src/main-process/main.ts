@@ -672,6 +672,9 @@ app.on('ready', () => {
     }
 
     try {
+      if (nativeTransport !== undefined) {
+        return await nativeTransport.openExternal(path)
+      }
       await shell.openExternal(path)
       return true
     } catch (e) {

@@ -115,3 +115,53 @@ func TestProjectSearchMenuFocusAndKeyboardSelection(t *testing.T) {
 		t.Fatal("keyboard selection did not request original repository selection")
 	}
 }
+
+func TestProjectRailGroupsAssignedAccountsAndKeepsKeyboardNavigation(t *testing.T) {
+	for _, locale := range []string{"en", "zh-Hans", "zh-Hant"} {
+		t.Run(locale, func(t *testing.T) {
+			a, tt := projectSearchTester(t)
+			var snapshot backend.KernelSnapshot
+			// Two servers can have the same login. Ownership uses the original
+			// account assignment, not the repository/organization name.
+			err := json.Unmarshal([]byte(`{
+				"revision":2,
+				"accounts":[{"login":"alice","endpoint":"https://api.github.com"},{"login":"alice","endpoint":"https://work.example/api/v3"}],
+				"repositories":[
+					{"id":1,"path":"C:/alpha","name":"alpha","kind":"repository","account":{"login":"alice","endpoint":"https://api.github.com"}},
+					{"id":2,"path":"C:/beta","name":"beta","kind":"repository","account":{"login":"alice","endpoint":"https://work.example/api/v3"}},
+					{"id":3,"path":"C:/local","name":"local","kind":"repository"}
+				]
+			}`), &snapshot)
+			if err != nil {
+				t.Fatal(err)
+			}
+			a.applyCoreSnapshot(snapshot)
+			tt.SetLocale(locale)
+			tt.Frame()
+			first, ok := tt.AccessByRole(ui.RoleHeading, "@alice · github.com")
+			if !ok {
+				t.Fatal("GitHub account heading missing")
+			}
+			second, ok := tt.AccessByRole(ui.RoleHeading, "@alice · work.example")
+			if !ok || second.Bounds.Y <= first.Bounds.Y {
+				t.Fatal("same-login accounts from different servers were merged")
+			}
+			alpha, _ := tt.Find("alpha")
+			beta, _ := tt.Find("beta")
+			if alpha.Y <= first.Bounds.Y || alpha.Y >= second.Bounds.Y || beta.Y <= second.Bounds.Y {
+				t.Fatal("project is displayed under the wrong account")
+			}
+			if !tt.HasText(workspaceLabel(locale, "workspace.unassignedProjects")) {
+				t.Fatal("unassigned repositories were attributed to an account")
+			}
+			if err := tt.Click(workspaceLabel(locale, "workspace.searchProjects")); err != nil {
+				t.Fatal(err)
+			}
+			tt.Key(0, ui.KeyDown)
+			tt.Key(0, ui.KeyEnter)
+			if len(a.coreQueue) != 1 {
+				t.Fatal("keyboard navigation submitted a group heading instead of a project")
+			}
+		})
+	}
+}

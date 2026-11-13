@@ -43,7 +43,10 @@ type nativeWorkspaceState struct {
 	workspaceHistoryFilesSHA          string
 	workspaceHistoryCombinedFilesOpen bool
 	workspaceHistoryCursor            int
-	workspaceHistoryRows              []int // commit index per list row; -1 is a day heading
+	workspaceHistoryRows              []historyRow
+	workspaceHistorySource            []backend.Commit
+	workspaceHistoryScroll            ui.ScrollState
+	workspaceHistoryScrollY           float32
 	workspaceHistorySummaries         map[string]backend.KernelHistorySummary
 	workspaceHistorySummaryLoading    bool
 	workspaceHistorySummaryError      error
@@ -116,6 +119,11 @@ func (a *app) workspaceAction(action backend.KernelWorkspaceAction) {
 			if action.Type == "history.select" {
 				a.workspaceHistorySelectionPending--
 				a.loadingCommit, a.commitErr = a.workspaceHistorySelectionPending > 0, err
+				if a.workspaceHistorySelectionPending == 0 {
+					// Reconcile even when the last selection failed and the original
+					// state kept the same identity as before the user's clicks.
+					a.workspaceHistoryIdentity = ""
+				}
 			}
 		},
 	})

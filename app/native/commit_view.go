@@ -24,24 +24,14 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 		// Sources and output language remain visible; they are negotiated and
 		// applied from real settings receipts, never invented demonstration data.
 		vm := a.nativeCommitView()
-		caption := tx.SaveShortcut()
-		if a.savingVersion {
-			caption = tx.SavingVersion()
-		} else if a.generating {
-			caption = tx.GeneratingMessage()
-		} else if vm != nil && vm.RulesPending {
-			// Every kernel refresh may check rules again. Reuse the existing
-			// single-line status slot so this transient state cannot resize the
-			// composer and displace the file viewport on return or tray restore.
-			caption = nativeDialogLabel(c.Locale(), "commit.checkingRules")
-		} else if a.generationNotice == generationStopped {
-			caption = tx.GenerationStopped()
-		} else if a.generationNotice == generationChanged {
-			caption = tx.GenerationChanged()
-		} else if a.generationNotice == generationFilled {
-			caption = tx.GenerationFilled()
-		} else if a.lastSavedSHA != "" {
-			caption = tx.VersionSaved(a.lastSavedSHA[:min(12, len(a.lastSavedSHA))])
+		scope := tx.IncludedFiles(len(a.included))
+		if a.status != nil && len(a.status.Files) > 0 {
+			scope = tx.SelectedOfTotal(len(a.included), len(a.status.Files))
+		}
+		selectionCount := func() {
+			// Only the user's file selection changes this caption. Background
+			// rule checks must not replace it when the window becomes active.
+			ui.Text(c.Key("commit-selection-count"), scope).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted).FontFeatures("tnum").SingleLine().Tooltip(tx.IncludedFiles(len(a.included))).Role(ui.RoleStatus)
 		}
 		if vm == nil || vm.Mode != "copilot" {
 			if a.core == nil {
@@ -74,9 +64,7 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 				if inlineHint {
 					description.Trigger.Description(nativeDialogLabel(c.Locale(), "commit.summaryHint"))
 				}
-				// A status beside the description disclosure saves a whole row at
-				// minimum height while keeping progress and the shortcut visible.
-				ui.Text(c, caption).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted).Grow(1).MinWidth(0).SingleLine().Tooltip(caption).Role(ui.RoleStatus)
+				selectionCount()
 			})
 			description.Panel(func() {
 				// Give long descriptions more editing space as the window grows.
@@ -125,19 +113,18 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 			})
 		}
 		if vm != nil && vm.Mode == "copilot" {
-			ui.Text(c, caption).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted).SingleLine().Tooltip(caption).Role(ui.RoleStatus)
+			selectionCount()
 		}
 		ui.Row(c.Key("composer-actions")).FillWidth().Gap(gap).AlignItems(ui.Center).Wrap().Children(func() {
 			if a.core != nil && (vm == nil || vm.Mode != "copilot") {
 				a.coreGenerationMenu(c, tx)
 			}
 			ui.Spacer(c)
-			a.nativeCommitOptions(c)
 			if vm == nil || vm.Mode != "copilot" {
 				if a.generating {
 					quietButton(c.Key("stop-generation"), tx.StopGeneration(), "x").Height(36).OnClick(a.stopGeneration)
 				} else {
-					quietButton(c.Key("generate-message"), tx.GenerateMessage(), "file-text").Height(36).
+					ui.Button(c.Key("generate-message"), tx.GenerateMessage()).Height(40).Padding(8, 16).FontWeight(500).
 						Tooltip(a.generationTooltip(tx)).Disabled(!a.generationActionEnabled()).OnClick(a.requestGeneration)
 				}
 			}
@@ -148,22 +135,19 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 			if vm != nil && vm.Mode == "copilot" {
 				saveLabel = nativeDialogLabel(c.Locale(), "commit.assistedSave")
 			}
-			// Scope belongs to Save, including files hidden by the active filter.
-			// An inline caption shares the action baseline, without creating a
-			// floating status row above Save. Keep the pair together on wrap.
+			if a.savingVersion {
+				saveLabel = tx.SavingVersion()
+			}
+			// Save and its advanced options stay together on the right, including
+			// at the minimum width when the model selector wraps above them.
 			ui.Row(c.Key("commit-save-group")).Shrink(0).AlignItems(ui.Center).Gap(12).Children(func() {
-				// Of all changed files, so the scope reads in review mode too.
-				scope := tx.IncludedFiles(len(a.included))
-				if a.status != nil && len(a.status.Files) > 0 {
-					scope = tx.SelectedOfTotal(len(a.included), len(a.status.Files))
-				}
-				ui.Text(c, scope).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted).FontFeatures("tnum").NoWrap().Tooltip(tx.IncludedFiles(len(a.included)))
 				save := ui.PrimaryButton(c.Key("save-version"), saveLabel).Height(40).Padding(8, 16).FontWeight(500).Label(saveLabel).
 					Tooltip(tx.SaveVersionTooltip() + " · " + tx.SaveShortcut() + " · " + tx.IncludedFiles(len(a.included))).Disabled(!a.canSaveVersion()).OnClick(a.saveVersion)
 				if a.coreFocusTarget == "commit-submit" {
 					save.Focus()
 					a.coreFocusTarget = ""
 				}
+				a.nativeCommitOptions(c)
 			})
 		})
 	})
