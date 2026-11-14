@@ -13,7 +13,7 @@ import (
 )
 
 // view is the production workspace, shared by real windows and ui.NewTester.
-// A file review replaces the overview; it never adds another permanent pane.
+// File changes keep their list and draft beside a collapsible native diff pane.
 func (a *app) view(c *ui.Context) {
 	a.beginCorePresentation()
 	a.applyCoreZoom(c)
@@ -29,6 +29,7 @@ func (a *app) view(c *ui.Context) {
 		return
 	}
 	width, height := c.Size()
+	changesWorkspace := a.isChangesWorkspace()
 	verticalPadding := float32(20)
 	if height < 700 {
 		verticalPadding = 12
@@ -51,6 +52,8 @@ func (a *app) view(c *ui.Context) {
 					switch {
 					case a.repo == nil:
 						a.noProject(c, tx)
+					case changesWorkspace:
+						a.changesWorkspace(c, tx, colors, min(1440, width-a.nativeRailWidth(c))-2*padding)
 					case a.workspaceStashView(c):
 					case a.reviewingFile:
 						a.diffPane(c, tx, min(1440, width-a.nativeRailWidth(c))-2*padding)
@@ -60,9 +63,9 @@ func (a *app) view(c *ui.Context) {
 						a.changesOverview(c, tx, colors)
 					}
 				})
-				// The single composer stays at the bottom of the same canvas in
-				// overview and review, with stable input identities and draft.
-				if a.repo != nil && a.tab == changesTab && a.commitCapable {
+				// File changes own their stable composer inside the split's first
+				// pane. Other changes flows, such as stash review, retain this one.
+				if a.repo != nil && a.tab == changesTab && a.commitCapable && !changesWorkspace {
 					a.commitForm(c, tx)
 				}
 			})
@@ -419,7 +422,8 @@ func (a *app) historyPage(c *ui.Context, tx locales.Messages) {
 func (a *app) diffPane(c *ui.Context, tx locales.Messages, width float32) {
 	file, _, selected := a.currentFile()
 	_, height := c.Size()
-	compact := height < 700
+	inline := a.isChangesWorkspace()
+	compact := height < 700 || inline
 	label := tx.DiffTitle()
 	if selected {
 		label = file.Path
@@ -428,8 +432,7 @@ func (a *app) diffPane(c *ui.Context, tx locales.Messages, width float32) {
 	if a.tab == historyTab {
 		back = tx.BackToVersion()
 	}
-	ui.Row(c).Gap(12).Margin(0, 0, 8, 0).Children(func() {
-		iconButton(c.Key("back-to-overview"), back, "arrow-left").OnClick(a.backFromReview)
+	title := func() {
 		// The file name leads; its folder is quiet context and its change size
 		// follows, as in the file list the review was opened from.
 		ui.Row(c.Key("review-title")).Grow(1).MinWidth(0).Gap(10).AlignItems(ui.Center).Children(func() {
@@ -449,14 +452,15 @@ func (a *app) diffPane(c *ui.Context, tx locales.Messages, width float32) {
 			}
 			ui.Spacer(c)
 		})
+	}
+	inclusion := func() {
 		if a.tab == changesTab && a.commitCapable && selected {
 			included := a.fileCheckState(file.Path)
 			ui.CheckboxState(c.Key("include-reviewed-file"), &included, tx.IncludeForSave()).Label(tx.IncludeFile(file.Path)).
 				Disabled(a.composerLocked() || !a.ready).OnChange(func() { a.changeIncluded(file.Path, included == ui.CheckOn) })
 		}
-		if compact {
-			a.nativeDiffControls(c, true)
-		}
+	}
+	options := func() {
 		if a.preview != nil && len(a.preview.patches) > 0 {
 			anchor := iconButton(c.Key("review-options"), tx.ReviewOptions(), "ellipsis").
 				OnClick(func() { a.reviewOptionsOpen = !a.reviewOptionsOpen })
@@ -483,7 +487,28 @@ func (a *app) diffPane(c *ui.Context, tx locales.Messages, width float32) {
 				ui.Checkbox(c.Key("wrap-lines"), &a.wrap, tx.WrapLines())
 			}).Width(280).Padding(16).Gap(16)
 		}
-	})
+	}
+	if inline {
+		ui.Row(c.Key("diff-heading")).FillWidth().MinHeight(36).Gap(8).Margin(0, 0, 4, 0).Children(func() {
+			title()
+			options()
+			a.changesDiffToggle(c, tx)
+		})
+		ui.Row(c.Key("diff-controls")).FillWidth().Gap(8).Wrap().Margin(0, 0, 8, 0).Children(func() {
+			inclusion()
+			a.nativeDiffControls(c, true)
+		})
+	} else {
+		ui.Row(c.Key("diff-heading")).Gap(12).Margin(0, 0, 8, 0).Children(func() {
+			iconButton(c.Key("back-to-overview"), back, "arrow-left").OnClick(a.backFromReview)
+			title()
+			inclusion()
+			if compact {
+				a.nativeDiffControls(c, true)
+			}
+			options()
+		})
+	}
 	if selected && file.OldPath != "" {
 		ui.Text(c, tx.PreviousPath(file.OldPath)).TextColor(c.Theme().TextMuted).Margin(0, 0, 12, 0)
 	}
@@ -513,7 +538,7 @@ func (a *app) previewView(c *ui.Context, tx locales.Messages, width float32) {
 			emptyState(c, message)
 			return
 		}
-		if _, height := c.Size(); height >= 700 {
+		if _, height := c.Size(); height >= 700 && !a.isChangesWorkspace() {
 			a.nativeDiffControls(c, false)
 		}
 		layout := editor.DiffLayout(a.diffLayout)

@@ -530,7 +530,7 @@ func renderNativeDialogButton(c *ui.Context, action backend.KernelDialogAction, 
 	}
 	button.MinHeight(40).Padding(8, 16).FontWeight(500).Disabled(busy || action.Disabled)
 	if action.Destructive {
-		button.TextColor(c.Theme().Danger)
+		button.TextColor(workspaceDestructiveText(c, action.Primary))
 	}
 	button.OnClick(func() { send(action) })
 }

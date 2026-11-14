@@ -109,7 +109,7 @@ func exerciseRealSelectedCommit(t *testing.T, shortcut bool) {
 		}
 	}
 	tt.Type("Native selected version")
-	if err = tt.Click("Back to changes"); err != nil {
+	if err = tt.Click("Collapse diff"); err != nil {
 		t.Fatal(err)
 	}
 	if a.reviewingFile || !a.included["first.txt"] || a.commitSummary != "Native selected version" {

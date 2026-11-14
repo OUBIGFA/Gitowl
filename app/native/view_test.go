@@ -199,7 +199,7 @@ func TestNativeOpenStatusAndPatch(t *testing.T) {
 	if r.id != 1 || r.path != "first.txt" || r.commit != "" {
 		t.Fatalf("working-tree diff request: %+v", r)
 	}
-	if !h.tt.HasText("example") || !h.tt.HasText("Changes") || !h.tt.HasText("Changed files") || h.tt.HasText("Current changes") || h.tt.HasText("1 changed file") || h.tt.HasText("@@ -7,2 +7,2 @@") {
+	if !h.tt.HasText("example") || !h.tt.HasText("File changes") || !h.tt.HasText("Changed files") || h.tt.HasText("Current changes") || h.tt.HasText("1 changed file") || h.tt.HasText("@@ -7,2 +7,2 @@") {
 		t.Fatalf("overview did not keep the page hierarchy compact: %q", h.tt.Texts())
 	}
 	h.click(t, "Branch details")
@@ -216,7 +216,7 @@ func TestNativeOpenStatusAndPatch(t *testing.T) {
 		t.Fatalf("native read-only diff: added=%d deleted=%d editable=%v", added, deleted, diff.Editable)
 	}
 	hunk := h.a.preview.patches[0].file.Hunks[0]
-	if hunk.OldStart != 7 || hunk.NewStart != 7 || !h.tt.HasText("Changed section") || !h.tt.HasText("Before") || !h.tt.HasText("After") {
+	if hunk.OldStart != 7 || hunk.NewStart != 7 || !h.tt.HasText("Changed section") || diff.Layout != editor.DiffUnified || diff.Old.String() != "context\nbefore" || diff.New.String() != "context\nafter" {
 		t.Fatalf("review context or original file line numbers were lost: %q / %+v", h.tt.Texts(), hunk)
 	}
 }
@@ -366,7 +366,7 @@ func TestMinimumWindowAndVirtualFileList(t *testing.T) {
 	h.tt.SetTitleBar(ui.TitleBar{Height: 48, Right: 138})
 	h.tt.SetSize(900, 620)
 	row, found := h.tt.Find("Review file-00000.txt")
-	if !found || row.X < projectRailWidth || row.X+row.W > 900 || row.H != 48 || h.tt.HasText("Back to changes") {
+	if !found || row.X < projectRailWidth || row.X+row.W > 900 || row.H != 48 || h.tt.HasText("Collapse diff") {
 		t.Fatalf("minimum-window central overview row: %+v / %v", row, found)
 	}
 	first, last := h.a.changesList.list().Visible()

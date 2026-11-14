@@ -59,7 +59,10 @@ import {
   parseCopilotAssistedCommitResponse,
 } from '../copilot-assisted-commit'
 import { IAssistedCommitAnalysis } from '../../models/assisted-commit'
-import { getCopilotRuntimePath } from '../copilot-runtime'
+import {
+  getCopilotRuntimeLaunch,
+  getCopilotRuntimePath,
+} from '../copilot-runtime'
 import { startTimer } from '../../ui/lib/timing'
 import { join } from 'path'
 import { BaseStore } from './base-store'
@@ -842,9 +845,9 @@ export class CopilotStore extends BaseStore {
     }
 
     const client = new CopilotClient({
-      connection: RuntimeConnection.forStdio({
-        path: runtimePath,
-      }),
+      connection: RuntimeConnection.forStdio(
+        getCopilotRuntimeLaunch(runtimePath)
+      ),
       env: {
         ...options.env,
         GH_HOST: getCopilotGHHost(account),

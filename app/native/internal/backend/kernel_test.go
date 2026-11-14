@@ -278,7 +278,9 @@ func TestKernelConfigKeepsOwnedPathsAndElectronBootstrap(t *testing.T) {
 	t.Setenv("NODE_OPTIONS", "--require=unrelated-script")
 	t.Setenv("GITOWL_USER_DATA", "unrelated-profile")
 	t.Setenv("GITOWL_CREDENTIAL_NAMESPACE", "upstream-namespace")
-	for _, item := range kernelEnvironment(data) {
+	t.Setenv("GITOWL_COPILOT_LAUNCHER", "unrelated-launcher")
+	config.CopilotLauncher = filepath.Join(expectedData, "Gitowl.exe")
+	for _, item := range kernelEnvironment(config) {
 		key, value, _ := strings.Cut(item, "=")
 		switch strings.ToUpper(key) {
 		case "ELECTRON_RUN_AS_NODE", "NODE_OPTIONS", "GITOWL_CREDENTIAL_NAMESPACE":
@@ -290,6 +292,10 @@ func TestKernelConfigKeepsOwnedPathsAndElectronBootstrap(t *testing.T) {
 		case "ELECTRON_NO_ATTACH_CONSOLE":
 			if value != "1" {
 				t.Fatal("owned Windows pipe was redirected")
+			}
+		case "GITOWL_COPILOT_LAUNCHER":
+			if value != config.CopilotLauncher {
+				t.Fatal("Copilot launcher redirected by parent environment")
 			}
 		}
 	}

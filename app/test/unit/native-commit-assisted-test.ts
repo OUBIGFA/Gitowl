@@ -11,12 +11,14 @@ import { ipcRenderer } from 'electron'
 import type { AppRuntime } from '../../src/ui/app-runtime'
 import type { NativeCommitPresenter } from '../../src/native-kernel/commit-presenter'
 import type { Repository } from '../../src/models/repository'
+import { getCopilotRuntimeLaunch } from '../../src/lib/copilot-runtime'
 
 // OS-only fixture boundaries. The executable locator points at the repository's
 // SDK subprocess fixture, not a mocked CopilotStore/client/planner. Tests stop at
 // consent, or commit an empty selection (which never invokes any model).
 mock.module('../../src/lib/copilot-runtime', {
   namedExports: {
+    getCopilotRuntimeLaunch,
     getCopilotRuntimePath: () =>
       resolve('app/test/native-service/copilot-fixture-runtime.js'),
   },

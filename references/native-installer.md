@@ -42,6 +42,8 @@ npm run prepare:native-runtime
 
 准备入口最后运行真实生产包 smoke（新建一次性空 profile、原内核 state/正常 shutdown、空 Web body、原 Git 与 Copilot/Koffi FFI 加载），不安装程序、不 seed profile、不访问真实账户或请求付费模型。实际 production 编译仍有 renderer/native-kernel 各四条 Copilot `createRequire` / Koffi 动态依赖 warnings，Bundle Analyzer 对 `out/174.js` 的 `import.meta` 报解析警告（报告仍生成），另有 license URL 弃用提示；不能称无警告，也未据此验证真实 Copilot 登录/会话。日志保存在 `_temp/kernel-reuse/runtime-packaging/`。官方 Electron archive 与 SHA256 清单须先缓存至 `.local/downloads/electron-v<锁定版本>-win32-x64.zip` / `electron-v<锁定版本>-SHASUMS256.txt`；登记工具核对官方清单与锁定 npm checksums 后逐文件比对 dist，缺失或字节不一致时明确失败，不下载替代来源。
 
+Windows 的 Copilot SDK 仍启动原 `copilot-runtime.exe`。原生宿主通过自身的内部启动入口为它创建从首帧就隐藏的控制台，并原样转发 SDK 的输入、输出、错误和退出码。PowerShell 全局钩子继承同一控制台，避免启动其他命令时先分配可见控制台再隐藏。该入口复用现有 Windows job 生命周期；SDK 强制结束启动器时，运行时及钩子也结束。原 SDK、模型选择、认证、配置和钩子保留，未新增运行时二进制或修改第三方包。
+
 源码/登记或父任务在编译中变化时拒绝写可复用 receipt，须待输入稳定后重跑。正常准备不会更新 `output/release/`；只有 runtime smoke 以及上述身份/CLI 成组验收通过后，才允许单独恢复 `_temp/native-previews/`。
 
 `build-info.json` 记录测试包实际范围。`fullFeatureParity: false` 表示仍未完成所有上游功能，不能当作可发布版本。构建通过不等于桌面安装、升级或全部功能验收通过。当前没有 Windows Authenticode 签名，系统可能提示未知发布者；没有配置公开更新源。
@@ -58,4 +60,4 @@ MyGo 负责布局、本地化、原生控件和交互桥接。账户登录、Cop
 
 首次启动使用系统显示语言；显式选择保留到下一次启动。“跟随系统”恢复自动匹配。安装器和应用都带英文、简体中文、繁体中文资源，每次只显示当前语言。生成提交说明的语言使用独立设置，不与界面语言绑在一起。
 
-当前锁定 MyGo v0.8.3。有限补丁覆盖安装器进程占用提示、差异编辑器菜单转发、原生编辑菜单角色、数字输入按钮的中英文读屏名称、系统菜单按键的消费标记、语言显式选择的只读查询和单实例启动消息边界。单实例补丁在完整 JSON 消息到达后解析，保留原尺寸限制与超时，避免 Windows 延迟连接结束信号时丢失 CLI/深链请求。补丁应用于忽略目录中的独立源码副本，不修改 Go module cache。来源、修订、补丁理由与校验见 `third_party/mygo.json`、`third_party/native-runtimes.json`；升级时重新核对每项补丁是否必要。完整桌面升级及交付验收以当前源码的实际结果为准。
+当前锁定 MyGo v0.9.0。有限补丁覆盖安装器进程占用提示、差异编辑器菜单转发、原生编辑菜单角色、数字输入按钮的中英文读屏名称、系统菜单按键的消费标记、单实例启动消息边界和显式资源目录中的隐藏子目录复制。单实例补丁在完整 JSON 消息到达后解析，保留原尺寸限制与超时，避免 Windows 延迟连接结束信号时丢失 CLI/深链请求。补丁应用于忽略目录中的独立源码副本，不修改 Go module cache。来源、修订、补丁理由与校验见 `third_party/mygo.json`、`third_party/native-runtimes.json`；升级时重新核对每项补丁是否必要。完整桌面升级及交付验收以当前源码的实际结果为准。

@@ -111,29 +111,25 @@ func TestWorkspaceOverviewReviewBackAcrossSizesAndLanguages(t *testing.T) {
 					t.Fatalf("primary action is not naturally visible at the canvas bottom: %+v", before)
 				}
 				h.click(t, tx.OpenFile("first.txt"))
-				if !h.a.reviewingFile || h.tt.HasText(tx.OpenFile("second.txt")) || h.tt.HasText(tx.IncludeAll()) {
-					t.Fatalf("review did not replace the overview: %q", h.tt.Texts())
+				if !h.a.reviewingFile || !h.tt.HasText(tx.OpenFile("second.txt")) || !h.tt.HasText(tx.IncludeAll()) {
+					t.Fatalf("review did not stay beside the file overview: %q", h.tt.Texts())
 				}
 				diff := visibleControl(t, h.tt, tx.DiffTitle(), size.width, size.height)
-				padding := float32(32)
-				if size.width < 1100 {
-					padding = 24
-				}
-				canvasWidth := min(1440, float32(size.width)-projectRailWidth) - 2*padding
-				if diff.X < projectRailWidth || diff.W < canvasWidth-1 {
-					t.Fatalf("focused native diff is not canvas-wide: %+v, canvas %v", diff, canvasWidth)
+				files := visibleControl(t, h.tt, tx.ChangedFiles(), size.width, size.height)
+				if diff.X <= files.X+files.W {
+					t.Fatalf("native diff is not beside the file list: diff=%+v files=%+v", diff, files)
 				}
 				layout := editor.DiffSplit
-				if canvasWidth < 760 {
+				if diff.W < 760 {
 					layout = editor.DiffUnified
 				}
 				if h.a.preview.patches[0].state.Layout != layout {
 					t.Fatal("diff measured the whole window instead of its canvas")
 				}
-				if got := visibleControl(t, h.tt, tx.SaveVersion(), size.width, size.height); got != before {
-					t.Fatalf("primary action moved on entering review: before %+v after %+v", before, got)
+				if got := visibleControl(t, h.tt, tx.SaveVersion(), size.width, size.height); got.Y+got.H != before.Y+before.H || got.X+got.W >= diff.X {
+					t.Fatalf("primary action left the file pane footer: before %+v after %+v", before, got)
 				}
-				h.click(t, tx.BackToOverview())
+				h.click(t, tx.CollapseDiff())
 				if h.a.reviewingFile || h.a.commitSummary != summary || h.a.commitDescription != description || !h.a.included["first.txt"] || h.a.included["second.txt"] || !h.a.descriptionOpen {
 					t.Fatalf("review/back lost project draft or selection: %+v", h.a.included)
 				}

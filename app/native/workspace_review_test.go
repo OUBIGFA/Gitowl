@@ -16,15 +16,24 @@ func TestNativeReviewExplainsSidesAndRetainsRawRangeTooltip(t *testing.T) {
 			h := newViewHarness(t)
 			h.open(t, []backend.File{{Path: "notes.md", Status: "Modified"}})
 			h.answer(t, "diff", patch("notes.md", "before", "after"), nil)
+			h.tt.SetSize(1920, 1080)
 			h.tt.SetLocale(tag)
 			tx := locales.In(tag)
 			h.click(t, tx.OpenFile("notes.md"))
-			before := visibleControl(t, h.tt, tx.ImageBefore(), 1180, 760)
-			after := visibleControl(t, h.tt, tx.ImageAfter(), 1180, 760)
+			divider, ok := h.tt.AccessByRole(ui.RoleSplitter, "")
+			if !ok {
+				t.Fatal("file/diff divider missing")
+			}
+			x, y := divider.Bounds.X, divider.Bounds.Y+divider.Bounds.H/2
+			h.tt.Press(x, y)
+			h.tt.Move(x-220, y)
+			h.tt.Release(x-220, y)
+			before := visibleControl(t, h.tt, tx.ImageBefore(), 1920, 1080)
+			after := visibleControl(t, h.tt, tx.ImageAfter(), 1920, 1080)
 			if before.X >= after.X || before.Y != after.Y {
 				t.Fatalf("diff sides lack aligned before/after context: %+v / %+v", before, after)
 			}
-			section := visibleControl(t, h.tt, tx.DiffSection(), 1180, 760)
+			section := visibleControl(t, h.tt, tx.DiffSection(), 1920, 1080)
 			h.tt.Move(section.X+section.W/2, section.Y+section.H/2)
 			h.tt.Advance(time.Second)
 			if !h.tt.HasText(tx.RawDiffRange("@@ -7,2 +7,2 @@")) {
@@ -45,7 +54,7 @@ func TestNativeReviewExplainsSidesAndRetainsRawRangeTooltip(t *testing.T) {
 				t.Fatal("native wrap control stopped working")
 			}
 			h.tt.Key(0, ui.KeyEscape)
-			h.tt.SetSize(1180, 760)
+			h.tt.SetSize(1920, 1080)
 			h.click(t, tx.ReviewOptions())
 			h.click(t, tx.Unified())
 			if h.tt.HasText(tx.ImageBefore()) || h.a.preview.patches[0].state.Layout != editor.DiffUnified {

@@ -12,6 +12,11 @@ import (
 // and density without stealing the central review canvas from small windows.
 const projectRailWidth float32 = 232
 
+var (
+	dangerOnDark  = ui.Hex("#ffadd1")
+	dangerOnLight = ui.Hex("#92244e")
+)
+
 // Workspace surfaces are warm graphite, not the desktop accent. High-contrast
 // mode keeps MyGo's system-derived colors; language and text-size preferences
 // still apply in both appearances.
@@ -42,7 +47,7 @@ func setWorkspaceTheme(c *ui.Context) workspaceColors {
 			t.Border, t.Text, t.TextMuted = ui.Hex("#52524b"), ui.Hex("#e8e7e2"), ui.Hex("#b0afa7")
 			t.Accent, t.AccentHover, t.AccentPressed, t.AccentText = ui.Hex("#dedbd2"), ui.Hex("#efede7"), ui.Hex("#c6c2b7"), ui.Hex("#292925")
 			t.Selection, t.Focus = ui.RGBA(208, 195, 217, 0.22), ui.Hex("#b7a5c1")
-			t.Danger, t.Warning, t.Success = ui.Hex("#ee938f"), ui.Hex("#d8b878"), ui.Hex("#8cbe9c")
+			t.Danger, t.Warning, t.Success = dangerOnDark, ui.Hex("#d8b878"), ui.Hex("#8cbe9c")
 			t.Scrollbar = ui.Hex("#8e857a").Alpha(0.7)
 			colors = workspaceColors{rail: ui.Hex("#1e1e1c"), selected: ui.Hex("#363632"), hairline: ui.Hex("#3b3b36")}
 		} else {
@@ -51,13 +56,30 @@ func setWorkspaceTheme(c *ui.Context) workspaceColors {
 			t.Border, t.Text, t.TextMuted = ui.Hex("#c9c9bf"), ui.Hex("#292925"), ui.Hex("#66665e")
 			t.Accent, t.AccentHover, t.AccentPressed, t.AccentText = ui.Hex("#42394f"), ui.Hex("#554b62"), ui.Hex("#302938"), ui.Hex("#ffffff")
 			t.Selection, t.Focus = ui.RGBA(71, 59, 78, 0.16), ui.Hex("#80688d")
-			t.Danger, t.Warning, t.Success = ui.Hex("#a83e38"), ui.Hex("#85601e"), ui.Hex("#39714c")
+			t.Danger, t.Warning, t.Success = dangerOnLight, ui.Hex("#85601e"), ui.Hex("#39714c")
 			t.Scrollbar = ui.Hex("#9b9286").Alpha(0.75)
 			colors = workspaceColors{rail: ui.Hex("#efefe9"), selected: ui.Hex("#e4e4dc"), hairline: ui.Hex("#ddddd4")}
 		}
 	}
 	c.SetTheme(&t)
 	return colors
+}
+
+// MyGo inverts the primary surface and uses the ordinary surface when the
+// window is inactive. Match that surface instead of putting ordinary danger
+// text on its opposite background; high contrast keeps the native text pair.
+func workspaceDestructiveText(c *ui.Context, primary bool) ui.Color {
+	t := c.Theme()
+	if !primary || !(c.WindowActive() || t.InactiveAccent == t.Accent) {
+		return t.Danger
+	}
+	if c.Preferences().HighContrast {
+		return t.AccentText
+	}
+	if t.Dark {
+		return dangerOnLight
+	}
+	return dangerOnDark
 }
 
 func workspaceCodeFont() string {

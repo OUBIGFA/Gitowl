@@ -79,7 +79,7 @@ func exerciseOriginalKernelMedia(t *testing.T, v originalGenerationView) {
 		})
 		if name == "dds" && v.app.preview.kind == "binary" {
 			t.Log("DDS is disabled by the original production feature flag; no extra format entry invented")
-			v.click("Back to changes")
+			v.click("Collapse diff")
 			continue
 		}
 		if v.app.imageError != nil {
@@ -134,7 +134,10 @@ func exerciseOriginalKernelMedia(t *testing.T, v originalGenerationView) {
 				t.Fatal("native mode did not round-trip through original AppStore")
 			}
 		}
-		v.click("Back to changes")
+		v.click("Collapse diff")
+		if v.app.reviewingFile || !v.tester.HasText("Changed files") {
+			t.Fatal("collapsing image review did not retain the file list")
+		}
 	}
 	// Real menus/controls remain usable after the media traffic.
 	v.tester.Key(ui.Cmd, ui.KeyA)

@@ -70,6 +70,11 @@ function menuLabel(item: Exclude<MenuItem, { type: 'separator' }>) {
   if (item.id === 'preferences') {
     return { labelKey: 'menu.preferences' }
   }
+  // Gitowl calls this page File changes. Keep the upstream menu's ID and
+  // shortcut instead of requiring its English label to match our catalog.
+  if (item.id === 'show-changes') {
+    return { labelKey: 'menu.show-changes' }
+  }
   const role = nativeRole(item.role)
   if (role) {
     return {
@@ -97,7 +102,6 @@ function menuLabel(item: Exclude<MenuItem, { type: 'separator' }>) {
   }
   const alias: Record<string, string> = {
     'github desktop': 'menu.app',
-    'show changes': 'menu.show-changes',
     'show history': 'menu.show-history',
     'show repository list': 'menu.show-repository-list',
     'show branches list': 'menu.show-branches-list',

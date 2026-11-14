@@ -181,7 +181,7 @@ func TestNativeWorkspaceRenderRealProject(t *testing.T) {
 	r.snapshot(t, "workspace-review-zh", "zh-Hans", "focused review", 1180, 760, false)
 	r.snapshot(t, "workspace-review-min-zh", "zh-Hans", "focused review", 900, 620, false)
 	r.snapshot(t, "workspace-review-dark-zh", "zh-Hans", "focused review", 1180, 760, true)
-	r.click(t, tx.BackToOverview())
+	r.click(t, tx.CollapseDiff())
 	if !r.a.included[path] || r.a.commitSummary != "调整湖区两日行程" {
 		t.Fatal("real fixture overview/review/back lost its draft or selection")
 	}

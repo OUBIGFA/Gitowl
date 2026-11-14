@@ -70,9 +70,9 @@
   },
   "menu.find": { "en": "Find", "zh-Hans": "查找", "zh-Hant": "尋找" },
   "menu.show-changes": {
-    "en": "Changes",
-    "zh-Hans": "改动",
-    "zh-Hant": "變更"
+    "en": "File changes",
+    "zh-Hans": "文件改动",
+    "zh-Hant": "檔案變更"
   },
   "menu.show-history": {
     "en": "History",

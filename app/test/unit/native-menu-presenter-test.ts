@@ -115,6 +115,9 @@ describe('original application menu in the native presenter', () => {
               assert.ok(translations[locale].length > 0)
             }
           }
+          const changes = items.find(i => i.id === 'show-changes')
+          assert.equal(changes?.labelKey, 'menu.show-changes')
+          assert.equal(changes?.accelerator, 'CmdOrCtrl+1')
           assert.equal(
             items.find(i => i.id === 'push')?.accelerator,
             'CmdOrCtrl+P'

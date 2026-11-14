@@ -63,6 +63,19 @@ type ownedProcess struct {
 	job        uintptr // Windows job handle, for inspection only
 }
 
+// RunCopilotRuntime forwards the SDK's pipes unchanged. The launcher owns a
+// nested kill-on-close job, so SDK cancellation also ends runtime descendants.
+func RunCopilotRuntime(executable string, arguments []string) error {
+	cmd := exec.Command(executable, arguments...)
+	cmd.Stdin, cmd.Stdout, cmd.Stderr = os.Stdin, os.Stdout, os.Stderr
+	configureCopilotConsole(cmd)
+	owned, err := startOwnedCommand(cmd)
+	if err != nil {
+		return err
+	}
+	return owned.wait()
+}
+
 // Service owns the child and its transport. Closing stdin first gives Node its
 // normal EOF shutdown; a bounded fallback kills an unresponsive child and reaps
 // it. The UI calls Close after its event loop, never from a click handler.

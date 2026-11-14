@@ -18,7 +18,7 @@ type workspaceChangesCallbacks struct {
 	contextMenu func(*ui.Context, ui.Element, string)
 }
 
-// The overview is replaced by focused review on an ordinary file click.
+// An ordinary file click opens its diff beside the overview.
 // Native Ctrl/Shift and keyboard navigation remain selection-only. Inclusion
 // stays a separate checkbox and never changes as a side effect of selection.
 func (a *app) workspaceChangesList(c *ui.Context) bool {

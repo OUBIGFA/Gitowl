@@ -21,6 +21,9 @@ import (
 var BuildNumber = "dev"
 
 func main() {
+	if runtime.GOOS == "windows" && len(os.Args) > 1 && os.Args[1] == "--gitowl-copilot-runtime" {
+		os.Exit(runCopilotRuntime(os.Args[2:]))
+	}
 	workingDirectory, err := os.Getwd()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -59,6 +62,9 @@ func run(entry, electron, initialPath, profile string, initialLaunch nativeLaunc
 	resources, resourceErr := mygo.App.Path(mygo.PathResources)
 	userData, userDataErr := mygo.App.Path(mygo.PathUserData)
 	config, configErr := backend.ResolveKernelConfig(resources, userData, entry, electron)
+	if configErr == nil && runtime.GOOS == "windows" {
+		config.CopilotLauncher, configErr = os.Executable()
+	}
 	logo, logoErr := loadLogo(resources)
 	a := newCoreApp(nil, logo)
 	a.serviceErr, a.logoErr = errors.Join(resourceErr, userDataErr, configErr), logoErr

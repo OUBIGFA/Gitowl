@@ -67,6 +67,8 @@ describe(
     // Teardown leases and deletes the fixtures; a background refresh that is
     // still running then fails by design. Those are not test outcomes.
     let tearingDown = false
+    const pendingErrorPosts = new Set<Promise<void>>()
+    const errorPostFailures: unknown[] = []
 
     before(async () => {
       localStorage.clear()
@@ -83,7 +85,15 @@ describe(
       // it, AppStore failures have no presentation host to request recovery.
       runtime.appStore.onDidError(error => {
         if (!tearingDown) {
-          void runtime.dispatcher.postError(error)
+          const pending = runtime.dispatcher.postError(error)
+          pendingErrorPosts.add(pending)
+          pending.then(
+            () => pendingErrorPosts.delete(pending),
+            failure => {
+              pendingErrorPosts.delete(pending)
+              errorPostFailures.push(failure)
+            }
+          )
         }
       })
       await mkdir(root, { recursive: true })
@@ -102,6 +112,12 @@ describe(
     after(async () => {
       tearingDown = true
       await runtime.appStore._selectRepository(null)
+      // Recovery already posted by the error listener can still remove a
+      // missing repository. Drain it before teardown protects that path;
+      // otherwise its destruction guard rejects after the tests have ended.
+      while (pendingErrorPosts.size > 0) {
+        await Promise.allSettled([...pendingErrorPosts])
+      }
       const repositories = runtime.appStore
         .getState()
         .repositories.filter(
@@ -126,6 +142,7 @@ describe(
         leases.forEach(lease => lease.release())
         window.close()
       }
+      assert.deepEqual(errorPostFailures, [])
     })
 
     async function fixture() {

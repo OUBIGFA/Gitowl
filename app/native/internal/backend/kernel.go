@@ -283,9 +283,10 @@ type KernelEvent struct {
 }
 
 type KernelConfig struct {
-	Electron string
-	Entry    string
-	UserData string
+	Electron        string
+	Entry           string
+	UserData        string
+	CopilotLauncher string // Set by the visible host, never an ambient override.
 }
 
 func ResolveKernelConfig(resources, userData, entry, electron string) (KernelConfig, error) {
@@ -320,19 +321,22 @@ func ResolveKernelConfig(resources, userData, entry, electron string) (KernelCon
 	return KernelConfig{Electron: electron, Entry: entry, UserData: userData}, nil
 }
 
-func kernelEnvironment(userData string) []string {
+func kernelEnvironment(config KernelConfig) []string {
 	var env []string
 	for _, item := range os.Environ() {
 		key, _, _ := strings.Cut(item, "=")
 		switch strings.ToUpper(key) {
-		case "ELECTRON_RUN_AS_NODE", "ELECTRON_NO_ATTACH_CONSOLE", "NODE_OPTIONS", "LOCAL_GIT_DIRECTORY", "GIT_EXEC_PATH", "GITOWL_USER_DATA", "GITOWL_NATIVE_CORE", "GITOWL_CREDENTIAL_NAMESPACE":
+		case "ELECTRON_RUN_AS_NODE", "ELECTRON_NO_ATTACH_CONSOLE", "NODE_OPTIONS", "LOCAL_GIT_DIRECTORY", "GIT_EXEC_PATH", "GITOWL_USER_DATA", "GITOWL_NATIVE_CORE", "GITOWL_CREDENTIAL_NAMESPACE", "GITOWL_COPILOT_LAUNCHER":
 			continue
 		}
 		env = append(env, item)
 	}
 	// Electron's Windows bootstrap must not replace the owned pipes with a
 	// console. Its EOF-only process.stdin is separately handled by native-mode.
-	return append(env, "GITOWL_USER_DATA="+userData, "ELECTRON_NO_ATTACH_CONSOLE=1")
+	if config.CopilotLauncher != "" {
+		env = append(env, "GITOWL_COPILOT_LAUNCHER="+config.CopilotLauncher)
+	}
+	return append(env, "GITOWL_USER_DATA="+config.UserData, "ELECTRON_NO_ATTACH_CONSOLE=1")
 }
 
 // Kernel owns no Git/credential/business state. It connects the MyGo presenter
@@ -383,7 +387,7 @@ func StartKernel(config KernelConfig, onEvent func(KernelEvent)) (*Kernel, error
 	}
 	cmd := exec.Command(config.Electron, application, "--gitowl-native-core")
 	cmd.Dir = filepath.Dir(config.Entry)
-	cmd.Env = kernelEnvironment(config.UserData)
+	cmd.Env = kernelEnvironment(config)
 	k := &Kernel{onEvent: onEvent, closeDone: make(chan struct{})}
 	s, err := startProcess(cmd, "Electron", k.receiveEvent, false)
 	if err != nil {

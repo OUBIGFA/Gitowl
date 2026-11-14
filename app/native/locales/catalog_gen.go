@@ -76,11 +76,11 @@ func (msgs Messages) Settings() string {
 	return Catalog.Format(msgs.locale, "settings", nil)
 }
 
-// Changes says "Changes"
+// Changes says "File changes"
 // in the language the app shows.
 func Changes() string { return In(i18n.Locale()).Changes() }
 
-// Changes says "Changes"
+// Changes says "File changes"
 // in the language of msgs.
 func (msgs Messages) Changes() string {
 	return Catalog.Format(msgs.locale, "changes", nil)
@@ -444,6 +444,26 @@ func DiffTitle() string { return In(i18n.Locale()).DiffTitle() }
 // in the language of msgs.
 func (msgs Messages) DiffTitle() string {
 	return Catalog.Format(msgs.locale, "diffTitle", nil)
+}
+
+// ExpandDiff says "Expand diff"
+// in the language the app shows.
+func ExpandDiff() string { return In(i18n.Locale()).ExpandDiff() }
+
+// ExpandDiff says "Expand diff"
+// in the language of msgs.
+func (msgs Messages) ExpandDiff() string {
+	return Catalog.Format(msgs.locale, "expandDiff", nil)
+}
+
+// CollapseDiff says "Collapse diff"
+// in the language the app shows.
+func CollapseDiff() string { return In(i18n.Locale()).CollapseDiff() }
+
+// CollapseDiff says "Collapse diff"
+// in the language of msgs.
+func (msgs Messages) CollapseDiff() string {
+	return Catalog.Format(msgs.locale, "collapseDiff", nil)
 }
 
 // DiffEmpty says "No text changes in this patch."
@@ -832,6 +852,16 @@ func SaveVersion() string { return In(i18n.Locale()).SaveVersion() }
 // Hide unless the service advertises repository.commit.
 func (msgs Messages) SaveVersion() string {
 	return Catalog.Format(msgs.locale, "saveVersion", nil)
+}
+
+// SaveVersionShort says "Save"
+// in the language the app shows.
+func SaveVersionShort() string { return In(i18n.Locale()).SaveVersionShort() }
+
+// SaveVersionShort says "Save"
+// in the language of msgs.
+func (msgs Messages) SaveVersionShort() string {
+	return Catalog.Format(msgs.locale, "saveVersionShort", nil)
 }
 
 // SaveVersionTooltip says "Create a local Git commit for the selected changes. This does not push or upload changes."
@@ -1258,6 +1288,16 @@ func GenerateMessage() string { return In(i18n.Locale()).GenerateMessage() }
 // in the language of msgs.
 func (msgs Messages) GenerateMessage() string {
 	return Catalog.Format(msgs.locale, "generateMessage", nil)
+}
+
+// GenerateMessageShort says "Generate"
+// in the language the app shows.
+func GenerateMessageShort() string { return In(i18n.Locale()).GenerateMessageShort() }
+
+// GenerateMessageShort says "Generate"
+// in the language of msgs.
+func (msgs Messages) GenerateMessageShort() string {
+	return Catalog.Format(msgs.locale, "generateMessageShort", nil)
 }
 
 // StopGeneration says "Stop generating"
@@ -3934,6 +3974,18 @@ func SelectedOfTotal(selected int, total int) string {
 // How many changed files are included in the version.
 func (msgs Messages) SelectedOfTotal(selected int, total int) string {
 	return Catalog.Format(msgs.locale, "selectedOfTotal", map[string]any{"selected": selected, "total": total})
+}
+
+// SelectedOfTotalCompact says "{selected, number} / {total, number}"
+// in the language the app shows.
+func SelectedOfTotalCompact(selected int, total int) string {
+	return In(i18n.Locale()).SelectedOfTotalCompact(selected, total)
+}
+
+// SelectedOfTotalCompact says "{selected, number} / {total, number}"
+// in the language of msgs.
+func (msgs Messages) SelectedOfTotalCompact(selected int, total int) string {
+	return Catalog.Format(msgs.locale, "selectedOfTotalCompact", map[string]any{"selected": selected, "total": total})
 }
 
 // DialogLabelD72e38d1b248cd9a says "Select account"
@@ -7986,11 +8038,11 @@ func (msgs Messages) DialogLabel8fadf9c79fb03452() string {
 	return Catalog.Format(msgs.locale, "dialogLabel_8fadf9c79fb03452", nil)
 }
 
-// DialogLabel82784c721297cf4b says "Changes"
+// DialogLabel82784c721297cf4b says "File changes"
 // in the language the app shows.
 func DialogLabel82784c721297cf4b() string { return In(i18n.Locale()).DialogLabel82784c721297cf4b() }
 
-// DialogLabel82784c721297cf4b says "Changes"
+// DialogLabel82784c721297cf4b says "File changes"
 // in the language of msgs.
 func (msgs Messages) DialogLabel82784c721297cf4b() string {
 	return Catalog.Format(msgs.locale, "dialogLabel_82784c721297cf4b", nil)

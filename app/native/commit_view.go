@@ -5,10 +5,11 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
-// The composer is a single canvas sibling of the overview/review page. Its
-// stable keys preserve native editing state while that page is replaced.
+// The composer stays in the file pane while its diff opens or closes. Its
+// stable parent and keys preserve native editing state through resizing.
 func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 	_, height := c.Size()
+	narrow := a.isChangesWorkspace() && a.changesDiffLayout.width < 420
 	// Reviewing a file at a short window: the diff is what is being read. The
 	// actions wrap to two rows there, so tighten the spacing above them (every
 	// label stays) to keep a usable code viewport. Padding is unchanged so Save
@@ -31,7 +32,11 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 		selectionCount := func() {
 			// Only the user's file selection changes this caption. Background
 			// rule checks must not replace it when the window becomes active.
-			ui.Text(c.Key("commit-selection-count"), scope).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted).FontFeatures("tnum").SingleLine().Tooltip(tx.IncludedFiles(len(a.included))).Role(ui.RoleStatus)
+			shown := scope
+			if narrow && a.status != nil && len(a.status.Files) > 0 {
+				shown = tx.SelectedOfTotalCompact(len(a.included), len(a.status.Files))
+			}
+			ui.Text(c.Key("commit-selection-count"), shown).Label(scope).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted).FontFeatures("tnum").SingleLine().Tooltip(scope).Role(ui.RoleStatus)
 		}
 		if vm == nil || vm.Mode != "copilot" {
 			if a.core == nil {
@@ -124,7 +129,11 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 				if a.generating {
 					quietButton(c.Key("stop-generation"), tx.StopGeneration(), "x").Height(36).OnClick(a.stopGeneration)
 				} else {
-					ui.Button(c.Key("generate-message"), tx.GenerateMessage()).Height(40).Padding(8, 16).FontWeight(500).
+					label := tx.GenerateMessage()
+					if narrow {
+						label = tx.GenerateMessageShort()
+					}
+					ui.Button(c.Key("generate-message"), label).Label(tx.GenerateMessage()).Height(40).Padding(8, 16).FontWeight(500).
 						Tooltip(a.generationTooltip(tx)).Disabled(!a.generationActionEnabled()).OnClick(a.requestGeneration)
 				}
 			}
@@ -138,10 +147,14 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 			if a.savingVersion {
 				saveLabel = tx.SavingVersion()
 			}
+			shownSaveLabel := saveLabel
+			if narrow && !a.savingVersion && (vm == nil || vm.Mode != "copilot" && !vm.Amending) {
+				shownSaveLabel = tx.SaveVersionShort()
+			}
 			// Save and its advanced options stay together on the right, including
 			// at the minimum width when the model selector wraps above them.
 			ui.Row(c.Key("commit-save-group")).Shrink(0).AlignItems(ui.Center).Gap(12).Children(func() {
-				save := ui.PrimaryButton(c.Key("save-version"), saveLabel).Height(40).Padding(8, 16).FontWeight(500).Label(saveLabel).
+				save := ui.PrimaryButton(c.Key("save-version"), shownSaveLabel).Height(40).Padding(8, 16).FontWeight(500).Label(saveLabel).
 					Tooltip(tx.SaveVersionTooltip() + " · " + tx.SaveShortcut() + " · " + tx.IncludedFiles(len(a.included))).Disabled(!a.canSaveVersion()).OnClick(a.saveVersion)
 				if a.coreFocusTarget == "commit-submit" {
 					save.Focus()

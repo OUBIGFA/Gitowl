@@ -47,6 +47,11 @@ func (a *app) nativeCommitOptions(c *ui.Context) {
 	if vm.Mode == "copilot" {
 		a.focusCoreCommitMessage(button)
 	}
+	// A closed Popover builds no element to consume Context.Key. Do not let
+	// that pending key name the enclosing split's native divider instead.
+	if !a.commitOptionsOpen {
+		return
+	}
 	core, ctx := a.core, a.ctx
 	ref, ok := a.coreReference()
 	if !ok {

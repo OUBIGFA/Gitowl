@@ -491,7 +491,7 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 		}
 		await(func() bool { return a.corePending == 0 && a.coreSnapshot.Workspace.CheckMarks == checkMarks })
 	}
-	click(tx.BackToOverview())
+	click(tx.CollapseDiff())
 	if a.commitSummary != "Original kernel native commit" || !a.included["selected.txt"] {
 		t.Fatal("review/back lost original draft or inclusion")
 	}

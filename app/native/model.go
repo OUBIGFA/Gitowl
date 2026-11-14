@@ -120,6 +120,7 @@ type app struct {
 	commitFilesList   nativeListState
 	patchList         nativeListState
 	reviewingFile     bool
+	changesDiffLayout changesDiffLayout
 	viewingCommit     bool
 	descriptionOpen   bool
 	branchDetailsOpen bool

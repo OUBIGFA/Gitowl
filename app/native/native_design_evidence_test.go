@@ -196,7 +196,7 @@ func TestChangesAndReviewLayoutAcrossLanguagesAppearancesAndSizes(t *testing.T) 
 							labels = append(labels, tx.OpenFile("budget.csv"), tx.GenerateMessage())
 						}
 						if scene == "review" {
-							labels = append(labels, tx.BackToOverview())
+							labels = append(labels, tx.CollapseDiff())
 						}
 						for _, label := range labels {
 							visibleControl(t, tt, label, size[0], size[1])
