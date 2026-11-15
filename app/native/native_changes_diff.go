@@ -5,7 +5,7 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
-type changesDiffLayout struct {
+type workspaceDiffLayout struct {
 	width, expandedWidth, available float32
 	expanded                        bool
 }
@@ -18,15 +18,23 @@ func (a *app) isChangesWorkspace() bool {
 	return w == nil || w.Stash == nil || !w.Stash.Selected
 }
 
-func (a *app) expandChangesDiff() {
+func (a *app) isFileWorkspace() bool {
+	return a.isChangesWorkspace() || a.repo != nil && a.tab == historyTab
+}
+
+func (a *app) expandWorkspaceDiff() {
 	if _, _, found := a.currentFile(); found {
-		a.reviewFile(a.changeIndex)
+		index := a.changeIndex
+		if a.tab == historyTab {
+			index = a.commitFileIndex
+		}
+		a.reviewFile(index)
 	} else {
 		a.reviewingFile, a.reviewOptionsOpen = true, false
 	}
 }
 
-func (a *app) changesDiffToggle(c *ui.Context, tx locales.Messages) {
+func (a *app) workspaceDiffToggle(c *ui.Context, tx locales.Messages) {
 	label, icon := tx.ExpandDiff(), "panel-left-open"
 	if a.reviewingFile {
 		label, icon = tx.CollapseDiff(), "panel-left-close"
@@ -40,16 +48,15 @@ func (a *app) changesDiffToggle(c *ui.Context, tx locales.Messages) {
 		if a.reviewingFile {
 			a.backFromReview()
 		} else {
-			a.expandChangesDiff()
+			a.expandWorkspaceDiff()
 		}
 	})
 }
 
-// The native split is kept even while folded. Its minimum second pane holds
-// the expand button, so the list and composer never change parents and native
-// focus, text selection, undo and scrolling survive every panel transition.
-func (a *app) changesWorkspace(c *ui.Context, tx locales.Messages, colors workspaceColors, available float32) {
-	layout := &a.changesDiffLayout
+// Changes and history share this split and its pane styling. Keeping it while
+// folded preserves native focus, selection, undo and list/diff scroll state.
+func (a *app) fileWorkspace(c *ui.Context, tx locales.Messages, colors workspaceColors, available float32) {
+	layout := &a.diffPanelLayout
 	minimum := min(float32(280), (available-1)/2)
 	fit := func(width float32) float32 { return max(minimum, min(width, available-1-minimum)) }
 	if layout.available != available || layout.expanded != a.reviewingFile {
@@ -71,21 +78,25 @@ func (a *app) changesWorkspace(c *ui.Context, tx locales.Messages, colors worksp
 	if a.reviewingFile {
 		bottomPadding = 16
 	}
-	split := ui.Split(c.Key("changes-diff-split"), &layout.width, func() {
-		ui.Column(c.Key("changes-primary")).Fill().MinWidth(0).Padding(0, 16, bottomPadding, 0).Children(func() {
-			ui.Column(c.Key("changes-page")).Grow(1).MinHeight(0).FillWidth().Children(func() {
-				a.changesOverview(c, tx, colors)
+	split := ui.Split(c.Key("workspace-diff-split"), &layout.width, func() {
+		ui.Column(c.Key("workspace-primary")).Fill().MinWidth(0).Padding(0, 16, bottomPadding, 0).Children(func() {
+			ui.Column(c.Key("workspace-overview")).Grow(1).MinHeight(0).FillWidth().Children(func() {
+				if a.tab == historyTab {
+					a.historyPage(c, tx)
+				} else {
+					a.changesOverview(c, tx, colors)
+				}
 			})
-			if a.commitCapable {
+			if a.tab == changesTab && a.commitCapable {
 				a.commitForm(c, tx)
 			}
 		})
 	}, func() {
-		ui.Column(c.Key("changes-diff-pane")).Fill().MinWidth(0).Children(func() {
+		ui.Column(c.Key("workspace-diff-pane")).Fill().MinWidth(0).Children(func() {
 			if a.reviewingFile {
 				a.diffPane(c, tx, available-layout.width-1)
 			} else {
-				ui.Row(c.Key("diff-heading")).FillWidth().MinHeight(36).Children(func() { a.changesDiffToggle(c, tx) })
+				ui.Row(c.Key("diff-heading")).FillWidth().MinHeight(36).Children(func() { a.workspaceDiffToggle(c, tx) })
 			}
 		})
 	}).Fill().MinWidth(0).MinHeight(0)
@@ -93,7 +104,7 @@ func (a *app) changesWorkspace(c *ui.Context, tx locales.Messages, colors worksp
 		layout.width = fit(layout.width)
 		layout.expandedWidth = layout.width
 		if !a.reviewingFile {
-			a.expandChangesDiff()
+			a.expandWorkspaceDiff()
 		}
 	}
 }

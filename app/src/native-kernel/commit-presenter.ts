@@ -117,6 +117,8 @@ export class NativeCommitPresenter {
   private contextAccount: Account | undefined
   private contextGenerationAccount: Account | undefined
   private ruleInput: ReadonlyArray<unknown> = []
+  // Undefined is unchecked, null is a failed format; failures wait for an edit.
+  private ruleMessage: string | null | undefined
   private ruleID = 0
   private rulesPending = false
   private rules: CommitRuleStatus | null = null
@@ -238,41 +240,51 @@ export class NativeCommitPresenter {
     if (selected === null) {
       this.ruleID++
       this.ruleInput = []
+      this.ruleMessage = undefined
       this.rules = null
       this.rulesPending = false
       return
     }
     const r = selected.state
     const info = r.changesState.currentRepoRulesInfo
-    const input = [
-      selected.repository.hash,
-      account,
-      r.changesState.workingDirectory,
-      r.changesState.commitMessage,
-      r.changesState.coAuthors,
-      r.commitToAmend,
-      r.commitAuthor?.email,
-      r.branchesState.tip,
-      info,
-      r.aheadBehind,
-    ]
-    if (
-      input.every((value, index) => value === this.ruleInput[index]) &&
-      input.length === this.ruleInput.length
-    ) {
-      return
-    }
-    this.ruleInput = input
-    const id = ++this.ruleID
     const enabled = useRepoRulesLogic(account ?? null, selected.repository)
     const branch =
       r.branchesState.tip.kind === TipState.Valid
         ? r.branchesState.tip.branch.name
         : null
+    const commitContext = this.context(selected.repository, r)
+    // Upstream only validates the placeholder when both text fields are empty.
+    // The eventual commit context still uses the single-file default summary.
+    const ruleContext = {
+      ...commitContext,
+      summary:
+        !r.changesState.commitMessage.summary &&
+        r.changesState.commitMessage.description
+          ? ''
+          : commitContext.summary,
+    }
+    // Format only changed content. Refreshed rules, authors and branches are
+    // checked synchronously below against the same original Git-formatted text.
+    const input = [selected.repository.hash, JSON.stringify(ruleContext)]
+    if (
+      !input.every((value, index) => value === this.ruleInput[index]) ||
+      input.length !== this.ruleInput.length
+    ) {
+      this.ruleInput = input
+      this.ruleID++
+      this.ruleMessage = undefined
+      this.rulesPending = false
+    }
+    const checksMessage = enabled && info.commitMessagePatterns.hasRules
     const base: CommitRuleStatus = {
       enabled,
       info,
-      message: 'pass',
+      message:
+        !checksMessage || this.ruleMessage === undefined
+          ? 'pass'
+          : this.ruleMessage === null
+          ? 'fail'
+          : info.commitMessagePatterns.getFailedRules(this.ruleMessage).status,
       author: r.commitAuthor?.email
         ? info.commitAuthorEmailPatterns.getFailedRules(r.commitAuthor.email)
             .status
@@ -283,30 +295,26 @@ export class NativeCommitPresenter {
       aheadBehind: r.aheadBehind,
     }
     this.rules = base
-    this.rulesPending = enabled
-    if (!enabled) {
+    if (!checksMessage) {
+      if (this.rulesPending) {
+        this.ruleID++
+        this.rulesPending = false
+      }
       return
     }
-    const ruleContext = this.context(selected.repository, r)
-    // Upstream only validates the placeholder when both text fields are empty.
-    // The eventual commit context still uses the single-file default summary.
-    void formatCommitMessage(selected.repository, {
-      ...ruleContext,
-      summary:
-        !r.changesState.commitMessage.summary &&
-        r.changesState.commitMessage.description
-          ? ''
-          : ruleContext.summary,
-    })
+    if (this.ruleMessage !== undefined || this.rulesPending) {
+      return
+    }
+    const id = ++this.ruleID
+    this.rulesPending = true
+    void formatCommitMessage(selected.repository, ruleContext)
       .then(message => {
         if (this.disposed || id !== this.ruleID) {
           return
         }
-        this.rules = {
-          ...base,
-          message: info.commitMessagePatterns.getFailedRules(message).status,
-        }
+        this.ruleMessage = message
         this.rulesPending = false
+        this.observe(this.runtime.appStore.getState())
         this.emit()
       })
       .catch(error => {
@@ -314,7 +322,8 @@ export class NativeCommitPresenter {
           return
         }
         this.rulesPending = false
-        this.rules = { ...base, message: 'fail' }
+        this.ruleMessage = null
+        this.observe(this.runtime.appStore.getState())
         void this.runtime.dispatcher.postError(error)
         this.emit()
       })

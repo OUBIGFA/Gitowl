@@ -95,6 +95,7 @@ try {
             authenticodeSigned=$false; fullFeatureParity=($null -ne $acceptance)
             originalCore='desktop/desktop'; presentationComplete=($null -ne $acceptance)
             runtimeInputHash=(Get-Content 'output/native-runtime/runtime-receipt.json' -Raw -Encoding UTF8 | ConvertFrom-Json).inputHash
+            runtimeSmoke=if ($env:GITOWL_SKIP_RUNTIME_SMOKE -eq '1') { 'skipped-by-request' } else { 'passed' }
             desktopAcceptance=if ($null -ne $acceptance) { 'source-bound-parent-review' } else { 'not-required' }; installedAcceptance='not-required'; channel='research-preview'
         }
         if ($null -ne $acceptance) {

@@ -420,6 +420,12 @@ async function prepare() {
       reuse ? 'verified and reused' : 'prepared'
     }: ${kernel}`
   )
+  if (process.env.GITOWL_SKIP_RUNTIME_SMOKE === '1') {
+    console.log(
+      'Runtime smoke test skipped explicitly (GITOWL_SKIP_RUNTIME_SMOKE=1).'
+    )
+    return
+  }
   const smoke = getNpmCommand([
     'test',
     '--',

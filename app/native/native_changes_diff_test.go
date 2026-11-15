@@ -12,6 +12,79 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
+func TestHistoryDiffUsesRightPanelWithoutReplacingTimeline(test *testing.T) {
+	for _, size := range [][2]int{{900, 620}, {1180, 760}, {1920, 1080}} {
+		for _, locale := range []string{"en", "zh-Hans", "zh-Hant"} {
+			for _, dark := range []bool{false, true} {
+				test.Run(fmt.Sprintf("%dx%d/%s/dark=%t", size[0], size[1], locale, dark), func(test *testing.T) {
+					application := designEvidenceApp(test, time.Now(), "review")
+					stdout, output := io.Pipe()
+					input, stdin := io.Pipe()
+					application.core = backend.NewKernel(stdout, stdin, nil)
+					updates := make(chan func(), 32)
+					application.update = func(update func()) { updates <- update }
+					go io.Copy(io.Discard, input)
+					test.Cleanup(func() { application.close(); input.Close(); stdin.Close(); stdout.Close(); output.Close() })
+					application.tab, application.reviewingFile, application.changeIndex, application.commitIndex, application.commitFileIndex = historyTab, false, 2, 0, 0
+					application.changeset = &backend.Changeset{Files: coreFiles(application.coreSnapshot.Selected.HistoryFiles)}
+					application.coreSnapshot.Selected.Section = "history"
+					application.coreSnapshot.Selected.HistorySelection = []string{application.commits[0].SHA}
+					application.coreSnapshot.Selected.HistoryFileID = ptr("a")
+					application.workspaceHistoryFilesSHA = application.commits[0].SHA
+					tester := designEvidenceTester(application, size[0], size[1], locale, dark)
+					tx := locales.In(locale)
+					historyLabel := workspaceLabel(locale, "workspace.history")
+					collapsed := visibleControl(test, tester, historyLabel, size[0], size[1])
+					if err := tester.Click(tx.OpenFile("docs/routes/lake-district.md")); err != nil {
+						test.Fatal(err)
+					}
+					tester.Advance(time.Second)
+					history := visibleControl(test, tester, historyLabel, size[0], size[1])
+					diff := visibleControl(test, tester, tx.DiffTitle(), size[0], size[1])
+					if !application.reviewingFile || diff.X <= history.X+history.W || diff.X+diff.W < float32(size[0]-1) || diff.Y+diff.H < float32(size[1]-1) {
+						test.Fatalf("history diff must stay right of the timeline and fill its edges: history=%+v diff=%+v", history, diff)
+					}
+					if tester.HasText(tx.SaveVersion()) || tester.HasText(tx.IncludeForSave()) || tester.HasText(tx.BackToVersion()) {
+						test.Fatal("history review showed changes-only actions or fullscreen navigation")
+					}
+					tester.Move(4, 4)
+					tester.Advance(time.Second)
+					saveDesignEvidence(test, tester, fmt.Sprintf("history-diff-%s-%d-dark-%v.png", locale, size[0], dark))
+					divider, found := tester.AccessByRole(ui.RoleSplitter, "")
+					if !found {
+						test.Fatal("history review lost the native draggable divider")
+					}
+					dividerX, dividerY := divider.Bounds.X+divider.Bounds.W/2, divider.Bounds.Y+divider.Bounds.H/2
+					tester.Press(dividerX, dividerY)
+					tester.Move(dividerX-24, dividerY)
+					tester.Release(dividerX-24, dividerY)
+					tester.Frame()
+					resized := visibleControl(test, tester, tx.DiffTitle(), size[0], size[1])
+					if resized.W <= diff.W {
+						test.Fatal("drag did not enlarge the history diff")
+					}
+					preview, selection := application.preview, application.workspaceHistoryFilesSHA
+					if err := tester.Click(tx.CollapseDiff()); err != nil {
+						test.Fatal(err)
+					}
+					if folded := visibleControl(test, tester, historyLabel, size[0], size[1]); folded.X != collapsed.X || folded.W != collapsed.W || application.reviewingFile {
+						test.Fatalf("collapse did not restore the timeline: before=%+v after=%+v", collapsed, folded)
+					}
+					if err := tester.Click(tx.ExpandDiff()); err != nil {
+						test.Fatal(err)
+					}
+					if reopened := visibleControl(test, tester, tx.DiffTitle(), size[0], size[1]); reopened.W != resized.W {
+						test.Fatalf("reopening lost the chosen width: resized=%+v reopened=%+v", resized, reopened)
+					}
+					if application.preview != preview || application.commitFileIndex != 0 || application.workspaceHistoryFilesSHA != selection {
+						test.Fatal("panel transitions changed the selected history file or its prepared diff")
+					}
+				})
+			}
+		}
+	}
+}
+
 func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing.T) {
 	for _, size := range [][2]int{{900, 620}, {1180, 760}, {1920, 1080}} {
 		for _, locale := range []string{"en", "zh-Hans", "zh-Hant"} {
@@ -36,10 +109,10 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 					history := designEvidenceApp(t, time.Now(), "history")
 					historyTester := designEvidenceTester(history, size[0], size[1], locale, dark)
 					historyBounds := visibleControl(t, historyTester, workspaceLabel(locale, "workspace.history"), size[0], size[1])
+					historyToggle := visibleControl(t, historyTester, tx.ExpandDiff(), size[0], size[1])
 					collapsedFiles := visibleControl(t, tt, tx.ChangedFiles(), size[0], size[1])
 					toggle := visibleControl(t, tt, tx.ExpandDiff(), size[0], size[1])
-					rightInset := historyBounds.X + historyBounds.W - toggle.X - toggle.W
-					if collapsedFiles.X != historyBounds.X || rightInset < 0 || rightInset > 8 {
+					if collapsedFiles.X != historyBounds.X || collapsedFiles.W != historyBounds.W || toggle.X != historyToggle.X {
 						t.Fatalf("collapsed changes must use the history page width: files=%+v toggle=%+v history=%+v", collapsedFiles, toggle, historyBounds)
 					}
 					if err := tt.Click("docs/routes/lake-district.md"); err != nil {

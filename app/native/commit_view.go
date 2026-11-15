@@ -9,7 +9,7 @@ import (
 // stable parent and keys preserve native editing state through resizing.
 func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 	_, height := c.Size()
-	narrow := a.isChangesWorkspace() && a.changesDiffLayout.width < 420
+	narrow := a.isChangesWorkspace() && a.diffPanelLayout.width < 420
 	// Reviewing a file at a short window: the diff is what is being read. The
 	// actions wrap to two rows there, so tighten the spacing above them (every
 	// label stays) to keep a usable code viewport. Padding is unchanged so Save

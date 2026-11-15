@@ -13,7 +13,7 @@ import (
 )
 
 // view is the production workspace, shared by real windows and ui.NewTester.
-// File changes keep their list and draft beside a collapsible native diff pane.
+// Changes and history keep their overview beside the same native diff pane.
 func (a *app) view(c *ui.Context) {
 	a.beginCorePresentation()
 	a.applyCoreZoom(c)
@@ -29,8 +29,8 @@ func (a *app) view(c *ui.Context) {
 		return
 	}
 	width, height := c.Size()
-	changesWorkspace := a.isChangesWorkspace()
-	expandedChanges := changesWorkspace && a.reviewingFile
+	fileWorkspace := a.isFileWorkspace()
+	expandedDiff := fileWorkspace && a.reviewingFile
 	verticalPadding := float32(20)
 	if height < 700 {
 		verticalPadding = 12
@@ -40,7 +40,7 @@ func (a *app) view(c *ui.Context) {
 		padding = 24
 	}
 	available := min(float32(1440), width-a.nativeRailWidth(c)) - 2*padding
-	if expandedChanges {
+	if expandedDiff {
 		available = width - a.nativeRailWidth(c) - padding
 	}
 	ui.Row(c).Fill().AlignItems(ui.Stretch).FontWeight(400).Children(func() {
@@ -51,8 +51,8 @@ func (a *app) view(c *ui.Context) {
 				a.workspaceTaskBar(c, tx, colors, padding)
 			}
 			content := ui.Column(c.Key("workspace-content")).Grow(1).MinHeight(0).FillWidth()
-			if expandedChanges {
-				// The diff pane owns everything right of the file list: it runs to
+			if expandedDiff {
+				// The diff pane owns everything right of the overview: it runs to
 				// the window's right and bottom edges instead of a centered column.
 				content.Padding(verticalPadding, 0, 0, padding)
 			} else {
@@ -64,8 +64,8 @@ func (a *app) view(c *ui.Context) {
 					switch {
 					case a.repo == nil:
 						a.noProject(c, tx)
-					case changesWorkspace:
-						a.changesWorkspace(c, tx, colors, available)
+					case fileWorkspace:
+						a.fileWorkspace(c, tx, colors, available)
 					case a.workspaceStashView(c):
 					case a.reviewingFile:
 						a.diffPane(c, tx, min(1440, width-a.nativeRailWidth(c))-2*padding)
@@ -77,7 +77,7 @@ func (a *app) view(c *ui.Context) {
 				})
 				// File changes own their stable composer inside the split's first
 				// pane. Other changes flows, such as stash review, retain this one.
-				if a.repo != nil && a.tab == changesTab && a.commitCapable && !changesWorkspace {
+				if a.repo != nil && a.tab == changesTab && a.commitCapable && !fileWorkspace {
 					a.commitForm(c, tx)
 				}
 			})
@@ -440,7 +440,7 @@ func (a *app) historyPage(c *ui.Context, tx locales.Messages) {
 func (a *app) diffPane(c *ui.Context, tx locales.Messages, width float32) {
 	file, _, selected := a.currentFile()
 	_, height := c.Size()
-	inline := a.isChangesWorkspace()
+	inline := a.isFileWorkspace()
 	compact := height < 700 || inline
 	label := tx.DiffTitle()
 	if selected {
@@ -510,7 +510,7 @@ func (a *app) diffPane(c *ui.Context, tx locales.Messages, width float32) {
 		ui.Row(c.Key("diff-heading")).FillWidth().MinHeight(36).Padding(0, 16).Gap(8).Margin(0, 0, 4, 0).Children(func() {
 			title()
 			options()
-			a.changesDiffToggle(c, tx)
+			a.workspaceDiffToggle(c, tx)
 		})
 		ui.Row(c.Key("diff-controls")).FillWidth().Padding(0, 16).Gap(8).Wrap().Margin(0, 0, 8, 0).Children(func() {
 			inclusion()
@@ -559,7 +559,7 @@ func (a *app) previewView(c *ui.Context, tx locales.Messages, width float32) {
 			emptyState(c, message)
 			return
 		}
-		if _, height := c.Size(); height >= 700 && !a.isChangesWorkspace() {
+		if _, height := c.Size(); height >= 700 && !a.isFileWorkspace() {
 			a.nativeDiffControls(c, false)
 		}
 		layout := editor.DiffLayout(a.diffLayout)

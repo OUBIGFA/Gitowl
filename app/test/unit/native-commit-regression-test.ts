@@ -607,6 +607,170 @@ describe(
       runtime.dispatcher.setCoAuthors(repos[0], [])
     })
 
+    it('keeps saving enabled across identical refreshes but rechecks changed messages', async () => {
+      const repo = repos[0]
+      await select(repo)
+      await writeFile(join(repo.path, 'rule-refresh.txt'), 'Changed file\n')
+      await runtime.dispatcher.refreshRepository(repo)
+      const { RepositorySectionTab } = await import('../../src/lib/app-state')
+      runtime.dispatcher.changeRepositorySection(
+        repo,
+        RepositorySectionTab.Changes
+      )
+      const { WorkingDirectoryStatus } = await import('../../src/models/status')
+      const { RepoRulesInfo } = await import('../../src/models/repo-rules')
+      const { parseRepoRules } = await import(
+        '../../src/lib/helpers/repo-rules'
+      )
+      const { APIRepoRuleType, APIRepoRuleMetadataOperator } = await import(
+        '../../src/lib/api'
+      )
+      const info = await parseRepoRules(
+        [
+          {
+            ruleset_id: 1,
+            type: APIRepoRuleType.CommitMessagePattern,
+            parameters: {
+              name: 'Stable summary',
+              negate: false,
+              operator: APIRepoRuleMetadataOperator.StartsWith,
+              pattern: 'Stable',
+            },
+          },
+        ],
+        new Map([[1, { id: 1, current_user_can_bypass: 'never' as const }]]),
+        repo
+      )
+      runtime.dispatcher.setCoAuthors(repo, [])
+      runtime.dispatcher.setCommitMessage(repo, {
+        summary: 'Stable refresh',
+        description: '',
+        timestamp: Date.now(),
+      })
+      await runtime.dispatcher.changeFileIncluded(
+        repo,
+        state(repo).changesState.workingDirectory.files,
+        true
+      )
+      runtime.repositoryStateManager.updateChangesState(repo, () => ({
+        currentRepoRulesInfo: info,
+      }))
+      try {
+        await until(
+          () => !presenter.getState()!.rulesPending,
+          'Initial rules did not settle'
+        )
+        assert.equal(presenter.getState()!.canCommit, true)
+        for (let refresh = 0; refresh < 6; refresh++) {
+          const previous = state(repo)
+          runtime.repositoryStateManager.updateChangesState(repo, () => ({
+            workingDirectory: WorkingDirectoryStatus.fromFiles(
+              previous.changesState.workingDirectory.files.map(file =>
+                file.withSelection(file.selection)
+              )
+            ),
+            commitMessage: {
+              ...previous.changesState.commitMessage,
+              timestamp: Date.now() + refresh,
+            },
+            coAuthors: [...previous.changesState.coAuthors],
+          }))
+          runtime.repositoryStateManager.update(repo, () => ({
+            branchesState: {
+              ...previous.branchesState,
+              tip: { ...previous.branchesState.tip },
+            },
+            aheadBehind:
+              previous.aheadBehind === null
+                ? null
+                : { ...previous.aheadBehind },
+          }))
+          const view = presenter.getState()!
+          assert.equal(
+            view.rulesPending,
+            false,
+            'Equivalent refresh restarted asynchronous rules'
+          )
+          assert.equal(
+            view.canCommit,
+            true,
+            'Equivalent refresh disabled Save version'
+          )
+        }
+        const refreshedInfo = new RepoRulesInfo()
+        for (const rule of info.commitMessagePatterns.getRules()) {
+          refreshedInfo.commitMessagePatterns.push({ ...rule })
+        }
+        runtime.repositoryStateManager.updateChangesState(repo, () => ({
+          currentRepoRulesInfo: refreshedInfo,
+        }))
+        assert.equal(
+          presenter.getState()!.rulesPending,
+          false,
+          'Refreshed rules reformatted an unchanged message'
+        )
+        assert.equal(presenter.getState()!.canCommit, true)
+        runtime.dispatcher.setCommitMessage(repo, {
+          summary: 'Blocked message',
+          description: '',
+          timestamp: Date.now(),
+        })
+        assert.equal(presenter.getState()!.rulesPending, true)
+        assert.equal(presenter.getState()!.canCommit, false)
+        await until(
+          () => !presenter.getState()!.rulesPending,
+          'Edited rules did not settle'
+        )
+        assert.equal(presenter.getState()!.rulesBlocked, true)
+        const allowedInfo = await parseRepoRules(
+          [
+            {
+              ruleset_id: 1,
+              type: APIRepoRuleType.CommitMessagePattern,
+              parameters: {
+                name: 'Updated summary rule',
+                negate: false,
+                operator: APIRepoRuleMetadataOperator.StartsWith,
+                pattern: 'Blocked',
+              },
+            },
+          ],
+          new Map([[1, { id: 1, current_user_can_bypass: 'never' as const }]]),
+          repo
+        )
+        runtime.repositoryStateManager.updateChangesState(repo, () => ({
+          currentRepoRulesInfo: allowedInfo,
+        }))
+        assert.equal(presenter.getState()!.rulesPending, false)
+        assert.equal(
+          presenter.getState()!.rulesBlocked,
+          false,
+          'Changed rules reused the previous verdict'
+        )
+        assert.equal(presenter.getState()!.canCommit, true)
+        runtime.repositoryStateManager.updateChangesState(repo, () => ({
+          currentRepoRulesInfo: new RepoRulesInfo(),
+        }))
+        runtime.dispatcher.setCommitMessage(repo, {
+          summary: 'No message restrictions',
+          description: '',
+          timestamp: Date.now(),
+        })
+        assert.equal(
+          presenter.getState()!.rulesPending,
+          false,
+          'Empty message rules disabled saving'
+        )
+        assert.equal(presenter.getState()!.canCommit, true)
+      } finally {
+        runtime.repositoryStateManager.updateChangesState(repo, () => ({
+          currentRepoRulesInfo: new RepoRulesInfo(),
+        }))
+        await rm(join(repo.path, 'rule-refresh.txt'))
+        await runtime.dispatcher.refreshRepository(repo)
+      }
+    })
+
     it('rechecks default summaries after selection changes and enforces original rules on modal drafts', async () => {
       const repo = repos[0]
       await select(repo)
@@ -653,6 +817,36 @@ describe(
       await until(() => !presenter.getState()!.rulesPending, 'Rules pending')
       assert.equal(presenter.getState()!.defaultSummary, 'Create visible.txt')
       assert.equal(presenter.getState()!.rulesBlocked, false)
+      runtime.dispatcher.setCommitMessage(repo, {
+        summary: '',
+        description: 'Describe the visible file',
+        timestamp: Date.now(),
+      })
+      await until(
+        () => !presenter.getState()!.rulesPending,
+        'Description-only rules did not settle'
+      )
+      assert.equal(presenter.getState()!.rulesBlocked, true)
+      runtime.dispatcher.setCommitMessage(repo, {
+        summary: 'Create visible.txt',
+        description: 'Describe the visible file',
+        timestamp: Date.now(),
+      })
+      assert.equal(
+        presenter.getState()!.rulesPending,
+        true,
+        'Entering the default summary reused the description-only check'
+      )
+      await until(
+        () => !presenter.getState()!.rulesPending,
+        'Explicit default summary rules did not settle'
+      )
+      assert.equal(presenter.getState()!.rulesBlocked, false)
+      runtime.dispatcher.setCommitMessage(repo, {
+        summary: '',
+        description: '',
+        timestamp: Date.now(),
+      })
       await runtime.dispatcher.changeFileIncluded(
         repo,
         files.filter(file => file.path === 'visible.txt'),
