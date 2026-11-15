@@ -86,6 +86,14 @@ export type NativeWorkspaceAction =
       readonly identity: string
     }
   | {
+      /** One step from a displayed hunk header, as Desktop's expansion handle. */
+      readonly type: 'diff.expandHunk'
+      readonly fileID: string
+      readonly identity: string
+      readonly hunk: number
+      readonly direction: 'up' | 'down'
+    }
+  | {
       readonly type: 'diff.discard'
       readonly fileID: string
       readonly identity: string
@@ -270,6 +278,14 @@ export function parseNativeWorkspaceCommand(
         exact(['fileID', 'identity']) &&
         text(action.fileID) &&
         text(action.identity)
+      break
+    case 'diff.expandHunk':
+      valid =
+        exact(['fileID', 'identity', 'hunk', 'direction']) &&
+        text(action.fileID) &&
+        text(action.identity) &&
+        integer(action.hunk) &&
+        ['up', 'down'].includes(String(action.direction))
       break
     case 'diff.discard':
       valid =

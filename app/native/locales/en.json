@@ -1633,6 +1633,8 @@
   "dialogLabel_8d6afc0208da3536": "Include selected lines",
   "dialogLabel_ae245ecc34099a47": "Exclude selected lines",
   "dialogLabel_bf9cb14fce8f00d2": "Select changed lines to include only that part in the version.",
+  "dialogLabel_5d815d3ea8a429df": "Show context above",
+  "dialogLabel_dae023b93b61c1dd": "Show context below",
   "dialogLabel_68c036007ce9d7de": "Expand whole file",
   "dialogLabel_ce63d814c24809a4": "Collapse expanded lines",
   "dialogLabel_685851315173ec89": "Discard selected lines…",

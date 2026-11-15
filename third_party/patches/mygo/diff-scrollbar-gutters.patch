@@ -1,0 +1,97 @@
+diff --git a/ui/editor/paint.go b/ui/editor/paint.go
+index 2f9e2f70fc..7145722e63 100644
+--- a/ui/editor/paint.go
++++ b/ui/editor/paint.go
+@@ -49,6 +49,9 @@ func (ed *editor) layout(w, h, scale float32) {
+ 	}
+ 	ed.viewH, ed.laidW = h, w
+ 	wrap := ed.o.wrap != ed.toggledWrap
++	if ed.o.keepScrollbars && !ed.o.hideScrollbars && !ed.o.fitContent && !wrap && v.maxLine > w-ed.textX-ed.trackWidth() {
++		ed.viewH = max(0, h-ed.barWidth())
++	}
+ 	ww := w - ed.textX - ed.trackWidth() - 4
+ 	if ed.o.wrapColumn > 0 {
+ 		ww = min(ww, float32(ed.o.wrapColumn)*v.charWidth)
+@@ -108,7 +111,7 @@ func (ed *editor) paint(p *ui.Painter, r ui.Rect) {
+ 	// editor as high as its content.
+ 	clip := p.Visible()
+ 	y0 := ed.scrollY + float64(max(0, clip.Y-r.Y))
+-	y1 := ed.scrollY + float64(min(r.H, clip.Y+clip.H-r.Y))
++	y1 := ed.scrollY + float64(min(ed.viewH, clip.Y+clip.H-r.Y))
+ 	// The horizontal scroll bar at the bottom of what shows, as an editor
+ 	// as high as its content may run far below the window's.
+ 	ed.hbarY = max(0, min(r.H, clip.Y+clip.H-r.Y)) - ed.barWidth()
+@@ -151,12 +154,18 @@ func (ed *editor) paint(p *ui.Painter, r ui.Rect) {
+ 	if ed.replacementsMoved() {
+ 		ed.services.Invalidate()
+ 	}
+-	ed.paintBlocks(p, r, &f)
+-	text := ui.Rect{X: r.X + ed.gutterW, Y: r.Y, W: r.W - ed.gutterW, H: r.H}
+-	p.Clip(text, 0, func() {
+-		ed.paintLines(p, r, &f)
++	content := r
++	if ed.o.keepScrollbars && !ed.o.hideScrollbars {
++		content.W, content.H = max(0, r.W-ed.trackWidth()), ed.viewH
++	}
++	p.Clip(content, 0, func() {
++		ed.paintBlocks(p, r, &f)
++		text := ui.Rect{X: r.X + ed.gutterW, Y: r.Y, W: r.W - ed.gutterW, H: r.H}
++		p.Clip(text, 0, func() {
++			ed.paintLines(p, r, &f)
++		})
++		ed.paintGutter(p, r, &f)
+ 	})
+-	ed.paintGutter(p, r, &f)
+ 	ed.paintScrollbars(p, r, &f)
+ 	if v.approx || more {
+ 		p.AnimationFrame()
+diff --git a/ui/editor/gitowl_scrollbar_test.go b/ui/editor/gitowl_scrollbar_test.go
+new file mode 100644
+--- /dev/null
++++ b/ui/editor/gitowl_scrollbar_test.go
+@@ -0,0 +1,45 @@
++package editor
++
++import (
++	"strings"
++	"testing"
++	"time"
++
++	"github.com/egoist/mygo/ui"
++)
++
++func TestGitowlDiffPersistentScrollbarsReserveContentSpace(t *testing.T) {
++	for _, layout := range []DiffLayout{DiffSplit, DiffUnified} {
++		before := strings.Repeat(strings.Repeat("wide text ", 40)+"\n", 35)
++		diff := &DiffState{
++			Old: NewBuffer(before), New: NewBuffer(before + "last visible line\n"),
++			Layout: layout, KeepScrollbars: true, ExpandUnchanged: true,
++		}
++		tester := ui.NewTester(func(c *ui.Context) { DiffView(c, diff).Fill() }, 700, 320)
++		tester.Advance(time.Second)
++		editor := &diff.eds[1]
++		if _, horizontal := editor.scrollbars(); !horizontal {
++			t.Fatal("the long-line fixture did not need a horizontal scrollbar")
++		}
++		if editor.viewH > editor.hbarY {
++			t.Fatalf("layout %v: content height %v runs under scrollbar at %v", layout, editor.viewH, editor.hbarY)
++		}
++		diff.SetScrollY(1e9)
++		tester.Frame()
++		if bottom := editor.view.heights.total() - diff.ScrollY(); bottom > float64(editor.hbarY)+0.1 {
++			t.Fatalf("layout %v: last line ends at %v below scrollbar %v", layout, bottom, editor.hbarY)
++		}
++		diff.Wrap = true
++		tester.Frame()
++		tester.Advance(time.Second)
++		if diff.ViewportHeight() != 320 {
++			t.Fatal("wrapped lines lost space to an absent horizontal scrollbar")
++		}
++		diff.Wrap, diff.NoScrollbars = false, true
++		tester.Frame()
++		tester.Advance(time.Second)
++		if diff.ViewportHeight() != 320 {
++			t.Fatal("hidden scrollbars still reserve content space")
++		}
++	}
++}

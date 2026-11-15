@@ -21,7 +21,7 @@ import { TipState } from '../models/tip'
 import { BannerType } from '../models/banner'
 import { PopupType } from '../models/popup'
 import { StashedChangesLoadStates } from '../models/stash-entry'
-import { DiffType } from '../models/diff'
+import { DiffHunkExpansionType, DiffType } from '../models/diff'
 import {
   MultiCommitOperationKind,
   MultiCommitOperationStepKind,
@@ -79,6 +79,7 @@ import {
 import { discardWorkspaceDiffSelection } from '../ui/diff/diff-menu-controller'
 import { getFileContents } from '../ui/diff/syntax-highlighting'
 import {
+  expandTextDiffHunk,
   expandWholeTextDiff,
   getTextDiffWithBottomDummyHunk,
 } from '../ui/diff/text-diff-expansion'
@@ -877,6 +878,7 @@ export async function executeNativeWorkspaceCommand(
     }
     case 'diff.prepare':
     case 'diff.expand':
+    case 'diff.expandHunk':
     case 'diff.collapse': {
       const selected = selectedWorkspaceTextDiff(state)
       if (
@@ -916,6 +918,51 @@ export async function executeNativeWorkspaceCommand(
       }
       if (action.type === 'diff.collapse') {
         view = { ...view, expanded: null }
+      }
+      if (action.type === 'diff.expandHunk') {
+        const displayed =
+          view.expanded ??
+          getTextDiffWithBottomDummyHunk(
+            selected.diff,
+            selected.diff.hunks,
+            view.contents.oldContents.length,
+            view.contents.newContents.length
+          ) ??
+          selected.diff
+        const header = displayed.hunks.at(action.hunk)
+        // Desktop's handle: a header expands its own hunk up, or the hunk
+        // above it down. Only the offered directions are accepted.
+        const allowed =
+          action.direction === 'up'
+            ? [
+                DiffHunkExpansionType.Up,
+                DiffHunkExpansionType.Both,
+                DiffHunkExpansionType.Short,
+              ]
+            : [DiffHunkExpansionType.Down, DiffHunkExpansionType.Both]
+        const target =
+          action.direction === 'up'
+            ? header
+            : displayed.hunks.at(action.hunk - 1)
+        if (
+          !view.contents.canBeExpanded ||
+          header === undefined ||
+          target === undefined ||
+          action.hunk < (action.direction === 'up' ? 0 : 1) ||
+          !allowed.includes(header.expansionType)
+        ) {
+          throw new Error('The diff changed; expand the current patch again')
+        }
+        const expanded = expandTextDiffHunk(
+          displayed,
+          target,
+          action.direction,
+          view.contents.newContents
+        )
+        if (expanded === undefined) {
+          throw new Error('The current file contents do not match this patch')
+        }
+        view = { ...view, expanded }
       }
       if (action.type === 'diff.expand') {
         if (

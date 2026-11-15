@@ -15228,6 +15228,26 @@ func (msgs Messages) DialogLabelBf9cb14fce8f00d2() string {
 	return Catalog.Format(msgs.locale, "dialogLabel_bf9cb14fce8f00d2", nil)
 }
 
+// DialogLabel5d815d3ea8a429df says "Show context above"
+// in the language the app shows.
+func DialogLabel5d815d3ea8a429df() string { return In(i18n.Locale()).DialogLabel5d815d3ea8a429df() }
+
+// DialogLabel5d815d3ea8a429df says "Show context above"
+// in the language of msgs.
+func (msgs Messages) DialogLabel5d815d3ea8a429df() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_5d815d3ea8a429df", nil)
+}
+
+// DialogLabelDae023b93b61c1dd says "Show context below"
+// in the language the app shows.
+func DialogLabelDae023b93b61c1dd() string { return In(i18n.Locale()).DialogLabelDae023b93b61c1dd() }
+
+// DialogLabelDae023b93b61c1dd says "Show context below"
+// in the language of msgs.
+func (msgs Messages) DialogLabelDae023b93b61c1dd() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_dae023b93b61c1dd", nil)
+}
+
 // DialogLabel68c036007ce9d7de says "Expand whole file"
 // in the language the app shows.
 func DialogLabel68c036007ce9d7de() string { return In(i18n.Locale()).DialogLabel68c036007ce9d7de() }

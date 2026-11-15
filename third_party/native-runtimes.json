@@ -123,7 +123,7 @@
     "presentationComplete": false,
     "channel": "research-preview",
     "blockers": [
-      "Original Windows cli.js/static github.bat still target GitHubDesktop.exe, not the MyGo launcher; CLI/deep-link acceptance is pending.",
+      "Original cli.js/static github.bat still target GitHubDesktop.exe, not the MyGo launcher; CLI/deep-link acceptance is pending.",
       "Gitowl OAuth/updates/protocol registration and original native frontend acceptance are not complete."
     ]
   },

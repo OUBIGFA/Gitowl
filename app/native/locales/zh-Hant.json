@@ -1506,6 +1506,8 @@
   "dialogLabel_8d6afc0208da3536": "包含所選行",
   "dialogLabel_ae245ecc34099a47": "排除所選行",
   "dialogLabel_bf9cb14fce8f00d2": "選取變更行，僅將該部分包含在版本中。",
+  "dialogLabel_5d815d3ea8a429df": "顯示上方上下文",
+  "dialogLabel_dae023b93b61c1dd": "顯示下方上下文",
   "dialogLabel_68c036007ce9d7de": "展開整個檔案",
   "dialogLabel_ce63d814c24809a4": "摺疊已展開行",
   "dialogLabel_685851315173ec89": "捨棄所選行…",

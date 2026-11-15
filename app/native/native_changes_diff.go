@@ -68,7 +68,7 @@ func (a *app) changesWorkspace(c *ui.Context, tx locales.Messages, colors worksp
 		layout.width = fit(layout.width)
 	}
 	split := ui.Split(c.Key("changes-diff-split"), &layout.width, func() {
-		ui.Column(c.Key("changes-primary")).Fill().MinWidth(0).Padding(0, 16, 0, 0).Children(func() {
+		ui.Column(c.Key("changes-primary")).Fill().MinWidth(0).Padding(0, 16, 16, 0).Children(func() {
 			ui.Column(c.Key("changes-page")).Grow(1).MinHeight(0).FillWidth().Children(func() {
 				a.changesOverview(c, tx, colors)
 			})
@@ -77,13 +77,9 @@ func (a *app) changesWorkspace(c *ui.Context, tx locales.Messages, colors worksp
 			}
 		})
 	}, func() {
-		padding := float32(2)
-		if a.reviewingFile {
-			padding = 16
-		}
-		ui.Column(c.Key("changes-diff-pane")).Fill().MinWidth(0).Padding(0, 0, 0, padding).Children(func() {
+		ui.Column(c.Key("changes-diff-pane")).Fill().MinWidth(0).Children(func() {
 			if a.reviewingFile {
-				a.diffPane(c, tx, available-layout.width-1-padding)
+				a.diffPane(c, tx, available-layout.width-1)
 			} else {
 				ui.Row(c.Key("diff-heading")).FillWidth().MinHeight(36).Children(func() { a.changesDiffToggle(c, tx) })
 			}

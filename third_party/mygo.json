@@ -7,6 +7,23 @@
   "archive_sha256": "1b15caf37041da5eb620db82e99dd1e3139a196b4b2de4cabc35de6abd20b22e",
   "patches": [
     {
+      "path": "third_party/patches/mygo/diff-scrollbar-gutters.patch",
+      "sha256": "e4cb3a9737adb91c19a1de5affc2207d8edbb44464feab0287a706f7550b5f4a",
+      "reason": "MyGo v0.9.0 paints text beneath persistent scrollbars and counts their horizontal track as readable viewport height. KeepScrollbars now reserves the bottom gutter in unwrapped scrolling editors and clips content out of both tracks. Gitowl enables the existing option on its native diff; default, wrapped, hidden-scrollbar and fit-content behavior remain unchanged. Tests cover split/unified bottom-line visibility, wrapping, hidden bars and existing viewport behavior.",
+      "files": [
+        {
+          "path": "ui/editor/paint.go",
+          "before": "8bb4966d8ab9ad7af92f7bca10abf0af08b6ea2ce435311736879ecdd1db330d",
+          "after": "bf1fca0816a1b90ce5ea763af34ade4f83cde677b24397da36367df80960b8d4"
+        },
+        {
+          "path": "ui/editor/gitowl_scrollbar_test.go",
+          "before": null,
+          "after": "df8c575c9be1b90746511a99082d4a48643a485200ab910f211437d3e3fc60a0"
+        }
+      ]
+    },
+    {
       "path": "third_party/patches/mygo/installer-languages.patch",
       "sha256": "dd1a7df8d47895daf0cc36479be9b947294b128d974266b56bf2ee7b0db8fe07",
       "reason": "NSIS process and removal errors follow the selected English, Simplified Chinese or Traditional Chinese language. A real installed lifecycle exposed unchecked deletion leaving electron.exe while reporting success. Retry transient deletion locks for five seconds, report persistent failure, and retain registration until file removal succeeds. The original Desktop CLI hook still runs before removal; no application shutdown deadline or termination policy changes. Real compiled NSIS tests cover unlocked, temporary-lock and persistent-lock removal. Reviewed against v0.9.0; upstream still lacks these checks.",

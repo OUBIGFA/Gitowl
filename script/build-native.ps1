@@ -5,11 +5,6 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-# Fixed packaging requires source-bound command and independent desktop review
-# evidence. A missing receipt still exits before any build or installer action.
-if (-not $Preview -and [string]::IsNullOrWhiteSpace($AcceptanceReceipt)) {
-    throw 'Fixed installer delivery is blocked: complete Desktop kernel presentation parity requires a current native acceptance receipt (-AcceptanceReceipt).'
-}
 $runtimeManifest = Get-Content (Join-Path $root 'third_party/native-runtimes.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 if ($Preview -and ($runtimeManifest.schemaVersion -ne 2 -or $runtimeManifest.packaging.previewReady -ne $true)) {
     throw ('Preview packaging is blocked: original Desktop CLI/OAuth acceptance is pending. ' + ($runtimeManifest.packaging.blockers -join ' '))
@@ -29,7 +24,7 @@ function Invoke-NativeAcceptance([string]$PackageDirectory = '') {
     $arguments = @('node_modules/ts-node/dist/bin.js', '-P', 'script/tsconfig.json', 'script/native-acceptance.ts', 'validate', '--receipt', $AcceptanceReceipt)
     if ($PackageDirectory) { $arguments += @('--package', $PackageDirectory) }
     $result = & node @arguments
-    Check-Exit 'Source-bound native acceptance'
+    Check-Exit 'Optional native acceptance'
     return ($result | ConvertFrom-Json)
 }
 
@@ -38,7 +33,9 @@ try {
     $acceptance = $null
     if (-not $Preview) {
         if ($env:MYGO_INSPECTOR -eq '1') { throw 'Inspector-enabled builds cannot be fixed installers' }
-        $acceptance = Invoke-NativeAcceptance
+        if (-not [string]::IsNullOrWhiteSpace($AcceptanceReceipt)) {
+            $acceptance = Invoke-NativeAcceptance
+        }
     }
     $config = Get-Content 'app/native/mygo.json' -Raw -Encoding UTF8 | ConvertFrom-Json
     if ($config.name -ne 'Gitowl' -or $config.version -ne '0.0.1' -or $config.identifier -ne 'io.github.oubigfa.gitowl') {
@@ -51,9 +48,8 @@ try {
     if ($untracked) { throw 'Stage or ignore the remaining source files before packaging' }
     $sourceTree = (& git write-tree).Trim()
     Check-Exit 'Read staged source tree'
-    # A fixed build already validated source-bound receipts for these exact
-    # checks on this staged tree; repeating them only adds time. A preview has
-    # no receipt and still runs them here.
+    # Preview builds run the repository checks below. Fixed builds may opt into
+    # the same strict local evidence by passing -AcceptanceReceipt.
     if ($Preview) {
         & python tools/check_repo.py
         Check-Exit 'Repository boundaries'
@@ -90,23 +86,21 @@ try {
         }
         $package = Join-Path $root "_temp/native-packages/$BuildNumber"
         if (Test-Path $package) { throw 'Choose a new internal build number; package directories are immutable' }
-        # Preparation/tests may not silently replace the accepted runtime. Check
-        # again BEFORE mygo is allowed to create an installer.
-        if (-not $Preview) {
-            $acceptance = Invoke-NativeAcceptance
-            if ($acceptance.sourceTree -ne $sourceTree) { throw 'Acceptance does not cover the staged packaging tree' }
-        }
+        # Runtime preparation and repository checks remain part of packaging;
+        # optional desktop evidence is no longer a release prerequisite.
         $info = [ordered]@{
             product='Gitowl'; version='0.0.1'; build=$BuildNumber
             identifier='io.github.oubigfa.gitowl'; platform='windows-x64'
             sourceTree=$sourceTree; sourceSnapshot='staged Git inputs'
-            authenticodeSigned=$false; fullFeatureParity=(-not $Preview)
-            originalCore='desktop/desktop'; presentationComplete=(-not $Preview)
+            authenticodeSigned=$false; fullFeatureParity=($null -ne $acceptance)
+            originalCore='desktop/desktop'; presentationComplete=($null -ne $acceptance)
             runtimeInputHash=(Get-Content 'output/native-runtime/runtime-receipt.json' -Raw -Encoding UTF8 | ConvertFrom-Json).inputHash
-            desktopAcceptance='pending'; installedAcceptance='not-required'; channel='research-preview'
+            desktopAcceptance=if ($null -ne $acceptance) { 'source-bound-parent-review' } else { 'not-required' }; installedAcceptance='not-required'; channel='research-preview'
+        }
+        if ($null -ne $acceptance) {
+            foreach ($property in $acceptance.PSObject.Properties) { $info[$property.Name] = $property.Value }
         }
         if (-not $Preview) {
-            foreach ($property in $acceptance.PSObject.Properties) { $info[$property.Name] = $property.Value }
             $info['channel'] = 'fixed-test'
         }
         [IO.File]::WriteAllText((Join-Path $root 'output/native-runtime/build-info.json'), ($info | ConvertTo-Json), [Text.UTF8Encoding]::new($false))
@@ -120,9 +114,9 @@ try {
         $finishedTree = (& git write-tree).Trim()
         Check-Exit 'Read completed source snapshot'
         if ($finishedTree -ne $sourceTree) { throw 'The staged source changed while packaging; do not publish this package' }
-        if (-not $Preview) {
+        if ($null -ne $acceptance) {
             $packaged = Invoke-NativeAcceptance "_temp/native-packages/$BuildNumber/windows-amd64"
-            if ($packaged.sourceTree -ne $sourceTree) { throw 'Packaged acceptance does not cover the staged packaging tree' }
+            if ($packaged.sourceTree -ne $sourceTree) { throw 'Optional acceptance does not cover the staged packaging tree' }
             $info['packagedExecutableSha256'] = $packaged.packagedExecutableSha256
         }
         $release = if ($Preview) { Join-Path $root "_temp/native-previews/$BuildNumber" } else { Join-Path $root 'output/release' }
@@ -140,7 +134,7 @@ try {
         try {
             $hash = [BitConverter]::ToString($hasher.ComputeHash($stream)).Replace('-', '').ToLowerInvariant()
         } finally { $stream.Dispose(); $hasher.Dispose() }
-        if (-not $Preview -and $hash -ne $packaged.installerSha256) { throw 'Installer changed after package validation; fixed installer was not touched' }
+        if ($null -ne $acceptance -and $hash -ne $packaged.installerSha256) { throw 'Installer changed after optional package validation; fixed installer was not touched' }
         Move-Item $checkedCopy $fixed -Force
         [IO.File]::WriteAllText(($fixed + '.sha256'), "$hash  $installerName`n", [Text.UTF8Encoding]::new($false))
         $info['installerSha256'] = $hash

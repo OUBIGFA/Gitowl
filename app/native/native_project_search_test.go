@@ -97,6 +97,7 @@ func TestProjectSearchUsesOriginalResultsAndKeepsNewestInput(t *testing.T) {
 
 func TestProjectSearchMenuFocusAndKeyboardSelection(t *testing.T) {
 	a, tt := projectSearchTester(t)
+	transport := observeRepositorySelection(t, a)
 	snapshot := projectSearchSnapshot(t, 2, "", []string{"C:/beta", "C:/alpha"})
 	snapshot.Workspace = &backend.KernelWorkspace{Navigation: "repositories"}
 	a.applyCoreSnapshot(snapshot)
@@ -111,15 +112,14 @@ func TestProjectSearchMenuFocusAndKeyboardSelection(t *testing.T) {
 	<-a.coreQueue
 	tt.Key(0, ui.KeyDown)
 	tt.Key(0, ui.KeyEnter)
-	if len(a.coreQueue) != 1 {
-		t.Fatal("keyboard selection did not request original repository selection")
-	}
+	transport.next(t, "")
 }
 
 func TestProjectRailGroupsAssignedAccountsAndKeepsKeyboardNavigation(t *testing.T) {
 	for _, locale := range []string{"en", "zh-Hans", "zh-Hant"} {
 		t.Run(locale, func(t *testing.T) {
 			a, tt := projectSearchTester(t)
+			transport := observeRepositorySelection(t, a)
 			var snapshot backend.KernelSnapshot
 			// Two servers can have the same login. Ownership uses the original
 			// account assignment, not the repository/organization name.
@@ -159,9 +159,7 @@ func TestProjectRailGroupsAssignedAccountsAndKeepsKeyboardNavigation(t *testing.
 			}
 			tt.Key(0, ui.KeyDown)
 			tt.Key(0, ui.KeyEnter)
-			if len(a.coreQueue) != 1 {
-				t.Fatal("keyboard navigation submitted a group heading instead of a project")
-			}
+			transport.next(t, "C:/alpha")
 		})
 	}
 }

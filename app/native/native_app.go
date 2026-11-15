@@ -354,9 +354,9 @@ func (a *app) openCoreRepository(path string) {
 func (a *app) selectCoreRepository(reference backend.KernelRepositoryReference) {
 	seq := a.openSeq
 	core, ctx := a.core, a.ctx
-	a.queueCore(nativeOperation{
-		call: func() (backend.KernelResult, error) { return core.SelectRepository(ctx, reference) },
-		complete: func(_ backend.KernelResult, err error) {
+	a.runCoreTask(
+		func() (backend.KernelResult, error) { return core.SelectRepository(ctx, reference) },
+		func(_ backend.KernelResult, err error) {
 			if seq != a.openSeq {
 				return
 			}
@@ -365,7 +365,7 @@ func (a *app) selectCoreRepository(reference backend.KernelRepositoryReference) 
 				a.openModal = false
 			}
 		},
-	})
+	)
 }
 
 // Refresh and remote tasks can remain in flight while the UI reviews or edits;

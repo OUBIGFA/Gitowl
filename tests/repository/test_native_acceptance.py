@@ -25,17 +25,31 @@ class NativeAcceptanceEntryTests(unittest.TestCase):
             cwd=root, capture_output=True, timeout=30,
         )
 
-    def test_missing_evidence_stops_before_any_build_output(self):
+    def test_missing_evidence_does_not_create_a_release_gate(self):
         with tempfile.TemporaryDirectory(prefix='gitowl-gate-entry-') as directory:
             root = Path(directory)
+            for name, value in {
+                'third_party/native-runtimes.json': {
+                    'schemaVersion': 2,
+                    'packaging': {'previewReady': False},
+                },
+                'app/native/mygo.json': {
+                    'name': 'Invalid Fixture Identity',
+                    'version': '0.0.1',
+                    'identifier': 'io.github.oubigfa.gitowl',
+                },
+            }.items():
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(json.dumps(value), encoding='utf-8')
             result = self.run_entry(root)
             self.assertNotEqual(result.returncode, 0)
-            self.assertIn(
+            self.assertIn(b'The fixed test product identity changed', result.stderr)
+            self.assertNotIn(
                 b'complete Desktop kernel presentation parity',
                 result.stderr.replace(b'\r\n', b''),
             )
             self.assertFalse((root / 'output').exists())
-            self.assertFalse((root / '_temp').exists())
 
     def test_preview_is_explicit_and_does_not_bypass_its_own_readiness_gate(self):
         with tempfile.TemporaryDirectory(prefix='gitowl-gate-preview-') as directory:

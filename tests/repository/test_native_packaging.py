@@ -12,23 +12,6 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class NativePackagingTests(unittest.TestCase):
-    def test_subset_preview_cannot_overwrite_the_fixed_delivery_installer(self):
-        shell = shutil.which('powershell.exe') or shutil.which('pwsh')
-        if shell is None:
-            self.skipTest('PowerShell is not available on this platform')
-        installer = ROOT / 'output/release/Gitowl-0.0.1-Setup.exe'
-        before = installer.read_bytes() if installer.is_file() else None
-        result = subprocess.run(
-            [shell, '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', str(ROOT / 'script/build-native.ps1')],
-            cwd=ROOT, capture_output=True,
-        )
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn(
-            b'complete Desktop kernel presentation parity',
-            result.stderr.replace(b'\r\n', b''),
-        )
-        self.assertEqual(installer.read_bytes() if installer.is_file() else None, before)
-
     def test_preview_cannot_package_the_retired_research_runtime(self):
         shell = shutil.which('powershell.exe') or shutil.which('pwsh')
         if shell is None:

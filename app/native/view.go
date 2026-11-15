@@ -45,15 +45,22 @@ func (a *app) view(c *ui.Context) {
 			if a.repo != nil {
 				a.workspaceTaskBar(c, tx, colors, padding)
 			}
-			ui.Column(c.Key("workspace-content")).Grow(1).MinHeight(0).FillWidth().MaxWidth(1440).
-				AlignSelf(ui.Center).Padding(verticalPadding, padding, 16, padding).Children(func() {
+			content := ui.Column(c.Key("workspace-content")).Grow(1).MinHeight(0).FillWidth()
+			if changesWorkspace {
+				// The diff pane owns everything right of the file list: it runs to
+				// the window's right and bottom edges instead of a centered column.
+				content.Padding(verticalPadding, 0, 0, padding)
+			} else {
+				content.MaxWidth(1440).AlignSelf(ui.Center).Padding(verticalPadding, padding, 16, padding)
+			}
+			content.Children(func() {
 				a.workspaceNotices(c, tx)
 				ui.Column(c.Key("workspace-page")).Grow(1).MinHeight(0).FillWidth().Children(func() {
 					switch {
 					case a.repo == nil:
 						a.noProject(c, tx)
 					case changesWorkspace:
-						a.changesWorkspace(c, tx, colors, min(1440, width-a.nativeRailWidth(c))-2*padding)
+						a.changesWorkspace(c, tx, colors, width-a.nativeRailWidth(c)-padding)
 					case a.workspaceStashView(c):
 					case a.reviewingFile:
 						a.diffPane(c, tx, min(1440, width-a.nativeRailWidth(c))-2*padding)
@@ -568,12 +575,13 @@ func (a *app) previewView(c *ui.Context, tx locales.Messages, width float32) {
 		for i, patch := range p.patches {
 			a.configureNativeDiffSelection(c, i, patch.state)
 			patch.state.Layout, patch.state.Wrap = layout, a.wrap
+			patch.state.KeepScrollbars = true
 			if a.coreSnapshot != nil && a.coreSnapshot.Appearance != nil {
 				patch.state.TabSize = a.coreSnapshot.Appearance.TabSize
 			}
 			patch.state.Font = ui.Font{Family: workspaceCodeFont(), Size: c.Theme().FontSize}
 			patch.state.Theme = workspaceDiffTheme(c.Theme())
-			patch.state.RenderSeparator = workspaceDiffSeparator
+			a.configureNativeDiffExpansion(patch.state)
 			patch.state.FitContent = len(p.patches) > 1
 		}
 		if len(p.patches) == 1 {

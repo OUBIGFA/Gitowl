@@ -169,7 +169,7 @@ def collect():
         'packaging': {'previewReady': False, 'originalCore': 'desktop/desktop',
                       'presentationComplete': False, 'channel': 'research-preview',
                       'blockers': [
-                          'Original Windows cli.js/static github.bat still target GitHubDesktop.exe, not the MyGo launcher; CLI/deep-link acceptance is pending.',
+                          'Original cli.js/static github.bat still target GitHubDesktop.exe, not the MyGo launcher; CLI/deep-link acceptance is pending.',
                           'Gitowl OAuth/updates/protocol registration and original native frontend acceptance are not complete.'
                       ]},
         'node': {'role': 'build-tool-only', 'version': node_version, 'source': 'https://nodejs.org/dist/v' + node_version + '/node-v' + node_version + '-win-x64.zip', 'executableSha256': sha((node_dir / 'node.exe').read_bytes()), 'archiveSha256': sha((ROOT / '.local/downloads' / ('node-v' + node_version + '-win-x64.zip')).read_bytes()), 'license': 'MIT and bundled third-party notices', 'licenseSha256': sha((node_dir / 'LICENSE').read_bytes())},

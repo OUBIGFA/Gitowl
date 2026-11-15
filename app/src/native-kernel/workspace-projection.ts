@@ -9,6 +9,7 @@ import {
   RepositorySectionTab,
 } from '../lib/app-state'
 import { Repository } from '../models/repository'
+import type { DiffHunkExpansionType } from '../models/diff'
 import { BranchesTab } from '../models/branches-tab'
 import { Branch, BranchType } from '../models/branch'
 import type { Commit } from '../models/commit'
@@ -184,6 +185,12 @@ export interface IKernelWorkspaceDTO {
     readonly prepared: boolean
     readonly canExpand: boolean
     readonly expandedText: string | null
+    /** Headers of the displayed hunks with Desktop's expansion type. The last
+     * one may be the text-less bottom hunk that only expands down. */
+    readonly hunks: ReadonlyArray<{
+      readonly header: string
+      readonly expansion: DiffHunkExpansionType
+    }>
     readonly selection: IKernelDiffSelection | null
   } | null
   readonly hideWhitespace: boolean
@@ -705,6 +712,13 @@ export function projectNativeWorkspace(app: IAppState): IKernelWorkspaceDTO {
                 diffView.expanded !== null
               ),
             expandedText: diffView?.expanded?.text ?? null,
+            hunks:
+              diffView === null || !diffView.contents.canBeExpanded
+                ? []
+                : (diffView.expanded ?? expandableDiff)?.hunks.map(hunk => ({
+                    header: hunk.lines[0].text,
+                    expansion: hunk.expansionType,
+                  })) ?? [],
             selection:
               expandedSelection === null || diffSelection === null
                 ? null

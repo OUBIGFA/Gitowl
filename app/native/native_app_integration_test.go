@@ -20,7 +20,7 @@ import (
 // This is the production MyGo view and real original Electron kernel. It never
 // invokes the reduced research service or substitutes a commit confirmation.
 func TestNativeViewUsesOriginalDesktopKernel(t *testing.T) {
-	for _, scenario := range []string{"save-en", "shortcut-zh", "hook-ignore", "hook-abort"} {
+	for _, scenario := range []string{"save-en", "shortcut-zh", "hook-ignore", "hook-abort", "remote-sync"} {
 		t.Run(scenario, func(t *testing.T) { exerciseOriginalKernelView(t, scenario) })
 	}
 }
@@ -74,6 +74,13 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 	}
 	runGit("-C", repo, "add", ".")
 	runGit("-C", repo, "commit", "-m", "initial")
+	if scenario == "remote-sync" {
+		remote := filepath.Join(work, "origin.git")
+		runGit("clone", "--bare", repo, remote)
+		runGit("-C", repo, "remote", "add", "origin", remote)
+		runGit("-C", repo, "fetch", "origin")
+		runGit("-C", repo, "branch", "--set-upstream-to=origin/main", "main")
+	}
 	for _, name := range []string{"selected.txt", "unselected.txt"} {
 		if err = os.WriteFile(filepath.Join(repo, name), []byte("after\n"), 0o644); err != nil {
 			t.Fatal(err)
@@ -222,11 +229,60 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 	if a.backend != nil || a.generation != nil || a.coreSnapshot.Core != "desktop/desktop" || a.coreSnapshot.PresentationComplete {
 		t.Fatal("native view used a reduced coordinator or claimed complete parity")
 	}
-	// This fixture has no remote: the retained upstream action is Publish.
-	for _, action := range []string{tx.FetchUpdates(), tx.PullUpdates(), nativeDialogLabel(locale, "repositoryDialog.PublishRepository"), tx.GenerateMessage(), tx.SaveVersion()} {
+	// Repositories without a remote retain the original Publish action.
+	pushLabel := nativeDialogLabel(locale, "repositoryDialog.PublishRepository")
+	if scenario == "remote-sync" {
+		pushLabel = tx.PushChanges()
+	}
+	for _, action := range []string{tx.FetchUpdates(), tx.PullUpdates(), pushLabel, tx.GenerateMessage(), tx.SaveVersion()} {
 		if !tt.HasText(action) {
 			t.Fatalf("high-frequency entry missing: %q", action)
 		}
+	}
+	if scenario == "remote-sync" {
+		await(func() bool {
+			fetch, found := nativeMenuAction(a.coreSnapshot.Menu.Items, "fetch")
+			return found && fetch.Enabled && a.coreSnapshot.Selected.HasRemote && !a.coreSnapshot.Selected.RemoteInProgress
+		})
+		originalHead := runGit("-C", repo, "rev-parse", "HEAD")
+		author := filepath.Join(work, "author")
+		runGit("clone", filepath.Join(work, "origin.git"), author)
+		runGit("-C", author, "config", "user.name", "Remote Author")
+		runGit("-C", author, "config", "user.email", "remote@example.invalid")
+		runGit("-C", author, "config", "commit.gpgsign", "false")
+		remoteReadme := "Updated on origin while the native view was open.\n"
+		if err := os.WriteFile(filepath.Join(author, "README.md"), []byte(remoteReadme), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		runGit("-C", author, "add", "README.md")
+		runGit("-C", author, "commit", "-m", "Update remote README")
+		runGit("-C", author, "push", "origin", "main")
+		remoteHead := runGit("-C", author, "rev-parse", "HEAD")
+		click(tx.FetchUpdates())
+		await(func() bool {
+			return !a.coreRemotePending && !a.coreSnapshot.Selected.RemoteInProgress && a.coreSnapshot.Selected.Behind == 1
+		})
+		if runGit("-C", repo, "rev-parse", "HEAD") != originalHead || runGit("-C", repo, "rev-parse", "origin/main") != remoteHead {
+			t.Fatal("Fetch did not update origin/main independently of the working branch")
+		}
+		click(tx.PullUpdates())
+		await(func() bool {
+			return !a.coreRemotePending && !a.coreSnapshot.Selected.RemoteInProgress && a.coreSnapshot.Selected.Behind == 0
+		})
+		if runGit("-C", repo, "rev-parse", "HEAD") != remoteHead || a.statusErr != nil || a.coreSnapshot.CurrentPopup != nil {
+			t.Fatalf("original Pull did not fast-forward cleanly: error=%v popup=%+v", a.statusErr, a.coreSnapshot.CurrentPopup)
+		}
+		readme, err := os.ReadFile(filepath.Join(repo, "README.md"))
+		if err != nil || string(readme) != remoteReadme {
+			t.Fatalf("remote README was not pulled: %q, %v", readme, err)
+		}
+		for _, name := range []string{"selected.txt", "unselected.txt"} {
+			contents, err := os.ReadFile(filepath.Join(repo, name))
+			if err != nil || string(contents) != "after\n" {
+				t.Fatalf("Pull changed the local edits in %s: %q, %v", name, contents, err)
+			}
+		}
+		return
 	}
 	if scenario == "preferences-fit" {
 		a.showSettings(settingsInterface)

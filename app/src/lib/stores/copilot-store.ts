@@ -60,9 +60,10 @@ import {
 } from '../copilot-assisted-commit'
 import { IAssistedCommitAnalysis } from '../../models/assisted-commit'
 import {
-  getCopilotRuntimeLaunch,
+  getCopilotBaseDirectory,
   getCopilotRuntimePath,
 } from '../copilot-runtime'
+import { getPath } from '../../ui/main-process-proxy'
 import { startTimer } from '../../ui/lib/timing'
 import { join } from 'path'
 import { BaseStore } from './base-store'
@@ -845,9 +846,11 @@ export class CopilotStore extends BaseStore {
     }
 
     const client = new CopilotClient({
-      connection: RuntimeConnection.forStdio(
-        getCopilotRuntimeLaunch(runtimePath)
-      ),
+      connection: RuntimeConnection.forStdio({
+        path: runtimePath,
+      }),
+      // Keep the CLI's user-level hooks and settings out of these sessions.
+      baseDirectory: getCopilotBaseDirectory(await getPath('userData')),
       env: {
         ...options.env,
         GH_HOST: getCopilotGHHost(account),

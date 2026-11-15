@@ -654,6 +654,16 @@
     "zh-Hans": "选中更改行，仅将该部分包含在版本中。",
     "zh-Hant": "選取變更行，僅將該部分包含在版本中。"
   },
+  "workspace.expandContextAbove": {
+    "en": "Show context above",
+    "zh-Hans": "显示上方上下文",
+    "zh-Hant": "顯示上方上下文"
+  },
+  "workspace.expandContextBelow": {
+    "en": "Show context below",
+    "zh-Hans": "显示下方上下文",
+    "zh-Hant": "顯示下方上下文"
+  },
   "workspace.expandWhole": {
     "en": "Expand whole file",
     "zh-Hans": "展开整个文件",

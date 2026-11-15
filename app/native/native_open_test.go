@@ -70,7 +70,7 @@ func TestNativePendingOpenDismissalDoesNotCancelOrNavigateFromLateReply(t *testi
 func TestNativeLateSelectionReplyDoesNotCloseANewerOpener(t *testing.T) {
 	a := newApp(nil, nil)
 	defer a.close()
-	a.core = &backend.Kernel{}
+	transport := observeRepositorySelection(t, a)
 	a.coreQueue = make(chan nativeOperation, 4)
 	a.coreSnapshot = &backend.KernelSnapshot{}
 	a.ready, a.openModal = true, true
@@ -78,14 +78,19 @@ func TestNativeLateSelectionReplyDoesNotCloseANewerOpener(t *testing.T) {
 	add := <-a.coreQueue
 	ref := backend.KernelRepositoryReference{ID: 1, Path: "C:/fixture/A"}
 	add.complete(backend.KernelResult{AddedRepositories: []backend.KernelRepositoryReference{ref}}, nil)
-	selectReply := <-a.coreQueue
+	selectRequest := transport.next(t, ref.Path)
 	a.cancelOpen()
 	a.showOpen()
 	a.pathDraft = "C:/fixture/B"
 	a.openCoreRepository(a.pathDraft)
 	result := backend.KernelResult{Snapshot: backend.KernelSnapshot{Revision: 2, Selected: &backend.KernelSelected{Repository: backend.KernelRepository{KernelRepositoryReference: ref, Name: "A", Kind: "repository"}, Section: "changes"}}}
-	selectReply.complete(result, nil)
-	a.applyCoreSnapshot(result.Snapshot)
+	result.Snapshot.Protocol, result.Snapshot.Core = 1, "desktop/desktop"
+	result.Snapshot.Accounts = []backend.KernelAccount{}
+	result.Snapshot.Repositories = []backend.KernelRepository{}
+	result.Snapshot.Popups = []backend.KernelPopup{}
+	result.Snapshot.Selected.Files = []backend.KernelFile{}
+	result.Snapshot.Selected.History = []backend.Commit{}
+	transport.reply(t, selectRequest, result.Snapshot)
 	if !a.openModal || !a.opening || a.pathDraft != "C:/fixture/B" || len(a.coreQueue) != 1 {
 		t.Fatal("late A selection changed B's opener")
 	}

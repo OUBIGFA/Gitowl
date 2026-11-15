@@ -53,12 +53,18 @@ type KernelWorkspaceConflict struct {
 }
 
 type KernelWorkspaceTextDiff struct {
-	FileID       string               `json:"fileID"`
-	Identity     string               `json:"identity"`
-	Prepared     bool                 `json:"prepared"`
-	CanExpand    bool                 `json:"canExpand"`
-	ExpandedText *string              `json:"expandedText"`
-	Selection    *KernelDiffSelection `json:"selection"`
+	FileID       string                    `json:"fileID"`
+	Identity     string                    `json:"identity"`
+	Prepared     bool                      `json:"prepared"`
+	CanExpand    bool                      `json:"canExpand"`
+	ExpandedText *string                   `json:"expandedText"`
+	Selection    *KernelDiffSelection      `json:"selection"`
+	Hunks        []KernelWorkspaceDiffHunk `json:"hunks"`
+}
+
+type KernelWorkspaceDiffHunk struct {
+	Header    string `json:"header"`
+	Expansion string `json:"expansion"`
 }
 
 type KernelWorkspaceBranch struct {
@@ -159,6 +165,8 @@ type KernelWorkspaceAction struct {
 	Target                                                                     KernelWorkspaceMenuTarget
 	MenuPath, LineIDs                                                          []int
 	Value                                                                      bool
+	Hunk                                                                       int
+	Direction                                                                  string
 }
 
 func (a KernelWorkspaceAction) wire() (map[string]any, error) {
@@ -208,6 +216,8 @@ func (a KernelWorkspaceAction) wire() (map[string]any, error) {
 		out["id"], out["action"] = a.ID, a.Action
 	case "diff.prepare", "diff.expand", "diff.collapse":
 		out["fileID"], out["identity"] = a.FileID, a.Identity
+	case "diff.expandHunk":
+		out["fileID"], out["identity"], out["hunk"], out["direction"] = a.FileID, a.Identity, a.Hunk, a.Direction
 	case "diff.discard":
 		out["fileID"], out["identity"], out["lineIDs"] = a.FileID, a.Identity, a.LineIDs
 	case "diff.option":

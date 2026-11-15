@@ -102,6 +102,10 @@ func taskTitle(c *ui.Context, title, detail string) {
 // Only the patch header's presentation changes. Native expansion controls for
 // collapsed unchanged lines, original hunk ranges and the diff model stay intact.
 func workspaceDiffSeparator(c *ui.Context, sep ui.Element, section *editor.DiffSeparator) {
+	workspaceDiffSeparatorWithActions(c, sep, section, nil)
+}
+
+func workspaceDiffSeparatorWithActions(c *ui.Context, sep ui.Element, section *editor.DiffSeparator, actions func(*ui.Context)) {
 	if section.Lines != 0 {
 		editor.DefaultSeparator(c, sep, section)
 		return
@@ -117,6 +121,9 @@ func workspaceDiffSeparator(c *ui.Context, sep ui.Element, section *editor.DiffS
 		}
 		ui.Row(c).Grow(1).AlignSelf(ui.Stretch).Padding(0, 8).Radius(6).Background(c.Theme().SurfaceHover).
 			Label(tx.DiffSection()).Tooltip(tx.RawDiffRange(section.Header)).Children(func() {
+			if actions != nil {
+				actions(c)
+			}
 			ui.Text(c, context).SingleLine().Grow(1).MinWidth(0).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted)
 		})
 	})

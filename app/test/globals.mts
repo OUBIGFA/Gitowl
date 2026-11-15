@@ -1,6 +1,8 @@
 import 'fake-indexeddb/auto'
 import 'global-jsdom/register'
 import { mock } from 'node:test'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
 // These constants are defined by Webpack at build time, but since tests aren't
 // built with Webpack we need to make sure these exist at runtime.
@@ -49,7 +51,12 @@ mock.module('electron', {
     },
     ipcRenderer: {
       send: mock.fn(() => {}),
-      invoke: mock.fn(async () => {}),
+      // `get-path` answers like Electron's app.getPath, with a disposable root.
+      invoke: mock.fn(async (channel?: string, name?: string) =>
+        channel === 'get-path'
+          ? join(tmpdir(), 'desktop-unit', `${name}`)
+          : undefined
+      ),
       on: mock.fn(x => {}),
     },
   },

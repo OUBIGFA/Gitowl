@@ -49,6 +49,9 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 					tt.Advance(time.Second)
 					files := visibleControl(t, tt, tx.ChangedFiles(), size[0], size[1])
 					diff := visibleControl(t, tt, tx.DiffTitle(), size[0], size[1])
+					if diff.X+diff.W < float32(size[0]-1) || diff.Y+diff.H < float32(size[1]-1) {
+						t.Fatalf("diff left unused space at the window edges: %+v in %v", diff, size)
+					}
 					if !a.reviewingFile || diff.X <= files.X+files.W || !tt.HasText(tx.IncludeAll()) {
 						t.Fatalf("file review replaced the home page: files=%+v diff=%+v", files, diff)
 					}

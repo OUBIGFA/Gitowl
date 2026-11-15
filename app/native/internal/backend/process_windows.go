@@ -12,7 +12,6 @@ import (
 
 const (
 	createNoWindow            = 0x08000000
-	createNewConsole          = 0x00000010
 	jobObjectBasicProcessList = 3
 	jobObjectExtendedLimit    = 9
 	jobObjectKillOnClose      = 0x2000
@@ -127,7 +126,11 @@ func startOwnedCommand(cmd *exec.Cmd) (ownedProcess, error) {
 	if err != nil {
 		return ownedProcess{}, err
 	}
-	hideConsole(cmd)
+	if cmd.SysProcAttr == nil {
+		cmd.SysProcAttr = &syscall.SysProcAttr{}
+	}
+	cmd.SysProcAttr.HideWindow = true
+	cmd.SysProcAttr.CreationFlags |= createNoWindow
 	if err := cmd.Start(); err != nil {
 		return ownedProcess{}, err
 	}
@@ -212,14 +215,5 @@ func hideConsole(cmd *exec.Cmd) {
 		cmd.SysProcAttr = &syscall.SysProcAttr{}
 	}
 	cmd.SysProcAttr.HideWindow = true
-	if cmd.SysProcAttr.CreationFlags&createNewConsole == 0 {
-		cmd.SysProcAttr.CreationFlags |= createNoWindow
-	}
-}
-
-// PowerShell allocates then hides a console when a hook starts a native tool
-// without one. Start the original runtime with its console hidden from the
-// first frame instead: its hooks inherit it and never enter that flashing path.
-func configureCopilotConsole(cmd *exec.Cmd) {
-	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: createNewConsole}
+	cmd.SysProcAttr.CreationFlags |= createNoWindow
 }

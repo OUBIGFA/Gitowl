@@ -1072,6 +1072,48 @@ describe(
         identity: textDiff.identity,
       })
       assert.equal(f.view().textDiff?.canExpand, true)
+      // Desktop's per-hunk handles: the changed hunk expands up, and the
+      // bottom hunk without text expands the changed hunk down, 20 lines each.
+      assert.deepEqual(
+        f.view().textDiff?.hunks.map(hunk => hunk.expansion),
+        ['Up', 'Down']
+      )
+      const step = { fileID: textDiff.fileID, identity: textDiff.identity }
+      await f.act({
+        type: 'diff.expandHunk',
+        ...step,
+        hunk: 0,
+        direction: 'up',
+      })
+      const up = f.view().textDiff!
+      assert.match(up.expandedText!, /^@@ -1,24 \+1,24 @@\n context-0\n/)
+      assert.doesNotMatch(up.expandedText!, /context-39/)
+      assert.deepEqual(
+        up.hunks.map(hunk => hunk.expansion),
+        ['None', 'Down']
+      )
+      assert.deepEqual(
+        up.selection?.lines.map(line => line.id),
+        diff.lines.map(line => line.id)
+      )
+      // A direction the header does not offer is refused, not guessed.
+      await assert.rejects(
+        f.act({ type: 'diff.expandHunk', ...step, hunk: 0, direction: 'up' }),
+        /changed/
+      )
+      await f.act({
+        type: 'diff.expandHunk',
+        ...step,
+        hunk: 1,
+        direction: 'down',
+      })
+      assert.match(f.view().textDiff!.expandedText!, /context-39/)
+      assert.deepEqual(
+        f.view().textDiff?.hunks.map(hunk => hunk.expansion),
+        ['None']
+      )
+      await f.act({ type: 'diff.collapse', ...step })
+      assert.equal(f.view().textDiff?.expandedText, null)
       await f.act({
         type: 'diff.expand',
         fileID: textDiff.fileID,
