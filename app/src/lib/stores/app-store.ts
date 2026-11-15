@@ -4561,36 +4561,50 @@ export class AppStore extends TypedBaseStore<IAppState> {
   /**
    * Refresh indicator in repository list for a specific repository
    */
-  private refreshIndicatorForRepository = async (repository: Repository) => {
+  public _refreshLocalRepositoryIndicator(repository: Repository) {
+    return this.refreshIndicatorForRepository(repository, false)
+  }
+
+  private refreshIndicatorForRepository = async (
+    repository: Repository,
+    includeRemote = true
+  ) => {
     if (isRepositoryGitPaused(repository.path)) {
       this.assistedCommits.readers.deferRefresh(repository)
       return
     }
     return withRepositoryGitOperation(repository.path, 'read', () =>
-      this.refreshIndicatorForRepositoryCore(repository)
+      this.refreshIndicatorForRepositoryCore(repository, includeRemote)
     )
   }
 
   private async refreshIndicatorForRepositoryCore(
-    repository: Repository
+    repository: Repository,
+    includeRemote: boolean
   ): Promise<void> {
     const lookup = this.localRepositoryStateLookup
 
     if (repository.missing) {
-      lookup.delete(repository.id)
+      if (lookup.delete(repository.id)) {
+        this.emitUpdate()
+      }
       return
     }
 
     const exists = await pathExists(repository.path)
     if (!exists) {
-      lookup.delete(repository.id)
+      if (lookup.delete(repository.id)) {
+        this.emitUpdate()
+      }
       return
     }
 
     const gitStore = this.gitStoreCache.get(repository)
     const status = await gitStore.loadStatus()
     if (status === null) {
-      lookup.delete(repository.id)
+      if (lookup.delete(repository.id)) {
+        this.emitUpdate()
+      }
       return
     }
 
@@ -4598,8 +4612,9 @@ export class AppStore extends TypedBaseStore<IAppState> {
     this.emitUpdate()
 
     if (
-      isRepositoryWithGitHubRepository(repository) &&
-      getAccountForRepository(this.accounts, repository) === null
+      !includeRemote ||
+      (isRepositoryWithGitHubRepository(repository) &&
+        getAccountForRepository(this.accounts, repository) === null)
     ) {
       return
     }

@@ -30,6 +30,7 @@ func (a *app) view(c *ui.Context) {
 	}
 	width, height := c.Size()
 	changesWorkspace := a.isChangesWorkspace()
+	expandedChanges := changesWorkspace && a.reviewingFile
 	verticalPadding := float32(20)
 	if height < 700 {
 		verticalPadding = 12
@@ -37,6 +38,10 @@ func (a *app) view(c *ui.Context) {
 	padding := float32(32)
 	if width < 1100 {
 		padding = 24
+	}
+	available := min(float32(1440), width-a.nativeRailWidth(c)) - 2*padding
+	if expandedChanges {
+		available = width - a.nativeRailWidth(c) - padding
 	}
 	ui.Row(c).Fill().AlignItems(ui.Stretch).FontWeight(400).Children(func() {
 		a.projectRail(c, tx, colors)
@@ -46,7 +51,7 @@ func (a *app) view(c *ui.Context) {
 				a.workspaceTaskBar(c, tx, colors, padding)
 			}
 			content := ui.Column(c.Key("workspace-content")).Grow(1).MinHeight(0).FillWidth()
-			if changesWorkspace {
+			if expandedChanges {
 				// The diff pane owns everything right of the file list: it runs to
 				// the window's right and bottom edges instead of a centered column.
 				content.Padding(verticalPadding, 0, 0, padding)
@@ -60,7 +65,7 @@ func (a *app) view(c *ui.Context) {
 					case a.repo == nil:
 						a.noProject(c, tx)
 					case changesWorkspace:
-						a.changesWorkspace(c, tx, colors, width-a.nativeRailWidth(c)-padding)
+						a.changesWorkspace(c, tx, colors, available)
 					case a.workspaceStashView(c):
 					case a.reviewingFile:
 						a.diffPane(c, tx, min(1440, width-a.nativeRailWidth(c))-2*padding)
@@ -348,7 +353,13 @@ func (a *app) fileList(c *ui.Context, tx locales.Messages, files []backend.File,
 				ui.Text(c, file.Path).SingleLine().Grow(1).MinWidth(0)
 				fileStatusPill(c, tx, file.Status, file.IsSubmodule)
 				ui.Icon(c, icons["chevron-right"]).FontSize(18).Shrink(0).TextColor(c.Theme().TextMuted)
-			}).OnClick(func() { a.reviewFile(i) })
+			}).OnClick(func() {
+				if a.tab == changesTab {
+					a.selectFile(i)
+				} else {
+					a.reviewFile(i)
+				}
+			})
 		})
 	}).Grow(1).MinHeight(0).FillWidth().Gap(4).Padding(8, 0, 0, 0).
 		BorderWidth(1, 0, 0, 0).BorderColor(colors.hairline).Label(tx.ChangedFiles())
@@ -496,12 +507,12 @@ func (a *app) diffPane(c *ui.Context, tx locales.Messages, width float32) {
 		}
 	}
 	if inline {
-		ui.Row(c.Key("diff-heading")).FillWidth().MinHeight(36).Gap(8).Margin(0, 0, 4, 0).Children(func() {
+		ui.Row(c.Key("diff-heading")).FillWidth().MinHeight(36).Padding(0, 16).Gap(8).Margin(0, 0, 4, 0).Children(func() {
 			title()
 			options()
 			a.changesDiffToggle(c, tx)
 		})
-		ui.Row(c.Key("diff-controls")).FillWidth().Gap(8).Wrap().Margin(0, 0, 8, 0).Children(func() {
+		ui.Row(c.Key("diff-controls")).FillWidth().Padding(0, 16).Gap(8).Wrap().Margin(0, 0, 8, 0).Children(func() {
 			inclusion()
 			a.nativeDiffControls(c, true)
 		})
@@ -517,7 +528,10 @@ func (a *app) diffPane(c *ui.Context, tx locales.Messages, width float32) {
 		})
 	}
 	if selected && file.OldPath != "" {
-		ui.Text(c, tx.PreviousPath(file.OldPath)).TextColor(c.Theme().TextMuted).Margin(0, 0, 12, 0)
+		previousPath := ui.Text(c, tx.PreviousPath(file.OldPath)).TextColor(c.Theme().TextMuted).Margin(0, 0, 12, 0)
+		if inline {
+			previousPath.Padding(0, 16)
+		}
 	}
 	if a.diffErr != nil {
 		showError(c, tx.FailedDiff(a.diffErr.Error()))

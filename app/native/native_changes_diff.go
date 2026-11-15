@@ -67,8 +67,12 @@ func (a *app) changesWorkspace(c *ui.Context, tx locales.Messages, colors worksp
 	if a.reviewingFile {
 		layout.width = fit(layout.width)
 	}
+	bottomPadding := float32(0)
+	if a.reviewingFile {
+		bottomPadding = 16
+	}
 	split := ui.Split(c.Key("changes-diff-split"), &layout.width, func() {
-		ui.Column(c.Key("changes-primary")).Fill().MinWidth(0).Padding(0, 16, 16, 0).Children(func() {
+		ui.Column(c.Key("changes-primary")).Fill().MinWidth(0).Padding(0, 16, bottomPadding, 0).Children(func() {
 			ui.Column(c.Key("changes-page")).Grow(1).MinHeight(0).FillWidth().Children(func() {
 				a.changesOverview(c, tx, colors)
 			})

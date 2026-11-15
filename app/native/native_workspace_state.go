@@ -33,9 +33,6 @@ type nativeWorkspaceState struct {
 	workspaceStashList                nativeListState
 	workspaceHistorySelection         ui.Selection[string]
 	workspaceFilesSelection           ui.Selection[string]
-	workspaceFilePointerID            string
-	workspaceFileReviewPath           string
-	workspaceFilePointerPlain         bool
 	workspaceFilesIdentity            string
 	workspaceFileCursor               int
 	workspaceHistoryIdentity          string

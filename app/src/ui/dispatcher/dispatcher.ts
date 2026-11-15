@@ -3116,6 +3116,10 @@ export class Dispatcher {
     this.appStore._setRepositoryIndicatorsEnabled(repositoryIndicatorsEnabled)
   }
 
+  public refreshLocalRepositoryIndicator(repository: Repository) {
+    return this.appStore._refreshLocalRepositoryIndicator(repository)
+  }
+
   public setCommitSpellcheckEnabled(commitSpellcheckEnabled: boolean) {
     this.appStore._setCommitSpellcheckEnabled(commitSpellcheckEnabled)
   }

@@ -52,7 +52,7 @@ func TestWorkspaceResizePresentationUsesFiveDIPsAndWindowBounds(t *testing.T) {
 	}
 }
 
-func TestWorkspaceFileClickReviewsButModifiersAndArrowsOnlySelect(t *testing.T) {
+func TestWorkspaceFileClickAndNavigationOnlySelectUntilExplicitReview(t *testing.T) {
 	state := &nativeWorkspaceState{workspaceFileCursor: -1}
 	list := &ui.ListState{}
 	files := []backend.KernelFile{{ID: "a", Path: "a.txt", Status: "Modified"}, {ID: "b", Path: "b.txt", Status: "Modified"}, {ID: "c", Path: "c.txt", Status: "Modified"}, {ID: "d", Path: "d.txt", Status: "Modified"}}
@@ -73,8 +73,8 @@ func TestWorkspaceFileClickReviewsButModifiersAndArrowsOnlySelect(t *testing.T) 
 	if err := tt.Click("a.txt"); err != nil {
 		t.Fatal(err)
 	}
-	if !slices.Equal(reviews, []string{"a.txt"}) || !slices.Equal(selected, []string{"a"}) {
-		t.Fatalf("ordinary click must select and enter focused review: selected=%v review=%v", selected, reviews)
+	if len(reviews) != 0 || !slices.Equal(selected, []string{"a"}) {
+		t.Fatalf("ordinary click must only select: selected=%v review=%v", selected, reviews)
 	}
 	reviews = nil
 	if err := tt.ClickWith(ui.Cmd, "c.txt"); err != nil {

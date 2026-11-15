@@ -18,9 +18,8 @@ type workspaceChangesCallbacks struct {
 	contextMenu func(*ui.Context, ui.Element, string)
 }
 
-// An ordinary file click opens its diff beside the overview.
-// Native Ctrl/Shift and keyboard navigation remain selection-only. Inclusion
-// stays a separate checkbox and never changes as a side effect of selection.
+// File clicks and native Ctrl/Shift or arrow navigation only change selection.
+// Explicit review controls open the diff; inclusion remains independent.
 func (a *app) workspaceChangesList(c *ui.Context) bool {
 	w := a.nativeWorkspace()
 	if a.core == nil || w == nil || a.coreSnapshot.Selected == nil || a.tab != changesTab {
@@ -42,10 +41,8 @@ func (a *app) workspaceChangesList(c *ui.Context) bool {
 	return true
 }
 
-// This same production renderer is used by MyGoTester. ObserveInput is MyGo
-// 0.8.1's non-consuming capture API: using Clicked on a child would steal the
-// click from List's native Ctrl/Shift range selection. Only pointer-up queues a
-// review; List.Changed also fires for arrows and must not open the review.
+// This same production renderer is used by MyGoTester. The native List owns
+// pointer and keyboard selection without changing whether the diff is open.
 func renderWorkspaceChangesList(c *ui.Context, state *nativeWorkspaceState, listState *ui.ListState, files []backend.KernelFile, selectedIDs []string, repositoryPath string, ready, locked bool, callbacks workspaceChangesCallbacks) {
 	identity := repositoryPath + strings.Join(selectedIDs, "/")
 	if identity != state.workspaceFilesIdentity {
@@ -80,23 +77,7 @@ func renderWorkspaceChangesList(c *ui.Context, state *nativeWorkspaceState, list
 			c.SetTheme(baseTheme)
 			ui.CheckboxState(c.Key("include-file"), &included, "").Size(32, 32).Padding(8).Label(tx.IncludeFile(file.Path)).Tooltip(tx.IncludeFile(file.Path)).Disabled(locked || !ready).OnChange(func() { callbacks.include(file.Path, included == ui.CheckOn) })
 			c.SetTheme(&listTheme)
-			// Observe only the file region, not its independent inclusion checkbox.
-			ui.Row(c.Key("review-file-region")).Grow(1).MinWidth(0).FillHeight().Gap(8).Disabled(!ready).ObserveInput(func(event ui.InputEvent) {
-				switch event.Kind {
-				case ui.InputPointerDown:
-					if event.Button == 0 {
-						state.workspaceFilePointerID = file.ID
-						state.workspaceFilePointerPlain = event.Mods&(ui.Cmd|ui.Ctrl|ui.Shift) == 0
-					}
-				case ui.InputPointerUp:
-					if event.Button == 0 {
-						if !event.Canceled && state.workspaceFilePointerID == file.ID && state.workspaceFilePointerPlain && event.Mods&(ui.Cmd|ui.Ctrl|ui.Shift) == 0 {
-							state.workspaceFileReviewPath = file.Path
-						}
-						state.workspaceFilePointerID = ""
-					}
-				}
-			}).Children(func() {
+			ui.Row(c.Key("review-file-region")).Grow(1).MinWidth(0).FillHeight().Gap(8).Disabled(!ready).Children(func() {
 				ui.Icon(c, icons[fileIcon(file.Path, file.IsSubmodule)]).FontSize(18).Shrink(0).TextColor(c.Theme().TextMuted)
 				ui.Text(c, path.Base(file.Path)).SingleLine().Shrink(1).MinWidth(0).Tooltip(file.Path)
 				if directory := path.Dir(file.Path); directory != "." {
@@ -127,10 +108,7 @@ func renderWorkspaceChangesList(c *ui.Context, state *nativeWorkspaceState, list
 		}
 		callbacks.selectFiles(ids)
 	}
-	if path := state.workspaceFileReviewPath; path != "" {
-		state.workspaceFileReviewPath = ""
-		callbacks.review(path)
-	} else if list.Submitted() && state.workspaceFileCursor >= 0 && state.workspaceFileCursor < len(files) {
+	if list.Submitted() && state.workspaceFileCursor >= 0 && state.workspaceFileCursor < len(files) {
 		callbacks.review(files[state.workspaceFileCursor].Path)
 	}
 }
@@ -177,7 +155,6 @@ func (a *app) applyWorkspaceSnapshot(snapshot backend.KernelSnapshot, changedRep
 		a.workspaceHistorySummaryError = nil
 		a.workspaceBranchOpen, a.workspaceWorktreeOpen, a.workspacePROpen, a.workspaceCompareOpen = false, false, false, false
 		a.workspaceHistoryIdentity, a.workspaceFilesIdentity, a.workspaceFilterIdentity, a.workspacePreparedDiffID = "", "", "", ""
-		a.workspaceFilePointerID, a.workspaceFileReviewPath = "", ""
 		a.workspaceHistoryCursor, a.workspaceFileCursor = -1, -1
 		a.workspaceBranchList, a.workspaceTreeList, a.workspacePRList, a.workspaceCompareList, a.workspaceStashList = nativeListState{}, nativeListState{}, nativeListState{}, nativeListState{}, nativeListState{}
 	}

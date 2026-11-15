@@ -33,10 +33,24 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 					tt.SetDark(dark)
 					tt.Advance(time.Second)
 					tx := locales.In(locale)
-					visibleControl(t, tt, tx.ExpandDiff(), size[0], size[1])
-					if _, shown := tt.Find(tx.DiffTitle()); shown {
-						t.Fatal("diff is expanded before the user opens it")
+					history := designEvidenceApp(t, time.Now(), "history")
+					historyTester := designEvidenceTester(history, size[0], size[1], locale, dark)
+					historyBounds := visibleControl(t, historyTester, workspaceLabel(locale, "workspace.history"), size[0], size[1])
+					collapsedFiles := visibleControl(t, tt, tx.ChangedFiles(), size[0], size[1])
+					toggle := visibleControl(t, tt, tx.ExpandDiff(), size[0], size[1])
+					rightInset := historyBounds.X + historyBounds.W - toggle.X - toggle.W
+					if collapsedFiles.X != historyBounds.X || rightInset < 0 || rightInset > 8 {
+						t.Fatalf("collapsed changes must use the history page width: files=%+v toggle=%+v history=%+v", collapsedFiles, toggle, historyBounds)
 					}
+					if err := tt.Click("docs/routes/lake-district.md"); err != nil {
+						t.Fatal(err)
+					}
+					if _, shown := tt.Find(tx.DiffTitle()); shown {
+						t.Fatal("ordinary file click expanded the diff")
+					}
+					tt.Move(4, 4)
+					tt.Advance(time.Second)
+					saveDesignEvidence(t, tt, fmt.Sprintf("changes-collapsed-%s-%d-dark-%v.png", locale, size[0], dark))
 					original, included := a.commitSummary, maps.Clone(a.included)
 					if err := tt.Click(tx.CommitSummary()); err != nil {
 						t.Fatal(err)
@@ -49,6 +63,15 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 					tt.Advance(time.Second)
 					files := visibleControl(t, tt, tx.ChangedFiles(), size[0], size[1])
 					diff := visibleControl(t, tt, tx.DiffTitle(), size[0], size[1])
+					heading, found := tt.AccessByRole(ui.RoleHeading, "docs/routes/lake-district.md")
+					inclusion := visibleControl(t, tt, tx.IncludeForSave(), size[0], size[1])
+					collapse := visibleControl(t, tt, tx.CollapseDiff(), size[0], size[1])
+					if !found || heading.Bounds.X < diff.X+16 || inclusion.X < diff.X+16 || collapse.X+collapse.W > diff.X+diff.W-16 {
+						t.Fatalf("diff controls lost their safety padding: diff=%+v heading=%+v inclusion=%+v collapse=%+v", diff, heading.Bounds, inclusion, collapse)
+					}
+					tt.Move(4, 4)
+					tt.Advance(time.Second)
+					saveDesignEvidence(t, tt, fmt.Sprintf("changes-expanded-%s-%d-dark-%v.png", locale, size[0], dark))
 					if diff.X+diff.W < float32(size[0]-1) || diff.Y+diff.H < float32(size[1]-1) {
 						t.Fatalf("diff left unused space at the window edges: %+v in %v", diff, size)
 					}
@@ -84,6 +107,9 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 					}
 					if _, shown := tt.Find(tx.DiffTitle()); shown || a.reviewingFile {
 						t.Fatal("collapse left the diff open")
+					}
+					if folded := visibleControl(t, tt, tx.ChangedFiles(), size[0], size[1]); folded.X != collapsedFiles.X || folded.W != collapsedFiles.W {
+						t.Fatalf("collapse did not restore the centered width: before=%+v after=%+v", collapsedFiles, folded)
 					}
 					if err := tt.Click(tx.ExpandDiff()); err != nil {
 						t.Fatal(err)

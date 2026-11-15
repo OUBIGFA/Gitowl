@@ -14,6 +14,7 @@ import { createStatus } from '../../helpers/changes-state-helper'
 import { RepositorySectionTab } from '../../../src/lib/app-state'
 import { writeFile } from 'fs/promises'
 import { join } from 'path'
+import { setupEmptyDirectory } from '../../helpers/repositories'
 
 describe('AppStore repository indicators', () => {
   let appStore: AppStore
@@ -240,6 +241,46 @@ describe('AppStore repository indicators', () => {
       false
     )
     assert.deepStrictEqual(emittedPresence, [false])
+  })
+
+  it('clears and publishes stale local counts for unavailable repositories', async t => {
+    for (const condition of [
+      'marked-missing',
+      'missing-path',
+      'not-a-repository',
+    ]) {
+      await t.test(condition, async t => {
+        const directory = await setupEmptyDirectory(t)
+        const repository = new Repository(
+          condition === 'missing-path'
+            ? join(directory.path, 'missing')
+            : directory.path,
+          103,
+          null,
+          condition === 'marked-missing'
+        )
+        appStore['localRepositoryStateLookup'].set(repository.id, {
+          changedFilesCount: 2,
+          aheadBehind: null,
+        })
+        const emitUpdate = appStore['emitUpdate']
+        const emittedPresence: boolean[] = []
+        appStore['emitUpdate'] = () => {
+          emittedPresence.push(
+            appStore['localRepositoryStateLookup'].has(repository.id)
+          )
+        }
+        t.after(() => {
+          appStore['emitUpdate'] = emitUpdate
+        })
+        await appStore._refreshLocalRepositoryIndicator(repository)
+        assert.equal(
+          appStore.getState().localRepositoryStateLookup.has(repository.id),
+          false
+        )
+        assert.deepStrictEqual(emittedPresence, [false])
+      })
+    }
   })
 
   it('keeps local repositories when a cloning repository is selected', () => {

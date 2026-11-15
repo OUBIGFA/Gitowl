@@ -28,7 +28,9 @@ export class RepositoryIndicatorUpdater {
     private readonly getRepositories: () => ReadonlyArray<Repository>,
     private readonly refreshRepositoryIndicators: (
       repository: Repository
-    ) => Promise<void>
+    ) => Promise<void>,
+    private readonly refreshInterval = RefreshInterval,
+    private readonly refreshSkew = skew
   ) {}
 
   public start() {
@@ -47,7 +49,9 @@ export class RepositoryIndicatorUpdater {
           ? Infinity
           : Date.now() - this.lastRefreshStartedAt
 
-      const timeout = Math.max(RefreshInterval - timeSinceLastRefresh, 0) + skew
+      const timeout =
+        Math.max(this.refreshInterval - timeSinceLastRefresh, 0) +
+        this.refreshSkew
       const lastRefreshText = isFinite(timeSinceLastRefresh)
         ? `${(timeSinceLastRefresh / 1000).toFixed(3)}s ago`
         : 'never'
