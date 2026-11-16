@@ -2,6 +2,7 @@ import { execFileSync, spawn } from 'child_process'
 import { join, resolve } from 'path'
 import { readdir, readFile, stat } from 'fs/promises'
 import { parseEnv } from 'util'
+import { selectUnitTestFiles } from './test-selection.mjs'
 
 function reporter(r) {
   return ['--test-reporter', r, '--test-reporter-destination', 'stdout']
@@ -48,26 +49,14 @@ let files =
 // about 90% of a full unit run. Run them when the current change set (against
 // the last delivered origin/main) touches the code they exercise, or when
 // GITOWL_UNIT_ALL=1. Any doubt about the change set runs them.
-const assistedTest = /[\\/]assisted-commit[^\\/]*-test\.tsx?$/
-const assistedSources = [
-  'app/src/lib/assisted-commit/',
-  'app/src/lib/git/',
-  'app/src/lib/stores/',
-  'app/src/lib/copilot',
-  'app/src/models/',
-  'app/test/helpers/',
-  'package-lock.json',
-  'app/package.json',
-  'app/package-lock.json',
-]
 function changedPaths() {
   const run = args =>
     execFileSync('git', args, { cwd: projectRoot, encoding: 'utf8' })
-      .split('\n')
+      .split('\0')
       .filter(Boolean)
   return [
-    ...run(['diff', '--name-only', 'origin/main']),
-    ...run(['ls-files', '--others', '--exclude-standard']),
+    ...run(['diff', '--name-only', '--no-renames', '-z', 'origin/main']),
+    ...run(['ls-files', '-z', '--others', '--exclude-standard']),
   ]
 }
 if (fileArgs.length === 0 && process.env.GITOWL_UNIT_ALL !== '1') {
@@ -75,18 +64,15 @@ if (fileArgs.length === 0 && process.env.GITOWL_UNIT_ALL !== '1') {
   try {
     changed = changedPaths()
   } catch {}
-  const relevant =
-    changed === null ||
-    changed.some(
-      p => assistedTest.test(p) || assistedSources.some(s => p.startsWith(s))
-    )
-  if (!relevant) {
-    const skipped = files.filter(f => assistedTest.test(f))
-    files = files.filter(f => !assistedTest.test(f))
+  const selected = selectUnitTestFiles(files, changed)
+  if (selected.length !== files.length) {
     console.log(
-      `Skipping ${skipped.length} upstream assisted-commit test files: no change to the code they exercise (set GITOWL_UNIT_ALL=1 to run them).`
+      'Skipping ' +
+        (files.length - selected.length) +
+        ' upstream assisted-commit test files: no change to the code they exercise (set GITOWL_UNIT_ALL=1 to run them).'
     )
   }
+  files = selected
 }
 
 // I would _looooove_ to use the `--env-file` option, but it doesn't override

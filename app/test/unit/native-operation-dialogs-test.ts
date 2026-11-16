@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { after, afterEach, before, describe, it } from 'node:test'
 import { EventEmitter } from 'events'
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'fs/promises'
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'fs/promises'
 import { join, resolve } from 'path'
 import { ipcRenderer } from 'electron'
 import { exec } from 'dugite'
@@ -63,6 +63,7 @@ describe(
   { timeout: 600000 },
   () => {
     let runtime: AppRuntime
+    let repositoryTemplate: string
     const directories: string[] = []
     // Teardown leases and deletes the fixtures; a background refresh that is
     // still running then fails by design. Those are not test outcomes.
@@ -97,6 +98,7 @@ describe(
         }
       })
       await mkdir(root, { recursive: true })
+      repositoryTemplate = await createRepositoryTemplate()
     })
 
     afterEach(() => {
@@ -145,8 +147,8 @@ describe(
       assert.deepEqual(errorPostFailures, [])
     })
 
-    async function fixture() {
-      const path = await mkdtemp(join(root, 'operation-git-'))
+    async function createRepositoryTemplate() {
+      const path = await mkdtemp(join(root, 'operation-template-'))
       directories.push(path)
       const hooks = join(path, 'empty-hooks')
       await mkdir(hooks)
@@ -165,6 +167,14 @@ describe(
       await git(path, ['add', 'file.txt'])
       await git(path, ['commit', '-m', 'initial'])
       await git(path, ['branch', 'feature'])
+      return path
+    }
+
+    async function fixture() {
+      const path = await mkdtemp(join(root, 'operation-git-'))
+      directories.push(path)
+      await cp(repositoryTemplate, path, { recursive: true })
+      await git(path, ['config', 'core.hooksPath', join(path, 'empty-hooks')])
       await runtime.dispatcher.addRepositories([path])
       const repository = runtime.appStore
         .getState()

@@ -63,10 +63,12 @@ const crashConfig = merge({}, common.crash, config, {
 
 // eslint-disable-next-line no-restricted-syntax
 export default [
-  mainConfig,
-  rendererConfig,
-  nativeKernelConfig,
-  crashConfig,
-  cliConfig,
-  highlighterConfig,
+  common.withCache('production-main', __filename, mainConfig),
+  ...(process.env.GITOWL_NATIVE_BUILD === '1'
+    ? []
+    : [common.withCache('production-renderer', __filename, rendererConfig)]),
+  common.withCache('production-kernel', __filename, nativeKernelConfig),
+  common.withCache('production-crash', __filename, crashConfig),
+  common.withCache('production-cli', __filename, cliConfig),
+  common.withCache('production-highlighter', __filename, highlighterConfig),
 ]

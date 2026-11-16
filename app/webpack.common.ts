@@ -11,6 +11,42 @@ export const externals = ['7zip']
 const outputDir = 'out'
 export const replacements = getReplacements()
 
+/** DefinePlugin tracks changed values such as the Git revision per module.
+ * Keep target/mode caches separate so seeded tests cannot satisfy production. */
+export function withCache(
+  name: string,
+  configFile: string,
+  configuration: webpack.Configuration
+): webpack.Configuration {
+  return {
+    ...configuration,
+    name,
+    cache: {
+      type: 'filesystem',
+      name,
+      cacheDirectory: path.resolve(__dirname, '../.local/webpack-cache'),
+      version: JSON.stringify([
+        process.platform,
+        process.arch,
+        process.env.TARGET_ARCH,
+        process.env.NODE_ENV,
+        process.env.RELEASE_CHANNEL,
+        process.env.GITOWL_NATIVE_BUILD,
+        process.env.DESKTOP_KERNEL_TEST,
+        process.env.TEST_ENV,
+      ]),
+      buildDependencies: {
+        config: [configFile],
+        inputs: [
+          path.resolve(__dirname, '../tsconfig.json'),
+          path.resolve(__dirname, '../package-lock.json'),
+          path.resolve(__dirname, 'package-lock.json'),
+        ],
+      },
+    },
+  }
+}
+
 const commonConfig: webpack.Configuration = {
   optimization: {
     emitOnErrors: false,

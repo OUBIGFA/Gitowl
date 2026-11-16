@@ -37,30 +37,73 @@ export const isSHA = (value: unknown): value is string =>
   typeof value === 'string' && /^[a-f0-9]{64}$/.test(value)
 
 /** Receipts contain repository-relative paths only. Reject traversal, junctions
- * and symlinks, including a linked ancestor, before reading any evidence. */
-export async function safePath(root: string, name: string): Promise<string> {
-  requireCondition(
-    typeof name === 'string' &&
-      name.length > 0 &&
-      !isAbsolute(name) &&
-      !/[\\:\x00-\x1f]/.test(name) &&
-      name.split('/').every(p => p !== '' && p !== '.' && p !== '..'),
-    `Unsafe evidence path: ${name}`
-  )
-  const base = await realpath(root)
-  let current = base
-  for (const part of name.split('/')) {
-    current = resolve(current, part)
+ * and symlinks, including a linked ancestor, before reading any evidence.
+ * Parent reuse is scoped to one snapshot and checked again before it completes. */
+function createPathResolver(root: string) {
+  const parents = new Map<string, Promise<string>>()
+  let rootPath: Promise<string> | undefined
+  const base = () => (rootPath ??= realpath(root))
+
+  async function inspect(name: string): Promise<string> {
+    const separator = name.lastIndexOf('/')
+    const parent =
+      separator < 0 ? await base() : await parentPath(name.slice(0, separator))
+    const current = resolve(parent, name.slice(separator + 1))
     const entry = await lstat(current)
-    requireCondition(!entry.isSymbolicLink(), `Linked evidence path: ${name}`)
+    requireCondition(!entry.isSymbolicLink(), 'Linked evidence path: ' + name)
     const actual = await realpath(current)
-    const within = relative(base, actual)
+    const within = relative(await base(), actual)
     requireCondition(
-      within !== '..' && !within.startsWith(`..${sep}`) && !isAbsolute(within),
-      `Evidence escapes repository: ${name}`
+      within !== '..' && !within.startsWith('..' + sep) && !isAbsolute(within),
+      'Evidence escapes repository: ' + name
+    )
+    return current
+  }
+
+  function parentPath(name: string): Promise<string> {
+    let pending = parents.get(name)
+    if (pending === undefined) {
+      pending = inspect(name)
+      parents.set(name, pending)
+    }
+    return pending
+  }
+
+  return {
+    async resolve(name: string): Promise<string> {
+      requireCondition(
+        typeof name === 'string' &&
+          name.length > 0 &&
+          !isAbsolute(name) &&
+          !/[\\:\x00-\x1f]/.test(name) &&
+          name
+            .split('/')
+            .every(part => part !== '' && part !== '.' && part !== '..'),
+        'Unsafe evidence path: ' + name
+      )
+      return inspect(name)
+    },
+    async verify() {
+      const names = [...parents.keys()]
+      for (let offset = 0; offset < names.length; offset += 16) {
+        await Promise.all(names.slice(offset, offset + 16).map(inspect))
+      }
+    },
+  }
+}
+
+export async function safePath(root: string, name: string): Promise<string> {
+  return createPathResolver(root).resolve(name)
+}
+
+export async function safePaths(root: string, names: ReadonlyArray<string>) {
+  const validatedPaths = createPathResolver(root)
+  for (let offset = 0; offset < names.length; offset += 16) {
+    await Promise.all(
+      names.slice(offset, offset + 16).map(name => validatedPaths.resolve(name))
     )
   }
-  return current
+  await validatedPaths.verify()
 }
 
 export function isEvidencePath(name: string) {
@@ -110,6 +153,7 @@ export async function captureSourceTreeEvidence(
   root: string,
   reviewArtifacts: ReadonlyArray<Artifact> = []
 ): Promise<SourceTreeEvidence> {
+  const validatedPaths = createPathResolver(root)
   const files: Artifact[] = []
   const submodules: Array<{ path: string; revision: string }> = []
   async function collect(directory: string, prefix: string) {
@@ -135,38 +179,46 @@ export async function captureSourceTreeEvidence(
         .map(line => /^160000 [a-f0-9]+ 0\t(.+)$/.exec(line)?.[1])
         .filter(Boolean)
     )
-    for (const name of names) {
-      const path = prefix + name
-      requireCondition(
-        !/^docs\//.test(path) &&
-          !/(^|\/)(?:\.local|\.git|node_modules|output|_temp|\.agents)(\/|$)/.test(
-            path
-          ) &&
-          !/(^|\/)(?:AGENTS|CLAUDE)\.md$/.test(path),
-        `Private/generated input in source set: ${path}`
+    for (let offset = 0; offset < names.length; offset += 16) {
+      await Promise.all(
+        names.slice(offset, offset + 16).map(async name => {
+          const path = prefix + name
+          requireCondition(
+            !/^docs\//.test(path) &&
+              !/(^|\/)(?:\.local|\.git|node_modules|output|_temp|\.agents)(\/|$)/.test(
+                path
+              ) &&
+              !/(^|\/)(?:AGENTS|CLAUDE)\.md$/.test(path),
+            `Private/generated input in source set: ${path}`
+          )
+          const absolute = await validatedPaths.resolve(path)
+          if (gitlinks.has(name)) {
+            // Runtime inputs include three actual upstream submodules. Hash their
+            // Git input sets too, including uncommitted bytes, not just gitlinks.
+            const revision = (await git(absolute, ['rev-parse', 'HEAD'])).trim()
+            requireCondition(
+              /^[a-f0-9]{40,64}$/.test(revision),
+              `Invalid submodule: ${path}`
+            )
+            submodules.push({ path, revision })
+            await collect(absolute, path + '/')
+          } else {
+            requireCondition(
+              (await lstat(absolute)).isFile(),
+              `Not a regular source input: ${path}`
+            )
+            // Empty source files are legal; empty evidence receipts are not.
+            files.push({ path, sha256: hash(await readFile(absolute)) })
+          }
+        })
       )
-      const absolute = await safePath(root, path)
-      if (gitlinks.has(name)) {
-        // Runtime inputs include three actual upstream submodules. Hash their
-        // Git input sets too, including uncommitted bytes, not just gitlinks.
-        const revision = (await git(absolute, ['rev-parse', 'HEAD'])).trim()
-        requireCondition(
-          /^[a-f0-9]{40,64}$/.test(revision),
-          `Invalid submodule: ${path}`
-        )
-        submodules.push({ path, revision })
-        await collect(absolute, path + '/')
-      } else {
-        requireCondition(
-          (await lstat(absolute)).isFile(),
-          `Not a regular source input: ${path}`
-        )
-        // Empty source files are legal; empty evidence receipts are not.
-        files.push({ path, sha256: hash(await readFile(absolute)) })
-      }
     }
   }
   await collect(root, '')
+  await validatedPaths.verify()
+  submodules.sort((first, second) =>
+    first.path < second.path ? -1 : first.path > second.path ? 1 : 0
+  )
   files.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0))
   const revision = (await git(root, ['rev-parse', 'HEAD'])).trim()
   requireCondition(/^[a-f0-9]{40,64}$/.test(revision), 'Invalid Git revision')
@@ -212,9 +264,10 @@ export async function treeArtifact(
   name: string
 ): Promise<Artifact> {
   const files = await inventory(await safePath(root, name))
-  requireCondition(files.length > 0, `Empty asset directory: ${name}`)
-  for (const file of files) {
-    await safePath(root, `${name}/${file.path}`)
-  }
+  requireCondition(files.length > 0, 'Empty asset directory: ' + name)
+  await safePaths(
+    root,
+    files.map(file => name + '/' + file.path)
+  )
   return { path: name, sha256: jsonHash(files) }
 }

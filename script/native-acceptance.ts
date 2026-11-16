@@ -131,12 +131,6 @@ export function commandEnvironment(root: string, suite: Suite) {
   if (suite === 'native-build' || suite === 'locales') {
     env.GOFLAGS = `"-modfile=${join(root, '.local/gitowl-native.mod')}"`
   }
-  if (suite === 'script') {
-    env.GITOWL_RUNTIME_SMOKE = join(
-      root,
-      'output/native-runtime/desktop-kernel'
-    )
-  }
   return env
 }
 

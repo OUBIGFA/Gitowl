@@ -111,6 +111,8 @@ func TestWorkspaceOverviewReviewBackAcrossSizesAndLanguages(t *testing.T) {
 					t.Fatalf("primary action is not naturally visible at the canvas bottom: %+v", before)
 				}
 				h.click(t, tx.OpenFile("first.txt"))
+				h.click(t, tx.ExpandDiff())
+				h.answer(t, "diff", patch("first.txt", "before", "after"), nil)
 				if !h.a.reviewingFile || !h.tt.HasText(tx.OpenFile("second.txt")) || !h.tt.HasText(tx.IncludeAll()) {
 					t.Fatalf("review did not stay beside the file overview: %q", h.tt.Texts())
 				}
@@ -202,6 +204,8 @@ func TestFailedOrCanceledProjectOpenPreservesActiveWorkspace(t *testing.T) {
 			h.click(t, tx.IncludeFile("first.txt"))
 			typeDraft(t, h, tx, "Keep this project", "Keep this description")
 			h.click(t, tx.OpenFile("first.txt"))
+			h.click(t, tx.ExpandDiff())
+			h.answer(t, "diff", patch("first.txt", "before", "after"), nil)
 			original, status, preview := h.a.repo, h.a.status, h.a.preview
 			h.click(t, tx.OpenRepository())
 			h.click(t, tx.RepositoryPath())

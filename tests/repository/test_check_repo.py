@@ -125,6 +125,49 @@ class RepositoryCheckTests(unittest.TestCase):
         self.git("update-index", "--add", "--cacheinfo", f"100644,{blob},readme.md")
         self.assert_rejected("case collision")
 
+    def test_git_process_count_does_not_grow_with_index_size(self):
+        for number in range(40):
+            self.write(f"references/file-{number}.txt", f"fixture {number}\n")
+        self.git("add", ".")
+        program = """
+import runpy
+import sys
+
+processes = []
+sys.addaudithook(lambda event, args: processes.append(args[0]) if event == "subprocess.Popen" else None)
+checker = runpy.run_path(sys.argv[1])
+result = checker["check"]()
+print("Git processes:", len(processes))
+sys.exit(result)
+"""
+        result = subprocess.run(
+            [sys.executable, "-X", "utf8", "-c", program, str(CHECKER)],
+            cwd=self.repo,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        count = int(result.stdout.split("Git processes:")[1])
+        self.assertLessEqual(count, 6, result.stdout)
+
+    def test_batch_reads_keep_empty_and_duplicate_blob_paths(self):
+        self.write("empty.txt", b"")
+        self.write("references/first.json", "{bad}\n")
+        self.write("references/second.json", "{bad}\n")
+        self.git("add", ".")
+        result = self.run_check()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("references/first.json: invalid JSON", result.stdout)
+        self.assertIn("references/second.json: invalid JSON", result.stdout)
+        self.assertNotIn("empty.txt:", result.stdout)
+
+    def test_missing_index_object_is_not_silently_skipped(self):
+        self.git("update-index", "--add", "--cacheinfo", f"100644,{'f' * 40},missing.txt")
+        result = self.run_check()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("could not complete", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

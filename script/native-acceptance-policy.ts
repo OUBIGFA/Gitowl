@@ -14,6 +14,7 @@ import {
   isSHA,
   requireCondition as check,
   safePath,
+  safePaths,
   treeArtifact,
   verifyArtifact,
 } from './native-acceptance-source'
@@ -57,15 +58,14 @@ export function commandPlan(suite: Suite, receiptPath: string): CommandPlan {
     'production-kernel': 'test:kernel:production',
   }
   if (npm[suite]) {
-    // The script suite includes expensive source-graph hashing and native tsc
-    // probes. Run its files sequentially so they cannot starve the real
-    // Electron smoke's deadline; no test or timeout is removed or weakened.
+    // Runtime smoke has its own suite. Bound script concurrency so the source
+    // graph and compiler probes do not exhaust each other's process budget.
     return {
       executable: 'npm',
       args: [
         'run',
         npm[suite]!,
-        ...(suite === 'script' ? ['--', '--test-concurrency=1'] : []),
+        ...(suite === 'script' ? ['--', '--test-concurrency=2'] : []),
       ],
       cwd: '.',
     }
@@ -394,13 +394,17 @@ export function validateResults(suite: Suite, stdout: string, stderr: string) {
       `${suite}: no structured Go test/package results`
     )
   }
-  if (suite === 'production-kernel') {
-    for (const name of [
+  if (suite === 'kernel' || suite === 'production-kernel') {
+    const required = [
       'TestNativeViewUsesOriginalDesktopKernel',
+      'TestNativePreferencesFitAllOriginalPages',
       'TestNativeGenerationUsesOriginalDesktopKernel',
       'TestNativeMediaUsesOriginalDesktopKernel',
-      'TestOriginalKernelFreshProfileCompletesNativeWelcome',
-    ]) {
+    ]
+    if (suite === 'production-kernel') {
+      required.push('TestOriginalKernelFreshProfileCompletesNativeWelcome')
+    }
+    for (const name of required) {
       check(
         results.goPass.has(name) && !results.goSkip.has(name),
         `Required production test did not run: ${name}`
@@ -534,7 +538,6 @@ export async function validateRuntime(root: string, reference: Artifact) {
   )
   for (const file of receipt.files) {
     check(isSHA(file.sha256), 'Invalid runtime file SHA')
-    await safePath(root, `${runtimePath}/${file.path}`)
     // Git for Windows ships this system shell startup file, not a user
     // profile. Its bytes remain checked against the original runtime receipt.
     const gitSystemProfile = file.path === 'app/git/etc/profile'
@@ -546,6 +549,10 @@ export async function validateRuntime(root: string, reference: Artifact) {
       `Test/research resource in shipping runtime: ${file.path}`
     )
   }
+  await safePaths(
+    root,
+    receipt.files.map((file: Artifact) => `${runtimePath}/${file.path}`)
+  )
   check(
     await reusableRuntime(
       await safePath(root, reference.path),

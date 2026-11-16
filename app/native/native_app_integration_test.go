@@ -310,23 +310,23 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 				await(func() bool {
 					return a.corePending == 0 && a.coreSnapshot.Appearance.Theme == theme && !a.nativeDialogFormFor(a.coreSnapshot.CurrentPopup).validating()
 				})
-				for _, scale := range []float32{1, 1.25, 1.5} {
-					tt.SetPreferences(ui.Preferences{TextScale: scale})
-					for _, size := range [][2]int{{900, 620}, {1440, 900}} {
-						settingsSize = size
-						tt.SetSize(size[0], size[1])
-						settleSettings()
-						var panelBounds ui.Rect
-						for _, page := range []string{"accounts", "integrations", "copilot", "git", "appearance", "notifications", "prompts", "advanced", "accessibility"} {
+				panelBoundsByLayout := make(map[[3]float32]ui.Rect)
+				for _, page := range []string{"accounts", "integrations", "copilot", "git", "appearance", "notifications", "prompts", "advanced", "accessibility"} {
+					click(nativeDialogChoiceLabel(locale, "settings.option."+page))
+					await(func() bool {
+						popup := a.coreSnapshot.CurrentPopup
+						if popup != nil && popup.Type == "Error" {
+							t.Fatalf("settings page %s: original error popup %+v", page, popup)
+						}
+						return a.corePending == 0 && popup != nil && popup.Type == "Preferences" && len(popup.Fields) > 0 && popup.Fields[0].Value == page && !a.nativeDialogFormFor(popup).validating()
+					})
+					for _, scale := range []float32{1, 1.25, 1.5} {
+						tt.SetPreferences(ui.Preferences{TextScale: scale})
+						for _, size := range [][2]int{{900, 620}, {1440, 900}} {
+							settingsSize = size
+							tt.SetSize(size[0], size[1])
+							settleSettings()
 							t.Logf("preferences %s/%v/%v/scale%g/%s", locale, dark, size, scale, page)
-							click(nativeDialogChoiceLabel(locale, "settings.option."+page))
-							await(func() bool {
-								popup := a.coreSnapshot.CurrentPopup
-								if popup != nil && popup.Type == "Error" {
-									t.Fatalf("settings page %s: original error popup %+v", page, popup)
-								}
-								return a.corePending == 0 && popup != nil && popup.Type == "Preferences" && len(popup.Fields) > 0 && popup.Fields[0].Value == page && !a.nativeDialogFormFor(popup).validating()
-							})
 							if _, found := tt.AccessByRole(ui.RoleScroll, ""); found {
 								t.Fatalf("%s/%s/%v settings has a scrollbar", locale, page, size)
 							}
@@ -350,11 +350,20 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 							if !ok {
 								t.Fatal("settings dialog missing")
 							}
-							if panelBounds.W != 0 && panel.Bounds != panelBounds {
-								t.Fatalf("settings resized between pages: %s %+v != %+v", page, panel.Bounds, panelBounds)
+							layoutKey := [3]float32{scale, float32(size[0]), float32(size[1])}
+							if previous, seen := panelBoundsByLayout[layoutKey]; seen && panel.Bounds != previous {
+								t.Fatalf("settings resized between pages: %s %+v != %+v", page, panel.Bounds, previous)
 							}
-							panelBounds = panel.Bounds
+							panelBoundsByLayout[layoutKey] = panel.Bounds
 						}
+					}
+				}
+				for _, scale := range []float32{1, 1.25, 1.5} {
+					tt.SetPreferences(ui.Preferences{TextScale: scale})
+					for _, size := range [][2]int{{900, 620}, {1440, 900}} {
+						settingsSize = size
+						tt.SetSize(size[0], size[1])
+						settleSettings()
 						click(locales.In(locale).CustomProviders())
 						click(locales.In(locale).AddProvider())
 						if evidence := os.Getenv("GITOWL_NATIVE_LAYOUT_EVIDENCE"); evidence != "" {

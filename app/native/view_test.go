@@ -208,6 +208,11 @@ func TestNativeOpenStatusAndPatch(t *testing.T) {
 	}
 	h.tt.Key(0, ui.KeyEscape)
 	h.click(t, "Review first.txt")
+	if h.a.reviewingFile || !h.a.loadingDiff {
+		t.Fatal("selecting a file must load its diff without expanding the panel")
+	}
+	h.click(t, locales.In("en").ExpandDiff())
+	h.answer(t, "diff", patch("first.txt", "before", "after"), nil)
 	if h.a.preview == nil || len(h.a.preview.patches) != 1 {
 		t.Fatal("native patch viewer not prepared")
 	}

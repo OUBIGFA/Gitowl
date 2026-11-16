@@ -1,7 +1,15 @@
 import assert from 'node:assert/strict'
 import { before, after, describe, it, TestContext } from 'node:test'
 import { EventEmitter } from 'events'
-import { mkdir, mkdtemp, rm, writeFile, readFile, rename } from 'fs/promises'
+import {
+  cp,
+  mkdir,
+  mkdtemp,
+  rm,
+  writeFile,
+  readFile,
+  rename,
+} from 'fs/promises'
 import { join, resolve } from 'path'
 import { exec } from 'dugite'
 import { ipcRenderer } from 'electron'
@@ -59,14 +67,37 @@ describe(
   { timeout: 600000 },
   () => {
     let runtime: AppRuntime
+    let repositoryTemplate: string
     before(async () => {
       localStorage.clear()
       localStorage.setItem('stats-opt-out', '1')
       localStorage.setItem('has-sent-stats-opt-in-ping', '1')
       const { getAppRuntime } = await import('../../src/ui/app-runtime')
       runtime = getAppRuntime()
+      const root = resolve('_temp/native-workspace-tests')
+      await mkdir(root, { recursive: true })
+      repositoryTemplate = await mkdtemp(join(root, 'template-'))
+      const seedGit = async (args: string[]) => {
+        const result = await exec(args, repositoryTemplate)
+        assert.equal(result.exitCode, 0, result.stderr)
+      }
+      await seedGit(['init', '-b', 'main'])
+      await seedGit(['config', 'core.autocrlf', 'false'])
+      await seedGit(['config', 'user.name', 'Workspace Fixture'])
+      await seedGit(['config', 'user.email', 'workspace@example.invalid'])
+      await writeFile(join(repositoryTemplate, 'file.txt'), 'base\n')
+      await seedGit(['add', '.'])
+      await seedGit(['commit', '-m', 'base'])
     })
-    after(() => window.close())
+    after(async () => {
+      window.close()
+      await rm(repositoryTemplate, {
+        recursive: true,
+        force: true,
+        maxRetries: 5,
+        retryDelay: 50,
+      })
+    })
 
     async function until(predicate: () => boolean) {
       if (predicate()) {
@@ -96,13 +127,7 @@ describe(
         assert.equal(result.exitCode, code, result.stderr)
         return result.stdout.trim()
       }
-      await git(['init', '-b', 'main'])
-      await git(['config', 'core.autocrlf', 'false'])
-      await git(['config', 'user.name', 'Workspace Fixture'])
-      await git(['config', 'user.email', 'workspace@example.invalid'])
-      await writeFile(join(path, 'file.txt'), 'base\n')
-      await git(['add', '.'])
-      await git(['commit', '-m', 'base'])
+      await cp(repositoryTemplate, path, { recursive: true })
       const [repository] = await runtime.dispatcher.addRepositories([path])
       assert.ok(repository instanceof Repository)
       await runtime.dispatcher.selectRepository(repository)

@@ -23,4 +23,11 @@ const nativeKernel =
     : merge({}, common.nativeKernel, config)
 
 // eslint-disable-next-line no-restricted-syntax
-export default [merge({}, common.main, config), nativeKernel]
+export default [
+  common.withCache(
+    'development-main',
+    __filename,
+    merge({}, common.main, config)
+  ),
+  common.withCache('development-kernel', __filename, nativeKernel),
+]

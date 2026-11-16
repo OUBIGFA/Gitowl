@@ -29,7 +29,8 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Verified MyGo preparation failed' }
     Push-Location app/native
     try {
-        & go test "-modfile=$modfile" ./... -count=1
+        $kernelTests = '^(TestNativeViewUsesOriginalDesktopKernel|TestNativePreferencesFitAllOriginalPages|TestNativeGenerationUsesOriginalDesktopKernel|TestNativeMediaUsesOriginalDesktopKernel|TestOriginalKernelFreshProfileCompletesNativeWelcome)$'
+        & go test "-modfile=$modfile" ./... -run $kernelTests -count=1
         if ($LASTEXITCODE -ne 0) { throw 'Original Desktop kernel / MyGo UI tests failed' }
         # A valid second launch must reach the original CLI/OAuth dispatcher
         # even when Windows delays the local socket's write-side EOF.

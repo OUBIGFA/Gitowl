@@ -1,6 +1,16 @@
 import assert from 'node:assert/strict'
 import { it } from 'node:test'
-import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'fs/promises'
+import {
+  mkdir,
+  mkdtemp,
+  readFile,
+  rename,
+  rm,
+  stat,
+  symlink,
+  utimes,
+  writeFile,
+} from 'fs/promises'
 import { dirname, join } from 'path'
 import { tmpdir } from 'os'
 import { crc32, deflateSync } from 'zlib'
@@ -39,6 +49,7 @@ const nodeSummary =
   'ℹ tests 2\nℹ suites 1\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\n'
 const productionTests = [
   'TestNativeViewUsesOriginalDesktopKernel',
+  'TestNativePreferencesFitAllOriginalPages',
   'TestNativeGenerationUsesOriginalDesktopKernel',
   'TestNativeMediaUsesOriginalDesktopKernel',
   'TestOriginalKernelFreshProfileCompletesNativeWelcome',
@@ -472,6 +483,68 @@ it('source evidence includes every Git input and independent artifact, never pri
   )
 })
 
+it('checks shared source parents once per snapshot, not once per file', async context => {
+  const fixtureData = await fixture(context)
+  for (let index = 0; index < 40; index++) {
+    await fixtureData.file(
+      'sources/nested/shared/file-' + index + '.ts',
+      'export const value = ' + index + '\n'
+    )
+  }
+  const filesystem = require('fs/promises') as typeof import('fs/promises')
+  const traced = context.mock.method(filesystem, 'realpath')
+  const source = await captureSourceTreeEvidence(fixtureData.root)
+  assert.ok(traced.mock.callCount() > 0)
+  assert.ok(
+    traced.mock.callCount() <= source.files.length + 40,
+    traced.mock.callCount() +
+      ' realpath calls for ' +
+      source.files.length +
+      ' files'
+  )
+})
+
+it('rehashes already-dirty source bytes even when status, size and timestamps match', async context => {
+  const fixtureData = await fixture(context)
+  await fixtureData.file('src.ts', 'export const value = 1\n')
+  const before = await captureSourceTreeEvidence(fixtureData.root)
+  const statusBefore = await git(fixtureData.root, [
+    'status',
+    '--porcelain',
+    '-z',
+  ])
+  const sourcePath = join(fixtureData.root, 'src.ts')
+  const timestamp = await stat(sourcePath)
+  await fixtureData.file('src.ts', 'export const value = 2\n')
+  await utimes(sourcePath, timestamp.atime, timestamp.mtime)
+  assert.equal(
+    await git(fixtureData.root, ['status', '--porcelain', '-z']),
+    statusBefore
+  )
+  const after = await captureSourceTreeEvidence(fixtureData.root)
+  assert.notEqual(after.sourceDigest, before.sourceDigest)
+  assert.equal(after.sourceTree, before.sourceTree)
+})
+
+it('rejects a parent replaced with an in-repository junction between snapshots', async context => {
+  const fixtureData = await fixture(context)
+  await fixtureData.file('sources/nested/file.ts', 'export const value = 1\n')
+  await git(fixtureData.root, ['add', 'sources'])
+  await captureSourceTreeEvidence(fixtureData.root)
+  const parent = join(fixtureData.root, 'sources/nested')
+  const moved = join(fixtureData.root, '_temp/moved-source')
+  await rename(parent, moved)
+  await symlink(
+    moved,
+    parent,
+    process.platform === 'win32' ? 'junction' : 'dir'
+  )
+  await assert.rejects(
+    captureSourceTreeEvidence(fixtureData.root),
+    /Linked evidence path/
+  )
+})
+
 it('rejects receipts after an index-only change and binds the final commit tree', async t => {
   const f = await fixture(t)
   // A mode-only staging change leaves every workspace byte unchanged.
@@ -564,6 +637,45 @@ it('rejects runner substitution, failed status, missing suites, changed logs and
   await assert.rejects(
     validateAcceptance(f.root, f.acceptanceRef.path),
     /Missing required acceptance commands/
+  )
+})
+
+it('requires the real-kernel entries in both development and production smoke runs', () => {
+  const developmentTests = productionTests.filter(
+    name => name !== 'TestOriginalKernelFreshProfileCompletesNativeWelcome'
+  )
+  validateResults('kernel', nodeSummary + goResults(developmentTests), '')
+  for (const suite of ['kernel', 'production-kernel'] as const) {
+    assert.throws(
+      () =>
+        validateResults(
+          suite,
+          nodeSummary + goResults(['TestSingleInstance']),
+          ''
+        ),
+      /Required .* test did not run/
+    )
+    assert.throws(
+      () =>
+        validateResults(
+          suite,
+          nodeSummary +
+            goResults(
+              productionTests.filter(
+                name => name !== 'TestNativePreferencesFitAllOriginalPages'
+              )
+            ),
+          ''
+        ),
+      /TestNativePreferencesFitAllOriginalPages/
+    )
+  }
+})
+
+it('leaves packaged runtime smoke to its dedicated suite instead of repeating it in script tests', () => {
+  assert.equal(
+    commandEnvironment('fixture', 'script').GITOWL_RUNTIME_SMOKE,
+    undefined
   )
 })
 

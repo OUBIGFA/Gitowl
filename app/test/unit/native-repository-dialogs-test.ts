@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { after, before, beforeEach, describe, it } from 'node:test'
 import { EventEmitter } from 'events'
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'fs/promises'
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'fs/promises'
 import { join, resolve, normalize } from 'path'
 import { exec } from 'dugite'
 import { ipcRenderer } from 'electron'
@@ -46,6 +46,7 @@ Object.assign(ipcRenderer, {
   removeListener: ipc.removeListener.bind(ipc),
 })
 let fixture: string
+let repositoryTemplate: string
 let runtime: AppRuntime
 const previousGlobal = process.env.GIT_CONFIG_GLOBAL
 const previousCeiling = process.env.GIT_CEILING_DIRECTORIES
@@ -69,6 +70,15 @@ before(async () => {
   localStorage.setItem('last-clone-location', fixture)
   const { getAppRuntime } = await import('../../src/ui/app-runtime')
   runtime = getAppRuntime()
+  repositoryTemplate = join(fixture, 'template')
+  await mkdir(repositoryTemplate)
+  await git(['init', '-b', 'main'], repositoryTemplate)
+  await writeFile(
+    join(repositoryTemplate, 'existing.txt'),
+    'existing fixture\n'
+  )
+  await git(['add', '.'], repositoryTemplate)
+  await git(['commit', '-m', 'fixture initial'], repositoryTemplate)
 })
 beforeEach(() => {
   for (const popup of runtime.appStore.getState().allPopups) {
@@ -136,10 +146,7 @@ async function confirm(
 async function init(name: string) {
   const path = join(fixture, name)
   await mkdir(path)
-  await git(['init', '-b', 'main'], path)
-  await writeFile(join(path, 'existing.txt'), 'existing fixture\n')
-  await git(['add', '.'], path)
-  await git(['commit', '-m', 'fixture initial'], path)
+  await cp(repositoryTemplate, path, { recursive: true })
   const [repository] = await runtime.dispatcher.addRepositories([path])
   assert.ok(repository)
   await runtime.dispatcher.selectRepository(repository)

@@ -40,7 +40,7 @@ export async function inventory(
   directory: string,
   includeGitMetadata = false
 ): Promise<FileRecord[]> {
-  const records: FileRecord[] = []
+  const paths: string[] = []
   async function walk(relative: string) {
     for (const item of await readdir(join(directory, relative), {
       withFileTypes: true,
@@ -52,16 +52,24 @@ export async function inventory(
       if (item.isDirectory()) {
         await walk(name)
       } else if (item.isFile()) {
-        records.push({
-          path: name.replaceAll('\\', '/'),
-          sha256: hash(await readFile(join(directory, name))),
-        })
+        paths.push(name.replaceAll('\\', '/'))
       } else {
         throw new Error(`Unsupported runtime entry: ${name}`)
       }
     }
   }
   await walk('')
+  const records: FileRecord[] = []
+  for (let offset = 0; offset < paths.length; offset += 16) {
+    records.push(
+      ...(await Promise.all(
+        paths.slice(offset, offset + 16).map(async path => ({
+          path,
+          sha256: hash(await readFile(join(directory, path))),
+        }))
+      ))
+    )
+  }
   return records.sort((a, b) =>
     a.path < b.path ? -1 : a.path > b.path ? 1 : 0
   )
@@ -86,6 +94,40 @@ export async function reusableRuntime(
     }
     return false
   }
+}
+
+/** Only shipping sources and imported reference data invalidate the runtime.
+ * Test and documentation changes retain their independent validation gates. */
+export async function runtimeSourceInventory(directory: string) {
+  const directories = [
+    'app/src',
+    'gemoji',
+    'vendor',
+    'app/static',
+    'third_party/licenses/native',
+    'script/licenses',
+    'script/validate-sass',
+  ]
+  const sources = await Promise.all(
+    directories.map(async path => ({
+      path,
+      files: await inventory(join(directory, path)),
+    }))
+  )
+  sources.push({
+    path: 'references',
+    files: [
+      {
+        path: 'native-ui-menu-labels.json',
+        sha256: hash(
+          await readFile(
+            join(directory, 'references/native-ui-menu-labels.json')
+          )
+        ),
+      },
+    ],
+  })
+  return sources
 }
 
 function run(executable: string, args: readonly string[], env = process.env) {
@@ -169,17 +211,6 @@ async function prepare() {
 
   // Hash source/build inputs as well as locked binaries. A seeded dev bundle in
   // out/ is never an input: a cache miss performs the original production build.
-  const directories = [
-    'app/src',
-    'app/test',
-    'gemoji',
-    'vendor',
-    'app/static',
-    'references',
-    'third_party/licenses/native',
-    'script/licenses',
-    'script/validate-sass',
-  ]
   const buildFiles = [
     'package.json',
     'app/package.json',
@@ -204,12 +235,7 @@ async function prepare() {
     'LICENSE',
   ]
   const sourceSnapshot = async () => ({
-    sources: await Promise.all(
-      directories.map(async path => ({
-        path,
-        files: await inventory(join(root, path)),
-      }))
-    ),
+    sources: await runtimeSourceInventory(root),
     files: await Promise.all(
       buildFiles.map(async path => ({
         path,

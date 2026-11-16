@@ -48,15 +48,15 @@ LINK = re.compile(r"!?\[[^\]\n]*\]\(([^)\n]+)\)")
 RESERVED = re.compile(r"^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)", re.I)
 
 
-def git(*args):
+def git(*args, input=None):
     """Use Git's index and blob APIs instead of the working tree."""
-    result = subprocess.run(["git", *args], capture_output=True)
+    result = subprocess.run(["git", *args], input=input, capture_output=True)
     if result.returncode:
         raise RuntimeError("Git command failed: " + " ".join(args[:2]))
     return result.stdout
 
 
-def ignored(path):
+def ignored_paths(paths):
     """Evaluate project rules without inheriting a developer's global excludes."""
     result = subprocess.run(
         [
@@ -65,15 +65,65 @@ def ignored(path):
             "core.excludesFile=",
             "check-ignore",
             "--no-index",
-            "-q",
-            "--",
-            path,
+            "--stdin",
+            "-z",
         ],
+        input=b"".join(path.encode("utf-8") + b"\0" for path in paths),
         capture_output=True,
     )
     if result.returncode not in (0, 1):
         raise RuntimeError("Git ignore check failed")
-    return result.returncode == 0
+    return {path.decode("utf-8") for path in result.stdout.split(b"\0") if path}
+
+
+def staged_blobs(entries):
+    """Batch metadata, then stream bounded blob bodies without per-file processes."""
+    files = [
+        (path, blob)
+        for path, mode, blob, stage in entries
+        if mode in ("100644", "100755") and stage == "0"
+    ]
+    objects = list(dict.fromkeys(blob for _, blob in files))
+    if not objects:
+        return
+    headers = git(
+        "cat-file", "--batch-check", input="".join(blob + "\n" for blob in objects).encode("ascii")
+    ).splitlines()
+    if len(headers) != len(objects):
+        raise RuntimeError("Incomplete Git blob metadata")
+    sizes = {}
+    for blob, header in zip(objects, headers):
+        parts = header.split()
+        if len(parts) != 3 or parts[:2] != [blob.encode("ascii"), b"blob"]:
+            raise RuntimeError("Missing or invalid staged Git blob")
+        size = int(parts[2])
+        if size < 0:
+            raise RuntimeError("Invalid Git blob size")
+        sizes[blob] = size
+
+    with subprocess.Popen(
+        ["git", "cat-file", "--batch"],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+    ) as reader:
+        for path, blob in files:
+            size = sizes[blob]
+            if size > MAX_BYTES:
+                yield path, None
+                continue
+            reader.stdin.write((blob + "\n").encode("ascii"))
+            reader.stdin.flush()
+            header = reader.stdout.readline().split()
+            if header != [blob.encode("ascii"), b"blob", str(size).encode("ascii")]:
+                raise RuntimeError("Invalid Git blob response")
+            data = reader.stdout.read(size)
+            if len(data) != size or reader.stdout.read(1) != b"\n":
+                raise RuntimeError("Incomplete Git blob contents")
+            yield path, data
+        reader.stdin.close()
+        if reader.wait():
+            raise RuntimeError("Git blob read failed")
 
 
 def staged_entries():
@@ -110,11 +160,25 @@ def check():
         raise RuntimeError("Run the checker from the repository root")
 
     entries = staged_entries()
+    probes = (
+        "docs/probe.md",
+        "AGENTS.md",
+        "nested/CLAUDE.md",
+        ".agents/probe.txt",
+        "nested/.agents/probe.txt",
+        "output/probe.txt",
+        "nested/output/probe.txt",
+        "_temp/probe.txt",
+        "references/_temp/probe.txt",
+        ".local/private.txt",
+        "node_modules/package/index.js",
+    )
     errors = []
     texts = {}
     case_names = {}
     paths = {entry[0] for entry in entries}
     targets = set(paths)
+    ignored = ignored_paths([*paths, *probes])
 
     if not entries:
         errors.append("empty Git index: stage the intended files first")
@@ -139,7 +203,7 @@ def check():
         boundary = forbidden_path(path)
         if boundary:
             errors.append(f"{path}: forbidden {boundary}")
-        if ignored(path):
+        if path in ignored:
             errors.append(f"{path}: ignored path is tracked")
 
         if mode == "160000":
@@ -150,11 +214,10 @@ def check():
             errors.append(f"{path}: unsupported mode or unresolved index stage")
             continue
 
-        size = int(git("cat-file", "-s", blob))
-        if size > MAX_BYTES:
+    for path, data in staged_blobs(entries):
+        if data is None:
             errors.append(f"{path}: exceeds 10 MiB file limit")
             continue
-        data = git("cat-file", "blob", blob)
         try:
             text = data.decode("utf-8")
         except UnicodeDecodeError:
@@ -195,21 +258,8 @@ def check():
     if not rules or rules[-1] != "**/_temp/":
         errors.append("ignore boundary: the last active root rule must be **/_temp/")
     if ignore_files_match:
-        probes = (
-            "docs/probe.md",
-            "AGENTS.md",
-            "nested/CLAUDE.md",
-            ".agents/probe.txt",
-            "nested/.agents/probe.txt",
-            "output/probe.txt",
-            "nested/output/probe.txt",
-            "_temp/probe.txt",
-            "references/_temp/probe.txt",
-            ".local/private.txt",
-            "node_modules/package/index.js",
-        )
         for probe in probes:
-            if not ignored(probe):
+            if probe not in ignored:
                 errors.append(f"ignore boundary: {probe} is exposed")
 
     for path, text in texts.items():

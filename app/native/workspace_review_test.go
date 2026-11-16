@@ -20,6 +20,8 @@ func TestNativeReviewExplainsSidesAndRetainsRawRangeTooltip(t *testing.T) {
 			h.tt.SetLocale(tag)
 			tx := locales.In(tag)
 			h.click(t, tx.OpenFile("notes.md"))
+			h.click(t, tx.ExpandDiff())
+			h.answer(t, "diff", patch("notes.md", "before", "after"), nil)
 			divider, ok := h.tt.AccessByRole(ui.RoleSplitter, "")
 			if !ok {
 				t.Fatal("file/diff divider missing")
