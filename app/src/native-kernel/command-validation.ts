@@ -78,13 +78,16 @@ function commitContext(value: unknown): value is ICommitContext {
       'description',
       'messageGeneratedByCopilot',
       'amend',
+      'pushAfterCommit',
       'trailers',
     ]) ||
     !safeString(value.summary) ||
     (value.description !== null && !safeString(value.description)) ||
     (value.messageGeneratedByCopilot !== undefined &&
       typeof value.messageGeneratedByCopilot !== 'boolean') ||
-    (value.amend !== undefined && typeof value.amend !== 'boolean')
+    (value.amend !== undefined && typeof value.amend !== 'boolean') ||
+    (value.pushAfterCommit !== undefined &&
+      typeof value.pushAfterCommit !== 'boolean')
   ) {
     return false
   }

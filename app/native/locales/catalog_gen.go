@@ -864,6 +864,56 @@ func (msgs Messages) SaveVersionShort() string {
 	return Catalog.Format(msgs.locale, "saveVersionShort", nil)
 }
 
+// SaveOptions says "Save options"
+// in the language the app shows.
+func SaveOptions() string { return In(i18n.Locale()).SaveOptions() }
+
+// SaveOptions says "Save options"
+// in the language of msgs.
+func (msgs Messages) SaveOptions() string {
+	return Catalog.Format(msgs.locale, "saveOptions", nil)
+}
+
+// SaveVersionAndPush says "Save version and push"
+// in the language the app shows.
+func SaveVersionAndPush() string { return In(i18n.Locale()).SaveVersionAndPush() }
+
+// SaveVersionAndPush says "Save version and push"
+// in the language of msgs.
+func (msgs Messages) SaveVersionAndPush() string {
+	return Catalog.Format(msgs.locale, "saveVersionAndPush", nil)
+}
+
+// SaveVersionAndPushTooltip says "Save the selected changes and push the new version to the remote repository."
+// in the language the app shows.
+func SaveVersionAndPushTooltip() string { return In(i18n.Locale()).SaveVersionAndPushTooltip() }
+
+// SaveVersionAndPushTooltip says "Save the selected changes and push the new version to the remote repository."
+// in the language of msgs.
+func (msgs Messages) SaveVersionAndPushTooltip() string {
+	return Catalog.Format(msgs.locale, "saveVersionAndPushTooltip", nil)
+}
+
+// SavingVersionAndPush says "Saving and pushing…"
+// in the language the app shows.
+func SavingVersionAndPush() string { return In(i18n.Locale()).SavingVersionAndPush() }
+
+// SavingVersionAndPush says "Saving and pushing…"
+// in the language of msgs.
+func (msgs Messages) SavingVersionAndPush() string {
+	return Catalog.Format(msgs.locale, "savingVersionAndPush", nil)
+}
+
+// SaveActionPreferenceFailed says "Could not remember the save option. Try again."
+// in the language the app shows.
+func SaveActionPreferenceFailed() string { return In(i18n.Locale()).SaveActionPreferenceFailed() }
+
+// SaveActionPreferenceFailed says "Could not remember the save option. Try again."
+// in the language of msgs.
+func (msgs Messages) SaveActionPreferenceFailed() string {
+	return Catalog.Format(msgs.locale, "saveActionPreferenceFailed", nil)
+}
+
 // SaveVersionTooltip says "Create a local Git commit for the selected changes. This does not push or upload changes."
 // in the language the app shows.
 func SaveVersionTooltip() string { return In(i18n.Locale()).SaveVersionTooltip() }

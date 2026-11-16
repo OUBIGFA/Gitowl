@@ -32,10 +32,16 @@ func (a *app) canSaveVersion() bool {
 	if a.core != nil {
 		// The original commit flow owns conflict warnings, author checks, hooks,
 		// co-authors and recovery. Do not substitute the research Git gate.
-		ready := a.ready && a.repo != nil && a.status != nil && !a.composerLocked() &&
-			!a.opening && !a.loadingStatus && a.statusErr == nil && a.coreDraftPending == 0 && a.coreInclusionPending == 0
+		ready := a.ready && a.repo != nil && a.status != nil && a.tab == changesTab && !a.composerLocked() &&
+			!a.opening && !a.loadingStatus && a.statusErr == nil && a.coreInclusionPending == 0
 		if vm := a.nativeCommitView(); vm != nil {
-			return ready && vm.CanCommit
+			if vm.Mode == "copilot" {
+				return ready && vm.CanCommit
+			}
+			// Typing updates this local text gate immediately. The ordered queue
+			// persists the final draft before saving, and the original submit
+			// path validates rules; its asynchronous checks must not blink Save.
+			return ready && strings.TrimSpace(a.commitSummary) != "" && (len(a.included) > 0 || vm.AllowEmpty || vm.Amending)
 		}
 		return ready && strings.TrimSpace(a.commitSummary) != "" && len(a.included) > 0
 	}
@@ -45,11 +51,31 @@ func (a *app) canSaveVersion() bool {
 		strings.TrimSpace(a.commitSummary) != "" && len(a.included) > 0
 }
 
-// saveVersion performs exactly one upstream-backed local commit. Hook failures
-// or transport failures do not retry, clear text, or claim a push happened.
+// Selecting a default is a presentation preference, not permission to write
+// Git. Keep it in the existing native profile so later clicks and restarts use
+// the same action; a failed preference write leaves the previous action intact.
+func (a *app) selectSaveAction(pushAfterCommit bool) {
+	if a.closed || a.core == nil || a.composerLocked() {
+		return
+	}
+	next := a.windowPreferences
+	if next.PushAfterCommit == pushAfterCommit {
+		a.saveActionErr = nil
+		return
+	}
+	next.PushAfterCommit = pushAfterCommit
+	if err := writeWindowPreferences(a.windowPreferencesPath, next); err != nil {
+		a.saveActionErr = err
+		return
+	}
+	a.windowPreferences, a.saveActionErr = next, nil
+}
+
+// The primary button and shortcut execute the same remembered action. Only
+// the original kernel can acknowledge the local commit and optional push.
 func (a *app) saveVersion() {
 	if a.core != nil {
-		a.saveCoreVersion()
+		a.saveCoreVersion(a.windowPreferences.PushAfterCommit)
 		return
 	}
 	if !a.canSaveVersion() {

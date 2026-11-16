@@ -71,6 +71,7 @@ type KernelCommitContext struct {
 	Description               *string         `json:"description"`
 	MessageGeneratedByCopilot bool            `json:"messageGeneratedByCopilot,omitempty"`
 	Amend                     bool            `json:"amend,omitempty"`
+	PushAfterCommit           bool            `json:"pushAfterCommit,omitempty"`
 	Trailers                  []KernelTrailer `json:"trailers,omitempty"`
 }
 

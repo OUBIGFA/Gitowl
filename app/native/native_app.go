@@ -543,7 +543,7 @@ func (a *app) persistCoreDraft() {
 	a.queueCore(nativeOperation{draft: true, call: func() (backend.KernelResult, error) { return core.SetMessage(ctx, ref, message) }})
 }
 
-func (a *app) saveCoreVersion() {
+func (a *app) saveCoreVersion(pushAfterCommit bool) {
 	ref, ok := a.coreReference()
 	if !ok || !a.canSaveVersion() {
 		return
@@ -552,8 +552,13 @@ func (a *app) saveCoreVersion() {
 		a.saveCoreAssistedVersion()
 		return
 	}
+	if pushAfterCommit && (a.coreRemotePending || a.coreSnapshot.Selected.RemoteInProgress) {
+		return
+	}
 	body := a.commitDescription
-	commit := backend.KernelCommitContext{Summary: a.commitSummary, Description: &body, MessageGeneratedByCopilot: a.coreSnapshot.Selected.Message.GeneratedByCopilot}
+	// Pending draft writes are manual edits, even if the last receipt still
+	// describes a generated message. The queued save uses the latest UI text.
+	commit := backend.KernelCommitContext{Summary: a.commitSummary, Description: &body, MessageGeneratedByCopilot: a.coreDraftPending == 0 && a.coreSnapshot.Selected.Message.GeneratedByCopilot, PushAfterCommit: pushAfterCommit}
 	core, ctx := a.core, a.ctx
 	a.coreCommitPending, a.savingVersion, a.saveErr = true, true, nil
 	a.queueCore(nativeOperation{

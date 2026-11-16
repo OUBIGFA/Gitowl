@@ -18,9 +18,11 @@ const (
 	closeWindowToTray = "tray"
 )
 
-// This preference belongs to the visible native host, not the Git kernel.
+// Presentation defaults belong to the visible native host. Git state remains
+// in the original kernel; remembering an action never executes that action.
 type nativeWindowPreferences struct {
-	CloseBehavior string `json:"closeBehavior"`
+	CloseBehavior   string `json:"closeBehavior"`
+	PushAfterCommit bool   `json:"pushAfterCommit,omitempty"`
 }
 
 func readWindowPreferences(path string) (nativeWindowPreferences, error) {
@@ -69,7 +71,8 @@ func (a *app) changeWindowCloseBehavior(value string) {
 		return
 	}
 	previous := a.windowPreferences
-	next := nativeWindowPreferences{CloseBehavior: value}
+	next := a.windowPreferences
+	next.CloseBehavior = value
 	if value == closeWindowToTray && a.prepareTray != nil {
 		if err := a.prepareTray(true); err != nil {
 			a.windowPreferenceErr = err

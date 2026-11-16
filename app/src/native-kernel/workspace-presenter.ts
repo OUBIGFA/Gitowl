@@ -267,7 +267,7 @@ export function buildWorkspaceMenu(
         return []
       }
       const file = required(
-        state.changesState.workingDirectory.files.find(f => f.id === target.id),
+        state.changesState.workingDirectory.findFileWithID(target.id),
         'file'
       )
       return generateChangesContextMenu(

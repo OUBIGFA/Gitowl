@@ -7,7 +7,9 @@ import {
   HistoryTabMode,
   ComparisonMode,
   RepositorySectionTab,
+  isRebaseConflictState,
 } from '../lib/app-state'
+import type { WorkingDirectoryStatus } from '../models/status'
 import { Repository } from '../models/repository'
 import type { DiffHunkExpansionType } from '../models/diff'
 import { BranchesTab } from '../models/branches-tab'
@@ -274,6 +276,14 @@ const historyMenus = new WeakMap<
   { context: string; row: number; menu: IKernelWorkspaceMenu }
 >()
 
+// GitStore replaces the immutable working directory when file state changes.
+// Reuse only original menu metadata while it and the menu inputs stay the
+// same, instead of rebuilding every file's menu for each draft/refresh update.
+const fileMenus = new WeakMap<
+  WorkingDirectoryStatus,
+  { context: string; menus: Map<string, IKernelWorkspaceMenu> }
+>()
+
 function projectBanner(banner: Banner | null): IKernelWorkspaceBanner | null {
   if (banner === null) {
     return null
@@ -455,6 +465,19 @@ export function projectNativeWorkspace(app: IAppState): IKernelWorkspaceDTO {
   const menus: IKernelWorkspaceMenu[] = []
   if (repository !== undefined && state !== undefined) {
     const menuContext = workspaceMenuContext(repository, state)
+    const fileContext = JSON.stringify([
+      menuContext,
+      app.askForConfirmationOnDiscardChanges,
+      app.useCustomEditor ? null : app.selectedExternalEditor,
+      state.changesState.conflictState !== null &&
+        isRebaseConflictState(state.changesState.conflictState),
+    ])
+    const directory = state.changesState.workingDirectory
+    let cachedFiles = fileMenus.get(directory)
+    if (cachedFiles?.context !== fileContext) {
+      cachedFiles = { context: fileContext, menus: new Map() }
+      fileMenus.set(directory, cachedFiles)
+    }
     const form = state.compareState.formState
     const historyContext = JSON.stringify([
       menuContext,
@@ -477,20 +500,32 @@ export function projectNativeWorkspace(app: IAppState): IKernelWorkspaceDTO {
         id: String(pr.pullRequestNumber),
       })),
       ...state.worktrees.map(w => ({ kind: 'worktree' as const, id: w.path })),
-      ...visibleWorkingDirectoryFiles(state, app.showChangesFilter).map(f => ({
-        kind: 'file' as const,
-        id: f.id,
-      })),
+      // Desktop mounts one file page at a time. Hidden history-file menus
+      // otherwise stat every file on disk on every draft/status update.
+      ...(state.selectedSection === RepositorySectionTab.Changes
+        ? visibleWorkingDirectoryFiles(state, app.showChangesFilter).map(f => ({
+            kind: 'file' as const,
+            id: f.id,
+          }))
+        : []),
       ...state.compareState.commitSHAs
         .filter(sha => state.commitLookup.has(sha))
         .map(sha => ({ kind: 'commit' as const, id: sha })),
-      ...state.commitSelection.changesetData.files.map(f => ({
-        kind: 'historyFile' as const,
-        id: f.id,
-      })),
+      ...(state.selectedSection === RepositorySectionTab.History
+        ? state.commitSelection.changesetData.files.map(f => ({
+            kind: 'historyFile' as const,
+            id: f.id,
+          }))
+        : []),
       { kind: 'changes', id: '' },
     ]
     for (const target of targets) {
+      const cachedFile =
+        target.kind === 'file' ? cachedFiles.menus.get(target.id) : undefined
+      if (cachedFile !== undefined) {
+        menus.push(cachedFile)
+        continue
+      }
       const commit =
         target.kind === 'commit' ? state.commitLookup.get(target.id) : undefined
       const row = rows.get(target.id) ?? -1
@@ -507,6 +542,9 @@ export function projectNativeWorkspace(app: IAppState): IKernelWorkspaceDTO {
         menuContext
       )
       menus.push(menu)
+      if (target.kind === 'file') {
+        cachedFiles.menus.set(target.id, menu)
+      }
       if (commit !== undefined) {
         historyMenus.set(commit, { context: historyContext, row, menu })
       }

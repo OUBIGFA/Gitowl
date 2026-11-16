@@ -20,7 +20,7 @@ import (
 // This is the production MyGo view and real original Electron kernel. It never
 // invokes the reduced research service or substitutes a commit confirmation.
 func TestNativeViewUsesOriginalDesktopKernel(t *testing.T) {
-	for _, scenario := range []string{"save-en", "shortcut-zh", "hook-ignore", "hook-abort", "remote-sync"} {
+	for _, scenario := range []string{"save-en", "shortcut-zh", "save-and-push", "hook-ignore", "hook-abort", "remote-sync"} {
 		t.Run(scenario, func(t *testing.T) { exerciseOriginalKernelView(t, scenario) })
 	}
 }
@@ -74,7 +74,7 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 	}
 	runGit("-C", repo, "add", ".")
 	runGit("-C", repo, "commit", "-m", "initial")
-	if scenario == "remote-sync" {
+	if scenario == "remote-sync" || scenario == "save-and-push" {
 		remote := filepath.Join(work, "origin.git")
 		runGit("clone", "--bare", repo, remote)
 		runGit("-C", repo, "remote", "add", "origin", remote)
@@ -93,6 +93,11 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 	}
 
 	a := newCoreApp(nil, nil)
+	a.windowPreferencesPath = filepath.Join(work, "data", "window-preferences.json")
+	a.windowPreferences, err = readWindowPreferences(a.windowPreferencesPath)
+	if err != nil {
+		t.Fatal(err)
+	}
 	updates := make(chan func(), 1000)
 	a.update = func(fn func()) { updates <- fn }
 	core, err := backend.StartKernel(backend.KernelConfig{Electron: electron, Entry: entry, UserData: filepath.Join(work, "data")}, func(event backend.KernelEvent) {
@@ -231,7 +236,7 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 	}
 	// Repositories without a remote retain the original Publish action.
 	pushLabel := nativeDialogLabel(locale, "repositoryDialog.PublishRepository")
-	if scenario == "remote-sync" {
+	if scenario == "remote-sync" || scenario == "save-and-push" {
 		pushLabel = tx.PushChanges()
 	}
 	for _, action := range []string{tx.FetchUpdates(), tx.PullUpdates(), pushLabel, tx.GenerateMessage(), tx.SaveVersion()} {
@@ -568,6 +573,22 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 		click(tx.CommitSummary())
 		tt.Key(ui.Ctrl, ui.KeyEnter)
 		tt.Key(ui.Ctrl, ui.KeyEnter)
+	} else if scenario == "save-and-push" {
+		click(tx.CommitSummary())
+		tt.Key(0, ui.KeyEnd)
+		tt.Type("!")
+		if !a.canSaveVersion() || a.coreDraftPending == 0 {
+			t.Fatal("a pending final draft disabled Save")
+		}
+		click(tx.SaveOptions())
+		if err := tt.ChooseMenuItem(tx.SaveVersionAndPush()); err != nil {
+			t.Fatal(err)
+		}
+		tt.Frame()
+		if a.savingVersion {
+			t.Fatal("selecting the default save action wrote Git")
+		}
+		click(tx.SaveVersionAndPush())
 	} else {
 		click(tx.SaveVersion())
 	}
@@ -620,8 +641,69 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 	if runGit("-C", repo, "diff", "--name-only") != "unselected.txt" {
 		t.Fatal("the original commit staged an unselected file")
 	}
+	if scenario == "save-and-push" {
+		if runGit("--git-dir", filepath.Join(work, "origin.git"), "rev-parse", "main") != runGit("-C", repo, "rev-parse", "HEAD") ||
+			runGit("-C", repo, "log", "-1", "--format=%s") != "Original kernel native commit!" {
+			t.Fatal("Save and push did not preserve the final typed draft and update the original remote")
+		}
+	}
 	if a.saveErr != nil || a.commitSummary != "" || a.lastSavedSHA != runGit("-C", repo, "rev-parse", "HEAD") {
 		t.Fatalf("UI confirmation did not come from original state: %v %q %q", a.saveErr, a.commitSummary, a.lastSavedSHA)
+	}
+	if scenario == "save-and-push" {
+		// Reuse the selected action with the shortcut, then switch the same
+		// production button back to local Save. Neither choice itself writes Git.
+		for _, push := range []bool{true, false} {
+			previousRemote := runGit("--git-dir", filepath.Join(work, "origin.git"), "rev-parse", "main")
+			summary, label := "Repeat the remembered push", tx.SaveVersionAndPush()
+			if !push {
+				summary, label = "Save locally after switching back", tx.SaveVersion()
+			}
+			if err := os.WriteFile(filepath.Join(repo, "selected.txt"), []byte(summary+"\n"), 0o644); err != nil {
+				t.Fatal(err)
+			}
+			a.refresh()
+			await(func() bool { return a.corePending == 0 && !a.loadingStatus })
+			if !a.included["selected.txt"] {
+				click(tx.IncludeFile("selected.txt"))
+			}
+			if a.included["unselected.txt"] {
+				click(tx.IncludeFile("unselected.txt"))
+			}
+			await(func() bool { return a.coreInclusionPending == 0 })
+			click(tx.CommitSummary())
+			tt.Type(summary)
+			if !push {
+				click(tx.SaveOptions())
+				if err := tt.ChooseMenuItem(tx.SaveVersion()); err != nil {
+					t.Fatal(err)
+				}
+				tt.Frame()
+			}
+			if a.savingVersion {
+				t.Fatal("choosing an action unexpectedly saved a version")
+			}
+			if button, found := tt.AccessByRole(ui.RoleButton, label); !found || button.Disabled {
+				t.Fatalf("remembered action is not available: %q %+v", label, button)
+			}
+			if push {
+				click(tx.CommitSummary())
+				tt.Key(ui.Ctrl, ui.KeyEnter)
+			} else {
+				click(label)
+			}
+			await(func() bool { return a.corePending == 0 && !a.savingVersion && a.commitSummary == "" })
+			head := runGit("-C", repo, "rev-parse", "HEAD")
+			remote := runGit("--git-dir", filepath.Join(work, "origin.git"), "rev-parse", "main")
+			if runGit("-C", repo, "log", "-1", "--format=%s") != summary || push && remote != head || !push && remote != previousRemote {
+				t.Fatal("the main button or shortcut did not execute its displayed action")
+			}
+			prefs, err := readWindowPreferences(a.windowPreferencesPath)
+			if err != nil || prefs.PushAfterCommit != push {
+				t.Fatalf("the next launch would forget the selected action: %+v %v", prefs, err)
+			}
+		}
+		return
 	}
 	click(tx.History())
 	await(func() bool { return a.corePending == 0 && a.tab == historyTab && len(a.commits) > 0 })

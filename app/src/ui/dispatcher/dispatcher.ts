@@ -45,6 +45,10 @@ import {
 } from '../../lib/git'
 import { isGitOnPath } from '../../lib/is-git-on-path'
 import {
+  ForcePushBranchState,
+  getCurrentBranchForcePushState,
+} from '../../lib/rebase'
+import {
   IOpenRepositoryFromURLAction,
   IUnknownAction,
   URLActionType,
@@ -436,7 +440,39 @@ export class Dispatcher {
     repository: Repository,
     context: ICommitContext
   ): Promise<boolean> {
-    return this.appStore._commitIncludedChanges(repository, context)
+    const before =
+      context.pushAfterCommit && context.amend
+        ? this.repositoryStateManager.get(repository)
+        : undefined
+    const amendingPublishedCommit =
+      before !== undefined &&
+      before.commitToAmend !== null &&
+      !before.localCommitSHAs.includes(before.commitToAmend.sha)
+    const committed = await this.appStore._commitIncludedChanges(
+      repository,
+      context
+    )
+    if (committed && context.pushAfterCommit === true) {
+      // Warnings retain this context and converge here. Only the original
+      // commit receipt authorizes a push; a failed push must not turn the
+      // successful local commit into a failed save or cause another commit.
+      try {
+        const { branchesState, aheadBehind } =
+          this.repositoryStateManager.get(repository)
+        if (
+          amendingPublishedCommit ||
+          getCurrentBranchForcePushState(branchesState, aheadBehind) ===
+            ForcePushBranchState.Recommended
+        ) {
+          await this.confirmOrForcePush(repository)
+        } else {
+          await this.push(repository)
+        }
+      } catch (error) {
+        await this.postError(error as Error)
+      }
+    }
+    return committed
   }
 
   /** Change the file's includedness. */

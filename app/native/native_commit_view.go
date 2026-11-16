@@ -9,6 +9,7 @@ import (
 
 type nativeCommitUI struct {
 	commitOptionsOpen     bool
+	saveActionErr         error
 	coAuthorQuery         string
 	coAuthorChoice        string
 	coAuthorOwner         string

@@ -160,6 +160,96 @@ describe(
       return { repository, path, git, act, state, view }
     }
 
+    it('prepares file context menus only for the active page during a refresh', async t => {
+      const f = await fixture(t)
+      await writeFile(join(f.path, 'file.txt'), 'changed\n')
+      await runtime.dispatcher.refreshRepository(f.repository)
+      assert.ok(f.state().commitSelection.changesetData.files.length > 0)
+      assert.equal(
+        f.view().menus.some(menu => menu.target.kind === 'file'),
+        true
+      )
+      assert.equal(
+        f.view().menus.some(menu => menu.target.kind === 'historyFile'),
+        false
+      )
+      await runtime.dispatcher.changeRepositorySection(
+        f.repository,
+        RepositorySectionTab.History
+      )
+      assert.equal(
+        f.view().menus.some(menu => menu.target.kind === 'historyFile'),
+        true
+      )
+      assert.equal(
+        f.view().menus.some(menu => menu.target.kind === 'file'),
+        false
+      )
+    })
+
+    it('keeps file menus current across draft updates, selections, preferences and status refreshes', async t => {
+      const f = await fixture(t)
+      await writeFile(join(f.path, 'file.txt'), 'changed\n')
+      await writeFile(join(f.path, '.gitignore'), '# fixture\n')
+      await runtime.dispatcher.refreshRepository(f.repository)
+      const files = f.state().changesState.workingDirectory.files
+      const file = files.find(item => item.path === 'file.txt')!
+      const ignored = files.find(item => item.path === '.gitignore')!
+      const menu = (id: string) =>
+        f
+          .view()
+          .menus.find(
+            item => item.target.kind === 'file' && item.target.id === id
+          )!
+      const item = (id: string, key: string) =>
+        menu(id).items.find(entry => entry.labelKey === key)
+      assert.equal(item(file.id, 'workspace.ignoreFile')?.enabled, true)
+      assert.equal(item(ignored.id, 'workspace.ignoreFile')?.enabled, false)
+      runtime.dispatcher.setCommitMessage(f.repository, {
+        summary: 'Typing does not change file actions',
+        description: null,
+        timestamp: 1,
+      })
+      assert.equal(item(file.id, 'workspace.ignoreFile')?.enabled, true)
+      await runtime.dispatcher.selectWorkingDirectoryFiles(f.repository, [
+        ...files,
+      ])
+      assert.deepEqual(item(file.id, 'workspace.ignoreSelected')?.data, ['2'])
+      assert.equal(item(file.id, 'workspace.includeSelected')?.enabled, true)
+
+      const previousEditor = runtime.appStore['selectedExternalEditor']
+      const previousCustom = runtime.appStore['useCustomEditor']
+      t.after(() => {
+        runtime.appStore['selectedExternalEditor'] = previousEditor
+        runtime.appStore['useCustomEditor'] = previousCustom
+      })
+      runtime.appStore['selectedExternalEditor'] = 'Fixture Editor'
+      runtime.appStore['useCustomEditor'] = false
+      assert.deepEqual(item(file.id, 'workspace.openEditorNamed')?.data, [
+        'Fixture Editor',
+      ])
+      runtime.repositoryStateManager.update(f.repository, () => ({
+        isCommitting: true,
+      }))
+      assert.deepEqual(menu(file.id).items, [])
+      runtime.repositoryStateManager.update(f.repository, () => ({
+        isCommitting: false,
+      }))
+      assert.equal(item(file.id, 'workspace.includeSelected')?.enabled, true)
+      await rm(join(f.path, 'file.txt'))
+      await runtime.dispatcher.refreshRepository(f.repository)
+      const removed = f
+        .state()
+        .changesState.workingDirectory.files.find(
+          entry => entry.path === 'file.txt'
+        )!
+      assert.equal(item(removed.id, 'workspace.reveal')?.enabled, false)
+      assert.equal(
+        item(removed.id, 'workspace.openEditorNamed')?.enabled,
+        false
+      )
+    })
+
     it('projects the original unpushed commits and repository list state', async t => {
       const f = await fixture(t)
       const base = await f.git(['rev-parse', 'HEAD'])
