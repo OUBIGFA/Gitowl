@@ -94,6 +94,6 @@ func workspaceCodeFont() string {
 func workspaceDiffTheme(t *ui.Theme) *editor.Theme {
 	d := editor.DefaultTheme(t)
 	d.LineNumber = t.TextMuted
-	d.Added, d.Deleted, d.Modified = t.Success, t.Danger, t.TextMuted
+	d.Added, d.Deleted, d.Modified = t.Success, t.Danger, d.Info
 	return d
 }

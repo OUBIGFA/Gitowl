@@ -92,7 +92,10 @@ func (a *app) fileWorkspace(c *ui.Context, tx locales.Messages, colors workspace
 			}
 		})
 	}, func() {
-		ui.Column(c.Key("workspace-diff-pane")).Fill().MinWidth(0).Children(func() {
+		theme := *c.Theme()
+		scrollbar := theme.ScrollbarStyle.Resolve(&theme)
+		theme.ScrollbarStyle.TrackWidth = max(scrollbar.TrackWidth, scrollbar.ThumbWidth+12)
+		ui.Themed(c.Key("workspace-diff-pane"), &theme).Fill().MinWidth(0).Children(func() {
 			if a.reviewingFile {
 				a.diffPane(c, tx, available-layout.width-1)
 			} else {
