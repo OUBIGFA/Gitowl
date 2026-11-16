@@ -127,7 +127,7 @@ func preferenceItems(c *ui.Context, fields []backend.KernelDialogField, page str
 		items = append(items, preferenceItem{field: field, height: h})
 	}
 	if page == "appearance" && form.appearanceEnd != nil {
-		_, h := preferenceTextSize(c, width, locales.In(c.Locale()).ProductVersion("0.0.1")+"   "+locales.In(c.Locale()).BuildNumber(BuildNumber), c.Theme().FontSize)
+		_, h := preferenceTextSize(c, width, locales.In(c.Locale()).ProductVersion(productVersion())+"   "+locales.In(c.Locale()).BuildNumber(BuildNumber), c.Theme().FontSize)
 		items = append(items, preferenceItem{field: backend.KernelDialogField{ID: "native-version"}, height: h})
 	}
 	return items

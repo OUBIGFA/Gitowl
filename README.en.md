@@ -17,6 +17,19 @@ A simple desktop app to track file changes and save project versions
 
 Gitowl is a local desktop app that helps you see what changed in your project folders and save versions on your computer. You do not need to type commands or learn technical terms. Click clear buttons to review changes, write a short note, and save a version at any time.
 
+## Software preview
+
+<table>
+<tr>
+<td><img src="assets/readme/preview-changes-en.png" width="420" alt="Gitowl File changes and review view"><br>File changes and review</td>
+<td><img src="assets/readme/preview-history-en.png" width="420" alt="Gitowl History timeline view"><br>History timeline</td>
+</tr>
+<tr>
+<td><img src="assets/readme/preview-dark-en.png" width="420" alt="Gitowl Dark appearance view"><br>Dark appearance</td>
+<td><img src="assets/readme/preview-settings-en.png" width="420" alt="Gitowl Language and appearance settings"><br>Language and appearance settings</td>
+</tr>
+</table>
+
 ## Why use Gitowl
 
 - **Use buttons instead of commands.** Open a project folder and click clear buttons. You do not need a command window.

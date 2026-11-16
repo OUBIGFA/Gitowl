@@ -38,7 +38,7 @@ try {
         }
     }
     $config = Get-Content 'app/native/mygo.json' -Raw -Encoding UTF8 | ConvertFrom-Json
-    if ($config.name -ne 'Gitowl' -or $config.version -ne '0.0.1' -or $config.identifier -ne 'io.github.oubigfa.gitowl') {
+    if ($config.name -ne 'Gitowl' -or $config.version -ne '0.1.0' -or $config.identifier -ne 'io.github.oubigfa.gitowl') {
         throw 'The fixed test product identity changed; review installer/data compatibility first'
     }
     & git diff --quiet
@@ -89,7 +89,7 @@ try {
         # Runtime preparation and repository checks remain part of packaging;
         # optional desktop evidence is no longer a release prerequisite.
         $info = [ordered]@{
-            product='Gitowl'; version='0.0.1'; build=$BuildNumber
+            product='Gitowl'; version='0.1.0'; build=$BuildNumber
             identifier='io.github.oubigfa.gitowl'; platform='windows-x64'
             sourceTree=$sourceTree; sourceSnapshot='staged Git inputs'
             authenticodeSigned=$false; fullFeatureParity=($null -ne $acceptance)
@@ -122,9 +122,9 @@ try {
         }
         $release = if ($Preview) { Join-Path $root "_temp/native-previews/$BuildNumber" } else { Join-Path $root 'output/release' }
         New-Item -ItemType Directory -Force $release | Out-Null
-        $installer = Join-Path $package 'windows-amd64/gitowl-setup-0.0.1-amd64.exe'
+        $installer = Join-Path $package 'windows-amd64/gitowl-setup-0.1.0-amd64.exe'
         if (-not (Test-Path $installer)) { throw 'MyGo did not produce the expected installer' }
-        $installerName = if ($Preview) { 'Gitowl-0.0.1-Preview-Setup.exe' } else { 'Gitowl-0.0.1-Setup.exe' }
+        $installerName = if ($Preview) { 'Gitowl-0.1.0-Preview-Setup.exe' } else { 'Gitowl-0.1.0-Setup.exe' }
         $fixed = Join-Path $release $installerName
         $checkedCopy = Join-Path $package 'checked-installer.exe'
         Copy-Item $installer $checkedCopy

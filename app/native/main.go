@@ -43,7 +43,7 @@ func run(entry, electron, initialPath, profile string, initialLaunch nativeLaunc
 	packaged := mygo.App.Version() != ""
 	if !packaged {
 		mygo.App.SetName("Gitowl")
-		mygo.App.SetVersion("0.0.1")
+		mygo.App.SetVersion("0.1.0")
 	}
 	if profile != "" {
 		if !mygo.IsDev() || !filepath.IsAbs(profile) {

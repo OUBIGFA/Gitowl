@@ -17,6 +17,19 @@
 
 Gitowl 是一款运行在电脑本地的项目版本管理软件。你不需要背任何命令，也不用记专业术语。只要点几下鼠标，就能看清文件改了哪里、写上简短说明并保存历史版本，方便随时回看。
 
+## 软件预览
+
+<table>
+<tr>
+<td><img src="assets/readme/preview-changes-zh.png" width="420" alt="Gitowl 文件改动与对比界面"><br>文件改动与对比</td>
+<td><img src="assets/readme/preview-history-zh.png" width="420" alt="Gitowl 历史时间线"><br>历史时间线</td>
+</tr>
+<tr>
+<td><img src="assets/readme/preview-dark-zh.png" width="420" alt="Gitowl 深色主题工作台"><br>深色主题</td>
+<td><img src="assets/readme/preview-settings-zh.png" width="420" alt="Gitowl 语言与外观设置"><br>语言与外观设置</td>
+</tr>
+</table>
+
 ## 为什么使用 Gitowl
 
 - **不用背命令，点按钮就能用**：打开项目文件夹即可开始，全程图形界面操作，不需要打开黑框输入命令。

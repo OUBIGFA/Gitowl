@@ -35,7 +35,7 @@ class NativeAcceptanceEntryTests(unittest.TestCase):
                 },
                 'app/native/mygo.json': {
                     'name': 'Invalid Fixture Identity',
-                    'version': '0.0.1',
+                    'version': '0.1.0',
                     'identifier': 'io.github.oubigfa.gitowl',
                 },
             }.items():

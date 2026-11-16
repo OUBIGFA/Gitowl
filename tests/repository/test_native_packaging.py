@@ -16,7 +16,7 @@ class NativePackagingTests(unittest.TestCase):
         shell = shutil.which('powershell.exe') or shutil.which('pwsh')
         if shell is None:
             self.skipTest('PowerShell is not available on this platform')
-        installer = ROOT / 'output/release/Gitowl-0.0.1-Setup.exe'
+        installer = ROOT / 'output/release/Gitowl-0.1.0-Setup.exe'
         before = installer.read_bytes() if installer.is_file() else None
         result = subprocess.run(
             [shell, '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', str(ROOT / 'script/build-native.ps1'), '-Preview'],
@@ -72,7 +72,7 @@ class NativePackagingTests(unittest.TestCase):
         config = json.loads((ROOT / 'app/native/mygo.json').read_text(encoding='utf-8'))
         self.assertEqual(config['name'], 'Gitowl')
         self.assertEqual(config['identifier'], 'io.github.oubigfa.gitowl')
-        self.assertEqual(config['version'], '0.0.1')
+        self.assertEqual(config['version'], '0.1.0')
         self.assertEqual(config['i18n']['source'], 'en')
         self.assertFalse(config['linux']['webview'])
         catalogs = {}

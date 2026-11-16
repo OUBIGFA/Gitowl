@@ -141,7 +141,7 @@ async function fixture(t: { after: (fn: () => Promise<void>) => void }) {
   })
   await json('app/native/mygo.json', {
     name: 'Gitowl',
-    version: '0.0.1',
+    version: '0.1.0',
     identifier: 'io.github.oubigfa.gitowl',
     resources: [
       '../static/logos/gitowl/logo.png',
@@ -199,7 +199,7 @@ async function fixture(t: { after: (fn: () => Promise<void>) => void }) {
   }
   await json(`${runtimePath}/app/package.json`, {
     productName: 'Gitowl',
-    version: '0.0.1',
+    version: '0.1.0',
     bundleID: 'io.github.oubigfa.gitowl',
     main: 'main.js',
   })
@@ -874,7 +874,7 @@ it('checks trimmed Windows executable identity without requiring omitted linker 
       { lang: 1033, codepage: 1200 },
       {
         ProductName: name,
-        ProductVersion: '0.0.1',
+        ProductVersion: '0.1.0',
         OriginalFilename: 'Gitowl.exe',
         MyGoIdentifier: 'io.github.oubigfa.gitowl',
       }

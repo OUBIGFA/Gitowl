@@ -156,7 +156,7 @@ export class RepositoryService {
     if (method === 'system.info') {
       return {
         protocol: 1,
-        version: '0.0.1',
+        version: '0.1.0',
         capabilities: [
           'repository.open',
           'repository.status',

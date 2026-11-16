@@ -616,7 +616,7 @@ export async function validateRuntime(root: string, reference: Artifact) {
   )
   check(
     pkg.productName === 'Gitowl' &&
-      pkg.version === '0.0.1' &&
+      pkg.version === '0.1.0' &&
       pkg.bundleID === 'io.github.oubigfa.gitowl' &&
       pkg.main === 'main.js',
     'Runtime identity changed'
@@ -626,7 +626,7 @@ export async function validateRuntime(root: string, reference: Artifact) {
   )
   check(
     config.name === 'Gitowl' &&
-      config.version === '0.0.1' &&
+      config.version === '0.1.0' &&
       config.identifier === 'io.github.oubigfa.gitowl',
     'Fixed native product identity changed'
   )
@@ -1071,7 +1071,7 @@ export async function validateAcceptance(root: string, receiptPath: string) {
   )
   return {
     product: 'Gitowl',
-    version: '0.0.1',
+    version: '0.1.0',
     identifier: 'io.github.oubigfa.gitowl',
     originalCore: 'desktop/desktop',
     sourceDigest: source.sourceDigest,
@@ -1138,7 +1138,7 @@ export async function validatePackagedExecutable(
       values.every(
         v =>
           v.ProductName === 'Gitowl' &&
-          v.ProductVersion === '0.0.1' &&
+          v.ProductVersion === '0.1.0' &&
           v.OriginalFilename === 'Gitowl.exe' &&
           v.MyGoIdentifier === 'io.github.oubigfa.gitowl'
       ),
@@ -1165,7 +1165,7 @@ export async function validatePackagedAssets(
     'icons',
     'logo.png',
     'build-info.json',
-    'gitowl-setup-0.0.1-amd64.exe',
+    'gitowl-setup-0.1.0-amd64.exe',
     '.mygo-files',
   ])
   for (const name of await readdir(stage)) {
@@ -1225,7 +1225,7 @@ export async function validatePackagedAssets(
   )
   const installer = await artifact(
     root,
-    `${directory}/gitowl-setup-0.0.1-amd64.exe`
+    `${directory}/gitowl-setup-0.1.0-amd64.exe`
   )
   check(
     (await captureSourceTreeEvidence(root)).sourceDigest ===

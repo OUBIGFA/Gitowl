@@ -19,7 +19,7 @@ func TestReadOnlyContract(t *testing.T) {
 		result any
 		call   func(*Client) (any, error)
 	}{
-		{"system.info", map[string]any{}, Info{1, "0.0.1", []string{"repository.open"}}, func(c *Client) (any, error) { return c.Info(context.Background()) }},
+		{"system.info", map[string]any{}, Info{1, "0.1.0", []string{"repository.open"}}, func(c *Client) (any, error) { return c.Info(context.Background()) }},
 		{"repository.open", map[string]any{"path": "C:/repos/仓库"}, Repository{7, "C:/repos/仓库", "仓库"}, func(c *Client) (any, error) { return c.Open(context.Background(), "C:/repos/仓库") }},
 		{"repository.status", map[string]any{"id": float64(7)}, Status{&branch, &upstream, 2, 3, true, &operation, files}, func(c *Client) (any, error) { return c.Status(context.Background(), 7) }},
 		{"repository.history", map[string]any{"id": float64(7), "skip": float64(20), "limit": float64(50)}, commits, func(c *Client) (any, error) { return c.History(context.Background(), 7, 20, 50) }},

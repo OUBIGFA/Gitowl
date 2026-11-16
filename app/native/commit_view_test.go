@@ -13,13 +13,13 @@ import (
 func enableCommitCapability(t *testing.T, h *viewHarness) {
 	t.Helper()
 	h.a.connect("")
-	h.answer(t, "info", backend.Info{Protocol: 1, Version: "0.0.1", Capabilities: []string{"repository.open", "repository.status", "repository.history", "repository.changeset", "repository.diff", "repository.commit"}}, nil)
+	h.answer(t, "info", backend.Info{Protocol: 1, Version: "0.1.0", Capabilities: []string{"repository.open", "repository.status", "repository.history", "repository.changeset", "repository.diff", "repository.commit"}}, nil)
 }
 
 func TestNoCommitCapabilityRemainsReadOnly(t *testing.T) {
 	h := newViewHarness(t)
 	h.a.connect("")
-	h.answer(t, "info", backend.Info{Protocol: 1, Version: "0.0.1", Capabilities: []string{"repository.open", "repository.status"}}, nil)
+	h.answer(t, "info", backend.Info{Protocol: 1, Version: "0.1.0", Capabilities: []string{"repository.open", "repository.status"}}, nil)
 	h.open(t, []backend.File{{Path: "first.txt", Status: "Modified"}})
 	h.answer(t, "diff", patch("first.txt", "old", "new"), nil)
 	h.a.commitSummary = "not permitted"
@@ -140,11 +140,11 @@ func TestSettingsShowsProductVersionAndInjectedBuild(t *testing.T) {
 	t.Cleanup(func() { BuildNumber = old })
 	h := newViewHarness(t)
 	h.click(t, "Settings")
-	if !h.tt.HasText("Version: 0.0.1") || !h.tt.HasText("Build: 12345") {
+	if !h.tt.HasText("Version: 0.1.0") || !h.tt.HasText("Build: 12345") {
 		t.Fatalf("version/build missing: %q", h.tt.Texts())
 	}
 	h.tt.SetLocale("zh-Hans")
-	if !h.tt.HasText("版本：0.0.1") || !h.tt.HasText("构建号：12345") || h.tt.HasText("Build: 12345") {
+	if !h.tt.HasText("版本：0.1.0") || !h.tt.HasText("构建号：12345") || h.tt.HasText("Build: 12345") {
 		t.Fatalf("version/build language mixed: %q", h.tt.Texts())
 	}
 }

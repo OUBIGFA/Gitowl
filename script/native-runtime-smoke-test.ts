@@ -102,7 +102,7 @@ it(
     )
     const pkg = JSON.parse(await readFile(join(app, 'package.json'), 'utf8'))
     assert.equal(pkg.productName, 'Gitowl')
-    assert.equal(pkg.version, '0.0.1')
+    assert.equal(pkg.version, '0.1.0')
     assert.equal(pkg.bundleID, 'io.github.oubigfa.gitowl')
     const git = await promisify(execFile)(
       join(app, 'git/cmd/git.exe'),
@@ -233,7 +233,7 @@ it(
         NODE_ENV: 'production',
         RELEASE_CHANNEL: 'research-preview',
       })
-      assert.equal(main.version, '0.0.1')
+      assert.equal(main.version, '0.1.0')
       assert.equal(main.appPath, app)
       assert.equal(main.userData, join(data, 'desktop-kernel'))
       assert.deepEqual(main.visible, [false])

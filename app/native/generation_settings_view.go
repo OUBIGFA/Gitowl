@@ -144,13 +144,16 @@ func (a *app) interfaceSettingsView(c *ui.Context, tx locales.Messages) {
 	a.interfaceVersionView(c, tx)
 }
 
-func (a *app) interfaceVersionView(c *ui.Context, tx locales.Messages) {
-	version := mygo.App.Version()
-	if version == "" {
-		version = "0.0.1"
+func productVersion() string {
+	if version := mygo.App.Version(); version != "" {
+		return version
 	}
+	return "0.1.0"
+}
+
+func (a *app) interfaceVersionView(c *ui.Context, tx locales.Messages) {
 	ui.Row(c).Gap(16).Wrap().FillWidth().Shrink(0).Children(func() {
-		ui.Text(c, tx.ProductVersion(version))
+		ui.Text(c, tx.ProductVersion(productVersion()))
 		ui.Text(c, tx.BuildNumber(BuildNumber)).TextColor(c.Theme().TextMuted)
 	})
 }

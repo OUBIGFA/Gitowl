@@ -1,7 +1,7 @@
 {
   "name": "Gitowl",
   "identifier": "io.github.oubigfa.gitowl",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "icon": "../static/logos/gitowl/logo.png",
   "resources": [
     "../static/logos/gitowl/logo.png",

@@ -356,7 +356,7 @@ async function prepare() {
     const pkg = JSON.parse(await readFile(join(app, 'package.json'), 'utf8'))
     pkg.name = 'gitowl-desktop-kernel'
     pkg.productName = 'Gitowl'
-    pkg.version = '0.0.1'
+    pkg.version = '0.1.0'
     pkg.bundleID = 'io.github.oubigfa.gitowl'
     pkg.main = 'main.js'
     await writeFile(
@@ -423,7 +423,7 @@ async function prepare() {
     JSON.stringify(
       {
         product: 'Gitowl',
-        version: '0.0.1',
+        version: '0.1.0',
         identifier: 'io.github.oubigfa.gitowl',
         platform: 'windows-x64',
         originalCore: 'desktop/desktop',
