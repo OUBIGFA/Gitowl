@@ -163,7 +163,7 @@ func (a *app) applyCoreSnapshot(snapshot backend.KernelSnapshot) {
 	a.applyWorkspaceSnapshot(snapshot, changedRepository)
 	if changedRepository {
 		a.repoSeq++
-		a.reviewingFile, a.viewingCommit, a.reviewOptionsOpen = false, false, false
+		a.reviewingFile, a.viewingCommit = false, false
 		a.changesList, a.commitsList, a.commitFilesList = nativeListState{}, nativeListState{}, nativeListState{}
 		a.corePreviewDiff, a.corePreviewIdentity = nil, ""
 		a.coreHistoryExhausted = false

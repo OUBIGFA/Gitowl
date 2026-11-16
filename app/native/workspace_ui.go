@@ -148,12 +148,12 @@ func fileIcon(filePath string, submodule bool) string {
 // Navigation changes only the canvas. The selected whole files, draft and list
 // scroll positions belong to the project, not to the currently visible page.
 func (a *app) navigateWorkspace(tab int) {
-	a.reviewingFile, a.viewingCommit, a.reviewOptionsOpen = false, false, false
+	a.reviewingFile, a.viewingCommit = false, false
 	a.setTab(tab)
 }
 
 func (a *app) reviewFile(index int) {
-	a.reviewingFile, a.reviewOptionsOpen = true, false
+	a.reviewingFile = true
 	current := a.changeIndex
 	if a.tab == historyTab {
 		current = a.commitFileIndex
@@ -166,10 +166,10 @@ func (a *app) reviewFile(index int) {
 func (a *app) backFromReview() {
 	// Keep the native DiffState too: a return should not reload or erase review
 	// position, and a delayed reply must never send the user back into a file.
-	a.reviewingFile, a.reviewOptionsOpen = false, false
+	a.reviewingFile = false
 }
 
 func (a *app) openVersion(index int) {
-	a.viewingCommit, a.reviewingFile, a.reviewOptionsOpen = true, false, false
+	a.viewingCommit, a.reviewingFile = true, false
 	a.selectCommit(index)
 }

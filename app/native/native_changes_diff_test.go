@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"maps"
+	"math"
 	"testing"
 	"time"
 
@@ -41,8 +42,8 @@ func TestHistoryDiffUsesRightPanelWithoutReplacingTimeline(test *testing.T) {
 					tester.Advance(time.Second)
 					history := visibleControl(test, tester, historyLabel, size[0], size[1])
 					diff := visibleControl(test, tester, tx.DiffTitle(), size[0], size[1])
-					if !application.reviewingFile || diff.X <= history.X+history.W || diff.X+diff.W < float32(size[0]-1) || diff.Y+diff.H < float32(size[1]-1) {
-						test.Fatalf("history diff must stay right of the timeline and fill its edges: history=%+v diff=%+v", history, diff)
+					if !application.reviewingFile || diff.X <= history.X+history.W || math.Abs(float64(diff.X+diff.W-float32(size[0]-16))) > 1 || math.Abs(float64(diff.Y+diff.H-float32(size[1]-16))) > 1 {
+						test.Fatalf("history diff must stay right of the timeline with safe window margins: history=%+v diff=%+v", history, diff)
 					}
 					if tester.HasText(tx.SaveVersion()) || tester.HasText(tx.IncludeForSave()) || tester.HasText(tx.BackToVersion()) {
 						test.Fatal("history review showed changes-only actions or fullscreen navigation")
@@ -139,14 +140,17 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 					heading, found := tt.AccessByRole(ui.RoleHeading, "docs/routes/lake-district.md")
 					inclusion := visibleControl(t, tt, tx.IncludeForSave(), size[0], size[1])
 					collapse := visibleControl(t, tt, tx.CollapseDiff(), size[0], size[1])
-					if !found || heading.Bounds.X < diff.X+16 || inclusion.X < diff.X+16 || collapse.X+collapse.W > diff.X+diff.W-16 {
+					for _, label := range []string{tx.SideBySide(), tx.Unified(), tx.WrapLines()} {
+						visibleControl(t, tt, label, size[0], size[1])
+					}
+					if !found || heading.Bounds.X < diff.X || inclusion.X < diff.X || collapse.X+collapse.W > diff.X+diff.W {
 						t.Fatalf("diff controls lost their safety padding: diff=%+v heading=%+v inclusion=%+v collapse=%+v", diff, heading.Bounds, inclusion, collapse)
 					}
 					tt.Move(4, 4)
 					tt.Advance(time.Second)
 					saveDesignEvidence(t, tt, fmt.Sprintf("changes-expanded-%s-%d-dark-%v.png", locale, size[0], dark))
-					if diff.X+diff.W < float32(size[0]-1) || diff.Y+diff.H < float32(size[1]-1) {
-						t.Fatalf("diff left unused space at the window edges: %+v in %v", diff, size)
+					if math.Abs(float64(diff.X+diff.W-float32(size[0]-16))) > 1 || math.Abs(float64(diff.Y+diff.H-float32(size[1]-16))) > 1 {
+						t.Fatalf("diff content lost its safe window margins: %+v in %v", diff, size)
 					}
 					if !a.reviewingFile || diff.X <= files.X+files.W || !tt.HasText(tx.IncludeAll()) {
 						t.Fatalf("file review replaced the home page: files=%+v diff=%+v", files, diff)
@@ -202,6 +206,21 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 					if a.commitSummary != original {
 						t.Fatalf("panel transitions discarded native undo: %q", a.commitSummary)
 					}
+					// Exercise the image in the production split, rather than a
+					// standalone harness that supplies its own content padding.
+					prepared, err := prepareNativeImageDiff(a.ctx, nativeImageTestDiff(t, 600, 400))
+					if err != nil {
+						t.Fatal(err)
+					}
+					a.preview = &preview{kind: "image"}
+					a.imagePrepared = prepared
+					tt.Advance(time.Second)
+					image := visibleControl(t, tt, nativeImageLabel(locale, "preview"), size[0], size[1])
+					divider, ok = tt.AccessByRole(ui.RoleSplitter, "")
+					if !ok || image.X < divider.Bounds.X+divider.Bounds.W+15 || math.Abs(float64(image.X+image.W-float32(size[0]-16))) > 1 || math.Abs(float64(image.Y+image.H-float32(size[1]-16))) > 1 {
+						t.Fatalf("image preview lost the diff panel's safe margins: image=%+v divider=%+v", image, divider.Bounds)
+					}
+					saveDesignEvidence(t, tt, fmt.Sprintf("changes-image-%s-%d-dark-%v.png", locale, size[0], dark))
 				})
 			}
 		}

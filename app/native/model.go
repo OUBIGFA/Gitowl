@@ -124,7 +124,6 @@ type app struct {
 	viewingCommit     bool
 	descriptionOpen   bool
 	branchDetailsOpen bool
-	reviewOptionsOpen bool
 	saveErrorOpen     bool
 	diffLayout        int
 	wrap              bool
@@ -327,7 +326,7 @@ func (a *app) openRepository(path string) {
 			a.changesList, a.commitsList, a.commitFilesList = nativeListState{}, nativeListState{}, nativeListState{}
 			a.loadingStatus, a.loadingHistory, a.loadingCommit = false, false, false
 			a.historyLoaded, a.historyMore, a.historySkip = false, false, 0
-			a.reviewingFile, a.viewingCommit, a.branchDetailsOpen, a.reviewOptionsOpen = false, false, false, false
+			a.reviewingFile, a.viewingCommit, a.branchDetailsOpen = false, false, false
 			a.openModal, a.saveErr, a.lastSavedSHA = false, nil, ""
 			a.restoreProjectDraft()
 			a.clearDiff()

@@ -47,17 +47,21 @@ func TestNativeReviewExplainsSidesAndRetainsRawRangeTooltip(t *testing.T) {
 			if h.tt.HasText(tx.UnifiedDiffHint()) || h.tt.HasText(tx.ImageBefore()) || h.a.preview.patches[0].state.Layout != editor.DiffUnified {
 				t.Fatal("narrow unified review kept split labels or a redundant caption")
 			}
-			h.click(t, tx.ReviewOptions())
-			if !h.tt.HasText(tx.NarrowDiffLayout()) || h.tt.HasText(tx.SideBySide()) {
-				t.Fatal("narrow review offered a side-by-side control that cannot take effect")
+			for _, label := range []string{tx.SideBySide(), tx.Unified(), tx.WrapLines()} {
+				visibleControl(t, h.tt, label, 900, 620)
+			}
+			if _, folded := h.tt.AccessByRole(ui.RoleButton, tx.ReviewOptions()); folded {
+				t.Fatal("review options are still hidden behind a button")
+			}
+			split, found := h.tt.AccessByRole(ui.RoleRadio, tx.SideBySide())
+			if !found || !split.Disabled {
+				t.Fatal("narrow review must show the unavailable side-by-side option as disabled")
 			}
 			h.click(t, tx.WrapLines())
 			if h.a.wrap {
 				t.Fatal("native wrap control stopped working")
 			}
-			h.tt.Key(0, ui.KeyEscape)
 			h.tt.SetSize(1920, 1080)
-			h.click(t, tx.ReviewOptions())
 			h.click(t, tx.Unified())
 			if h.tt.HasText(tx.ImageBefore()) || h.a.preview.patches[0].state.Layout != editor.DiffUnified {
 				t.Fatal("the real unified option did not change the native view")

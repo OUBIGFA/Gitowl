@@ -480,39 +480,39 @@ func (a *app) diffPane(c *ui.Context, tx locales.Messages, width float32) {
 	}
 	options := func() {
 		if a.preview != nil && len(a.preview.patches) > 0 {
-			anchor := iconButton(c.Key("review-options"), tx.ReviewOptions(), "ellipsis").
-				OnClick(func() { a.reviewOptionsOpen = !a.reviewOptionsOpen })
-			ui.Popover(c.Key("review-options-popover"), anchor, &a.reviewOptionsOpen, func() {
-				ui.Text(c, tx.ReviewOptions()).FontWeight(500)
-				if width >= 760 {
-					layout := a.diffLayout
-					if w := a.nativeWorkspace(); w != nil {
-						layout = int(editor.DiffUnified)
-						if w.SideBySide {
-							layout = int(editor.DiffSplit)
-						}
+			ui.Row(c.Key("review-options")).FillWidth().Gap(12).Wrap().Margin(0, 0, 8, 0).Children(func() {
+				layout := a.diffLayout
+				if w := a.nativeWorkspace(); w != nil {
+					layout = int(editor.DiffUnified)
+					if w.SideBySide {
+						layout = int(editor.DiffSplit)
 					}
-					ui.Segmented(c.Key("diff-layout"), &layout, tx.SideBySide(), tx.Unified()).Label(tx.DiffLayout()).OnChange(func() {
-						if a.nativeWorkspace() != nil {
-							a.workspaceAction(backend.KernelWorkspaceAction{Type: "diff.option", Option: "sideBySide", Value: layout == int(editor.DiffSplit)})
-						} else {
-							a.diffLayout = layout
-						}
-					})
-				} else {
-					ui.Text(c, tx.NarrowDiffLayout()).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted)
+				}
+				// Show the effective narrow layout without losing the saved
+				// preference or hiding settings behind a popover.
+				if width < 760 {
+					layout = int(editor.DiffUnified)
+				}
+				control := ui.Segmented(c.Key("diff-layout"), &layout, tx.SideBySide(), tx.Unified()).Label(tx.DiffLayout()).Disabled(width < 760).OnChange(func() {
+					if a.nativeWorkspace() != nil {
+						a.workspaceAction(backend.KernelWorkspaceAction{Type: "diff.option", Option: "sideBySide", Value: layout == int(editor.DiffSplit)})
+					} else {
+						a.diffLayout = layout
+					}
+				})
+				if width < 760 {
+					control.Tooltip(tx.NarrowDiffLayout()).Description(tx.NarrowDiffLayout())
 				}
 				ui.Checkbox(c.Key("wrap-lines"), &a.wrap, tx.WrapLines())
-			}).Width(280).Padding(16).Gap(16)
+			})
 		}
 	}
 	if inline {
-		ui.Row(c.Key("diff-heading")).FillWidth().MinHeight(36).Padding(0, 16).Gap(8).Margin(0, 0, 4, 0).Children(func() {
+		ui.Row(c.Key("diff-heading")).FillWidth().MinHeight(36).Gap(8).Margin(0, 0, 4, 0).Children(func() {
 			title()
-			options()
 			a.workspaceDiffToggle(c, tx)
 		})
-		ui.Row(c.Key("diff-controls")).FillWidth().Padding(0, 16).Gap(8).Wrap().Margin(0, 0, 8, 0).Children(func() {
+		ui.Row(c.Key("diff-controls")).FillWidth().Gap(8).Wrap().Margin(0, 0, 8, 0).Children(func() {
 			inclusion()
 			a.nativeDiffControls(c, true)
 		})
@@ -524,15 +524,12 @@ func (a *app) diffPane(c *ui.Context, tx locales.Messages, width float32) {
 			if compact {
 				a.nativeDiffControls(c, true)
 			}
-			options()
 		})
 	}
 	if selected && file.OldPath != "" {
-		previousPath := ui.Text(c, tx.PreviousPath(file.OldPath)).TextColor(c.Theme().TextMuted).Margin(0, 0, 12, 0)
-		if inline {
-			previousPath.Padding(0, 16)
-		}
+		ui.Text(c, tx.PreviousPath(file.OldPath)).TextColor(c.Theme().TextMuted).Margin(0, 0, 12, 0)
 	}
+	options()
 	if a.diffErr != nil {
 		showError(c, tx.FailedDiff(a.diffErr.Error()))
 		ui.Spacer(c)

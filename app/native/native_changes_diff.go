@@ -30,7 +30,7 @@ func (a *app) expandWorkspaceDiff() {
 		}
 		a.reviewFile(index)
 	} else {
-		a.reviewingFile, a.reviewOptionsOpen = true, false
+		a.reviewingFile = true
 	}
 }
 
@@ -95,9 +95,15 @@ func (a *app) fileWorkspace(c *ui.Context, tx locales.Messages, colors workspace
 		theme := *c.Theme()
 		scrollbar := theme.ScrollbarStyle.Resolve(&theme)
 		theme.ScrollbarStyle.TrackWidth = max(scrollbar.TrackWidth, scrollbar.ThumbWidth+12)
-		ui.Themed(c.Key("workspace-diff-pane"), &theme).Fill().MinWidth(0).Children(func() {
+		pane := ui.Themed(c.Key("workspace-diff-pane"), &theme).Fill().MinWidth(0)
+		if a.reviewingFile {
+			// The page already supplies the top inset. Keep every preview,
+			// its controls and its scrollbars inside the same remaining margins.
+			pane.Padding(0, 16, 16, 16)
+		}
+		pane.Children(func() {
 			if a.reviewingFile {
-				a.diffPane(c, tx, available-layout.width-1)
+				a.diffPane(c, tx, available-layout.width-1-32)
 			} else {
 				ui.Row(c.Key("diff-heading")).FillWidth().MinHeight(36).Children(func() { a.workspaceDiffToggle(c, tx) })
 			}

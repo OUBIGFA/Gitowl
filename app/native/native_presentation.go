@@ -24,7 +24,7 @@ func (a *app) beginCorePresentation() {
 	for _, action := range a.corePresentationActions {
 		switch action {
 		case "focus-history", "focus-changes":
-			a.reviewingFile, a.viewingCommit, a.reviewOptionsOpen = false, false, false
+			a.reviewingFile, a.viewingCommit = false, false
 			a.coreFocusTarget = action
 		case "find-text":
 			if a.preview != nil && len(a.preview.patches) > 0 {
