@@ -333,6 +333,7 @@ func (a *app) fileList(c *ui.Context, tx locales.Messages, files []backend.File,
 	// Rows do not select themselves: including a whole file and opening it
 	// are separate native controls, never a blue List selection side effect.
 	state.Selected, state.Label = nil, nil
+	scrollbarWidth := c.Theme().ScrollbarStyle.Resolve(c.Theme()).TrackWidth
 	ui.List(c.Key("files"), state, len(files), func(i int) {
 		file := files[i]
 		row := ui.Row(c).Height(48).Padding(0, 4).Gap(4).Radius(8)
@@ -361,7 +362,7 @@ func (a *app) fileList(c *ui.Context, tx locales.Messages, files []backend.File,
 				}
 			})
 		})
-	}).Grow(1).MinHeight(0).FillWidth().Gap(4).Padding(8, 0, 0, 0).
+	}).Grow(1).MinHeight(0).FillWidth().Gap(4).Padding(8, scrollbarWidth, 0, 0).
 		BorderWidth(1, 0, 0, 0).BorderColor(colors.hairline).Label(tx.ChangedFiles())
 }
 

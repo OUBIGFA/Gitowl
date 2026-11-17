@@ -67,6 +67,9 @@ func renderWorkspaceChangesList(c *ui.Context, state *nativeWorkspaceState, list
 	}
 	c.SetTheme(&listTheme)
 	defer c.SetTheme(baseTheme)
+	// Pad the list itself so MyGo's selection background, not only the row
+	// controls, stays outside the scrollbar's full hover/drag hit area.
+	scrollbarWidth := baseTheme.ScrollbarStyle.Resolve(baseTheme).TrackWidth
 	list := ui.List(c.Key("workspace-changed-files"), listState, len(files), func(i int) {
 		file := files[i]
 		row := ui.Row(c.Key(file.ID)).Height(48).FillWidth().Padding(0, 4).Gap(8).Radius(6).Label(file.Path)
@@ -98,7 +101,7 @@ func renderWorkspaceChangesList(c *ui.Context, state *nativeWorkspaceState, list
 		if callbacks.contextMenu != nil {
 			callbacks.contextMenu(c, row, file.ID)
 		}
-	}).Grow(1).MinHeight(0).FillWidth().Gap(2).Padding(4, 0, 0, 0).Label(tx.ChangedFiles())
+	}).Grow(1).MinHeight(0).FillWidth().Gap(2).Padding(4, scrollbarWidth, 0, 0).Label(tx.ChangedFiles())
 	if list.Changed() {
 		var ids []string
 		for _, file := range files {

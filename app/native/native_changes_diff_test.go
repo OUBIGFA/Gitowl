@@ -36,6 +36,7 @@ func TestHistoryDiffUsesRightPanelWithoutReplacingTimeline(test *testing.T) {
 					tx := locales.In(locale)
 					historyLabel := workspaceLabel(locale, "workspace.history")
 					collapsed := visibleControl(test, tester, historyLabel, size[0], size[1])
+					assertCollapsedDiffLocked(test, tester, application)
 					if err := tester.Click(tx.OpenFile("docs/routes/lake-district.md")); err != nil {
 						test.Fatal(err)
 					}
@@ -116,6 +117,7 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 					if collapsedFiles.X != historyBounds.X || collapsedFiles.W != historyBounds.W || toggle.X != historyToggle.X {
 						t.Fatalf("collapsed changes must use the history page width: files=%+v toggle=%+v history=%+v", collapsedFiles, toggle, historyBounds)
 					}
+					assertCollapsedDiffLocked(t, tt, a)
 					if err := tt.Click("docs/routes/lake-district.md"); err != nil {
 						t.Fatal(err)
 					}
@@ -188,6 +190,7 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 					if folded := visibleControl(t, tt, tx.ChangedFiles(), size[0], size[1]); folded.X != collapsedFiles.X || folded.W != collapsedFiles.W {
 						t.Fatalf("collapse did not restore the centered width: before=%+v after=%+v", collapsedFiles, folded)
 					}
+					assertCollapsedDiffLocked(t, tt, a)
 					if err := tt.Click(tx.ExpandDiff()); err != nil {
 						t.Fatal(err)
 					}
@@ -224,5 +227,23 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 				})
 			}
 		}
+	}
+}
+
+// Exercise the former drag target, including keys after a press, without
+// relying on the implementation's choice of a disabled or absent handle.
+func assertCollapsedDiffLocked(t *testing.T, tester *ui.Tester, a *app) {
+	t.Helper()
+	before := a.diffPanelLayout
+	if divider, found := tester.AccessByRole(ui.RoleSplitter, ""); found {
+		x, y := divider.Bounds.X+divider.Bounds.W/2, divider.Bounds.Y+divider.Bounds.H/2
+		tester.Press(x, y)
+		tester.Move(x-40, y)
+		tester.Release(x-40, y)
+		tester.Key(0, ui.KeyLeft)
+		tester.Frame()
+	}
+	if a.reviewingFile || a.diffPanelLayout != before {
+		t.Fatalf("collapsed divider resized or opened the diff: before=%+v after=%+v open=%v", before, a.diffPanelLayout, a.reviewingFile)
 	}
 }

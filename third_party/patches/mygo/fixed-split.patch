@@ -1,0 +1,143 @@
+diff --git a/ui/split.go b/ui/split.go
+--- a/ui/split.go
++++ b/ui/split.go
+@@ -10,12 +10,19 @@
+ //
+ //	ui.Split(c, &app.sidebar, app.files, app.editor).Fill()
+ func coreSplit(c *context, size *float32, first, second func()) *node {
+-	return split(c, size, first, second, false, false)
++	return split(c, size, first, second, false, false, false)
++}
++
++// SplitFixed lays out the same panes as Split, with a noninteractive divider.
++// Switching between them keeps the panes' native focus, undo and scroll state.
++// The app owns *size; neither pointer nor keyboard input changes it.
++func coreSplitFixed(c *context, size *float32, first, second func()) *node {
++	return split(c, size, first, second, false, false, true)
+ }
+ 
+ // SplitVertical is Split with first above second, *size its height.
+ func coreSplitVertical(c *context, size *float32, first, second func()) *node {
+-	return split(c, size, first, second, true, false)
++	return split(c, size, first, second, true, false, false)
+ }
+ 
+ // SplitPercent is Split with *p the percentage of the room first takes,
+@@ -24,12 +31,12 @@
+ //
+ //	ui.SplitPercent(c, &app.sidebarPercent, app.files, app.editor).Fill()
+ func coreSplitPercent(c *context, p *float32, first, second func()) *node {
+-	return split(c, p, first, second, false, true)
++	return split(c, p, first, second, false, true, false)
+ }
+ 
+ // SplitVerticalPercent is SplitPercent with first above second.
+ func coreSplitVerticalPercent(c *context, p *float32, first, second func()) *node {
+-	return split(c, p, first, second, true, true)
++	return split(c, p, first, second, true, true, false)
+ }
+ 
+ // splitResetKey is the local that keeps a split's SplitReset settings.
+@@ -73,7 +80,7 @@
+ 
+ // split shares the room between first and second: *size is first's size
+ // in DIPs, or with inPercent its percentage of the room.
+-func split(c *context, size *float32, first, second func(), vertical, inPercent bool) *node {
++func split(c *context, size *float32, first, second func(), vertical, inPercent, fixed bool) *node {
+ 	t := c.theme
+ 	minPane, grip := t.Space(10), t.Space(1.5)
+ 	stack := func() *node {
+@@ -176,6 +183,7 @@
+ 			// The line takes the focus between the panes, in their order.
+ 			div := coreBox(c).Shrink(0).Focusable().Role(RoleSplitter).Label(c.texts().Divider())
+ 			div.widget = "Divider"
++			div.Disabled(fixed).DimDisabled(false)
+ 			div.flags |= flagOwnRing
+ 			length(div, 1)
+ 			// The arrows move the line the way they point.
+@@ -211,6 +219,10 @@
+ 			} else {
+ 				handle.Top(0).Bottom(0).Start(-(grip - 1) / 2).Width(grip).Cursor(CursorResizeEW)
+ 			}
++			handle.Disabled(fixed).DimDisabled(false)
++			if fixed {
++				handle.Cursor(CursorDefault)
++			}
+ 			// A press there focuses the line, as a press on it would. Only a
+ 			// move changes the size, so a press keeps *size for when there is
+ 			// room again. A double click restores the size SplitReset chose.
+@@ -250,7 +262,7 @@
+ 			})
+ 			div.Draw(func(p *Painter, r Rect) {
+ 				line := t.Border
+-				if held || handle.Hovered() {
++				if !fixed && (held || handle.Hovered()) {
+ 					line = t.Accent
+ 				}
+ 				p.Fill(r, line, 0)
+diff --git a/ui/api_gen.go b/ui/api_gen.go
+--- a/ui/api_gen.go
++++ b/ui/api_gen.go
+@@ -2519,6 +2519,20 @@
+ 	_p := coreSplitButton(_ctx, label)
+ 	_ctx.rt.endBuild()
+ 	return wrapSplitButtonParts(_p)
++}
++
++// SplitFixed lays out the same panes as Split, with a noninteractive divider.
++// Switching between them keeps the panes' native focus, undo and scroll state.
++// The app owns *size; neither pointer nor keyboard input changes it.
++func SplitFixed(c *Context, size *float32, first func(), second func()) Element {
++	_ctx := c.build()
++	if _ctx == nil {
++		return Element{}
++	}
++	_ctx.rt.beginBuild()
++	_e := coreSplitFixed(_ctx, size, first, second)
++	_ctx.rt.endBuild()
++	return wrapElement(_e)
+ }
+ 
+ // SplitPercent is Split with *p the percentage of the room first takes,
+@@ -3420,7 +3434,9 @@
+ // as it builds the element's node, only while assistive technology reads
+ // the window: what costs too much to give every frame, as the text of a
+ // large document. The node is a type internal to this module, so only
+-// its packages describe elements so, as package ui/editor does.
++// its packages describe elements so, as package ui/editor does. The
++// elements inside a text field described so show to assistive technology
++// too, as those of other text fields do not.
+ func (_handle Element) Access(fn func(n *platform.AccessNode)) Element {
+ 	_node := _handle.node()
+ 	if _node == nil {
+@@ -5676,7 +5692,9 @@
+ 
+ // InView reports whether some of the element showed in the window in the
+ // frame before, within the scroll containers and clips around it: to
+-// animate it in as it scrolls into view, as Motion's whileInView.
++// animate it in as it scrolls into view, as Motion's whileInView. When
++// what it answers from changes, as a scroll brings the element in, MyGo
++// builds another frame, so that the view reads the new answer.
+ func (_handle Element) InView() bool {
+ 	_node := _handle.node()
+ 	if _node == nil {
+@@ -5691,7 +5709,8 @@
+ // from 0 to 1, showed in the frame before, within the window and the
+ // scroll containers and clips around it, grown by margin as InViewMargin
+ // grows them: as IntersectionObserver's threshold, and Motion's amount
+-// for whileInView and useInView. An impression counts once half of a
++// for whileInView and useInView, and builds another frame when what it
++// answers from changes, as InView does. An impression counts once half of a
+ // card shows with 0.5, an animation starts at a fifth of it with 0.2,
+ // and 1 waits for all of it; 0 is InViewMargin. Its area is that of its
+ // box as transforms move it, the box holding them as InView's clips do.
+@@ -5717,7 +5736,8 @@
+ // IntersectionObserver's rootMargin and scrollMargin, a margin of 200
+ // has the element in view once it is within 200 DIPs of showing, to load
+ // what it shows before it scrolls in, and a negative one only once it is
+-// that far inside; other clips around it clip it as they do.
++// that far inside; other clips around it clip it as they do. As InView
++// does, it has MyGo build another frame when what it answers from changes.
+ func (_handle Element) InViewMargin(margin ...float32) bool {
+ 	_node := _handle.node()
+ 	if _node == nil {

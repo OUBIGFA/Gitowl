@@ -161,6 +161,23 @@
           "after": "c80f38609c7bc5540158f9a7457875f33c0fc1c2d5a69dd2fe8c23cf05d83669"
         }
       ]
+    },
+    {
+      "path": "third_party/patches/mygo/fixed-split.patch",
+      "sha256": "c9609525be04fd0b67ac533eb2e36f2ce351bb3ed43797496a39f14f322d0f3d",
+      "reason": "MyGo v0.9.0 Split always allows divider pointer and keyboard resizing. SplitFixed reuses the same native pane tree but disables only the divider and its drag handle, preserving child focus, draft undo and scrolling when Gitowl collapses its diff. Existing split constructors keep their behavior; the public facade is regenerated with go generate ./ui. Gitowl view tests cover locked changes/history panels, reopening, resizing and retained drafts.",
+      "files": [
+        {
+          "path": "ui/split.go",
+          "before": "840610f3372efb71dcbf382715019ae71b32b5c26ada6b7bf4f4b0954aa18b9b",
+          "after": "196bc7bbeeea422b47c53e86f7bf079398538e6f275a1b9d6f7e351dc7b7f34a"
+        },
+        {
+          "path": "ui/api_gen.go",
+          "before": "548df13674674a099f69fcfd11c610a88de91b1c4a42942733ca6d5add73ab5c",
+          "after": "3ac8a10fba18ebceaf8d02ebf4393b311bfb528db53cc5d0d866559286c08403"
+        }
+      ]
     }
   ],
   "update_policy": "Review latest official stable release before upgrades; remove each patch if the equivalent is provided upstream; rerun native, editor-menu and installer acceptance."

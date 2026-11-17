@@ -78,7 +78,13 @@ func (a *app) fileWorkspace(c *ui.Context, tx locales.Messages, colors workspace
 	if a.reviewingFile {
 		bottomPadding = 16
 	}
-	split := ui.Split(c.Key("workspace-diff-split"), &layout.width, func() {
+	// Use the same native pane tree when folded, keeping draft undo and list
+	// state while disabling only the divider's pointer and keyboard input.
+	buildSplit := ui.Split
+	if !a.reviewingFile {
+		buildSplit = ui.SplitFixed
+	}
+	split := buildSplit(c.Key("workspace-diff-split"), &layout.width, func() {
 		ui.Column(c.Key("workspace-primary")).Fill().MinWidth(0).Padding(0, 16, bottomPadding, 0).Children(func() {
 			ui.Column(c.Key("workspace-overview")).Grow(1).MinHeight(0).FillWidth().Children(func() {
 				if a.tab == historyTab {
@@ -112,8 +118,5 @@ func (a *app) fileWorkspace(c *ui.Context, tx locales.Messages, colors workspace
 	if split.Changed() {
 		layout.width = fit(layout.width)
 		layout.expandedWidth = layout.width
-		if !a.reviewingFile {
-			a.expandWorkspaceDiff()
-		}
 	}
 }
