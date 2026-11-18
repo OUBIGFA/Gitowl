@@ -31,6 +31,7 @@ func (a *app) view(c *ui.Context) {
 	width, height := c.Size()
 	fileWorkspace := a.isFileWorkspace()
 	expandedDiff := fileWorkspace && a.reviewingFile
+	editorWorkspace := a.core != nil && a.repo != nil
 	verticalPadding := float32(20)
 	if height < 700 {
 		verticalPadding = 12
@@ -51,7 +52,9 @@ func (a *app) view(c *ui.Context) {
 				a.workspaceTaskBar(c, tx, colors, padding)
 			}
 			content := ui.Column(c.Key("workspace-content")).Grow(1).MinHeight(0).FillWidth()
-			if expandedDiff {
+			if editorWorkspace {
+				content.Padding(8, 12, 16, 12)
+			} else if expandedDiff {
 				// The diff pane owns everything right of the overview: it runs to
 				// the window's right and bottom edges instead of a centered column.
 				content.Padding(verticalPadding, 0, 0, padding)
@@ -64,6 +67,8 @@ func (a *app) view(c *ui.Context) {
 					switch {
 					case a.repo == nil:
 						a.noProject(c, tx)
+					case editorWorkspace:
+						a.notebookView(c, tx, colors, width-a.nativeRailWidth(c)-24)
 					case fileWorkspace:
 						a.fileWorkspace(c, tx, colors, available)
 					case a.workspaceStashView(c):
@@ -77,13 +82,14 @@ func (a *app) view(c *ui.Context) {
 				})
 				// File changes own their stable composer inside the split's first
 				// pane. Other changes flows, such as stash review, retain this one.
-				if a.repo != nil && a.tab == changesTab && a.commitCapable && !fileWorkspace {
+				if a.repo != nil && a.tab == changesTab && a.commitCapable && !fileWorkspace && !editorWorkspace {
 					a.commitForm(c, tx)
 				}
 			})
 		})
 	})
 	a.openDialog(c, tx)
+	a.notebookDialogs(c)
 	a.settingsDialog(c, tx)
 	a.generationConsentDialog(c, tx)
 	a.pollCopilotLogin(c)
@@ -107,7 +113,11 @@ func (a *app) projectRail(c *ui.Context, tx locales.Messages, colors workspaceCo
 		ui.Column(c).Grow(1).MinHeight(0).Padding(12, 12, 0, 12).Gap(4).Children(func() {
 			quietButton(c.Key("open-repository"), tx.OpenRepository(), "plus").Height(36).FillWidth().Justify(ui.Start).
 				Disabled(!a.ready || a.savingVersion).OnClick(a.showOpen)
-			a.coreProjectList(c, tx, colors)
+			if a.core != nil && a.repo != nil {
+				a.notebookRail(c, tx, colors)
+			} else {
+				a.coreProjectList(c, tx, colors)
+			}
 			if a.repo != nil {
 				// Native launches already show the authoritative project list.
 				// A second current-project heading would duplicate context and
@@ -137,28 +147,35 @@ func (a *app) workspaceTaskBar(c *ui.Context, tx locales.Messages, colors worksp
 	ui.Column(c.Key("workspace-taskbar")).FillWidth().Shrink(0).Padding(8, padding, 8, padding).
 		BorderWidth(0, 0, 1, 0).BorderColor(colors.hairline).Gap(8).Children(func() {
 		ui.Row(c).FillWidth().Gap(4).Children(func() {
-			for _, nav := range []struct {
-				label string
-				tab   int
-			}{{tx.Changes(), changesTab}, {tx.History(), historyTab}} {
-				button := ui.ButtonBase(c.Key(nav.tab)).Height(36).Padding(8, 12).Gap(8).Label(nav.label)
-				quietSurface(c, button)
-				if a.tab == nav.tab {
-					button.Background(colors.selected).FontWeight(500).Value(tx.CurrentPage())
-				}
-				button.Children(func() {
-					ui.Text(c, nav.label).NoWrap()
-					if nav.tab == changesTab && a.status != nil {
-						ui.Text(c, i18n.FormatNumber(c.Locale(), len(a.status.Files), i18n.NumberOptions{})).FontSize(c.Theme().Rem(14.0 / 15)).FontFeatures("tnum").TextColor(c.Theme().TextMuted)
-					}
-				}).OnClick(func() { a.navigateWorkspace(nav.tab) })
+			if a.core == nil {
+				a.reviewTabs(c, tx, colors)
 			}
+
 			ui.Spacer(c)
 			if a.core != nil {
 				a.coreRemoteControls(c, tx)
 			}
 		})
 	})
+}
+
+func (a *app) reviewTabs(c *ui.Context, tx locales.Messages, colors workspaceColors) {
+	for _, nav := range []struct {
+		label string
+		tab   int
+	}{{tx.Changes(), changesTab}, {tx.History(), historyTab}} {
+		button := ui.ButtonBase(c.Key(nav.tab)).Height(36).Padding(8, 12).Gap(8).Label(nav.label)
+		quietSurface(c, button)
+		if a.tab == nav.tab {
+			button.Background(colors.selected).FontWeight(500).Value(tx.CurrentPage())
+		}
+		button.Children(func() {
+			ui.Text(c, nav.label).NoWrap()
+			if nav.tab == changesTab && a.status != nil {
+				ui.Text(c, i18n.FormatNumber(c.Locale(), len(a.status.Files), i18n.NumberOptions{})).FontSize(c.Theme().Rem(14.0 / 15)).FontFeatures("tnum").TextColor(c.Theme().TextMuted)
+			}
+		}).OnClick(func() { a.navigateWorkspace(nav.tab) })
+	}
 }
 
 func (a *app) workspaceTitleBar(c *ui.Context, tx locales.Messages, padding float32) {

@@ -1,0 +1,385 @@
+package main
+
+import (
+	"errors"
+	"os"
+	"path/filepath"
+	"slices"
+	"sort"
+	"strings"
+
+	rich "github.com/OUBIGFA/Gitowl/app/native/internal/arcmd/editor"
+	arclang "github.com/OUBIGFA/Gitowl/app/native/internal/arcmd/i18n"
+	"github.com/OUBIGFA/Gitowl/app/native/internal/backend"
+	"github.com/OUBIGFA/Gitowl/app/native/locales"
+	"github.com/egoist/mygo/ui"
+	"github.com/egoist/mygo/ui/editor"
+)
+
+type notebookNode struct {
+	name   string
+	depth  int
+	folder bool
+}
+type notebookProject struct {
+	docs     []*notebookDocument
+	current  *notebookDocument
+	expanded map[string]bool
+	rows     []notebookNode
+	list     nativeListState
+}
+type notebookWorkspace struct {
+	projects                                                    map[string]*notebookProject
+	projectPicker, searchOpen, outline, quitPrompt, discardQuit bool
+	closing                                                     *notebookDocument
+	err                                                         error
+	width                                                       float32
+	search                                                      notebookSearch
+}
+
+func (a *app) notes() *notebookProject {
+	root := a.repo.Path
+	if a.notebook.projects == nil {
+		a.notebook.projects = map[string]*notebookProject{}
+	}
+	p := a.notebook.projects[root]
+	if p == nil {
+		p = &notebookProject{expanded: map[string]bool{".": true}}
+		a.notebook.projects[root] = p
+		a.notebook.err = p.load(root)
+	}
+	return p
+}
+func (p *notebookProject) load(root string) error {
+	tree, err := os.OpenRoot(root)
+	if err != nil {
+		return err
+	}
+	defer tree.Close()
+	var rows []notebookNode
+	var visit func(string, int) error
+	visit = func(parent string, depth int) error {
+		f, err := tree.Open(parent)
+		if err != nil {
+			return err
+		}
+		entries, err := f.ReadDir(-1)
+		f.Close()
+		if err != nil {
+			return err
+		}
+		sort.Slice(entries, func(i, j int) bool {
+			if entries[i].IsDir() != entries[j].IsDir() {
+				return entries[i].IsDir()
+			}
+			return strings.ToLower(entries[i].Name()) < strings.ToLower(entries[j].Name())
+		})
+		for _, e := range entries {
+			if strings.EqualFold(e.Name(), ".git") || e.Type()&os.ModeSymlink != 0 {
+				continue
+			}
+			name := filepath.Join(parent, e.Name())
+			rows = append(rows, notebookNode{name, depth, e.IsDir()})
+			if e.IsDir() && p.expanded[name] {
+				if err := visit(name, depth+1); err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	}
+	if err := visit(".", 0); err != nil {
+		return err
+	}
+	p.rows = rows
+	return nil
+}
+func (a *app) openNote(name string) {
+	p := a.notes()
+	for _, d := range p.docs {
+		if d.name == name {
+			p.current = d
+			a.backFromReview()
+			a.notebook.err = nil
+			return
+		}
+	}
+	d, err := openNotebookDocument(a.repo.Path, name)
+	a.notebook.err = err
+	if err == nil {
+		p.docs = append(p.docs, d)
+		p.current = d
+		a.backFromReview()
+	}
+}
+func (p *notebookProject) close(d *notebookDocument) {
+	if i := slices.Index(p.docs, d); i >= 0 {
+		p.docs = slices.Delete(p.docs, i, i+1)
+		if p.current == d {
+			p.current = nil
+			if len(p.docs) > 0 {
+				p.current = p.docs[min(i, len(p.docs)-1)]
+			}
+		}
+	}
+}
+func (a *app) saveNote(d *notebookDocument) bool {
+	if d == nil {
+		return false
+	}
+	a.notebook.err = d.save()
+	if a.notebook.err != nil {
+		return false
+	}
+	if ref, ok := a.coreReference(); ok && ref.Path == d.root {
+		core, ctx := a.core, a.ctx
+		a.runCoreTask(func() (backend.KernelResult, error) { return core.RefreshChanges(ctx, ref) }, func(_ backend.KernelResult, err error) {
+			if err != nil {
+				a.notebook.err = err
+			}
+		})
+	}
+	return true
+}
+func bookLabel(c *ui.Context, key string) string {
+	return locales.Catalog.Format(c.Locale(), "editor"+key, nil)
+}
+
+func (a *app) notebookRail(c *ui.Context, tx locales.Messages, colors workspaceColors) {
+	p := a.notes()
+	n := &a.notebook
+	picker := quietButton(c.Key("project-picker"), a.repo.Name, "chevron-down").FillWidth().Height(36).Justify(ui.Start).Tooltip(a.repo.Path).OnClick(func() { n.projectPicker = !n.projectPicker })
+	if ref, ok := a.coreReference(); ok {
+		picker.PopoverMenu(func(m *ui.Menu) { a.renderRepositoryMenu(m, c.Locale(), ref) })
+	}
+	if a.coreFocusTarget == "focus-projects" {
+		n.projectPicker = true
+	}
+	if n.projectPicker {
+		a.coreProjectList(c, tx, colors)
+		return
+	}
+	ui.Row(c).FillWidth().Height(34).Gap(4).Children(func() {
+		ui.Text(c, bookLabel(c, "Files")).Grow(1).FontWeight(500)
+		notebookIcon(c, "find-files", bookLabel(c, "Search"), "search", func() { a.startNotebookSearch("files", "") })
+		notebookIcon(c, "reload-tree", tx.Refresh(), "refresh-cw", func() { n.err = p.load(a.repo.Path) })
+	})
+	status := map[string]string{}
+	if a.status != nil {
+		for _, f := range a.status.Files {
+			status[filepath.Clean(f.Path)] = f.Status
+		}
+	}
+	p.list.list().Key = func(i int) any { return p.rows[i].name }
+	ui.List(c.Key("notebook-tree"), p.list.list(), len(p.rows), func(i int) {
+		row := p.rows[i]
+		label := filepath.Base(row.name)
+		icon := fileIcon(label, false)
+		if row.folder {
+			icon = "chevron-right"
+			if p.expanded[row.name] {
+				icon = "chevron-down"
+			}
+		}
+		el := ui.ButtonBase(c.Key(row.name)).Height(30).FillWidth().Padding(3, 6, 3, float32(6+min(7, row.depth)*12)).Gap(6).Label(label).Tooltip(row.name)
+		quietSurface(c, el)
+		if p.current != nil && p.current.name == row.name {
+			el.Background(colors.selected)
+		}
+		if row.folder {
+			el.Expanded(p.expanded[row.name])
+		}
+		el.Children(func() {
+			ui.Icon(c, icons[icon]).FontSize(15).Shrink(0)
+			ui.Text(c, label).SingleLine().Grow(1).MinWidth(0)
+			if kind := status[row.name]; kind != "" {
+				ui.Text(c, fileStatus(tx, kind)).SingleLine().TextColor(fileStatusColor(c.Theme(), kind)).FontSize(12)
+			}
+		}).OnClick(func() {
+			if row.folder {
+				p.expanded[row.name] = !p.expanded[row.name]
+				n.err = p.load(a.repo.Path)
+			} else {
+				a.openNote(row.name)
+			}
+		})
+	}).Grow(1).MinHeight(0).FillWidth().Label(bookLabel(c, "Files"))
+}
+func notebookIcon(c *ui.Context, id, label, icon string, action func()) {
+	b := ui.ButtonBase(c.Key(id)).Size(30, 30).Padding(6).Label(label).Tooltip(label)
+	quietSurface(c, b).Children(func() { ui.Icon(c, icons[icon]).FontSize(16) }).OnClick(action)
+}
+func (a *app) notebookView(c *ui.Context, tx locales.Messages, colors workspaceColors, width float32) {
+	n := &a.notebook
+	p := a.notes()
+	if n.width == 0 {
+		n.width = width * .54
+	}
+	n.width = max(width*.38, min(n.width, width-min(280, width*.41)))
+	ui.Split(c.Key("notebook-split"), &n.width, func() {
+		ui.Column(c.Key("note-pane")).Fill().MinWidth(0).Padding(0, 10, 0, 0).Children(func() {
+			ui.ScrollHorizontal(c.Key("note-tabs")).Height(36).FillWidth().Children(func() {
+				ui.Row(c).Gap(3).Children(func() {
+					for _, d := range p.docs {
+						title := filepath.Base(d.name)
+						if d.dirty() {
+							title += " *"
+						}
+						tab := quietButton(c.Key(d.name), title, fileIcon(d.name, false)).Height(30).MaxWidth(185).Tooltip(d.name)
+						if p.current == d && !a.reviewingFile {
+							tab.Background(colors.selected)
+						}
+						tab.OnClick(func() { p.current = d; a.backFromReview() })
+					}
+					if !a.reviewingFile {
+						a.workspaceDiffToggle(c, tx)
+					}
+					if a.reviewingFile {
+						quietButton(c.Key("review-tab"), tx.Changes(), "git-branch").Height(30).OnClick(a.backFromReview)
+					}
+				})
+			})
+			if n.err != nil {
+				msg := n.err.Error()
+				for _, e := range []struct {
+					value error
+					key   string
+				}{{errNotebookPath, "Path"}, {errNotebookBinary, "Binary"}, {errNotebookConflict, "Conflict"}} {
+					if errors.Is(n.err, e.value) {
+						msg = bookLabel(c, e.key)
+						break
+					}
+				}
+				showError(c, msg)
+			}
+			d := p.current
+			if a.reviewingFile {
+				var name string
+				if a.tab == changesTab && a.status != nil && a.changeIndex >= 0 && a.changeIndex < len(a.status.Files) {
+					name = a.status.Files[a.changeIndex].Path
+				} else if a.tab == historyTab && a.changeset != nil && a.commitFileIndex >= 0 && a.commitFileIndex < len(a.changeset.Files) {
+					name = a.changeset.Files[a.commitFileIndex].Path
+				}
+				if name != "" {
+					quietButton(c.Key("edit-review-file"), bookLabel(c, "Edit"), "file-code").Height(30).OnClick(func() { a.openNote(name) })
+				}
+				theme := *c.Theme()
+				style := theme.ScrollbarStyle.Resolve(&theme)
+				theme.ScrollbarStyle.TrackWidth = max(style.TrackWidth, style.ThumbWidth+12)
+				ui.Themed(c.Key("notebook-diff"), &theme).Grow(1).MinHeight(0).FillWidth().Children(func() { a.diffPane(c, tx, n.width-10) })
+				return
+			}
+			if d == nil {
+				ui.Spacer(c)
+				ui.Text(c, bookLabel(c, "Choose")).TextColor(c.Theme().TextMuted).AlignSelf(ui.Center)
+				ui.Spacer(c)
+				return
+			}
+			ui.Row(c.Key("note-tools")).Height(34).FillWidth().Gap(4).Children(func() {
+				ui.Text(c, filepath.ToSlash(d.name)).SingleLine().Grow(1).MinWidth(0).Tooltip(d.name).TextColor(c.Theme().TextMuted)
+				if d.rich != nil {
+					quietButton(c.Key("note-outline"), bookLabel(c, "Outline"), "").Height(28).OnClick(func() { n.outline = !n.outline })
+				}
+				if d.markdown {
+					key := "Preview"
+					if d.rich != nil {
+						key = "Code"
+					}
+					quietButton(c.Key("note-mode"), bookLabel(c, key), "").Height(28).OnClick(d.switchMode)
+				}
+				quietButton(c.Key("save-note"), bookLabel(c, "Save"), "").Height(28).Disabled(!d.dirty()).OnClick(func() { a.saveNote(d) })
+				notebookIcon(c, "close-note", bookLabel(c, "Close"), "x", func() {
+					if d.dirty() {
+						n.closing = d
+					} else {
+						p.close(d)
+					}
+				})
+			})
+			if d.rich == nil {
+				editor.View(c.Key(d.name), &d.code).Grow(1).FillWidth().MinHeight(0)
+				return
+			}
+			arclang.SetLanguage(c.Locale())
+			rich.View(c.Key(d.name), d.rich, rich.Options{Width: max(90, n.width-12), Theme: c.Theme(), FontSize: 16, LineHeight: 1.55, LoadImage: d.loadImage, Outline: n.outline, SetOutline: func(open bool) { n.outline = open }, OpenWiki: func(name string) { a.startNotebookSearch("wiki", name) }}).Grow(1).FillWidth().MinHeight(0)
+		})
+	}, func() {
+		ui.Column(c.Key("review-pane")).Fill().MinWidth(0).Padding(0, 0, 0, 12).Children(func() {
+			ui.Row(c.Key("review-tabs")).FillWidth().Height(36).Gap(4).Children(func() { a.reviewTabs(c, tx, colors) })
+			if a.workspaceStashView(c) {
+				return
+			}
+			if a.tab == historyTab {
+				a.historyPage(c, tx)
+			} else {
+				a.changesOverview(c, tx, colors)
+				if a.commitCapable {
+					a.commitForm(c, tx)
+				}
+			}
+		})
+	}).Fill().MinHeight(0)
+	if c.Shortcut(ui.Cmd, ui.KeyS) && p.current != nil {
+		a.saveNote(p.current)
+	}
+	if c.Shortcut(ui.Cmd|ui.Alt, ui.KeyO) {
+		a.startNotebookSearch("files", "")
+	}
+	if c.Shortcut(ui.Cmd|ui.Alt, ui.KeyF) {
+		a.startNotebookSearch("text", "")
+	}
+}
+func (a *app) notebookDialogs(c *ui.Context) {
+	n := &a.notebook
+	if n.searchOpen && a.repo != nil {
+		a.notebookSearchDialog(c)
+	}
+	if n.closing == nil && !n.quitPrompt {
+		return
+	}
+	open := true
+	ui.Modal(c.Key("unsaved-note"), &open, func() {
+		ui.Text(c, bookLabel(c, "Unsaved")).FontWeight(500)
+		if n.closing != nil {
+			ui.Text(c, n.closing.name).SingleLine()
+		}
+		ui.Row(c).Gap(8).Children(func() {
+			quietButton(c, bookLabel(c, "Cancel"), "").OnClick(func() { open = false })
+			quietButton(c, bookLabel(c, "Discard"), "").OnClick(func() {
+				if n.quitPrompt {
+					n.discardQuit = true
+					open = false
+					if a.requestQuit != nil {
+						a.requestQuit()
+					}
+				} else if n.closing != nil {
+					n.projects[n.closing.root].close(n.closing)
+					open = false
+				}
+			})
+			quietButton(c, bookLabel(c, "Save"), "").OnClick(func() {
+				if n.quitPrompt {
+					for _, p := range n.projects {
+						for _, d := range p.docs {
+							if d.dirty() && !a.saveNote(d) {
+								open = false
+								return
+							}
+						}
+					}
+					open = false
+					if a.requestQuit != nil {
+						a.requestQuit()
+					}
+				} else if n.closing != nil && a.saveNote(n.closing) {
+					n.projects[n.closing.root].close(n.closing)
+					open = false
+				}
+			})
+		})
+	})
+	if !open {
+		n.closing = nil
+		n.quitPrompt = false
+	}
+}

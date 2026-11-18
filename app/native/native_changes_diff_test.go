@@ -13,7 +13,7 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
-func TestHistoryDiffUsesRightPanelWithoutReplacingTimeline(test *testing.T) {
+func TestHistoryDiffUsesEditorPaneBesideTimeline(test *testing.T) {
 	for _, size := range [][2]int{{900, 620}, {1180, 760}, {1920, 1080}} {
 		for _, locale := range []string{"en", "zh-Hans", "zh-Hant"} {
 			for _, dark := range []bool{false, true} {
@@ -36,15 +36,15 @@ func TestHistoryDiffUsesRightPanelWithoutReplacingTimeline(test *testing.T) {
 					tx := locales.In(locale)
 					historyLabel := workspaceLabel(locale, "workspace.history")
 					collapsed := visibleControl(test, tester, historyLabel, size[0], size[1])
-					assertCollapsedDiffLocked(test, tester, application)
+					assertNotebookDiffClosed(test, tester, application)
 					if err := tester.Click(tx.OpenFile("docs/routes/lake-district.md")); err != nil {
 						test.Fatal(err)
 					}
 					tester.Advance(time.Second)
 					history := visibleControl(test, tester, historyLabel, size[0], size[1])
 					diff := visibleControl(test, tester, tx.DiffTitle(), size[0], size[1])
-					if !application.reviewingFile || diff.X <= history.X+history.W || math.Abs(float64(diff.X+diff.W-float32(size[0]-16))) > 1 || math.Abs(float64(diff.Y+diff.H-float32(size[1]-16))) > 1 {
-						test.Fatalf("history diff must stay right of the timeline with safe window margins: history=%+v diff=%+v", history, diff)
+					if !application.reviewingFile || diff.X+diff.W >= history.X || diff.X < 12 || math.Abs(float64(diff.Y+diff.H-float32(size[1]-16))) > 1 {
+						test.Fatalf("history diff must stay left of the timeline with safe window margins: history=%+v diff=%+v", history, diff)
 					}
 					if tester.HasText(tx.SaveVersion()) || tester.HasText(tx.IncludeForSave()) || tester.HasText(tx.BackToVersion()) {
 						test.Fatal("history review showed changes-only actions or fullscreen navigation")
@@ -58,8 +58,8 @@ func TestHistoryDiffUsesRightPanelWithoutReplacingTimeline(test *testing.T) {
 					}
 					dividerX, dividerY := divider.Bounds.X+divider.Bounds.W/2, divider.Bounds.Y+divider.Bounds.H/2
 					tester.Press(dividerX, dividerY)
-					tester.Move(dividerX-24, dividerY)
-					tester.Release(dividerX-24, dividerY)
+					tester.Move(dividerX+24, dividerY)
+					tester.Release(dividerX+24, dividerY)
 					tester.Frame()
 					resized := visibleControl(test, tester, tx.DiffTitle(), size[0], size[1])
 					if resized.W <= diff.W {
@@ -69,7 +69,7 @@ func TestHistoryDiffUsesRightPanelWithoutReplacingTimeline(test *testing.T) {
 					if err := tester.Click(tx.CollapseDiff()); err != nil {
 						test.Fatal(err)
 					}
-					if folded := visibleControl(test, tester, historyLabel, size[0], size[1]); folded.X != collapsed.X || folded.W != collapsed.W || application.reviewingFile {
+					if folded := visibleControl(test, tester, historyLabel, size[0], size[1]); folded.X <= resized.X+resized.W || application.reviewingFile {
 						test.Fatalf("collapse did not restore the timeline: before=%+v after=%+v", collapsed, folded)
 					}
 					if err := tester.Click(tx.ExpandDiff()); err != nil {
@@ -108,16 +108,9 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 					tt.SetDark(dark)
 					tt.Advance(time.Second)
 					tx := locales.In(locale)
-					history := designEvidenceApp(t, time.Now(), "history")
-					historyTester := designEvidenceTester(history, size[0], size[1], locale, dark)
-					historyBounds := visibleControl(t, historyTester, workspaceLabel(locale, "workspace.history"), size[0], size[1])
-					historyToggle := visibleControl(t, historyTester, tx.ExpandDiff(), size[0], size[1])
 					collapsedFiles := visibleControl(t, tt, tx.ChangedFiles(), size[0], size[1])
-					toggle := visibleControl(t, tt, tx.ExpandDiff(), size[0], size[1])
-					if collapsedFiles.X != historyBounds.X || collapsedFiles.W != historyBounds.W || toggle.X != historyToggle.X {
-						t.Fatalf("collapsed changes must use the history page width: files=%+v toggle=%+v history=%+v", collapsedFiles, toggle, historyBounds)
-					}
-					assertCollapsedDiffLocked(t, tt, a)
+					_ = visibleControl(t, tt, tx.ExpandDiff(), size[0], size[1])
+					assertNotebookDiffClosed(t, tt, a)
 					if err := tt.Click("docs/routes/lake-district.md"); err != nil {
 						t.Fatal(err)
 					}
@@ -145,21 +138,21 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 					for _, label := range []string{tx.SideBySide(), tx.Unified(), tx.WrapLines()} {
 						visibleControl(t, tt, label, size[0], size[1])
 					}
-					if !found || heading.Bounds.X < diff.X || inclusion.X < diff.X || collapse.X+collapse.W > diff.X+diff.W {
+					if !found || heading.Bounds.X < diff.X || inclusion.X < diff.X || collapse.X+collapse.W > files.X {
 						t.Fatalf("diff controls lost their safety padding: diff=%+v heading=%+v inclusion=%+v collapse=%+v", diff, heading.Bounds, inclusion, collapse)
 					}
 					tt.Move(4, 4)
 					tt.Advance(time.Second)
 					saveDesignEvidence(t, tt, fmt.Sprintf("changes-expanded-%s-%d-dark-%v.png", locale, size[0], dark))
-					if math.Abs(float64(diff.X+diff.W-float32(size[0]-16))) > 1 || math.Abs(float64(diff.Y+diff.H-float32(size[1]-16))) > 1 {
+					if diff.X+diff.W >= files.X || math.Abs(float64(diff.Y+diff.H-float32(size[1]-16))) > 1 {
 						t.Fatalf("diff content lost its safe window margins: %+v in %v", diff, size)
 					}
-					if !a.reviewingFile || diff.X <= files.X+files.W || !tt.HasText(tx.IncludeAll()) {
+					if !a.reviewingFile || diff.X+diff.W >= files.X || !tt.HasText(tx.IncludeAll()) {
 						t.Fatalf("file review replaced the home page: files=%+v diff=%+v", files, diff)
 					}
 					visibleControl(t, tt, tx.OpenFile("budget.csv"), size[0], size[1])
 					save := visibleControl(t, tt, tx.SaveVersion(), size[0], size[1])
-					if save.X+save.W >= diff.X {
+					if save.X < files.X-1 {
 						t.Fatal("save controls escaped the file changes pane")
 					}
 					divider, ok := tt.AccessByRole(ui.RoleSplitter, "")
@@ -168,14 +161,14 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 					}
 					x, y := divider.Bounds.X+divider.Bounds.W/2, divider.Bounds.Y+divider.Bounds.H/2
 					tt.Press(x, y)
-					tt.Move(x-40, y)
-					tt.Release(x-40, y)
+					tt.Move(x+40, y)
+					tt.Release(x+40, y)
 					tt.Frame()
 					resized := visibleControl(t, tt, tx.DiffTitle(), size[0], size[1])
-					if resized.W <= diff.W || resized.X >= diff.X {
+					if resized.W <= diff.W || resized.X != diff.X {
 						t.Fatalf("drag did not resize the right pane: before=%+v after=%+v", diff, resized)
 					}
-					tt.Key(0, ui.KeyRight)
+					tt.Key(0, ui.KeyLeft)
 					keyboard := visibleControl(t, tt, tx.DiffTitle(), size[0], size[1])
 					if keyboard.W >= resized.W {
 						t.Fatal("focused native divider did not resize with the keyboard")
@@ -187,10 +180,10 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 					if _, shown := tt.Find(tx.DiffTitle()); shown || a.reviewingFile {
 						t.Fatal("collapse left the diff open")
 					}
-					if folded := visibleControl(t, tt, tx.ChangedFiles(), size[0], size[1]); folded.X != collapsedFiles.X || folded.W != collapsedFiles.W {
+					if folded := visibleControl(t, tt, tx.ChangedFiles(), size[0], size[1]); folded.X <= keyboard.X+keyboard.W || folded.W <= 0 {
 						t.Fatalf("collapse did not restore the centered width: before=%+v after=%+v", collapsedFiles, folded)
 					}
-					assertCollapsedDiffLocked(t, tt, a)
+					assertNotebookDiffClosed(t, tt, a)
 					if err := tt.Click(tx.ExpandDiff()); err != nil {
 						t.Fatal(err)
 					}
@@ -220,7 +213,7 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 					tt.Advance(time.Second)
 					image := visibleControl(t, tt, nativeImageLabel(locale, "preview"), size[0], size[1])
 					divider, ok = tt.AccessByRole(ui.RoleSplitter, "")
-					if !ok || image.X < divider.Bounds.X+divider.Bounds.W+15 || math.Abs(float64(image.X+image.W-float32(size[0]-16))) > 1 || math.Abs(float64(image.Y+image.H-float32(size[1]-16))) > 1 {
+					if !ok || image.X < 12 || image.X+image.W > divider.Bounds.X || math.Abs(float64(image.Y+image.H-float32(size[1]-16))) > 1 {
 						t.Fatalf("image preview lost the diff panel's safe margins: image=%+v divider=%+v", image, divider.Bounds)
 					}
 					saveDesignEvidence(t, tt, fmt.Sprintf("changes-image-%s-%d-dark-%v.png", locale, size[0], dark))
@@ -230,20 +223,13 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 	}
 }
 
-// Exercise the former drag target, including keys after a press, without
-// relying on the implementation's choice of a disabled or absent handle.
-func assertCollapsedDiffLocked(t *testing.T, tester *ui.Tester, a *app) {
+// Closing a diff keeps the editor and the review column available.
+func assertNotebookDiffClosed(t *testing.T, tester *ui.Tester, a *app) {
 	t.Helper()
-	before := a.diffPanelLayout
-	if divider, found := tester.AccessByRole(ui.RoleSplitter, ""); found {
-		x, y := divider.Bounds.X+divider.Bounds.W/2, divider.Bounds.Y+divider.Bounds.H/2
-		tester.Press(x, y)
-		tester.Move(x-40, y)
-		tester.Release(x-40, y)
-		tester.Key(0, ui.KeyLeft)
-		tester.Frame()
+	if a.reviewingFile {
+		t.Fatal("diff is open before selection")
 	}
-	if a.reviewingFile || a.diffPanelLayout != before {
-		t.Fatalf("collapsed divider resized or opened the diff: before=%+v after=%+v open=%v", before, a.diffPanelLayout, a.reviewingFile)
+	if _, found := tester.AccessByRole(ui.RoleSplitter, ""); !found {
+		t.Fatal("editor and review splitter is missing")
 	}
 }

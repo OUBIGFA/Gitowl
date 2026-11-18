@@ -776,6 +776,7 @@ func (a *app) coreProjectList(c *ui.Context, tx locales.Messages, colors workspa
 	canSelect := a.ready && !a.savingVersion && a.coreProjectFilterPending == 0
 	selectProject := func(i int) {
 		if canSelect && i >= 0 && i < len(rows) && rows[i].repository != nil {
+			a.notebook.projectPicker = false
 			a.selectCoreRepository(rows[i].repository.KernelRepositoryReference)
 		}
 	}

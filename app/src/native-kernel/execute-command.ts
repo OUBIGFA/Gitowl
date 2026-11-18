@@ -71,6 +71,9 @@ export async function executeKernelCommand(
     case 'repository.select':
       await presenter.selectRepository(command.repository)
       return {}
+    case 'repository.refreshChanges':
+      await presenter.refreshChanges(command.repository)
+      return {}
     case 'repository.refresh':
       await presenter.refreshRepository(command.repository)
       return {}

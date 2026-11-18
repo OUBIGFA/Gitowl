@@ -1,0 +1,693 @@
+{
+  "source": "https://github.com/Ciao1019/ArcMD",
+  "revision": "27322d387268751932624ef83a7c580cb0b068d5",
+  "license": "MIT",
+  "note": "Native Markdown editor and its package dependencies. Go imports are relocated. Embedded KaTeX typefaces use the SIL Open Font License.",
+  "files": [
+    {
+      "source": "internal/editor/access.go",
+      "path": "app/native/internal/arcmd/editor/access.go",
+      "upstreamSha256": "1b561658ed4c1e4c9317f3040f3beb7eacb0346d163271ae39a30e9b841303a3"
+    },
+    {
+      "source": "internal/editor/annotate.go",
+      "path": "app/native/internal/arcmd/editor/annotate.go",
+      "upstreamSha256": "843c9b51a9414b29a799d6092578b9b8dd9f276940138f1c52a517f3184f885d"
+    },
+    {
+      "source": "internal/editor/annotate_test.go",
+      "path": "app/native/internal/arcmd/editor/annotate_test.go",
+      "upstreamSha256": "5a4e1a9681a24c374a59b5ba4269bd3921c7042a0b3f969a14862e4c07c34a22"
+    },
+    {
+      "source": "internal/editor/autopair.go",
+      "path": "app/native/internal/arcmd/editor/autopair.go",
+      "upstreamSha256": "a85fa15c6601c3d66ec20915abe85ca099436cb254902a453ee1283754f0ba31"
+    },
+    {
+      "source": "internal/editor/autospace.go",
+      "path": "app/native/internal/arcmd/editor/autospace.go",
+      "upstreamSha256": "650f9c522dc129891ac93e5571793c049ee9046db575349eca315ea22c6119a9"
+    },
+    {
+      "source": "internal/editor/blockselect.go",
+      "path": "app/native/internal/arcmd/editor/blockselect.go",
+      "upstreamSha256": "e3ef603e4a2057d0080ec9a55659c70279f206dddf025dac60816e4500b6b72d"
+    },
+    {
+      "source": "internal/editor/blockselect_test.go",
+      "path": "app/native/internal/arcmd/editor/blockselect_test.go",
+      "upstreamSha256": "da821143e2d59541a675c259fc62fbeb52aa311a669de2ff3d2fa8909abd375f"
+    },
+    {
+      "source": "internal/editor/boldsymbol_test.go",
+      "path": "app/native/internal/arcmd/editor/boldsymbol_test.go",
+      "upstreamSha256": "5fa06872e1619c0897047a418eaa8281442680518d3b45cec6a10a8322774386"
+    },
+    {
+      "source": "internal/editor/bookmarks.go",
+      "path": "app/native/internal/arcmd/editor/bookmarks.go",
+      "upstreamSha256": "cafa1fc34ca5eb3b96ecab59de4a6a217b4613ec2ba3a1048e92e8e449c2cb2d"
+    },
+    {
+      "source": "internal/editor/buffer.go",
+      "path": "app/native/internal/arcmd/editor/buffer.go",
+      "upstreamSha256": "3556c078ccd75cc9d170af0e252b62a86536701fe103d786887324d9369da822"
+    },
+    {
+      "source": "internal/editor/buffer_test.go",
+      "path": "app/native/internal/arcmd/editor/buffer_test.go",
+      "upstreamSha256": "a26f4fc062df3561393ab48c904a264178891349e18f6cca3265c85429d61f52"
+    },
+    {
+      "source": "internal/editor/clipboard.go",
+      "path": "app/native/internal/arcmd/editor/clipboard.go",
+      "upstreamSha256": "7653c0a9f93edca0530b1a676466459bfbde4222f10895d0e1cf32a91a0c7e3a"
+    },
+    {
+      "source": "internal/editor/clipboard_test.go",
+      "path": "app/native/internal/arcmd/editor/clipboard_test.go",
+      "upstreamSha256": "1593e031892a249b6d05dcb3efcfdb93343c58cb62aaef7fb0a11e79554d55c4"
+    },
+    {
+      "source": "internal/editor/codewrap.go",
+      "path": "app/native/internal/arcmd/editor/codewrap.go",
+      "upstreamSha256": "48bf8160f1bf46140528f0ad67f66454f2d6fbb30aadd3c59e059a437a1e6a94"
+    },
+    {
+      "source": "internal/editor/columns.go",
+      "path": "app/native/internal/arcmd/editor/columns.go",
+      "upstreamSha256": "6b5420777916fe90b46a7522a4b6a465ddcaacf9f15362d57f9a0aa4ebea27ab"
+    },
+    {
+      "source": "internal/editor/columns_test.go",
+      "path": "app/native/internal/arcmd/editor/columns_test.go",
+      "upstreamSha256": "7431bf7fcb1004b2a7769ede799185f699f3c5f529ab10032049468731dbdc58"
+    },
+    {
+      "source": "internal/editor/commands.go",
+      "path": "app/native/internal/arcmd/editor/commands.go",
+      "upstreamSha256": "9c3e6f1d6063bfec78053c8801f209ee186e35bec90e4eff3d291ed5dcd7df4c"
+    },
+    {
+      "source": "internal/editor/complete.go",
+      "path": "app/native/internal/arcmd/editor/complete.go",
+      "upstreamSha256": "315d9ea7f4b99d59ab2f48b12645fd28ef0985a2f9b9866b00926854a6a9262b"
+    },
+    {
+      "source": "internal/editor/complete_test.go",
+      "path": "app/native/internal/arcmd/editor/complete_test.go",
+      "upstreamSha256": "2badc267b11c6ef593fc093c96bb09bd2707f0aa2e379580d722ecc43918a81e"
+    },
+    {
+      "source": "internal/editor/crop.go",
+      "path": "app/native/internal/arcmd/editor/crop.go",
+      "upstreamSha256": "6058496dec30b34326afe73766212715f3c62a164eee57b38db59d0e2b28d769"
+    },
+    {
+      "source": "internal/editor/crop_test.go",
+      "path": "app/native/internal/arcmd/editor/crop_test.go",
+      "upstreamSha256": "bc591c022c77e48d62d8d39091c8b9c143077a41a92e65200571a98aa60d3cc8"
+    },
+    {
+      "source": "internal/editor/csvpaste.go",
+      "path": "app/native/internal/arcmd/editor/csvpaste.go",
+      "upstreamSha256": "499aa4266010567a9f98374fe2ccceb25219d4df40d37dbc25c3ba5814e6eb65"
+    },
+    {
+      "source": "internal/editor/editor_test.go",
+      "path": "app/native/internal/arcmd/editor/editor_test.go",
+      "upstreamSha256": "c15a437d23b9f70eb606aed14328ccc10b8c5cf718d9a35a968157e7df8d23ba"
+    },
+    {
+      "source": "internal/editor/fenwick.go",
+      "path": "app/native/internal/arcmd/editor/fenwick.go",
+      "upstreamSha256": "4de5811656a25f7a5f7f42a0396d7e3e92fb945c1d83501f2c569f83da37df0f"
+    },
+    {
+      "source": "internal/editor/find.go",
+      "path": "app/native/internal/arcmd/editor/find.go",
+      "upstreamSha256": "a0604770243503f6b4fc3e0771031601bdf60f06cf644e52cb34a8a5504a6b9d"
+    },
+    {
+      "source": "internal/editor/find_index_test.go",
+      "path": "app/native/internal/arcmd/editor/find_index_test.go",
+      "upstreamSha256": "3e8fa1d257515636687af97145dce13168244ab7ba7552850da0d6c1921e7535"
+    },
+    {
+      "source": "internal/editor/focus.go",
+      "path": "app/native/internal/arcmd/editor/focus.go",
+      "upstreamSha256": "13b25cfbf28642bd9eed6595d9de468f57ab25352a7dad33cf34f29e87d691a0"
+    },
+    {
+      "source": "internal/editor/fonts/KaTeX_Main-Bold.ttf",
+      "path": "app/native/internal/arcmd/editor/fonts/KaTeX_Main-Bold.ttf",
+      "upstreamSha256": "138ac28d1663b3037e9c5f52371fa5c63d8324f4a38d22cd573e6ea3a3fd0cf8"
+    },
+    {
+      "source": "internal/editor/fonts/KaTeX_Main-Regular.ttf",
+      "path": "app/native/internal/arcmd/editor/fonts/KaTeX_Main-Regular.ttf",
+      "upstreamSha256": "d0332f52868370fd83ae7fa46470f90c8f2eab2fcf12bc4f88080b340c95a830"
+    },
+    {
+      "source": "internal/editor/fonts/KaTeX_Math-BoldItalic.ttf",
+      "path": "app/native/internal/arcmd/editor/fonts/KaTeX_Math-BoldItalic.ttf",
+      "upstreamSha256": "f9377ab0271cda59af24bcffbd46a4d0c8a3572ffafdbb38de2ad5ea7b0d5ee5"
+    },
+    {
+      "source": "internal/editor/fonts/KaTeX_Math-Italic.ttf",
+      "path": "app/native/internal/arcmd/editor/fonts/KaTeX_Math-Italic.ttf",
+      "upstreamSha256": "08ce98e51b04d58945a301e639e02b6998af29fdfd61a7b8afdd07bbfc479d4a"
+    },
+    {
+      "source": "internal/editor/gaps.go",
+      "path": "app/native/internal/arcmd/editor/gaps.go",
+      "upstreamSha256": "2344a0268d498b6f723337087bac88a55c3d68071e887f87d225bd11377bde79"
+    },
+    {
+      "source": "internal/editor/header.go",
+      "path": "app/native/internal/arcmd/editor/header.go",
+      "upstreamSha256": "3cab53029989a465cd8b8d629da3ba4326bced3bdc5903d4e071a90ed53a120a"
+    },
+    {
+      "source": "internal/editor/highlight.go",
+      "path": "app/native/internal/arcmd/editor/highlight.go",
+      "upstreamSha256": "51b3e5753f4a35699b27da255020f1c4203ea752ac73df58e22891d9cea074a0"
+    },
+    {
+      "source": "internal/editor/highlight_test.go",
+      "path": "app/native/internal/arcmd/editor/highlight_test.go",
+      "upstreamSha256": "d931a79b2fe4ae81135785ac0bf4e5532fcd9754fadf1c74375b3efe16333ba2"
+    },
+    {
+      "source": "internal/editor/html.go",
+      "path": "app/native/internal/arcmd/editor/html.go",
+      "upstreamSha256": "c5fed2b13b0f727a3699f6efd8399bdd87513e0d3566a2707f06156f8ee04c05"
+    },
+    {
+      "source": "internal/editor/html_test.go",
+      "path": "app/native/internal/arcmd/editor/html_test.go",
+      "upstreamSha256": "982c5d63229c1537247c435ed1c104240305666ac018d5d0f92ca8bfcb0a7723"
+    },
+    {
+      "source": "internal/editor/htmlexport.go",
+      "path": "app/native/internal/arcmd/editor/htmlexport.go",
+      "upstreamSha256": "950c7d003537f19badab583474ba1ab3d8c2d57e99146f747fba94b79311fc32"
+    },
+    {
+      "source": "internal/editor/icons.go",
+      "path": "app/native/internal/arcmd/editor/icons.go",
+      "upstreamSha256": "4da516e79cea518c3474700da2c222fd1510f90d9f457eb85dcac143c5c0fe39"
+    },
+    {
+      "source": "internal/editor/imageresize.go",
+      "path": "app/native/internal/arcmd/editor/imageresize.go",
+      "upstreamSha256": "c40823a0b5d7675bd9907e68991f37313ca85df53dbfe9f6ffa657a6475505d3"
+    },
+    {
+      "source": "internal/editor/images.go",
+      "path": "app/native/internal/arcmd/editor/images.go",
+      "upstreamSha256": "837a872ecf5837f84e7d3b013843360bdd136253581ed88081c2e254c5b4c672"
+    },
+    {
+      "source": "internal/editor/images_test.go",
+      "path": "app/native/internal/arcmd/editor/images_test.go",
+      "upstreamSha256": "b1e0e236fe28acb470fafc3a854cb388920d71e3b013af58582004727c7ebbc7"
+    },
+    {
+      "source": "internal/editor/incremental.go",
+      "path": "app/native/internal/arcmd/editor/incremental.go",
+      "upstreamSha256": "40eba44c6f9c10a7266e239b63d66ba8814405f7f200dab8643c9cc37485f69c"
+    },
+    {
+      "source": "internal/editor/incremental_test.go",
+      "path": "app/native/internal/arcmd/editor/incremental_test.go",
+      "upstreamSha256": "5c9edb502743c41a167774de940824ef3a11d82e84f6a1c77a7e291432baf104"
+    },
+    {
+      "source": "internal/editor/inline.go",
+      "path": "app/native/internal/arcmd/editor/inline.go",
+      "upstreamSha256": "95e77adf335f43495a5cad7d05c7a80628a9a2dc984f0b8259de245959aba69b"
+    },
+    {
+      "source": "internal/editor/input.go",
+      "path": "app/native/internal/arcmd/editor/input.go",
+      "upstreamSha256": "a90315e776d022ae635db084d4b4dfbeb71b76b93a63ef75608905f8914f4b6f"
+    },
+    {
+      "source": "internal/editor/keys.go",
+      "path": "app/native/internal/arcmd/editor/keys.go",
+      "upstreamSha256": "64e92e86908ceb36edca4fcdccc88f3134b24f4cb2898d64b1d78360ad7c461c"
+    },
+    {
+      "source": "internal/editor/keys_test.go",
+      "path": "app/native/internal/arcmd/editor/keys_test.go",
+      "upstreamSha256": "38d20e6567894280d07b5db5b1b55d46b02a6f2d6b2262c5365a9bb0cac9c4b0"
+    },
+    {
+      "source": "internal/editor/layoutcache.go",
+      "path": "app/native/internal/arcmd/editor/layoutcache.go",
+      "upstreamSha256": "c98127ff1ac79fedec6966d76407ab107be584ebcc72fa512d6aa4ee1bb93faf"
+    },
+    {
+      "source": "internal/editor/linkpopover.go",
+      "path": "app/native/internal/arcmd/editor/linkpopover.go",
+      "upstreamSha256": "fb2a6ed39c9b3ab88821bffaf969fb39b77311cd07d379dc1a3cee8286eb839b"
+    },
+    {
+      "source": "internal/editor/livecompile.go",
+      "path": "app/native/internal/arcmd/editor/livecompile.go",
+      "upstreamSha256": "dca9652e3c4b8271fdb24283c1d3408403e790dd91deb2ecd1f6833d678f4829"
+    },
+    {
+      "source": "internal/editor/markdown.go",
+      "path": "app/native/internal/arcmd/editor/markdown.go",
+      "upstreamSha256": "606b4447147c19744462429c01bd10e5691bba97542ec8d6ed0624b83e261037"
+    },
+    {
+      "source": "internal/editor/markdown_roundtrip_test.go",
+      "path": "app/native/internal/arcmd/editor/markdown_roundtrip_test.go",
+      "upstreamSha256": "47c8db78aaf039a2ac8007a287ecba35a0626db1a375eae260a8eb1989d7dfc2"
+    },
+    {
+      "source": "internal/editor/math.go",
+      "path": "app/native/internal/arcmd/editor/math.go",
+      "upstreamSha256": "96775304564be870fbdeaa80fbe6f0fc446633e8d91b2f9769fb29f3ce3f8d05"
+    },
+    {
+      "source": "internal/editor/math_test.go",
+      "path": "app/native/internal/arcmd/editor/math_test.go",
+      "upstreamSha256": "ad5594671ebd159602d7d9404a2c91d0ca5f74fc93582947e944addb6c9e5234"
+    },
+    {
+      "source": "internal/editor/mathfonts.go",
+      "path": "app/native/internal/arcmd/editor/mathfonts.go",
+      "upstreamSha256": "ac4833e2121da1567927db37b506209a1b7e28f31315be498ef4718af9538377"
+    },
+    {
+      "source": "internal/editor/mdstyle.go",
+      "path": "app/native/internal/arcmd/editor/mdstyle.go",
+      "upstreamSha256": "bd226cfc982897b6830bcd4ff96c3d0744d5350205b59483274e3a59aa11ef5a"
+    },
+    {
+      "source": "internal/editor/menus.go",
+      "path": "app/native/internal/arcmd/editor/menus.go",
+      "upstreamSha256": "745f714080cdd1faab6698af00fa2f6fcf7d6ad0541bddedb065e3b520815231"
+    },
+    {
+      "source": "internal/editor/mermaid.go",
+      "path": "app/native/internal/arcmd/editor/mermaid.go",
+      "upstreamSha256": "c0f2ce79dbd8d7e0903f3c56297285ccd3ac4e2f3a91351c3d6f58867665e7de"
+    },
+    {
+      "source": "internal/editor/mermaid_test.go",
+      "path": "app/native/internal/arcmd/editor/mermaid_test.go",
+      "upstreamSha256": "df946ccead9f1d80801c96552307f7180692d3e1629a092d1663839c05afe578"
+    },
+    {
+      "source": "internal/editor/motion.go",
+      "path": "app/native/internal/arcmd/editor/motion.go",
+      "upstreamSha256": "4416df3b77aa6a1035bbff4fce5e660d2e557e6dcd24475d75c3d2aa64ea7fba"
+    },
+    {
+      "source": "internal/editor/navigation_index_test.go",
+      "path": "app/native/internal/arcmd/editor/navigation_index_test.go",
+      "upstreamSha256": "8a298a1411dca6cbb37299738293cfb1abc97fae48efc3d47e2315ed12a233f8"
+    },
+    {
+      "source": "internal/editor/neverland_test.go",
+      "path": "app/native/internal/arcmd/editor/neverland_test.go",
+      "upstreamSha256": "70b1bc1c871180736f97e88528f0754aba6aa298b35857cd39582d7ff2c87d20"
+    },
+    {
+      "source": "internal/editor/notes_index_test.go",
+      "path": "app/native/internal/arcmd/editor/notes_index_test.go",
+      "upstreamSha256": "a205273933db7bdf68310edbf42f004715a686203cd7c1362be35c0eaa870760"
+    },
+    {
+      "source": "internal/editor/outline.go",
+      "path": "app/native/internal/arcmd/editor/outline.go",
+      "upstreamSha256": "175046be9b78b8a7ff186437cd5dc0951e868cf42ff3dc44d3d582ea6d6ffd64"
+    },
+    {
+      "source": "internal/editor/print.go",
+      "path": "app/native/internal/arcmd/editor/print.go",
+      "upstreamSha256": "752b89af69c0ce0baf8df6acc56a74c665496631dc2e7354507d7fe71657f402"
+    },
+    {
+      "source": "internal/editor/reading.go",
+      "path": "app/native/internal/arcmd/editor/reading.go",
+      "upstreamSha256": "5ea4e21d2379c19062e1e96e7b29e825bb8e8c0d3df82809249bba0afcc836a7"
+    },
+    {
+      "source": "internal/editor/reading_features_test.go",
+      "path": "app/native/internal/arcmd/editor/reading_features_test.go",
+      "upstreamSha256": "213a6972ed0a624f5b6bad97bf0bb1e091b8ed19ada633825f75bf096bff4078"
+    },
+    {
+      "source": "internal/editor/relocate.go",
+      "path": "app/native/internal/arcmd/editor/relocate.go",
+      "upstreamSha256": "5522b691e6fd769cffd25ae5d4087a28649607790bc6e87582985d49b196b1ef"
+    },
+    {
+      "source": "internal/editor/relocate_test.go",
+      "path": "app/native/internal/arcmd/editor/relocate_test.go",
+      "upstreamSha256": "88424d3208825877869b323cf1b14cac85b71ad421dd54624de364ad22de8d63"
+    },
+    {
+      "source": "internal/editor/resize.go",
+      "path": "app/native/internal/arcmd/editor/resize.go",
+      "upstreamSha256": "4931aa0b4c1404d15fcb26efc548fd3e39cc78973b2e38b3435302b8cd35ad18"
+    },
+    {
+      "source": "internal/editor/resize_test.go",
+      "path": "app/native/internal/arcmd/editor/resize_test.go",
+      "upstreamSha256": "c04d80b9522ec28e3628e3a6864fcbf5de0bf1b4a0d383cd247efa6914a781f0"
+    },
+    {
+      "source": "internal/editor/round3_test.go",
+      "path": "app/native/internal/arcmd/editor/round3_test.go",
+      "upstreamSha256": "9004277fe87f337de9b22468b4f400450868e9d312d75f367b53e98739d0e842"
+    },
+    {
+      "source": "internal/editor/scrollmotion.go",
+      "path": "app/native/internal/arcmd/editor/scrollmotion.go",
+      "upstreamSha256": "4f3d2ecab096a7377c6febb4a14e035468b8f1efc0f3394d163dd5023d013c0a"
+    },
+    {
+      "source": "internal/editor/selection_scroll.go",
+      "path": "app/native/internal/arcmd/editor/selection_scroll.go",
+      "upstreamSha256": "8d520e05ae7816cdd40ae28ba1a48b96f210036fdd625d826250019fee5d656e"
+    },
+    {
+      "source": "internal/editor/selection_scroll_test.go",
+      "path": "app/native/internal/arcmd/editor/selection_scroll_test.go",
+      "upstreamSha256": "bd1a5908b43115e3ca7fd4800ca6d407f18c47d297fe86756cc4037d386b6702"
+    },
+    {
+      "source": "internal/editor/spatial.go",
+      "path": "app/native/internal/arcmd/editor/spatial.go",
+      "upstreamSha256": "72ad0382c736c9e9fed082c922199e9d07fb79f5f80259f0fd4045a4cfa14038"
+    },
+    {
+      "source": "internal/editor/spatial_test.go",
+      "path": "app/native/internal/arcmd/editor/spatial_test.go",
+      "upstreamSha256": "0b4c1a2ac7efa4b001b00d8e374da3d2a4ac71b9a8be5691c42a52ae5fe6f429"
+    },
+    {
+      "source": "internal/editor/starter.go",
+      "path": "app/native/internal/arcmd/editor/starter.go",
+      "upstreamSha256": "139a1f6cf04af6f8f37b9bf1273854a045695f07309a2b907b1292c6c21af6c4"
+    },
+    {
+      "source": "internal/editor/style.go",
+      "path": "app/native/internal/arcmd/editor/style.go",
+      "upstreamSha256": "81d12ff5f0dd6bdb2280cc7cec3378e1d8debbd15aee40a4388ea43044cf7334"
+    },
+    {
+      "source": "internal/editor/table.go",
+      "path": "app/native/internal/arcmd/editor/table.go",
+      "upstreamSha256": "dfb1822d6a5720f2b97eac0290592b29e8f1a5a463cae8edb2464a9a7f9ec20e"
+    },
+    {
+      "source": "internal/editor/toggle_test.go",
+      "path": "app/native/internal/arcmd/editor/toggle_test.go",
+      "upstreamSha256": "b7fece5ff68efb14c13e8e943c9038070040eff42a1baab992949408fcb4c5b8"
+    },
+    {
+      "source": "internal/editor/tools.go",
+      "path": "app/native/internal/arcmd/editor/tools.go",
+      "upstreamSha256": "250423e5f6e8a93471e21c548e53c67321dc1f0cdd9597a5c3b25f91983d7f11"
+    },
+    {
+      "source": "internal/editor/vectorpdf.go",
+      "path": "app/native/internal/arcmd/editor/vectorpdf.go",
+      "upstreamSha256": "66933bb0db436ef641094680a4a72038af73b49660d2565de8903931e060292a"
+    },
+    {
+      "source": "internal/editor/view.go",
+      "path": "app/native/internal/arcmd/editor/view.go",
+      "upstreamSha256": "30cc329fc6cca2e397937cb12bc7c43bce913bb06b28976a15ba1ee12fb46b56"
+    },
+    {
+      "source": "internal/editor/virtualize.go",
+      "path": "app/native/internal/arcmd/editor/virtualize.go",
+      "upstreamSha256": "33e7e40a919d83463adcf71c0778c7bd67f26ab5cfc5d3589b6f1c6c59c3b8ff"
+    },
+    {
+      "source": "internal/editor/virtualize_test.go",
+      "path": "app/native/internal/arcmd/editor/virtualize_test.go",
+      "upstreamSha256": "9193b0f8f0eb58cf0b48b49014fac1e2813792d621723bed784ebb296d9d21a0"
+    },
+    {
+      "source": "internal/editor/wikilinks.go",
+      "path": "app/native/internal/arcmd/editor/wikilinks.go",
+      "upstreamSha256": "1fc43a3bc70c37a6616305f5b8e4d9c799eb96b2565b3a5092ea2c399c31a3a1"
+    },
+    {
+      "source": "internal/document/annotation_test.go",
+      "path": "app/native/internal/arcmd/document/annotation_test.go",
+      "upstreamSha256": "a307616c82b0cf8644be09ad0edca5ec9676a9f4fbfd2402157b0370dbdc1cf6"
+    },
+    {
+      "source": "internal/document/blocks.go",
+      "path": "app/native/internal/arcmd/document/blocks.go",
+      "upstreamSha256": "7f2bf2f0fdd15c9ba53446c33f083eef96c0db5318e5b4837738c7e71a8a868e"
+    },
+    {
+      "source": "internal/document/blocks_test.go",
+      "path": "app/native/internal/arcmd/document/blocks_test.go",
+      "upstreamSha256": "2fb5728ca546cd1037af8b0cdb9f4ab2e38058a911dcfea0307a9639dccd6c9f"
+    },
+    {
+      "source": "internal/document/cells.go",
+      "path": "app/native/internal/arcmd/document/cells.go",
+      "upstreamSha256": "d2c39be5b2d72959ad213c5aed95fa91d7d65f3e853b9d8848a74e7d7513b3ba"
+    },
+    {
+      "source": "internal/document/decode_test.go",
+      "path": "app/native/internal/arcmd/document/decode_test.go",
+      "upstreamSha256": "322b500f8d99fba9918db9d62241e4cbe63501fb3581a24d16f2da5dfcf5c52c"
+    },
+    {
+      "source": "internal/document/engine.go",
+      "path": "app/native/internal/arcmd/document/engine.go",
+      "upstreamSha256": "b214c92fc467ad6cdd8da0cf9f0cfaa0b9c8449edadfe404af23800c1e3fbc78"
+    },
+    {
+      "source": "internal/document/engine_test.go",
+      "path": "app/native/internal/arcmd/document/engine_test.go",
+      "upstreamSha256": "aec4b64ecd7289aef1758ea394c73cdda2b0366c78b0c217185a7006f33d5cc4"
+    },
+    {
+      "source": "internal/document/fold.go",
+      "path": "app/native/internal/arcmd/document/fold.go",
+      "upstreamSha256": "5742ec26656d3e381304b52411bb38907e0a37e351ea7dc4d5bfbc03632f94ba"
+    },
+    {
+      "source": "internal/document/images.go",
+      "path": "app/native/internal/arcmd/document/images.go",
+      "upstreamSha256": "5fab5a3b8219c470388ec64311836ee35b98276fc938dbf833fe0a6a31e616ad"
+    },
+    {
+      "source": "internal/document/images_test.go",
+      "path": "app/native/internal/arcmd/document/images_test.go",
+      "upstreamSha256": "e589533d50045146aae27032c24163a3f92990e3fa0b1f09ee7fab2b0a36816a"
+    },
+    {
+      "source": "internal/document/index.go",
+      "path": "app/native/internal/arcmd/document/index.go",
+      "upstreamSha256": "2ce458e101637f6ba388e8f4ed21c5f208c93a13beea98946dfa28b110652377"
+    },
+    {
+      "source": "internal/document/index_test.go",
+      "path": "app/native/internal/arcmd/document/index_test.go",
+      "upstreamSha256": "f35cb0e48257398ae2d782a060512096fef9864d3f055c85170e0b6742c51986"
+    },
+    {
+      "source": "internal/document/mathinput.go",
+      "path": "app/native/internal/arcmd/document/mathinput.go",
+      "upstreamSha256": "a1de034d3e49b811249169bbee5730551ead39137e9ea33f19b019cc6ce02128"
+    },
+    {
+      "source": "internal/document/mathinput_test.go",
+      "path": "app/native/internal/arcmd/document/mathinput_test.go",
+      "upstreamSha256": "9cb3a8c0d4b044a58ba0bf98c7ec51d475ec0fc1ada5e67099781d0df4d68b2f"
+    },
+    {
+      "source": "internal/document/model.go",
+      "path": "app/native/internal/arcmd/document/model.go",
+      "upstreamSha256": "3a75e758108d29687350bed9dbb1a9168c393d0f4be192fcc6763c0daeff229e"
+    },
+    {
+      "source": "internal/document/page.go",
+      "path": "app/native/internal/arcmd/document/page.go",
+      "upstreamSha256": "363c79c91fdd41a68a9cc6b415423fb8888e395b911ae3d96418d4564f0096c7"
+    },
+    {
+      "source": "internal/document/page_test.go",
+      "path": "app/native/internal/arcmd/document/page_test.go",
+      "upstreamSha256": "d2bd22d3e1fe8572a232c134182fc57b5f581b49c768cabaa9a491e16ac814bf"
+    },
+    {
+      "source": "internal/document/paste_test.go",
+      "path": "app/native/internal/arcmd/document/paste_test.go",
+      "upstreamSha256": "a971ec58bd88e00a7e5ee333d41c92fb21facbd97ef717d4089b78cbef2b64d5"
+    },
+    {
+      "source": "internal/document/plaintext_test.go",
+      "path": "app/native/internal/arcmd/document/plaintext_test.go",
+      "upstreamSha256": "8174c00db431ebfb6316491dd65ac95a615a9483b7a59752a433192639cf1244"
+    },
+    {
+      "source": "internal/document/reading.go",
+      "path": "app/native/internal/arcmd/document/reading.go",
+      "upstreamSha256": "7222c63525a9fee859c7fe17eebef21aceb5e11aeee8a30a9fa428d709a7e773"
+    },
+    {
+      "source": "internal/document/reading_test.go",
+      "path": "app/native/internal/arcmd/document/reading_test.go",
+      "upstreamSha256": "453b3f43104891d3804bb977599d381b0698b12748f68c8ad56ae51689cc9e02"
+    },
+    {
+      "source": "internal/document/sort.go",
+      "path": "app/native/internal/arcmd/document/sort.go",
+      "upstreamSha256": "5512c461ee29e9948cbb40d3a578492ff593250a784dbf355d59e0a1e0e1437c"
+    },
+    {
+      "source": "internal/document/sort_test.go",
+      "path": "app/native/internal/arcmd/document/sort_test.go",
+      "upstreamSha256": "ce800e9496f15d401e63afc787c3b644d33f0bf0d6b910846983e05e5dccafea"
+    },
+    {
+      "source": "internal/document/structure.go",
+      "path": "app/native/internal/arcmd/document/structure.go",
+      "upstreamSha256": "ac74b656ed151a6c840b840d0065e6acbd1900a6082d44daa2296206cb55fd70"
+    },
+    {
+      "source": "internal/document/textedit.go",
+      "path": "app/native/internal/arcmd/document/textedit.go",
+      "upstreamSha256": "48cf371097cfe060cb0f747a1802e8c5ffdba257ed06c4a45f5fd13f6c17b716"
+    },
+    {
+      "source": "internal/document/textedit_test.go",
+      "path": "app/native/internal/arcmd/document/textedit_test.go",
+      "upstreamSha256": "86a9ebf1f558f6608d2d926367ba3267977bb40d911a5d7a10b6a85a7746328d"
+    },
+    {
+      "source": "internal/wiki/wiki.go",
+      "path": "app/native/internal/arcmd/wiki/wiki.go",
+      "upstreamSha256": "af59d5c3397cd638efcd2775c82312417e6ec5447a632fb7809474f6dd5be847"
+    },
+    {
+      "source": "internal/wiki/wiki_test.go",
+      "path": "app/native/internal/arcmd/wiki/wiki_test.go",
+      "upstreamSha256": "8626e86c2adf4b6e8197d2e1b1226cde8e4d2d81ebb4aa9ffc1f3f70727dd13c"
+    },
+    {
+      "source": "internal/mermaid/flowchart.go",
+      "path": "app/native/internal/arcmd/mermaid/flowchart.go",
+      "upstreamSha256": "9d3fba51029ca53ad6bffdcf48f83888f634bcd3b6a03db3d3ff8065a9674368"
+    },
+    {
+      "source": "internal/mermaid/mermaid.go",
+      "path": "app/native/internal/arcmd/mermaid/mermaid.go",
+      "upstreamSha256": "0561386a00c0a3312413068d987d88c7bf245906b019d85c18dd386074b14e44"
+    },
+    {
+      "source": "internal/mermaid/mermaid_test.go",
+      "path": "app/native/internal/arcmd/mermaid/mermaid_test.go",
+      "upstreamSha256": "187b456b58db1367d694e42b0b68d3677dcda1ad1558eff838f6a983034c8803"
+    },
+    {
+      "source": "internal/mermaid/sequence.go",
+      "path": "app/native/internal/arcmd/mermaid/sequence.go",
+      "upstreamSha256": "23891a00c91287cdd6a70385b388de0c66881ec33df1380555e485a5fd4ebe04"
+    },
+    {
+      "source": "internal/tex/boldsymbol_test.go",
+      "path": "app/native/internal/arcmd/tex/boldsymbol_test.go",
+      "upstreamSha256": "491a8a0fa4cc5d9cc77cd3d3ee78491b6f359211e658addfad26f14658cc2351"
+    },
+    {
+      "source": "internal/tex/layout.go",
+      "path": "app/native/internal/arcmd/tex/layout.go",
+      "upstreamSha256": "5a8c0359d6869758c7c81d599a434a0e9a0b62f336a58dcbae005a83f3ed2ae1"
+    },
+    {
+      "source": "internal/tex/symbols.go",
+      "path": "app/native/internal/arcmd/tex/symbols.go",
+      "upstreamSha256": "d279324d730a452092c394af55b8b4467b4631c10b4558c2ef3582db3738184e"
+    },
+    {
+      "source": "internal/tex/tex.go",
+      "path": "app/native/internal/arcmd/tex/tex.go",
+      "upstreamSha256": "42fdc2c57fe97db6eae0501069da3bbe3e74ca59cbd652b414ca0a0600b9e8fa"
+    },
+    {
+      "source": "internal/tex/tex_test.go",
+      "path": "app/native/internal/arcmd/tex/tex_test.go",
+      "upstreamSha256": "241f0d248bb763b36a9fa30fa4cbadad7dd8394f4d008c577f69a8fd5b181ba0"
+    },
+    {
+      "source": "internal/pdf/fonts.go",
+      "path": "app/native/internal/arcmd/pdf/fonts.go",
+      "upstreamSha256": "40a5172ca8dc9fe5c7125ecccb7db4d46cf8d1e5187e97128f9c2a5ab0beefa5"
+    },
+    {
+      "source": "internal/pdf/pdf.go",
+      "path": "app/native/internal/arcmd/pdf/pdf.go",
+      "upstreamSha256": "091be8d1e6fe7845e1d973127c03adb84d1ef1997ee87444a3a36d04807742f4"
+    },
+    {
+      "source": "internal/pdf/pdf_test.go",
+      "path": "app/native/internal/arcmd/pdf/pdf_test.go",
+      "upstreamSha256": "39fe87ad177108d2375cde9f9f36da4e17aeb86e12989c8550f2dc8331ab6053"
+    },
+    {
+      "source": "internal/pdf/vector.go",
+      "path": "app/native/internal/arcmd/pdf/vector.go",
+      "upstreamSha256": "d30c65620f7f68c1897be81927ad4790e844375103dee9fd8be4fa26e4589911"
+    },
+    {
+      "source": "internal/i18n/en.go",
+      "path": "app/native/internal/arcmd/i18n/en.go",
+      "upstreamSha256": "d87fe09e1aea5988ac98e01c11d6ef43a1cffa1b14ba9333a37d8902bf3df892"
+    },
+    {
+      "source": "internal/i18n/i18n.go",
+      "path": "app/native/internal/arcmd/i18n/i18n.go",
+      "upstreamSha256": "b701e823dc673d91d11f58be014d292cd66ce067ee2739b16c5add876ebdc4a5"
+    },
+    {
+      "source": "LICENSE",
+      "path": "third_party/licenses/arcmd/LICENSE",
+      "upstreamSha256": "8def5edf09daaac73372039bf188110e25afbfd2e66192f8b803f32cd0078b0e"
+    },
+    {
+      "source": "third_party/katex/OFL.txt",
+      "path": "third_party/licenses/arcmd/katex/OFL.txt",
+      "upstreamSha256": "47753bd1e11a9f2c10f049d5907bf6f16fdd19352896bdec8f684819516641bb"
+    },
+    {
+      "source": "third_party/katex/LICENSE",
+      "path": "third_party/licenses/arcmd/katex/LICENSE",
+      "upstreamSha256": "766ccc1f306c885aa45542a9846bbd0a505b27a0374f146778171c2254ce18e3"
+    },
+    {
+      "source": "third_party/textus/LICENSE",
+      "path": "third_party/licenses/arcmd/textus/LICENSE",
+      "upstreamSha256": "597e42ef274921b9a12e3c4e2717c2413430e7ad18e596e23b5891a2778c0b68"
+    },
+    {
+      "source": "third_party/opensourceui/LICENSE",
+      "path": "third_party/licenses/arcmd/opensourceui/LICENSE",
+      "upstreamSha256": "215d2686815b8c7b044c2ba5017c9dda404e23d23778cde7c20189cda546fab2"
+    },
+    {
+      "source": "internal/editor/testdata/normal-distribution.md",
+      "path": "app/native/internal/arcmd/editor/testdata/normal-distribution.md",
+      "upstreamSha256": "9369228ac49f86243114f62f6474f70a7f7758c4d6419d0ec447f995746f9ce0"
+    }
+  ]
+}

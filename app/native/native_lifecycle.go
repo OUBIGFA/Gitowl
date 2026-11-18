@@ -122,6 +122,20 @@ func (a *app) quitBlocked() bool {
 // cancelable generation stops, and the app quits as soon as admitted work
 // settles. The window stays reachable for any prompt that work still needs.
 func (a *app) deferQuit(event *mygo.Preventable) {
+	if !a.notebook.discardQuit {
+		for _, p := range a.notebook.projects {
+			for _, d := range p.docs {
+				if d.dirty() {
+					event.PreventDefault()
+					a.notebook.quitPrompt = true
+					if a.showWindow != nil {
+						a.showWindow()
+					}
+					return
+				}
+			}
+		}
+	}
 	if !a.quitBlocked() {
 		a.quitDeferred = false
 		return

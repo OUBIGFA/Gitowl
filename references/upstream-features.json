@@ -543,7 +543,7 @@
       "symbol": "RequestChannels",
       "member": "native-kernel-state",
       "category": "ipc-request",
-      "signature": "(snapshot: INativeKernelSnapshot) => void"
+      "signature": "(snapshot: NativeKernelStatePush) => void"
     },
     {
       "id": "RequestChannels:native-theme-updated",

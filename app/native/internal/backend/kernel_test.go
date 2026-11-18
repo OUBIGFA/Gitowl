@@ -294,3 +294,136 @@ func TestKernelConfigKeepsOwnedPathsAndElectronBootstrap(t *testing.T) {
 		}
 	}
 }
+
+// pushedSnapshot is a wire-shaped push: only a JSON object can leave a section
+// out, which a marshaled KernelSnapshot (explicit nulls) cannot express.
+func pushedSnapshot(t *testing.T, snapshot KernelSnapshot, base int64, omitted ...string) map[string]any {
+	t.Helper()
+	data, err := json.Marshal(snapshot)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var wire map[string]any
+	if err := json.Unmarshal(data, &wire); err != nil {
+		t.Fatal(err)
+	}
+	for _, section := range omitted {
+		parent, name, nested := strings.Cut(section, ".")
+		if !nested {
+			delete(wire, parent)
+		} else {
+			delete(wire[parent].(map[string]any), name)
+		}
+	}
+	wire["unchanged"] = map[string]any{"base": base, "sections": omitted}
+	return wire
+}
+
+func heavyKernelSnapshot(revision int64) KernelSnapshot {
+	snapshot := emptyKernelSnapshot(revision)
+	snapshot.Menu = KernelMenuDTO{Items: []KernelMenuItem{{ID: "file", Type: "submenu"}}}
+	snapshot.Workspace = &KernelWorkspace{
+		Menus:          []KernelWorkspaceMenu{{Lease: "lease-1"}},
+		VisibleFileIDs: []string{"a.md"},
+	}
+	text := "@@ -1 +1 @@"
+	snapshot.Selected = &KernelSelected{
+		Repository:   KernelRepository{KernelRepositoryReference: KernelRepositoryReference{ID: 1, Path: "C:/repo"}, Name: "repo", Kind: "repository"},
+		Section:      "changes",
+		Files:        []KernelFile{{ID: "a.md", Path: "a.md", Status: "modified", Inclusion: "all"}},
+		History:      []Commit{{SHA: "1111111", Summary: "first"}},
+		HistoryFiles: []KernelFile{{ID: "h.md", Path: "h.md", Status: "new", Inclusion: "none"}},
+		Diff:         &Diff{Kind: "text", Text: &text},
+	}
+	return snapshot
+}
+
+// A push that leaves out sections must reach the UI complete: the omitted
+// sections come from the previous push, the sent ones from the new push.
+func TestKernelPushRestoresSectionsOmittedAsUnchanged(t *testing.T) {
+	events := make(chan KernelEvent, 4)
+	_, p := kernelPipes(t, func(event KernelEvent) { events <- event })
+	notification(t, p, "kernel.state", heavyKernelSnapshot(1))
+	if event := receive(t, events); event.Snapshot == nil || event.Snapshot.Unchanged != nil {
+		t.Fatalf("first push: %+v", event)
+	}
+
+	// Revision 2 changes only the file list (and a scalar); the rest is omitted.
+	second := heavyKernelSnapshot(2)
+	second.Selected.Files = []KernelFile{{ID: "b.md", Path: "b.md", Status: "new", Inclusion: "all"}}
+	second.Selected.Ahead = 3
+	notification(t, p, "kernel.state", pushedSnapshot(t, second, 1,
+		"menu", "workspace.menus", "workspace.visibleFileIDs", "selected.history", "selected.historyFiles", "selected.diff"))
+	got := receive(t, events).Snapshot
+	if got == nil || got.Revision != 2 || got.Unchanged != nil {
+		t.Fatalf("second push: %+v", got)
+	}
+	if len(got.Menu.Items) != 1 || got.Menu.Items[0].ID != "file" ||
+		len(got.Workspace.Menus) != 1 || got.Workspace.Menus[0].Lease != "lease-1" ||
+		len(got.Workspace.VisibleFileIDs) != 1 || got.Workspace.VisibleFileIDs[0] != "a.md" ||
+		len(got.Selected.History) != 1 || got.Selected.History[0].SHA != "1111111" ||
+		len(got.Selected.HistoryFiles) != 1 || got.Selected.HistoryFiles[0].ID != "h.md" ||
+		got.Selected.Diff == nil || got.Selected.Diff.Text == nil || *got.Selected.Diff.Text != "@@ -1 +1 @@" {
+		t.Fatalf("omitted sections were not restored: %+v / %+v / %+v", got.Menu, got.Workspace, got.Selected)
+	}
+	if len(got.Selected.Files) != 1 || got.Selected.Files[0].ID != "b.md" || got.Selected.Ahead != 3 {
+		t.Fatalf("sent content was replaced by the previous push: %+v", got.Selected)
+	}
+
+	// Revision 3 builds on the restored revision 2, not on the last full push.
+	third := heavyKernelSnapshot(3)
+	notification(t, p, "kernel.state", pushedSnapshot(t, third, 2, "selected.files", "workspace.menus"))
+	got = receive(t, events).Snapshot
+	if got == nil || len(got.Selected.Files) != 1 || got.Selected.Files[0].ID != "b.md" || len(got.Workspace.Menus) != 1 {
+		t.Fatalf("third push did not chain on the restored snapshot: %+v", got)
+	}
+}
+
+// Showing an older section under a newer revision would misreport the
+// repository, so a push built on a snapshot the parent never saw is fatal.
+func TestKernelPushRejectsSectionsFromAnUnseenPredecessor(t *testing.T) {
+	cases := map[string]func(t *testing.T, p peer){
+		"no predecessor": func(t *testing.T, p peer) {
+			notification(t, p, "kernel.state", pushedSnapshot(t, heavyKernelSnapshot(1), 0, "menu"))
+		},
+		"skipped revision": func(t *testing.T, p peer) {
+			notification(t, p, "kernel.state", heavyKernelSnapshot(1))
+			notification(t, p, "kernel.state", pushedSnapshot(t, heavyKernelSnapshot(3), 2, "menu"))
+		},
+		"predecessor without that parent": func(t *testing.T, p peer) {
+			notification(t, p, "kernel.state", emptyKernelSnapshot(1))
+			notification(t, p, "kernel.state", pushedSnapshot(t, heavyKernelSnapshot(2), 1, "selected.files"))
+		},
+		"unknown section": func(t *testing.T, p peer) {
+			notification(t, p, "kernel.state", heavyKernelSnapshot(1))
+			notification(t, p, "kernel.state", pushedSnapshot(t, heavyKernelSnapshot(2), 1, "repositories"))
+		},
+	}
+	for name, send := range cases {
+		t.Run(name, func(t *testing.T) {
+			k, p := kernelPipes(t, func(KernelEvent) {})
+			send(t, p)
+			select {
+			case <-k.Done():
+			case <-time.After(5 * time.Second):
+				t.Fatal("an unresolvable push did not end the connection")
+			}
+			var protocol *ProtocolError
+			if !errors.As(k.Err(), &protocol) {
+				t.Fatalf("expected a protocol failure, got %v", k.Err())
+			}
+		})
+	}
+}
+
+// Results are decoded outside push order and so can never reference a push.
+func TestKernelResultMustCarryACompleteSnapshot(t *testing.T) {
+	k, p := kernelPipes(t, nil)
+	call := kernelCall(func() (KernelResult, error) { return k.State(context.Background()) })
+	request := p.request(t)
+	p.result(t, request.ID, map[string]any{"snapshot": pushedSnapshot(t, heavyKernelSnapshot(1), 0, "menu")})
+	var protocol *ProtocolError
+	if result := receive(t, call); !errors.As(result.err, &protocol) {
+		t.Fatalf("an incomplete result snapshot was accepted: %+v", result)
+	}
+}

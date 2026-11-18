@@ -255,6 +255,12 @@ export class DesktopPresenter {
     )
   }
 
+  public refreshChanges(reference: INativeRepositoryReference) {
+    return this.runtime.dispatcher.refreshWorkingDirectory(
+      this.getRepository(reference)
+    )
+  }
+
   public refreshRepository(reference: INativeRepositoryReference) {
     return this.runtime.dispatcher.refreshRepository(
       this.getRepository(reference)

@@ -240,6 +240,63 @@ type KernelSnapshot struct {
 	Onboarding           *KernelOnboarding         `json:"onboarding"`
 	SignIn               *KernelSignIn             `json:"signIn"`
 	ErrorCount           int                       `json:"errorCount"`
+	// Set only on the wire of a pushed snapshot; resolved before delivery.
+	Unchanged *KernelUnchanged `json:"unchanged,omitempty"`
+}
+
+// KernelUnchanged names the heavy sections a pushed snapshot left out because
+// the previous push, revision Base, already delivered identical content.
+type KernelUnchanged struct {
+	Base     int64    `json:"base"`
+	Sections []string `json:"sections"`
+}
+
+// restoreUnchangedSections completes a pushed snapshot from its predecessor.
+// The restored slices are shared with that predecessor: snapshots are read-only
+// once delivered. A base mismatch means a push was lost or reordered; showing
+// the older section would misreport the repository, so it ends the connection.
+func restoreUnchangedSections(snapshot, previous *KernelSnapshot) error {
+	unchanged := snapshot.Unchanged
+	if unchanged == nil {
+		return nil
+	}
+	snapshot.Unchanged = nil
+	bad := &ProtocolError{"kernel.state omits a section its predecessor did not deliver"}
+	if previous == nil || previous.Revision != unchanged.Base {
+		return bad
+	}
+	for _, section := range unchanged.Sections {
+		switch section {
+		case "menu":
+			snapshot.Menu = previous.Menu
+		case "workspace.menus", "workspace.visibleFileIDs":
+			if snapshot.Workspace == nil || previous.Workspace == nil {
+				return bad
+			}
+			if section == "workspace.menus" {
+				snapshot.Workspace.Menus = previous.Workspace.Menus
+			} else {
+				snapshot.Workspace.VisibleFileIDs = previous.Workspace.VisibleFileIDs
+			}
+		case "selected.files", "selected.history", "selected.historyFiles", "selected.diff":
+			if snapshot.Selected == nil || previous.Selected == nil {
+				return bad
+			}
+			switch section {
+			case "selected.files":
+				snapshot.Selected.Files = previous.Selected.Files
+			case "selected.history":
+				snapshot.Selected.History = previous.Selected.History
+			case "selected.historyFiles":
+				snapshot.Selected.HistoryFiles = previous.Selected.HistoryFiles
+			default:
+				snapshot.Selected.Diff = previous.Selected.Diff
+			}
+		default:
+			return bad
+		}
+	}
+	return nil
 }
 
 type KernelResult struct {
@@ -339,13 +396,16 @@ func kernelEnvironment(userData string) []string {
 // Kernel owns no Git/credential/business state. It connects the MyGo presenter
 // to the original Electron main and non-mounted AppStore/Dispatcher renderer.
 type Kernel struct {
-	client    *Client
-	service   *Service
-	onEvent   func(KernelEvent)
-	mu        sync.Mutex
-	closing   bool
-	closeErr  error
-	closeDone chan struct{}
+	client  *Client
+	service *Service
+	onEvent func(KernelEvent)
+	// The last pushed snapshot, complete. Read and written only by the
+	// transport's reader goroutine, which delivers pushes in wire order.
+	lastPushed *KernelSnapshot
+	mu         sync.Mutex
+	closing    bool
+	closeErr   error
+	closeDone  chan struct{}
 }
 
 // NewKernel admits a caller-owned pipe (also used by transport contract tests).
@@ -400,6 +460,10 @@ func (k *Kernel) InFlight() int         { return k.client.InFlight() }
 func (k *Kernel) CriticalInFlight() int { return k.client.CriticalInFlight() }
 
 func validateKernelSnapshot(snapshot KernelSnapshot) error {
+	// Only a push may omit sections, and receiveEvent has restored them by now.
+	if snapshot.Unchanged != nil {
+		return &ProtocolError{"a command result must carry a complete snapshot"}
+	}
 	if snapshot.Protocol != 1 || snapshot.Core != "desktop/desktop" || snapshot.Revision <= 0 || snapshot.Repositories == nil || snapshot.Accounts == nil || snapshot.Popups == nil {
 		return &ProtocolError{"expected an original Desktop kernel presentation snapshot"}
 	}
@@ -446,9 +510,14 @@ func (k *Kernel) receiveEvent(method string, params json.RawMessage) error {
 		if err := json.Unmarshal(params, &snapshot); err != nil {
 			return &ProtocolError{"invalid kernel.state"}
 		}
+		if err := restoreUnchangedSections(&snapshot, k.lastPushed); err != nil {
+			return err
+		}
 		if err := validateKernelSnapshot(snapshot); err != nil {
 			return err
 		}
+		last := snapshot
+		k.lastPushed = &last
 		event.Snapshot = &snapshot
 	case "kernel.presentation":
 		var value struct {
@@ -560,6 +629,10 @@ func (k *Kernel) FilterRepositories(ctx context.Context, text string) (KernelRes
 		Text string `json:"text"`
 	}{"repositories.filter", text})
 }
+func (k *Kernel) RefreshChanges(ctx context.Context, repository KernelRepositoryReference) (KernelResult, error) {
+	return k.repositoryCommand(ctx, "repository.refreshChanges", repository)
+}
+
 func (k *Kernel) RefreshRepository(ctx context.Context, repository KernelRepositoryReference) (KernelResult, error) {
 	return k.repositoryCommand(ctx, "repository.refresh", repository)
 }

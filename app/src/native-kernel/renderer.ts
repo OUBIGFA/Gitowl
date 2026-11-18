@@ -10,6 +10,7 @@ import { kernelMediaErrorMessage } from './media-presentation'
 import { executeKernelCommand } from './execute-command'
 import { parseKernelCommand } from './command-validation'
 import { projectKernelState } from './state-projection'
+import { SnapshotPushEncoder } from './snapshot-sections'
 import * as ipcRenderer from '../lib/ipc-renderer'
 import { sendReady } from '../ui/main-process-proxy'
 import { migrateRendererGUID } from '../lib/get-renderer-guid'
@@ -55,16 +56,23 @@ const snapshot = () => {
     ) ?? []
   if (loaded && delays.length > 0) {
     // Follow the original relative-time scheduler even when Git state is idle.
-    dateRefreshTimer = window.setTimeout(() => {
-      ipcRenderer.send('native-kernel-state', snapshot())
-    }, Math.max(1, Math.min(2147483647, ...delays)))
+    dateRefreshTimer = window.setTimeout(
+      pushState,
+      Math.max(1, Math.min(2147483647, ...delays))
+    )
   }
   return result
+}
+// Every push goes through this one encoder, in order: a push names the
+// sections its predecessor already delivered instead of repeating them.
+const pushes = new SnapshotPushEncoder()
+function pushState() {
+  ipcRenderer.send('native-kernel-state', pushes.encode(snapshot()))
 }
 
 const stateUpdates = presenter.onDidUpdate(() => {
   if (loaded) {
-    ipcRenderer.send('native-kernel-state', snapshot())
+    pushState()
   }
 })
 runtime.appStore.onDidError(error => {
@@ -158,7 +166,7 @@ void presenter
   .loadInitialState()
   .then(() => {
     loaded = true
-    ipcRenderer.send('native-kernel-state', snapshot())
+    pushState()
     // Preserve upstream ordering: startup side effects run only after the
     // original main process has received renderer-ready.
     sendReady(performance.now() - startTime)

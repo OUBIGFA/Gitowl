@@ -226,6 +226,7 @@ export function parseKernelCommand(value: unknown): NativeKernelCommand {
         )
       case 'repository.select':
       case 'repository.refresh':
+      case 'repository.refreshChanges':
       case 'repository.fetch':
       case 'repository.pull':
       case 'repository.push':

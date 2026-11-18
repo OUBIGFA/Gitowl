@@ -507,6 +507,11 @@ export class Dispatcher {
     return this.appStore._changeIncludeAllFiles(repository, includeAll)
   }
 
+  /** Refresh the working tree after a local editor save. */
+  public async refreshWorkingDirectory(repository: Repository): Promise<void> {
+    await this.appStore._loadStatus(repository, false, true)
+  }
+
   /**
    * Refresh the repository. This would be used, e.g., when the app gains focus.
    */

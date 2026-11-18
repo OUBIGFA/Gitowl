@@ -418,14 +418,32 @@ export async function getAssistedCommitProtectedPaths(
   return (await getAssistedCommitProtectedResources(path)).paths
 }
 
-/** Discover admitted paths and the complete native alternate-object routing graph together. */
-export async function getAssistedCommitProtectedResources(
+async function metadataDirectories(
   path: string
-): Promise<{
-  readonly paths: ReadonlyArray<string>
-  readonly objectDirectories: ReadonlyArray<string>
-  readonly objectRoutingDiagnostics: string
-}> {
+): Promise<ReadonlyArray<string>> {
+  const grouped = await git(
+    [
+      'rev-parse',
+      '--path-format=absolute',
+      '--absolute-git-dir',
+      '--git-common-dir',
+      '--git-path',
+      'objects',
+    ],
+    path,
+    'assistedCommitMetadataDirectories',
+    { successExitCodes: new Set([0, 129]) }
+  )
+  const paths = grouped.stdout.replace(/\r?\n$/, '').split(/\r?\n/)
+  if (
+    grouped.exitCode === 0 &&
+    paths.length === 3 &&
+    paths.every(value => value.length > 0)
+  ) {
+    return paths
+  }
+  // A path can contain a newline on POSIX. Separate calls retain unambiguous
+  // boundaries, and also support Git versions rejecting the combined options.
   const directory = await git(
     ['rev-parse', '--absolute-git-dir'],
     path,
@@ -441,6 +459,20 @@ export async function getAssistedCommitProtectedResources(
     path,
     'assistedCommitObjectDirectory'
   )
+  return [directory, common, objects].map(result =>
+    result.stdout.replace(/\r?\n$/, '')
+  )
+}
+
+/** Discover admitted paths and the complete native alternate-object routing graph together. */
+export async function getAssistedCommitProtectedResources(
+  path: string
+): Promise<{
+  readonly paths: ReadonlyArray<string>
+  readonly objectDirectories: ReadonlyArray<string>
+  readonly objectRoutingDiagnostics: string
+}> {
+  const [directory, common, objects] = await metadataDirectories(path)
   // Git expands recursive alternates and its environment syntax. Do not try
   // to reconstruct this dependency graph from just objects/info/alternates.
   const alternates = await git(
@@ -449,18 +481,13 @@ export async function getAssistedCommitProtectedResources(
     'assistedCommitAlternateObjectDirectories'
   )
   const objectDirectories = [
-    objects.stdout.replace(/\r?\n$/, ''),
+    objects,
     ...alternates.stdout
       .split(/\r?\n/)
       .filter(line => line.startsWith('alternate: '))
       .map(line => parseAlternateObjectDirectory(line.slice(11))),
   ]
-  const original = [
-    path,
-    directory.stdout.replace(/\r?\n$/, ''),
-    common.stdout.replace(/\r?\n$/, ''),
-    ...objectDirectories,
-  ]
+  const original = [path, directory, common, ...objectDirectories]
   const paths = [
     ...original,
     ...(await Promise.all(original.map(value => realpath(value)))),

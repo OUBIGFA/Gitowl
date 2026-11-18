@@ -66,7 +66,7 @@ export type NativeKernelCommand =
       readonly repository: INativeRepositoryReference
     }
   | {
-      readonly name: 'repository.refresh'
+      readonly name: 'repository.refresh' | 'repository.refreshChanges'
       readonly repository: INativeRepositoryReference
     }
   | {

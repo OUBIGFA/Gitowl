@@ -29,6 +29,7 @@ type projectDraft struct {
 // returns through update (Window.Update in production). Sequence numbers also
 // reject replies from backends that cannot interrupt an already-running read.
 type app struct {
+	notebook              notebookWorkspace
 	windowPreferences     nativeWindowPreferences
 	windowPreferencesPath string
 	windowPreferenceErr   error

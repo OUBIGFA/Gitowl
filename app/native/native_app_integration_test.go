@@ -239,6 +239,40 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 	if scenario == "remote-sync" || scenario == "save-and-push" {
 		pushLabel = tx.PushChanges()
 	}
+	if scenario == "save-en" {
+		const note = "live-note.md"
+		if err := os.WriteFile(filepath.Join(repo, note), []byte("# Draft\n"), 0600); err != nil {
+			t.Fatal(err)
+		}
+		if err := a.notes().load(repo); err != nil {
+			t.Fatal(err)
+		}
+		tt.Frame()
+		click(note)
+		click(locales.Catalog.Format(locale, "editorCode", nil))
+		a.notes().current.code.Buffer.Set("# Revised\n")
+		tt.Frame()
+		click(locales.Catalog.Format(locale, "editorSave", nil))
+		containsNote := func() bool {
+			for _, file := range a.status.Files {
+				if file.Path == note {
+					return true
+				}
+			}
+			return false
+		}
+		await(func() bool { return a.corePending == 0 && containsNote() })
+		data, err := os.ReadFile(filepath.Join(repo, note))
+		if err != nil || string(data) != "# Revised\n" {
+			t.Fatalf("editor save: %q %v", data, err)
+		}
+		a.notes().close(a.notes().current)
+		if err := os.Remove(filepath.Join(repo, note)); err != nil {
+			t.Fatal(err)
+		}
+		a.refresh()
+		await(func() bool { return a.corePending == 0 && !containsNote() })
+	}
 	for _, action := range []string{tx.FetchUpdates(), tx.PullUpdates(), pushLabel, tx.GenerateMessage(), tx.SaveVersion()} {
 		if !tt.HasText(action) {
 			t.Fatalf("high-frequency entry missing: %q", action)
@@ -421,6 +455,7 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 		runGit("init", "--initial-branch=main", targetPath)
 		a.runCoreTask(func() (backend.KernelResult, error) { return core.AddRepositories(a.ctx, []string{targetPath}) }, nil)
 		await(func() bool { return a.corePending == 0 && len(a.coreSnapshot.RepositoryMenus) == 2 })
+		click(a.repo.Name) // Open the project picker above the file tree.
 		// List items and their button share a label. Target the actionable
 		// button rather than letting the text lookup pick its list wrapper.
 		menuTarget, ok := tt.AccessByRole(ui.RoleButton, "menu-target")
@@ -472,6 +507,7 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 		tt.Key(0, ui.KeyDown)
 		tt.Key(0, ui.KeyEnter)
 		await(func() bool { return a.corePending == 0 && a.repo.Path == repo })
+		click(a.repo.Name)
 		click(searchLabel)
 		tt.Key(0, ui.KeyEscape)
 		await(func() bool { return a.corePending == 0 && a.coreSnapshot.RepositoryFilter.Text == "" })

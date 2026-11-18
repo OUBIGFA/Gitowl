@@ -2,8 +2,8 @@ import type { AppMenuPresentationAction } from '../ui/app-menu-controller'
 import type {
   INativeKernelRequest,
   NativeKernelResponse,
-  INativeKernelSnapshot,
 } from '../native-kernel/protocol'
+import type { NativeKernelStatePush } from '../native-kernel/snapshot-sections'
 import { IMenuItemState } from './menu-update'
 import { MenuIDs } from '../models/menu-ids'
 import { ISerializableMenuItem } from './menu-item'
@@ -36,7 +36,7 @@ type NativeKernelInitializationFailure = 'initialization'
 export type RequestChannels = {
   'native-kernel-request': (request: INativeKernelRequest) => void
   'native-kernel-response': (response: NativeKernelResponse) => void
-  'native-kernel-state': (snapshot: INativeKernelSnapshot) => void
+  'native-kernel-state': (snapshot: NativeKernelStatePush) => void
   'native-kernel-presentation-action': (
     action: AppMenuPresentationAction
   ) => void
