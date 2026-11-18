@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
-	"sort"
 	"strings"
+	"time"
 
 	rich "github.com/OUBIGFA/Gitowl/app/native/internal/arcmd/editor"
 	arclang "github.com/OUBIGFA/Gitowl/app/native/internal/arcmd/i18n"
@@ -22,11 +22,12 @@ type notebookNode struct {
 	folder bool
 }
 type notebookProject struct {
-	docs     []*notebookDocument
-	current  *notebookDocument
-	expanded map[string]bool
-	rows     []notebookNode
-	list     nativeListState
+	sortByTime, descending bool
+	docs                   []*notebookDocument
+	current                *notebookDocument
+	expanded               map[string]bool
+	rows                   []notebookNode
+	list                   nativeListState
 }
 type notebookWorkspace struct {
 	projects                                                    map[string]*notebookProject
@@ -68,19 +69,49 @@ func (p *notebookProject) load(root string) error {
 		if err != nil {
 			return err
 		}
-		sort.Slice(entries, func(i, j int) bool {
-			if entries[i].IsDir() != entries[j].IsDir() {
-				return entries[i].IsDir()
-			}
-			return strings.ToLower(entries[i].Name()) < strings.ToLower(entries[j].Name())
-		})
-		for _, e := range entries {
-			if strings.EqualFold(e.Name(), ".git") || e.Type()&os.ModeSymlink != 0 {
+		// Sort siblings before descending so folders always retain their children.
+		type entry struct {
+			name, folded string
+			folder       bool
+			modified     time.Time
+		}
+		children := make([]entry, 0, len(entries))
+		for _, item := range entries {
+			if strings.EqualFold(item.Name(), ".git") || item.Type()&os.ModeSymlink != 0 {
 				continue
 			}
-			name := filepath.Join(parent, e.Name())
-			rows = append(rows, notebookNode{name, depth, e.IsDir()})
-			if e.IsDir() && p.expanded[name] {
+			e := entry{name: item.Name(), folded: strings.ToLower(item.Name()), folder: item.IsDir()}
+			if p.sortByTime {
+				info, err := item.Info()
+				if err != nil {
+					return err
+				}
+				e.modified = info.ModTime()
+			}
+			children = append(children, e)
+		}
+		slices.SortFunc(children, func(a, b entry) int {
+			if a.folder != b.folder {
+				if a.folder {
+					return -1
+				}
+				return 1
+			}
+			if p.descending {
+				a, b = b, a
+			}
+			if order := a.modified.Compare(b.modified); order != 0 {
+				return order
+			}
+			if order := strings.Compare(a.folded, b.folded); order != 0 {
+				return order
+			}
+			return strings.Compare(a.name, b.name)
+		})
+		for _, e := range children {
+			name := filepath.Join(parent, e.name)
+			rows = append(rows, notebookNode{name, depth, e.folder})
+			if e.folder && p.expanded[name] {
 				if err := visit(name, depth+1); err != nil {
 					return err
 				}
@@ -94,6 +125,18 @@ func (p *notebookProject) load(root string) error {
 	p.rows = rows
 	return nil
 }
+
+// A failed directory read keeps the previously displayed order and controls.
+func (p *notebookProject) changeOrder(root string, byTime, descending bool) error {
+	oldTime, oldDescending := p.sortByTime, p.descending
+	p.sortByTime, p.descending = byTime, descending
+	if err := p.load(root); err != nil {
+		p.sortByTime, p.descending = oldTime, oldDescending
+		return err
+	}
+	return nil
+}
+
 func (a *app) openNote(name string) {
 	p := a.notes()
 	for _, d := range p.docs {
@@ -114,6 +157,9 @@ func (a *app) openNote(name string) {
 }
 func (p *notebookProject) close(d *notebookDocument) {
 	if i := slices.Index(p.docs, d); i >= 0 {
+		if d.cancelImages != nil {
+			d.cancelImages()
+		}
 		p.docs = slices.Delete(p.docs, i, i+1)
 		if p.current == d {
 			p.current = nil
@@ -139,6 +185,9 @@ func (a *app) saveNote(d *notebookDocument) bool {
 			}
 		})
 	}
+	if project := a.notebook.projects[d.root]; project != nil && project.sortByTime {
+		a.notebook.err = project.load(d.root)
+	}
 	return true
 }
 func bookLabel(c *ui.Context, key string) string {
@@ -148,7 +197,7 @@ func bookLabel(c *ui.Context, key string) string {
 func (a *app) notebookRail(c *ui.Context, tx locales.Messages, colors workspaceColors) {
 	p := a.notes()
 	n := &a.notebook
-	picker := quietButton(c.Key("project-picker"), a.repo.Name, "chevron-down").FillWidth().Height(36).Justify(ui.Start).Tooltip(a.repo.Path).OnClick(func() { n.projectPicker = !n.projectPicker })
+	picker := notebookPathButton(c.Key("project-picker"), a.repo.Name, "chevron-down", a.repo.Path).FillWidth().Height(36).OnClick(func() { n.projectPicker = !n.projectPicker })
 	if ref, ok := a.coreReference(); ok {
 		picker.PopoverMenu(func(m *ui.Menu) { a.renderRepositoryMenu(m, c.Locale(), ref) })
 	}
@@ -159,10 +208,27 @@ func (a *app) notebookRail(c *ui.Context, tx locales.Messages, colors workspaceC
 		a.coreProjectList(c, tx, colors)
 		return
 	}
-	ui.Row(c).FillWidth().Height(34).Gap(4).Children(func() {
+	ui.Row(c).FillWidth().Height(36).AlignItems(ui.Center).Gap(4).Children(func() {
 		ui.Text(c, bookLabel(c, "Files")).Grow(1).FontWeight(500)
 		notebookIcon(c, "find-files", bookLabel(c, "Search"), "search", func() { a.startNotebookSearch("files", "") })
 		notebookIcon(c, "reload-tree", tx.Refresh(), "refresh-cw", func() { n.err = p.load(a.repo.Path) })
+	})
+	ui.Row(c.Key("tree-sort")).FillWidth().Height(36).AlignItems(ui.Center).Gap(4).Children(func() {
+		method := 0
+		if p.sortByTime {
+			method = 1
+		}
+		ui.Segmented(c.Key("method"), &method, bookLabel(c, "SortName"), bookLabel(c, "SortTime")).Label(bookLabel(c, "Sort")).OnChange(func() {
+			n.err = p.changeOrder(a.repo.Path, method == 1, method == 1)
+		})
+		ui.Spacer(c)
+		label, icon := "Ascending", "arrow-up"
+		if p.descending {
+			label, icon = "Descending", "arrow-down"
+		}
+		notebookIcon(c, "reverse", bookLabel(c, label), icon, func() {
+			n.err = p.changeOrder(a.repo.Path, p.sortByTime, !p.descending)
+		})
 	})
 	status := map[string]string{}
 	if a.status != nil {
@@ -170,7 +236,9 @@ func (a *app) notebookRail(c *ui.Context, tx locales.Messages, colors workspaceC
 			status[filepath.Clean(f.Path)] = f.Status
 		}
 	}
-	p.list.list().Key = func(i int) any { return p.rows[i].name }
+	rows := p.rows
+	p.list.list().KeepOffset = true
+	p.list.list().Key = func(i int) any { return rows[i].name }
 	ui.List(c.Key("notebook-tree"), p.list.list(), len(p.rows), func(i int) {
 		row := p.rows[i]
 		label := filepath.Base(row.name)
@@ -181,7 +249,7 @@ func (a *app) notebookRail(c *ui.Context, tx locales.Messages, colors workspaceC
 				icon = "chevron-down"
 			}
 		}
-		el := ui.ButtonBase(c.Key(row.name)).Height(30).FillWidth().Padding(3, 6, 3, float32(6+min(7, row.depth)*12)).Gap(6).Label(label).Tooltip(row.name)
+		el := ui.ButtonBase(c.Key(row.name)).Justify(ui.Start).Height(32).FillWidth().Padding(3, 6, 3, float32(6+min(7, row.depth)*12)).Gap(6).Label(label).Tooltip(row.name)
 		quietSurface(c, el)
 		if p.current != nil && p.current.name == row.name {
 			el.Background(colors.selected)
@@ -191,7 +259,7 @@ func (a *app) notebookRail(c *ui.Context, tx locales.Messages, colors workspaceC
 		}
 		el.Children(func() {
 			ui.Icon(c, icons[icon]).FontSize(15).Shrink(0)
-			ui.Text(c, label).SingleLine().Grow(1).MinWidth(0)
+			ui.Text(c, label).SingleLine().TruncateMiddle().Grow(1).MinWidth(0)
 			if kind := status[row.name]; kind != "" {
 				ui.Text(c, fileStatus(tx, kind)).SingleLine().TextColor(fileStatusColor(c.Theme(), kind)).FontSize(12)
 			}
@@ -205,8 +273,19 @@ func (a *app) notebookRail(c *ui.Context, tx locales.Messages, colors workspaceC
 		})
 	}).Grow(1).MinHeight(0).FillWidth().Label(bookLabel(c, "Files"))
 }
+
+// Paths can be wider than their container. Keep both ends readable and
+// expose the complete path on hover and to assistive technology.
+func notebookPathButton(c *ui.Context, text, icon, fullPath string) ui.Element {
+	b := ui.ButtonBase(c).Height(32).Padding(0, 8).Gap(8).Justify(ui.Start).Clip().Label(text).Tooltip(fullPath)
+	return quietSurface(c, b).Children(func() {
+		ui.Icon(c, icons[icon]).FontSize(16).Shrink(0)
+		ui.Text(c, text).MinWidth(0).Shrink(1).SingleLine().TruncateMiddle()
+	})
+}
+
 func notebookIcon(c *ui.Context, id, label, icon string, action func()) {
-	b := ui.ButtonBase(c.Key(id)).Size(30, 30).Padding(6).Label(label).Tooltip(label)
+	b := ui.ButtonBase(c.Key(id)).Size(32, 32).Padding(8).Label(label).Tooltip(label)
 	quietSurface(c, b).Children(func() { ui.Icon(c, icons[icon]).FontSize(16) }).OnClick(action)
 }
 func (a *app) notebookView(c *ui.Context, tx locales.Messages, colors workspaceColors, width float32) {
@@ -219,13 +298,14 @@ func (a *app) notebookView(c *ui.Context, tx locales.Messages, colors workspaceC
 	ui.Split(c.Key("notebook-split"), &n.width, func() {
 		ui.Column(c.Key("note-pane")).Fill().MinWidth(0).Padding(0, 10, 0, 0).Children(func() {
 			ui.ScrollHorizontal(c.Key("note-tabs")).Height(36).FillWidth().Children(func() {
-				ui.Row(c).Gap(3).Children(func() {
+				ui.Row(c).AlignItems(ui.Center).Gap(4).Children(func() {
 					for _, d := range p.docs {
 						title := filepath.Base(d.name)
 						if d.dirty() {
 							title += " *"
 						}
-						tab := quietButton(c.Key(d.name), title, fileIcon(d.name, false)).Height(30).MaxWidth(185).Tooltip(d.name)
+						tab := notebookPathButton(c.Key(d.name), title, fileIcon(d.name, false), d.name).MaxWidth(208).
+							Role(ui.RoleTab).AccessSelected(p.current == d && !a.reviewingFile)
 						if p.current == d && !a.reviewingFile {
 							tab.Background(colors.selected)
 						}
@@ -275,19 +355,23 @@ func (a *app) notebookView(c *ui.Context, tx locales.Messages, colors workspaceC
 				ui.Spacer(c)
 				return
 			}
-			ui.Row(c.Key("note-tools")).Height(34).FillWidth().Gap(4).Children(func() {
-				ui.Text(c, filepath.ToSlash(d.name)).SingleLine().Grow(1).MinWidth(0).Tooltip(d.name).TextColor(c.Theme().TextMuted)
-				if d.rich != nil {
-					quietButton(c.Key("note-outline"), bookLabel(c, "Outline"), "").Height(28).OnClick(func() { n.outline = !n.outline })
+			ui.Row(c.Key("note-tools")).Height(40).FillWidth().AlignItems(ui.Center).Gap(4).Children(func() {
+				ui.Text(c, filepath.ToSlash(d.name)).SingleLine().TruncateMiddle().Grow(1).MinWidth(0).Tooltip(d.name).TextColor(c.Theme().TextMuted)
+				if d.rich != nil && d.rich.OutlineAvailable() {
+					toggle := quietButton(c.Key("note-outline"), bookLabel(c, "Outline"), "").Height(32).MinHeight(32).
+						Expanded(d.rich.OutlineOpen()).OnClick(d.rich.ToggleOutline)
+					if d.rich.OutlineOpen() {
+						toggle.Background(colors.selected)
+					}
 				}
 				if d.markdown {
 					key := "Preview"
 					if d.rich != nil {
 						key = "Code"
 					}
-					quietButton(c.Key("note-mode"), bookLabel(c, key), "").Height(28).OnClick(d.switchMode)
+					quietButton(c.Key("note-mode"), bookLabel(c, key), "").Height(32).MinHeight(32).OnClick(d.switchMode)
 				}
-				quietButton(c.Key("save-note"), bookLabel(c, "Save"), "").Height(28).Disabled(!d.dirty()).OnClick(func() { a.saveNote(d) })
+				quietButton(c.Key("save-note"), bookLabel(c, "Save"), "").Height(32).MinHeight(32).Disabled(!d.dirty()).OnClick(func() { a.saveNote(d) })
 				notebookIcon(c, "close-note", bookLabel(c, "Close"), "x", func() {
 					if d.dirty() {
 						n.closing = d
@@ -301,7 +385,17 @@ func (a *app) notebookView(c *ui.Context, tx locales.Messages, colors workspaceC
 				return
 			}
 			arclang.SetLanguage(c.Locale())
-			rich.View(c.Key(d.name), d.rich, rich.Options{Width: max(90, n.width-12), Theme: c.Theme(), FontSize: 16, LineHeight: 1.55, LoadImage: d.loadImage, Outline: n.outline, SetOutline: func(open bool) { n.outline = open }, OpenWiki: func(name string) { a.startNotebookSearch("wiki", name) }}).Grow(1).FillWidth().MinHeight(0)
+			rich.View(c.Key(d.name), d.rich, rich.Options{
+				Width: max(90, n.width-12), Theme: c.Theme(), FontSize: 16, LineHeight: 1.55,
+				LoadImage: func(src string) rich.ImageResource { return a.notebookImage(d, src, false) },
+				RetryImage: func(src string) {
+					delete(d.webImages, src)
+					a.notebookImage(d, src, true)
+					d.rich.InvalidateImage(src)
+				},
+				Outline: n.outline, OutlineInToolbar: true, SetOutline: func(open bool) { n.outline = open },
+				OpenWiki: func(name string) { a.startNotebookSearch("wiki", name) },
+			}).Grow(1).FillWidth().MinHeight(0)
 		})
 	}, func() {
 		ui.Column(c.Key("review-pane")).Fill().MinWidth(0).Padding(0, 0, 0, 12).Children(func() {

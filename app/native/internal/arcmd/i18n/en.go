@@ -2,11 +2,11 @@ package i18n
 
 // en translates the interface's messages into English, by their Chinese.
 var en = map[string]string{
-	"外部空间":    "External",
-	"打开文件…":   "Open File\u2026",
-	"从外部空间移除": "Remove from External",
-	"只添加选中的文件，保留原位置":          "Add selected files and keep their original locations",
-	"内置空间 · 文件保留在原位置":         "Built-in space \u00b7 Files stay in their original locations",
+	"外部空间":            "External",
+	"打开文件…":           "Open File\u2026",
+	"从外部空间移除":         "Remove from External",
+	"只添加选中的文件，保留原位置":  "Add selected files and keep their original locations",
+	"内置空间 · 文件保留在原位置": "Built-in space \u00b7 Files stay in their original locations",
 	"打开的外部文档会显示在这里，文件保留在原位置。": "External documents appear here. Files stay in their original locations.",
 	"请在普通空间中新建文档。":            "Create new documents in a folder space.",
 	"外部空间只记录文件，不能作为移动目标。":     "External keeps file references and cannot be a move destination.",
@@ -543,7 +543,10 @@ var en = map[string]string{
 	"昨天 ":                "Yesterday ",
 	"显示":                 "Show",
 	"晨光":                 "Dawn",
-	"暂不加载网络图片，请选择本地图片。": "Images from the web aren't loaded yet; choose a local image.",
+	"未能直接连接。可使用当前网络重新加载。": "Direct connection failed. Retry using your network settings.",
+	"正在加载图片…":        "Loading image…",
+	"图片过大，无法预览。":     "The image is too large to preview.",
+	"重新加载":           "Retry",
 	"暂无文档":           "No documents",
 	"暮色":             "Dusk",
 	"更多":             "More",

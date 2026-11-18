@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/OUBIGFA/Gitowl/app/native/internal/arcmd/wiki"
@@ -13,13 +14,13 @@ import (
 )
 
 type notebookSearch struct {
-	mode, query, root string
-	results           []string
-	err               error
-	busy              bool
-	generation        int
-	cancel            context.CancelFunc
-	list              nativeListState
+	mode, query, root  string
+	results            []string
+	err                error
+	busy               bool
+	generation, active int
+	cancel             context.CancelFunc
+	list               nativeListState
 }
 
 func (a *app) startNotebookSearch(mode, query string) {
@@ -40,6 +41,8 @@ func (a *app) runNotebookSearch() {
 	gen := s.generation
 	s.root = a.repo.Path
 	s.results = nil
+	s.active = 0
+	s.list = nativeListState{}
 	s.err = nil
 	s.busy = true
 	root, mode, query := s.root, s.mode, s.query
@@ -130,35 +133,77 @@ func (a *app) notebookSearchDialog(c *ui.Context) {
 		return
 	}
 	ui.Modal(c.Key("notebook-search"), &n.searchOpen, func() {
-		ui.Row(c).Gap(8).Children(func() {
-			for _, mode := range []struct{ id, key string }{{"files", "Quick"}, {"text", "Search"}, {"backlinks", "Backlinks"}} {
-				if mode.id == "backlinks" && a.notes().current == nil {
-					continue
+		modes := []string{"files", "text"}
+		labels := []string{bookLabel(c, "Quick"), bookLabel(c, "SearchText")}
+		if a.notes().current != nil {
+			modes = append(modes, "backlinks")
+			labels = append(labels, bookLabel(c, "Backlinks"))
+		}
+		if s.mode == "wiki" {
+			modes = append(modes, "wiki")
+			labels = append(labels, bookLabel(c, "LinkTarget"))
+		}
+		mode := max(0, slices.Index(modes, s.mode))
+		ui.Segmented(c.Key("search-mode"), &mode, labels...).AlignSelf(ui.Start).Label(bookLabel(c, "Search")).OnChange(func() {
+			q := s.query
+			if modes[mode] == "backlinks" {
+				name := filepath.Base(a.notes().current.name)
+				q = strings.TrimSuffix(name, filepath.Ext(name))
+			}
+			a.startNotebookSearch(modes[mode], q)
+		})
+		hint := "FileName"
+		switch s.mode {
+		case "text":
+			hint = "SearchText"
+		case "backlinks", "wiki":
+			hint = "LinkTarget"
+		}
+		query := ui.SearchField(c.Key("note-query"), &s.query).FillWidth().AutoFocus().Label(bookLabel(c, hint)).Placeholder(bookLabel(c, hint)).OnChange(a.runNotebookSearch)
+		results := s.results
+		openResult := func(name string) {
+			n.searchOpen = false
+			a.openNote(name)
+		}
+		if len(results) != 0 {
+			// Keep typing in the field while arrows move through matching files.
+			move := 0
+			if query.Shortcut(0, ui.KeyDown) {
+				move = 1
+			}
+			if query.Shortcut(0, ui.KeyUp) {
+				move = -1
+			}
+			if move != 0 {
+				s.active = min(len(results)-1, max(0, s.active+move))
+				s.list.list().ScrollIntoView(s.active)
+			}
+			query.OnSubmit(func() { openResult(results[s.active]) })
+		}
+		ui.Column(c.Key("result-area")).FillWidth().Height(260).Children(func() {
+			switch {
+			case s.err != nil && !errors.Is(s.err, context.Canceled):
+				showError(c, s.err.Error())
+			case s.busy:
+				ui.Text(c, bookLabel(c, "Searching")).Role(ui.RoleStatus).TextColor(c.Theme().TextMuted)
+			case len(results) == 0:
+				msg := "NoResults"
+				if s.mode == "text" && strings.TrimSpace(s.query) == "" {
+					msg = "EnterText"
 				}
-				quietButton(c.Key(mode.id), bookLabel(c, mode.key), "").OnClick(func() {
-					q := s.query
-					if mode.id == "backlinks" {
-						name := filepath.Base(a.notes().current.name)
-						q = strings.TrimSuffix(name, filepath.Ext(name))
+				ui.Text(c, bookLabel(c, msg)).Role(ui.RoleStatus).TextColor(c.Theme().TextMuted)
+			default:
+				ui.List(c.Key("note-search-results"), s.list.list(), len(results), func(i int) {
+					name := results[i]
+					path := filepath.ToSlash(name)
+					row := notebookPathButton(c.Key(name), path, fileIcon(name, false), path).FillWidth().OnClick(func() { openResult(name) })
+					if i == s.active {
+						row.Background(c.Theme().SurfacePressed)
 					}
-					a.startNotebookSearch(mode.id, q)
-				})
+				}).Fill()
 			}
 		})
-		ui.SearchField(c.Key("note-query"), &s.query).FillWidth().Label(bookLabel(c, "Search")).Placeholder(bookLabel(c, "Search")).OnChange(a.runNotebookSearch)
-		if s.err != nil && !errors.Is(s.err, context.Canceled) {
-			showError(c, s.err.Error())
-		}
-		if s.busy {
-			ui.Text(c, bookLabel(c, "Searching")).Role(ui.RoleStatus)
-		} else if len(s.results) == 0 {
-			ui.Text(c, bookLabel(c, "NoResults")).Role(ui.RoleStatus)
-		}
-		ui.List(c.Key("note-search-results"), s.list.list(), len(s.results), func(i int) {
-			name := s.results[i]
-			quietButton(c.Key(name), filepath.ToSlash(name), fileIcon(name, false)).FillWidth().Height(32).OnClick(func() { n.searchOpen = false; a.openNote(name) })
-		}).FillWidth().Height(260)
-		quietButton(c.Key("close-search"), bookLabel(c, "Close"), "").OnClick(func() { n.searchOpen = false })
+		ui.Button(c.Key("close-search"), bookLabel(c, "Close")).AlignSelf(ui.End).OnClick(func() { n.searchOpen = false })
 	}).Width(500)
 	if !n.searchOpen && s.cancel != nil {
 		s.cancel()

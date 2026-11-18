@@ -22,6 +22,7 @@ const (
 	ImageUnsupported
 	ImageUnreadable
 	ImageRemote
+	ImageTooLarge
 )
 
 // ImageResource is a decoded picture, a picture whose header dimensions are
@@ -177,7 +178,9 @@ func (p ImageProblem) text() string {
 	case ImageUnreadable:
 		return i18n.T("无法读取图片，请检查文件及访问权限。")
 	case ImageRemote:
-		return i18n.T("暂不加载网络图片，请选择本地图片。")
+		return i18n.T("未能直接连接。可使用当前网络重新加载。")
+	case ImageTooLarge:
+		return i18n.T("图片过大，无法预览。")
 	default:
 		return i18n.T("图片路径无效，请重新选择图片。")
 	}
@@ -274,6 +277,9 @@ func (e *Editor) layoutImage(r *row, o Options) float32 {
 	cursor = f.reasonY + reasonH
 	if !e.printing {
 		var actions []imageAction
+		if o.RetryImage != nil && f.resource.Problem == ImageRemote {
+			actions = append(actions, imageAction{key: "retry", label: i18n.T("重新加载")})
+		}
 		if o.ReplaceImage != nil {
 			actions = append(actions, imageAction{key: "choose", label: i18n.T("重新选择图片…")})
 		}
@@ -462,6 +468,9 @@ func (e *Editor) imageControls(c *ui.Context, o Options) {
 		id, src := row.leaf.Block.ID, row.leaf.Block.URL
 		key := c.Key("image:" + id)
 		if f.resource.Loading {
+			r := f.bounds
+			ui.Box(key.Key("loading")).Absolute().Left(r.X).Top(r.Y).Size(r.W, r.H).
+				Role(ui.RoleStatus).Label(i18n.T("正在加载图片…") + " " + f.name)
 			continue
 		}
 		if f.resource.Bitmap == nil {
@@ -472,15 +481,14 @@ func (e *Editor) imageControls(c *ui.Context, o Options) {
 		for _, action := range f.actions {
 			b := e.imageButton(key.Key(action.key), action.label, action.bounds)
 			if b.Clicked() {
-				if action.key == "choose" {
+				if action.key == "retry" {
+					o.RetryImage(src)
+				} else if action.key == "choose" {
 					o.ReplaceImage(id, src)
 				} else {
 					o.RevealImage(src)
 				}
 			}
-		}
-		if f.resource.Loading {
-			continue
 		}
 		if f.resource.Bitmap == nil {
 			continue

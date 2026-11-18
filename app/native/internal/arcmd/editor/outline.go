@@ -10,13 +10,8 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
-// The outline lists the page title and the headings left of the page, as
-// Feishu's documents do. Collapsed, a button at the page's top left opens
-// it; open, it takes room beside the page, which slides over to make it,
-// and its « button collapses it again. The reader's choice is the host's
-// to keep (Options.Outline / SetOutline). A pane too narrow to give up the
-// room opens the outline over the page instead, until a press elsewhere.
-
+// The outline sits beside a wide page or floats over a narrow one. A
+// toolbar can own its toggle; standalone editors use the top-right button.
 const (
 	// outlineWidth is the room the open outline takes.
 	outlineWidth = 248
@@ -187,6 +182,9 @@ func (e *Editor) outlineRoom(c *ui.Context) float32 {
 	return room
 }
 
+// OutlineAvailable reports whether the document has anything to navigate.
+func (e *Editor) OutlineAvailable() bool { return e.hasHeadings() || e.hasBookmarks() }
+
 // OutlineOpen reports whether the outline shows.
 func (e *Editor) OutlineOpen() bool {
 	s := &e.outlineState
@@ -245,7 +243,7 @@ func (e *Editor) stepJump(c *ui.Context) {
 
 // outlineView draws the collapsed outline's button or the outline; reserve
 // is the room it has beside the page now.
-func (e *Editor) outlineView(c *ui.Context, pane ui.Element, reserve float32) {
+func (e *Editor) outlineView(c *ui.Context, pane ui.Element, reserve float32, toolbar bool) {
 	s := &e.outlineState
 	if s.mode == outlineOff {
 		return
@@ -260,8 +258,8 @@ func (e *Editor) outlineView(c *ui.Context, pane ui.Element, reserve float32) {
 		}
 		shown = pane.Animate("outline-float", target, 160*time.Millisecond)
 	}
-	if shown < 1 {
-		open := ui.ButtonBase(c.Key("outline-open")).Absolute().Left(16).Top(s.buttonTop).Size(28, 28).Radius(6).Center().
+	if shown < 1 && !toolbar {
+		open := ui.ButtonBase(c.Key("outline-open")).Absolute().Right(16).Top(s.buttonTop).Size(28, 28).Radius(6).Center().
 			Label(i18n.T("展开目录")).Tooltip(i18n.T("展开目录")).KeepFocus().Cursor(ui.CursorPointer).Opacity(1 - shown)
 		color := t.Text.Alpha(.55)
 		if open.Hovered() {
@@ -276,26 +274,40 @@ func (e *Editor) outlineView(c *ui.Context, pane ui.Element, reserve float32) {
 	if shown <= 0 {
 		return
 	}
-	panel := ui.Column(c.Key("outline")).Absolute().Left(0).Top(0).Width(outlineWidth).Height(e.viewport).
-		Padding(s.buttonTop, 12, 16, 16).Gap(8).Opacity(shown).Translate((shown-1)*24, 0)
+	top := s.buttonTop
+	if toolbar {
+		top = 12
+	}
+	panel := ui.Column(c.Key("outline")).Absolute().Right(0).Top(0).Width(min(outlineWidth, pane.LayoutBounds().W)).Height(e.viewport).
+		Padding(top, 16, 16, 12).Gap(8).Opacity(shown).Translate((1-shown)*24, 0)
 	if s.mode == outlineFloating {
-		panel.Background(e.page.Popover).Shadow(4, 0, 24, 0, t.Text.Alpha(.12)).KeepFocus()
+		panel.Background(e.page.Popover).Shadow(-4, 0, 24, 0, t.Text.Alpha(.12)).KeepFocus()
+		if toolbar {
+			// A short floating outline should leave the rest of the page usable.
+			height := e.viewport
+			if !e.hasBookmarks() {
+				height = min(height, top+float32(len(e.outline))*outlineRow+32)
+			}
+			panel.Right(4).Height(height).Radius(t.Radius).Border(1, t.Border).Clip()
+		}
 	}
 	panel.Children(func() {
-		close := ui.ButtonBase(c.Key("outline-close")).Size(28, 28).Radius(6).Center().AlignSelf(ui.Start).
-			Label(i18n.T("收起目录")).Tooltip(i18n.T("收起目录")).KeepFocus().Cursor(ui.CursorPointer)
-		color := t.Text.Alpha(.55)
-		if close.Hovered() {
-			close.Background(t.Text.Alpha(.06))
-			color = t.Accent
-		}
-		close.Children(func() { ui.Icon(c, iconChevronsLeft).FontSize(18).TextColor(color) })
-		if close.Clicked() {
-			e.ToggleOutline()
+		if !toolbar {
+			close := ui.ButtonBase(c.Key("outline-close")).Size(28, 28).Radius(6).Center().AlignSelf(ui.End).
+				Label(i18n.T("收起目录")).Tooltip(i18n.T("收起目录")).KeepFocus().Cursor(ui.CursorPointer)
+			color := t.Text.Alpha(.55)
+			if close.Hovered() {
+				close.Background(t.Text.Alpha(.06))
+				color = t.Accent
+			}
+			close.Children(func() { ui.Icon(c, iconChevronsLeft).Rotate(180).FontSize(18).TextColor(color) })
+			if close.Clicked() {
+				e.ToggleOutline()
+			}
 		}
 		e.outlineList(c)
 	})
-	if s.mode == outlineFloating && s.floating && panel.PressedOutside() {
+	if s.mode == outlineFloating && s.floating && panel.PressedOutside() && (!toolbar || pane.Hovered()) {
 		s.floating = false
 	}
 }
@@ -361,7 +373,7 @@ func (e *Editor) outlineList(c *ui.Context) {
 			for i := a; i < z; i++ {
 				item := *e.indexedOutline(i)
 				on := i == active
-				row := ui.ButtonBase(c.Key("outline:"+item.id)).Height(outlineRow).Radius(6).
+				row := ui.ButtonBase(c.Key("outline:"+item.id)).Height(outlineRow).Radius(t.Radius).
 					Padding(0, 8, 0, 8+float32(min(item.level-top, 4))*outlineIndent).
 					Label(i18n.T("跳到 ") + item.text).Tooltip(item.text).KeepFocus().Cursor(ui.CursorPointer)
 				if item.id != title {
@@ -391,7 +403,7 @@ func (e *Editor) outlineList(c *ui.Context) {
 				}
 				row.Children(func() {
 					if on {
-						slidingPill(c, outlinePillMatch{e}, t.Accent.Alpha(0.08), 6)
+						slidingPill(c, outlinePillMatch{e}, t.Accent.Alpha(0.08), t.Radius)
 						ui.Box(c.Key("active-bar")).Absolute().Left(1).Top(6).Bottom(6).Width(2.5).
 							Radius(1.5).Background(t.Accent).PassThrough().
 							Transition(ui.ElementTransition{Duration: 120 * time.Millisecond, Match: outlineBarMatch{e}})

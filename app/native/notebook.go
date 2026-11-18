@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"crypto/rand"
 	"errors"
 	"fmt"
@@ -20,6 +21,9 @@ var (
 )
 
 type notebookDocument struct {
+	imageContext     context.Context
+	cancelImages     context.CancelFunc
+	webImages        map[string]rich.ImageResource
 	root, name       string
 	original         []byte
 	code             editor.State

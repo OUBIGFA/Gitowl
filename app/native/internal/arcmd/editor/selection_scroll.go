@@ -21,7 +21,7 @@ func (e *Editor) extendSelection(x, y float32) {
 // stepSelectionDrag follows the pointer in viewport coordinates, which
 // stay fixed while the document scrolls. Revealing the caret here would
 // fight manual scrolling, especially when typewriter mode centers it.
-func (e *Editor) stepSelectionDrag(c *ui.Context, scroll ui.Element, reserve float32) {
+func (e *Editor) stepSelectionDrag(c *ui.Context, scroll ui.Element) {
 	if !e.dragging {
 		return
 	}
@@ -57,7 +57,7 @@ func (e *Editor) stepSelectionDrag(c *ui.Context, scroll ui.Element, reserve flo
 	}
 	d.scrollY = e.Scroll.Y
 	before := e.Caret
-	e.extendSelection(x-reserve, min(max(y, 0), e.viewport)+e.Scroll.Y)
+	e.extendSelection(x, min(max(y, 0), e.viewport)+e.Scroll.Y)
 	if e.Caret != before {
 		// Inline and block math may switch their editing layout with the
 		// selection; let the next frame update that layout too.

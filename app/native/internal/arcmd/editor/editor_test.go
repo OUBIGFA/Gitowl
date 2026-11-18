@@ -413,6 +413,9 @@ func TestOutlineCollapses(t *testing.T) {
 	if !ok {
 		t.Fatal("no collapse button")
 	}
+	if closeAt.X < 1200-outlineWidth {
+		t.Fatalf("outline control is outside the right rail: %v", closeAt)
+	}
 	if err := tt.Click("收起目录"); err != nil {
 		t.Fatal(err)
 	}
@@ -440,6 +443,29 @@ func TestOutlineCollapses(t *testing.T) {
 	}
 }
 
+func TestBlockGripCursorFollowsTheDrag(t *testing.T) {
+	e := outlineDoc()
+	tt := ui.NewTester(func(c *ui.Context) {
+		View(c, e, Options{Width: 1100, Theme: c.Theme()})
+	}, 1100, 650)
+	tt.Frame()
+	r := e.indexedHandle(1).rect
+	x, y := r.X+r.W/2, r.Y+r.H/2
+	tt.Move(x, y)
+	if tt.Cursor() != ui.CursorGrab {
+		t.Fatalf("hover cursor: %v", tt.Cursor())
+	}
+	tt.Press(x, y)
+	tt.Move(x+20, y+12)
+	if tt.Cursor() != ui.CursorGrabbing {
+		t.Fatalf("drag cursor: %v", tt.Cursor())
+	}
+	tt.Release(x+20, y+12)
+	if tt.Cursor() == ui.CursorGrabbing {
+		t.Fatal("cursor stayed in drag state")
+	}
+}
+
 func TestOutlineFloatsOverNarrowPage(t *testing.T) {
 	e := outlineDoc()
 	tt := ui.NewTester(func(c *ui.Context) {
@@ -449,6 +475,9 @@ func TestOutlineFloatsOverNarrowPage(t *testing.T) {
 	tt.Frame()
 	if e.OutlineOpen() || e.outlineState.mode != outlineFloating {
 		t.Fatal("narrow page opened the outline beside it")
+	}
+	if r, ok := tt.Find("展开目录"); !ok || r.X < 700-outlineWidth {
+		t.Fatalf("floating outline opens from the wrong edge: %v", r)
 	}
 	if err := tt.Click("展开目录"); err != nil {
 		t.Fatal(err)

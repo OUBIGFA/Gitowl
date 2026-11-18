@@ -238,7 +238,6 @@ type Editor struct {
 	imageEnter      imageEnterState
 	captionedImages map[string]bool
 	scrollBounds    ui.Rect
-	surfaceReserve  float32
 }
 
 type row struct {
@@ -493,6 +492,7 @@ type Options struct {
 	Width        float32
 	Theme        *ui.Theme
 	LoadImage    func(string) ImageResource
+	RetryImage   func(string)
 	LoadRawImage func(string) image.Image
 	// ReplaceImage selects a new file for a stable block ID. RevealImage
 	// opens its local file (or nearest existing folder) in the file manager.
@@ -544,11 +544,13 @@ type Options struct {
 	// Bindings rebind the editor's commands (DefaultBindings) to other
 	// keys; a command left out keeps its default.
 	Bindings map[string]Combo
-	// Outline opens the outline left of the page; SetOutline, when set,
+	// Outline opens the outline to the right of the page; SetOutline, when set,
 	// shows the outline's buttons and keeps what the reader picks. Without
 	// it the page has no outline, as in thumbnails.
 	Outline    bool
 	SetOutline func(open bool)
+	// OutlineInToolbar lets the host provide the single visible toggle.
+	OutlineInToolbar bool
 	// Bookmarks are the top-level blocks bookmarked, by ID, with the label
 	// the reader gave each ("" for none). ToggleBookmark, when set, shows
 	// them: a mark beside each, which takes it away, and a section of the
@@ -650,7 +652,7 @@ func View(c *ui.Context, e *Editor, o Options) ui.Element {
 	e.watchMermaid()
 	e.watchInline()
 	pane := ui.Column(c).Grow(1).MinHeight(0).MinWidth(0)
-	// The outline, open, takes room left of the page: the page slides over
+	// The outline, open, takes room to the right of the page: the page slides over
 	// as it opens, keeping offscreen shaping while it moves.
 	reserve := e.outlineReserve(c, o)
 	if reserve > 0 {
@@ -699,7 +701,7 @@ func View(c *ui.Context, e *Editor, o Options) ui.Element {
 			}
 			e.reveal = false
 		}
-		scroll := ui.Scroll(c.Key("page-scroll")).Grow(1).MinHeight(0)
+		scroll := ui.Scroll(c.Key("page-scroll")).Grow(1).MinHeight(0).MarginEnd(reserve)
 		// Bounds are the last frame's: none yet in the first frame of a new
 		// document, where the window's height stands in, or painting would
 		// cull every row as out of view and nothing would draw until
@@ -711,8 +713,7 @@ func View(c *ui.Context, e *Editor, o Options) ui.Element {
 			_, e.viewport = c.Size()
 		}
 		e.scrollBounds = scroll.Bounds()
-		e.surfaceReserve = reserve
-		e.stepSelectionDrag(c, scroll, reserve)
+		e.stepSelectionDrag(c, scroll)
 		scroll.TrackScroll(&e.Scroll)
 		scroll.Children(func() {
 			height := e.height
@@ -731,7 +732,7 @@ func View(c *ui.Context, e *Editor, o Options) ui.Element {
 			// out, not where it scrolled to.
 			e.outlineState.scrollMax = max(0, max(height, e.viewport)-e.viewport)
 			e.revealPending(c)
-			content := ui.Box(c.Key("page-content")).Width(o.Width).Height(max(height, e.viewport)).Shrink(0).MarginStart(reserve)
+			content := ui.Box(c.Key("page-content")).Width(o.Width).Height(max(height, e.viewport)).Shrink(0)
 			content.Children(func() {
 				surface = ui.Box(c.Key("writing-surface")).Width(o.Width).Height(max(height, e.viewport)).Shrink(0).
 					HandleTextInput(e).Role(ui.RoleTextField).Label(i18n.T("文档")).FocusRing(false)
@@ -756,9 +757,18 @@ func View(c *ui.Context, e *Editor, o Options) ui.Element {
 						o.DropFiles(files, at)
 					}
 				}
-				if e.resizing != nil || e.hoveredResizer() != nil {
+				var handle *blockHandle
+				var plus bool
+				if inside && !e.ReadOnly {
+					handle, plus = e.blockControlAt(px, py)
+				}
+				if e.dragID != "" {
+					surface.Cursor(ui.CursorGrabbing)
+				} else if e.resizing != nil || e.hoveredResizer() != nil {
 					surface.Cursor(ui.CursorResizeEW)
-				} else if _, ok := e.hoveredGap(); ok {
+				} else if handle != nil && !plus {
+					surface.Cursor(ui.CursorGrab)
+				} else if _, ok := e.hoveredGap(); ok || plus {
 					// A click here adds a paragraph rather than placing the caret.
 					surface.Cursor(ui.CursorPointer)
 				}
@@ -801,7 +811,7 @@ func View(c *ui.Context, e *Editor, o Options) ui.Element {
 				}
 			})
 		})
-		e.outlineView(c, pane, reserve)
+		e.outlineView(c, pane, reserve, o.OutlineInToolbar)
 		e.findBox(c)
 	})
 	if !e.ReadOnly {
@@ -833,7 +843,7 @@ func (e *Editor) surfaceBounds(surface ui.Element) ui.Rect {
 	b := surface.Bounds()
 	if e.scrollBounds.H > 0 {
 		sy := min(max(0, e.Scroll.Y), e.outlineState.scrollMax)
-		b.X = e.scrollBounds.X + e.surfaceReserve
+		b.X = e.scrollBounds.X
 		b.Y = e.scrollBounds.Y - sy
 		if b.W == 0 {
 			b.W = e.width
@@ -1994,6 +2004,21 @@ func (e *Editor) toggleTask(at int, x float32) bool {
 	return true
 }
 
+// Hover and press share the indexed geometry, including scrolled blocks.
+func (e *Editor) blockControlAt(x, y float32) (*blockHandle, bool) {
+	start, end := e.visibleHandleRange(y-64, y+64)
+	for i := start; i < end; i++ {
+		h := e.indexedHandle(i)
+		if h.rect.Contains(x, y) {
+			return h, false
+		}
+		if h.plus().Contains(x, y) {
+			return h, true
+		}
+	}
+	return nil, false
+}
+
 func (e *Editor) structuralPointer(ev ui.InputEvent) bool {
 	if e.ReadOnly {
 		if ev.Kind == ui.InputPointerDown && ev.Button == 0 {
@@ -2055,21 +2080,18 @@ func (e *Editor) structuralPointer(ev ui.InputEvent) bool {
 				return true
 			}
 		}
-		hs, he := e.visibleHandleRange(ev.Y-64, ev.Y+64)
-		for hi := hs; hi < he; hi++ {
-			h := *e.indexedHandle(hi)
-			if p := h.plus(); ev.X >= p.X && ev.X <= p.X+p.W && ev.Y >= p.Y && ev.Y <= p.Y+p.H {
+		h, plus := e.blockControlAt(ev.X, ev.Y)
+		if h != nil {
+			if plus {
 				e.insertAfter(h.id)
-				return true
-			}
-			if ev.X >= h.rect.X && ev.X <= h.rect.X+h.rect.W && ev.Y >= h.rect.Y && ev.Y <= h.rect.Y+h.rect.H {
+			} else {
 				if !e.blockSelected(h.id) {
 					e.clearBlocks()
 				}
 				e.dragID, e.dropIndex = h.id, h.index
 				e.dragStartY, e.dragY, e.dragActive = ev.Y, ev.Y, false
-				return true
 			}
+			return true
 		}
 	}
 	if e.tableDragPointer(ev) {
