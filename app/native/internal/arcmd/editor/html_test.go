@@ -1,9 +1,42 @@
 package editor
 
 import (
+	"html"
 	"strings"
 	"testing"
+
+	"github.com/OUBIGFA/Gitowl/app/native/internal/arcmd/document"
 )
+
+func TestHTMLImportsShareSafeLinkSchemes(t *testing.T) {
+	for _, tc := range []struct {
+		url  string
+		safe bool
+	}{
+		{"https://example.com/path", true},
+		{"mailto:reader@example.com", true},
+		{"notes/readme.md", true},
+		{"javascript:alert(1)", false},
+		{"JaVaScRiPt:alert(1)", false},
+		{"java\tscript:alert(1)", false},
+		{"vbscript:msgbox(1)", false},
+		{"data:text/html,<script>alert(1)</script>", false},
+	} {
+		source := `<a href="` + html.EscapeString(tc.url) + `">Keep this text</a>`
+		for _, runs := range [][]document.Run{ImportHTML(source).Blocks[0].Runs, parseInlineHTMLFragment(source)} {
+			if len(runs) != 1 || runs[0].Text != "Keep this text" {
+				t.Fatalf("link text was lost: %+v", runs)
+			}
+			want := ""
+			if tc.safe {
+				want = tc.url
+			}
+			if runs[0].Style.Link != want {
+				t.Errorf("imported link %q: got %q, want %q", tc.url, runs[0].Style.Link, want)
+			}
+		}
+	}
+}
 
 func TestImportHTML(t *testing.T) {
 	doc := ImportHTML(`<meta charset="utf-8"><style>p{}</style>

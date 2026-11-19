@@ -536,7 +536,8 @@ func applyElementTagStyle(n *xhtml.Node, style document.Style) document.Style {
 	case atom.Code, atom.Kbd, atom.Samp, atom.Tt:
 		style.Code = true
 	case atom.A:
-		if href := attr(n, "href"); href != "" && !strings.HasPrefix(strings.ToLower(strings.TrimSpace(href)), "javascript:") {
+		// Inline HTML must share the full link policy, not one blocked prefix.
+		if href := attr(n, "href"); href != "" && safeHTMLURL(href) {
 			style.Link = href
 		}
 	}

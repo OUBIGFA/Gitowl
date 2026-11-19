@@ -201,7 +201,8 @@ func (h *htmlImporter) walk(n *html.Node, style document.Style) {
 			style.Code = true
 		}
 	case atom.A:
-		if href := attr(n, "href"); href != "" && !strings.HasPrefix(strings.ToLower(href), "javascript:") {
+		// Pasted HTML uses the same allowed schemes as exported links.
+		if href := attr(n, "href"); href != "" && safeHTMLURL(href) {
 			style.Link = href
 		}
 	case atom.Br:
