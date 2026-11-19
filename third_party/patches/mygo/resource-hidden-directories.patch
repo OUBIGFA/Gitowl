@@ -1,6 +1,7 @@
+diff --git a/cmd/mygo/resources.go b/cmd/mygo/resources.go
 --- a/cmd/mygo/resources.go
 +++ b/cmd/mygo/resources.go
-@@ -761,7 +761,7 @@
+@@ -916,7 +916,7 @@
  			}
  			// See junkName: dotfiles ship, hidden directories and the
  			// droppings of a file manager do not.
@@ -9,9 +10,10 @@
  				continue
  			}
  			if r.filter.excludes(filepath.Join(path, e.Name()), child.IsDir()) {
+diff --git a/cmd/mygo/resources_test.go b/cmd/mygo/resources_test.go
 --- a/cmd/mygo/resources_test.go
 +++ b/cmd/mygo/resources_test.go
-@@ -23,16 +23,17 @@
+@@ -24,16 +24,17 @@
  	t.Helper()
  	dir := t.TempDir()
  	writeFiles(t, dir, map[string]string{
@@ -39,7 +41,7 @@
  	})
  	tool := filepath.Join(dir, "resources", "bin", "tool")
  	writeFiles(t, dir, map[string]string{"resources/bin/tool": "#!/bin/sh\n"})
-@@ -81,10 +82,11 @@
+@@ -82,10 +83,11 @@
  		t.Fatal(err)
  	}
  	for name, content := range map[string]string{
@@ -55,7 +57,7 @@
  	} {
  		if got, err := os.ReadFile(filepath.Join(dst, filepath.FromSlash(name))); err != nil || string(got) != content {
  			t.Errorf("%s = %q, %v", name, got, err)
-@@ -98,6 +100,12 @@
+@@ -99,6 +101,12 @@
  	}
  	if _, err := os.Lstat(filepath.Join(dst, "data", ".DS_Store")); err == nil {
  		t.Error("a file manager's droppings were copied")

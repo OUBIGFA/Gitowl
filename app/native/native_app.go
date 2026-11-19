@@ -136,6 +136,13 @@ func (a *app) applyCoreSnapshot(snapshot backend.KernelSnapshot) {
 		a.setCoreTheme(snapshot.Appearance.Theme)
 	}
 	a.coreSnapshot = &snapshot
+	if !snapshot.Welcome && len(a.coreDeferredLaunches) > 0 {
+		pending := a.coreDeferredLaunches
+		a.coreDeferredLaunches = nil
+		for _, launch := range pending {
+			a.routeCoreLaunch(launch)
+		}
+	}
 	if snapshot.RepositoryFilter != nil && a.coreProjectFilterPending == 0 {
 		a.coreProjectFilter = snapshot.RepositoryFilter.Text
 	}

@@ -228,7 +228,7 @@ func nativeDialogValid(popup *backend.KernelPopupPresentation) bool {
 			return false
 		}
 		fields[field.ID] = true
-		if field.Kind == "icons" && (field.IconLibrary != "octicons" || !field.ReadOnly || slices.ContainsFunc(field.Choices, func(choice backend.KernelDialogChoice) bool { return nativeOcticons[choice.ID] == nil })) {
+		if field.Kind == "icons" && (field.IconLibrary != "octicons" || !field.ReadOnly || slices.ContainsFunc(field.Choices, func(choice backend.KernelDialogChoice) bool { return nativeOcticons()[choice.ID] == nil })) {
 			return false
 		}
 		if field.Kind == "image" && (!field.ReadOnly || field.Image == nil) {
@@ -585,7 +585,7 @@ func renderNativeDialogField(c *ui.Context, field backend.KernelDialogField, for
 				ui.Row(c).FillWidth().Wrap().Gap(12).Children(func() {
 					for _, choice := range field.Choices {
 						ui.Column(c.Key(choice.ID)).Width(max(112, size+24)).Gap(8).Padding(8).AlignItems(ui.Center).Tooltip(choice.Label).Children(func() {
-							ui.Icon(c, nativeOcticons[choice.ID]).FontSize(size).Label(choice.Label)
+							ui.Icon(c, nativeOcticons()[choice.ID]).FontSize(size).Label(choice.Label)
 							ui.Text(c, choice.Label).FontSize(c.Theme().Rem(14.0 / 15)).SingleLine().FillWidth().TextAlign(ui.Center)
 						})
 					}

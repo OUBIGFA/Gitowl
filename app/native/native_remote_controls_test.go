@@ -8,6 +8,14 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
+func TestNativeRemoteToolbarBeforeFirstSnapshot(t *testing.T) {
+	a := &app{}
+	tt := ui.NewTester(func(c *ui.Context) {
+		a.coreRemoteControls(c, locales.In("en"))
+	}, 900, 100)
+	tt.Frame()
+}
+
 func TestNativeRemoteToolbarUsesOriginalMenuAvailability(t *testing.T) {
 	for _, test := range []struct {
 		name                  string

@@ -82,8 +82,8 @@ it(
     const { getAppRuntime } = await import('../../src/ui/app-runtime')
     const runtime = getAppRuntime()
     const appStore = runtime.appStore
-    let startup: NativeStartup | undefined
-    t.after(() => startup?.dispose())
+    const startup = new NativeStartup(runtime)
+    t.after(() => startup.dispose())
     const selectedFixture = await seed(t, { 'selected.txt': 'before\n' })
     const otherFixture = await seed(t, {
       'first.txt': 'before\n',
@@ -154,7 +154,6 @@ it(
     }
     await writeFile(join(selected.path, 'selected.txt'), 'changed\n')
     await writeFile(join(other.path, 'first.txt'), 'changed\n')
-    startup = new NativeStartup(runtime)
     const starting = startup.start()
     await delay(25)
     assert.deepEqual(counts(), [undefined, undefined])

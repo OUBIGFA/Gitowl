@@ -1,21 +1,25 @@
-diff --git a/docs/ui/diff-viewer.md b/docs/ui/diff-viewer.md
-index 50d4849bef..c9d56d2ccb 100644
---- a/docs/ui/diff-viewer.md
-+++ b/docs/ui/diff-viewer.md
-@@ -103,6 +103,10 @@ keystroke. Cmd+F8 and Shift+Cmd+F8 go to the next and previous changes
-   of a review does.
- - `OnGutterButton` shows a + on the gutter of the line under the pointer,
-   as to comment on it, and is called with the line when it is clicked.
-+- `ContextMenu` appends items to the text editors' context menus after their
-+  standard editing commands, as `State.ContextMenu` does. It applies to both
-+  sides in split layout and to the text editor in unified layout. Set it before
-+  building `DiffView`; leaving it nil keeps the standard menus unchanged.
- - `Annotations` leave room under lines for what `RenderAnnotation` builds
-   there, as the comments of a review, each as high as it asks; the other
-   side of a split view leaves the room empty, so that the lines stay
+diff --git a/ui/editor/diffview.go b/ui/editor/diffview.go
+--- a/ui/editor/diffview.go
++++ b/ui/editor/diffview.go
+@@ -71,6 +71,8 @@
+ 	Theme      *Theme
+ 	// Bindings add key bindings to the editors of the sides.
+ 	Bindings []Binding
++	// ContextMenu appends native review actions after the standard editor commands.
++	ContextMenu func(m *ui.Menu)
+ 	// HunkActions shows Revert and Keep on the change under the pointer,
+ 	// or the caret's, which put the old lines back in New, or make the
+ 	// new lines Old's, as an agent's changes are reviewed.
+@@ -579,6 +581,7 @@
+ 		scrollPastEnd:  d.ScrollPastEnd && !d.FitContent,
+ 		keepScrollbars: d.KeepScrollbars, hideScrollbars: d.NoScrollbars,
+ 		renderFindBar: d.RenderFindBar, renderGoToLine: d.RenderGoToLine,
++		contextMenu: d.ContextMenu,
+ 	}
+ 	o.scrollMargin = defaultScrollMargin
+ 	if d.NoLineNumbers {
 diff --git a/ui/editor/diff_context_menu_test.go b/ui/editor/diff_context_menu_test.go
 new file mode 100644
-index 0000000000..c41d360d38
 --- /dev/null
 +++ b/ui/editor/diff_context_menu_test.go
 @@ -0,0 +1,60 @@
@@ -79,26 +83,15 @@ index 0000000000..c41d360d38
 +		}
 +	}
 +}
-diff --git a/ui/editor/diffview.go b/ui/editor/diffview.go
-index cc072913f0..319cbe588c 100644
---- a/ui/editor/diffview.go
-+++ b/ui/editor/diffview.go
-@@ -62,6 +62,10 @@ type DiffState struct {
- 	Theme      *Theme
- 	// Bindings add key bindings to the editors of the sides.
- 	Bindings []Binding
-+	// ContextMenu adds items after the standard editing items in either side's
-+	// context menu, in split and unified layouts, as State.ContextMenu does.
-+	// A nil callback preserves the viewer's existing menus.
-+	ContextMenu func(m *ui.Menu)
- 	// HunkActions shows Revert and Keep on the change under the pointer,
- 	// or the caret's, which put the old lines back in New, or make the
- 	// new lines Old's, as an agent's changes are reviewed.
-@@ -543,6 +547,7 @@ func (d *DiffState) sideOptions(old bool) options {
- 		theme: d.Theme, bindings: d.Bindings, fitContent: d.FitContent, minDigits: digits,
- 		keepScrollbars: d.KeepScrollbars, hideScrollbars: d.NoScrollbars,
- 		renderFindBar: d.RenderFindBar, renderGoToLine: d.RenderGoToLine,
-+		contextMenu: d.ContextMenu,
- 	}
- 	if d.NoLineNumbers {
- 		o.lineNumbers = LineNumbersOff
+diff --git a/docs/ui/diff-viewer.md b/docs/ui/diff-viewer.md
+--- a/docs/ui/diff-viewer.md
++++ b/docs/ui/diff-viewer.md
+@@ -130,6 +130,8 @@
+   of a review does.
+ - `OnGutterButton` shows a + on the gutter of the line under the pointer,
+   as to comment on it, and is called with the line when it is clicked.
++- `ContextMenu` appends review items after the standard editing commands in
++  both split and unified layouts. A nil callback keeps the standard menu.
+ - `Annotations` leave room under lines for what `RenderAnnotation` builds
+   there, as the comments of a review, each as high as it asks; the other
+   side of a split view leaves the room empty, so that the lines stay

@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"strings"
+	"sync"
 
 	"github.com/egoist/mygo/ui"
 )
@@ -13,7 +14,9 @@ import (
 //go:embed octicons/*.svg
 var octiconFiles embed.FS
 
-var nativeOcticons = func() map[string]*ui.SVG {
+// The full upstream catalogue is only shown in its dedicated dialog. Parsing
+// it before the first window allocated thousands of unused SVG objects.
+var nativeOcticons = sync.OnceValue(func() map[string]*ui.SVG {
 	icons := make(map[string]*ui.SVG)
 	files, err := octiconFiles.ReadDir("octicons")
 	if err != nil {
@@ -27,4 +30,4 @@ var nativeOcticons = func() map[string]*ui.SVG {
 		icons[strings.TrimSuffix(file.Name(), ".svg")] = ui.MustParseSVG(data)
 	}
 	return icons
-}()
+})

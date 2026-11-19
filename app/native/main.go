@@ -81,8 +81,8 @@ func run(entry, electron, initialPath, profile string, initialLaunch nativeLaunc
 		launches.automaticSchemes = []string{"gitowl", "gitowl-auth"}
 	}
 	if configErr == nil {
-		callback, err := registerNativeOAuthCallback(config.Entry, mygo.App.RegisterURLScheme)
-		if callback != "" {
+		callback, err := registerNativeOAuthCallback(config.Entry, profile != "", mygo.App.RegisterURLScheme)
+		if callback != "" && profile == "" {
 			launches.automaticSchemes = append(launches.automaticSchemes, callback)
 		}
 		if err != nil {

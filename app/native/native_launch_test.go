@@ -1,6 +1,38 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/OUBIGFA/Gitowl/app/native/internal/backend"
+)
+
+func TestNativeLaunchWaitsForWelcomeButAllowsOAuth(t *testing.T) {
+	a := newApp(nil, nil)
+	defer a.close()
+	a.core, a.coreQueue = &backend.Kernel{}, make(chan nativeOperation, 8)
+	a.routeCoreLaunch(nativeLaunchOptions{openPath: "project"})
+	a.routeCoreLaunch(nativeLaunchOptions{cloneURL: "https://example.com/project.git"})
+	a.routeCoreLaunch(nativeLaunchOptions{protocolURL: "gitowl://openRepo/https://github.com/example/project"})
+	if len(a.coreQueue) != 0 {
+		t.Fatal("repository launches can cover the first-run author form")
+	}
+	a.routeCoreLaunch(nativeLaunchOptions{protocolURL: "x-github-desktop-dev-auth://oauth?code=fixture&state=fixture"})
+	if len(a.coreQueue) != 1 {
+		t.Fatal("welcome sign-in must still receive its OAuth callback")
+	}
+	a.applyCoreSnapshot(backend.KernelSnapshot{Revision: 1, Welcome: true})
+	if len(a.coreQueue) != 1 {
+		t.Fatal("launches escaped before welcome finished")
+	}
+	a.applyCoreSnapshot(backend.KernelSnapshot{Revision: 2})
+	if len(a.coreQueue) != 4 {
+		t.Fatal("completed welcome did not deliver its deferred launches")
+	}
+	a.applyCoreSnapshot(backend.KernelSnapshot{Revision: 3})
+	if len(a.coreQueue) != 4 {
+		t.Fatal("a later snapshot replayed a launch")
+	}
+}
 
 func TestSecondInstancePreservesSinglePositionalArgument(t *testing.T) {
 	options, err := parseSecondInstanceArguments([]string{"gitowl-auth://oauth?code=one&state=two"}, `C:\work`)

@@ -84,7 +84,7 @@
       "source": "file:../vendor/desktop-trampoline",
       "integrity": null,
       "path": "app/node_modules/desktop-trampoline/build/Release/desktop-askpass-trampoline.exe",
-      "sha256": "0ce5daeabf5c9b9f9ee4e672bb32a227293d64ac19ecff1102ac4086a27d0800"
+      "sha256": "3f31b999eaf7495c918a9f2b8e1d43efd5acbcc6cb7271ea50c709bad1245c8f"
     },
     {
       "package": "desktop-trampoline",
@@ -94,7 +94,7 @@
       "source": "file:../vendor/desktop-trampoline",
       "integrity": null,
       "path": "app/node_modules/desktop-trampoline/build/Release/desktop-credential-helper-trampoline.exe",
-      "sha256": "7883be280795346362a018c34b62c61c497d55ad3925b44f06e12d70989930fa"
+      "sha256": "aaabb36ca6e4f3d7d777f1029bee9ae877ad6d067aa4ab397dbc5847f6285f5a"
     },
     {
       "package": "process-proxy",
@@ -114,7 +114,7 @@
       "source": "file:vendor/printenvz",
       "integrity": null,
       "path": "node_modules/printenvz/build/Release/printenvz.exe",
-      "sha256": "5e91a8719807210a2f3a5ebe9c72c5385252f9f53887e0a3e78900d965ecc6c7"
+      "sha256": "6207a08cf9b21f5d00742f8b9c7bcd46fadc6765a169e9297accdf167854f715"
     }
   ],
   "packaging": {
@@ -123,8 +123,8 @@
     "presentationComplete": false,
     "channel": "research-preview",
     "blockers": [
-      "Original cli.js/static github.bat still target GitHubDesktop.exe, not the MyGo launcher; CLI/deep-link acceptance is pending.",
-      "Gitowl OAuth/updates/protocol registration and original native frontend acceptance are not complete."
+      "The native CLI and protocol adapters are implemented; full upstream feature parity and source-bound frontend acceptance are not certified.",
+      "A public Gitowl update feed and signed distribution are not configured; real account OAuth/Copilot acceptance remains pending."
     ]
   },
   "node": {
@@ -188,8 +188,8 @@
     },
     {
       "module": "github.com/egoist/mygo",
-      "version": "v0.9.0",
-      "source": "https://pkg.go.dev/github.com/egoist/mygo@v0.9.0",
+      "version": "v0.10.0",
+      "source": "https://pkg.go.dev/github.com/egoist/mygo@v0.10.0",
       "licenses": [
         {
           "path": "third_party/licenses/native/github.com_egoist_mygo-LICENSE",
@@ -321,19 +321,19 @@
   "lockfiles": [
     {
       "path": "package-lock.json",
-      "sha256": "59eedaf9199df76e6b9535ced2f743d9b9233d8361e36747a4c1bb2dd42cbfcb"
+      "sha256": "8d82979cbd9ade4ca7af39cfd5fb40060dc0e1dcbaed49254441a149c9019e6f"
     },
     {
       "path": "app/package-lock.json",
-      "sha256": "ad08a58c6ac34041998dd3ae73ecfa5953c8b6082e2321c13a3721db35fb0de6"
+      "sha256": "88149ac11498ce2c44efc4a58e143f062314c92b2912c7d2ede861da4f91cf6b"
     },
     {
       "path": "app/native/go.mod",
-      "sha256": "0f2a710cc41b3be00398136d32b381f922216593b1072de884db36ba3ddc1b18"
+      "sha256": "808eaffa3f57a0b0a32783f0610723df537a944a46887a39630b4e241d0149bf"
     },
     {
       "path": "app/native/go.sum",
-      "sha256": "0c7dbc04a56987898eb0aef7681ef7a20a5369c2f7409e11a434e84bcc58b39d"
+      "sha256": "8d6c80da32538153cc8d3f2edf55eb5180350efc210abcdf6e6b80ff77feb36a"
     }
   ]
 }

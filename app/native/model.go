@@ -68,6 +68,7 @@ type app struct {
 	coreOnboardingForm        kernelOnboardingForm
 	coreSignInForm            kernelSignInForm
 	coreInitialPath           string
+	coreDeferredLaunches      []nativeLaunchOptions
 	coreZoom                  float64
 	coreWindowAction          func(string)
 	corePresentationActions   []string

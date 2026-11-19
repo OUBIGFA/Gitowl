@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -23,7 +24,7 @@ func TestNativeOAuthRegistersOnlyTheOriginalCompiledCallback(t *testing.T) {
 		// Registry boundary only. Never alter the real user's installed handlers.
 		handlers := map[string]string{upstreamConfiguredOAuthScheme: "Installed Desktop", upstreamDevelopmentOAuthScheme: "Installed Desktop Dev", "x-github-client": "Installed Desktop"}
 		var calls []string
-		scheme, err := registerNativeOAuthCallback(filepath.Join(dir, "main.js"), func(scheme string) error {
+		scheme, err := registerNativeOAuthCallback(filepath.Join(dir, "main.js"), false, func(scheme string) error {
 			calls = append(calls, scheme)
 			handlers[scheme] = "Gitowl"
 			return nil
@@ -49,7 +50,7 @@ func TestNativeOAuthMetadataAndRegistrationFailuresAreReported(t *testing.T) {
 		if err := os.WriteFile(filepath.Join(dir, "native-launch.json"), []byte(data), 0600); err != nil {
 			t.Fatal(err)
 		}
-		_, err := registerNativeOAuthCallback(filepath.Join(dir, "main.js"), func(string) error { t.Fatal("invalid metadata reached OS registration"); return nil })
+		_, err := registerNativeOAuthCallback(filepath.Join(dir, "main.js"), false, func(string) error { t.Fatal("invalid metadata reached OS registration"); return nil })
 		if err == nil {
 			t.Fatal("invalid callback metadata was ignored")
 		}
@@ -58,8 +59,24 @@ func TestNativeOAuthMetadataAndRegistrationFailuresAreReported(t *testing.T) {
 		t.Fatal(err)
 	}
 	failure := errors.New("registration refused")
-	scheme, err := registerNativeOAuthCallback(filepath.Join(dir, "main.js"), func(string) error { return failure })
+	scheme, err := registerNativeOAuthCallback(filepath.Join(dir, "main.js"), false, func(string) error { return failure })
 	if scheme != upstreamDevelopmentOAuthScheme || !errors.Is(err, failure) {
 		t.Fatalf("registration failure lost: %q %v", scheme, err)
+	}
+}
+
+func TestIsolatedNativeProfileDoesNotReplaceInstalledOAuthHandler(t *testing.T) {
+	for _, scheme := range []string{upstreamDevelopmentOAuthScheme, upstreamConfiguredOAuthScheme} {
+		dir := t.TempDir()
+		if err := os.WriteFile(filepath.Join(dir, "native-launch.json"), []byte(fmt.Sprintf(`{"oauthCallbackScheme":%q}`, scheme)), 0600); err != nil {
+			t.Fatal(err)
+		}
+		callback, err := registerNativeOAuthCallback(filepath.Join(dir, "main.js"), true, func(string) error {
+			t.Fatal("isolated launch modified the installed protocol handler")
+			return nil
+		})
+		if err != nil || callback != scheme {
+			t.Fatalf("isolated callback routing: %q, %v", callback, err)
+		}
 	}
 }

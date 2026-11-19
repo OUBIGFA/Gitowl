@@ -1,20 +1,20 @@
 {
   "module": "github.com/egoist/mygo",
-  "version": "v0.9.0",
-  "revision": "4811a2869b5a66d2b7e21a9eb5993fcff544460b",
+  "version": "v0.10.0",
+  "revision": "ebde9399baf2734b3361856a53f4036859973d1d",
   "go": "1.27.3",
   "license": "MIT",
-  "archive_sha256": "1b15caf37041da5eb620db82e99dd1e3139a196b4b2de4cabc35de6abd20b22e",
+  "archive_sha256": "53b0ce8c4bf7581deb3891a2e8cf75267a5804a82ed6de0d5d68b8440d8c395a",
   "patches": [
     {
       "path": "third_party/patches/mygo/diff-scrollbar-gutters.patch",
-      "sha256": "e4cb3a9737adb91c19a1de5affc2207d8edbb44464feab0287a706f7550b5f4a",
-      "reason": "MyGo v0.9.0 paints text beneath persistent scrollbars and counts their horizontal track as readable viewport height. KeepScrollbars now reserves the bottom gutter in unwrapped scrolling editors and clips content out of both tracks. Gitowl enables the existing option on its native diff; default, wrapped, hidden-scrollbar and fit-content behavior remain unchanged. Tests cover split/unified bottom-line visibility, wrapping, hidden bars and existing viewport behavior.",
+      "sha256": "9d7b8861abe5b40caabfa493dda28f4579bb4623d167f11f5e7174ed13bb53f6",
+      "reason": "MyGo v0.10.0 paints text beneath persistent scrollbars and counts their horizontal track as readable viewport height. KeepScrollbars now reserves the bottom gutter in unwrapped scrolling editors and clips content out of both tracks. Gitowl enables the existing option on its native diff; default, wrapped, hidden-scrollbar and fit-content behavior remain unchanged. Tests cover split/unified bottom-line visibility, wrapping, hidden bars and existing viewport behavior.",
       "files": [
         {
           "path": "ui/editor/paint.go",
-          "before": "8bb4966d8ab9ad7af92f7bca10abf0af08b6ea2ce435311736879ecdd1db330d",
-          "after": "bf1fca0816a1b90ce5ea763af34ade4f83cde677b24397da36367df80960b8d4"
+          "before": "6715bcf1ce2a01796acb007337df1dbcf9bd3a86483ce51bef3480fdf73fa684",
+          "after": "3ac26f88d82817d01c2c0bdde7d2c596989869bd69d3b0fbb79ed4d036faaa1a"
         },
         {
           "path": "ui/editor/gitowl_scrollbar_test.go",
@@ -25,8 +25,8 @@
     },
     {
       "path": "third_party/patches/mygo/installer-languages.patch",
-      "sha256": "dd1a7df8d47895daf0cc36479be9b947294b128d974266b56bf2ee7b0db8fe07",
-      "reason": "NSIS process and removal errors follow the selected English, Simplified Chinese or Traditional Chinese language. A real installed lifecycle exposed unchecked deletion leaving electron.exe while reporting success. Retry transient deletion locks for five seconds, report persistent failure, and retain registration until file removal succeeds. The original Desktop CLI hook still runs before removal; no application shutdown deadline or termination policy changes. Real compiled NSIS tests cover unlocked, temporary-lock and persistent-lock removal. Reviewed against v0.9.0; upstream still lacks these checks.",
+      "sha256": "1cb4ee4e46edf759ba66326d49f45c776ec4af257de712e973d1b9898653339f",
+      "reason": "NSIS process and removal errors follow the selected English, Simplified Chinese or Traditional Chinese language. A real installed lifecycle exposed unchecked deletion leaving electron.exe while reporting success. Retry transient deletion locks for five seconds, report persistent failure, and retain registration until file removal succeeds. The original Desktop CLI hook still runs before removal; no application shutdown deadline or termination policy changes. Real compiled NSIS tests cover unlocked, temporary-lock and persistent-lock removal. Reviewed against v0.10.0; upstream still lacks these checks.",
       "files": [
         {
           "path": "cmd/mygo/nsis.go",
@@ -52,13 +52,13 @@
     },
     {
       "path": "third_party/patches/mygo/diff-context-menu.patch",
-      "sha256": "f6c3506cbe424075e72f146916ded06b90029326a85b8a78036475de69add43e",
-      "reason": "MyGo v0.9.0's inner diff editors own their context menus. Forward the existing editor context-menu extension to both DiffState sides so original expand/discard/options remain reachable without replacing native editing or retaining frame objects. Reviewed locked sideOptions/build/menu implementations; nil preserves upstream behavior. Covers split/unified and system/popover menus.",
+      "sha256": "32efc2ea10badbe3098f32de04a570dffe33403651f8f60cbcf6f67c01a400d7",
+      "reason": "MyGo v0.10.0's inner diff editors own their context menus. Forward the existing editor context-menu extension to both DiffState sides so original expand/discard/options remain reachable without replacing native editing or retaining frame objects. Reviewed locked sideOptions/build/menu implementations; nil preserves upstream behavior. Covers split/unified and system/popover menus.",
       "files": [
         {
           "path": "ui/editor/diffview.go",
-          "before": "cb9bc8569e8f263cf40fa04d2e98c61a7611b15a7b61237080a7e50a61b8cd51",
-          "after": "03970c5b4cd9471864eed203f38e6a1c9633981ba0d401bcf49be4bb32fad287"
+          "before": "c0c1944ba50ea7555bc7a95b71a85a0f0e66f7e0fcae3b7b076b9f13a97f9ddc",
+          "after": "06387477ee77f6cc3c5dac74d6a632ddf664bf2e7c2cded701688fed7d0317b9"
         },
         {
           "path": "ui/editor/diff_context_menu_test.go",
@@ -67,15 +67,15 @@
         },
         {
           "path": "docs/ui/diff-viewer.md",
-          "before": "6ad0a8660a70bfe46877f1a4d9ccdbd8ebb309553ecb291be14042e352bfbb09",
-          "after": "f1e888501a1d6bcb285af620d1bf2925f756afc626e0174042da5e10638d5cae"
+          "before": "c8a6ef3b0cd8fc3000a1df1393f74b558132183c9070934c2049ad98f11e7ff1",
+          "after": "ff56b7b2d7e82a86c9c666de4f9dbc71c40bedc3e761968a1b0756d534c7b73d"
         }
       ]
     },
     {
       "path": "third_party/patches/mygo/native-editing-role.patch",
       "sha256": "49f54eb8caf80fc6d5ed43ea7f04965083fdaf1f928f3d33b0083812a94520e7",
-      "reason": "Windows Select All is an application action for repository lists, but native text focus must retain the original toolkit editing role. Expose only Window.SelectAll forwarding the existing performRole implementation. No editing algorithm, engine input behavior, web UI or synthetic keys are added; verified against v0.9.0 menu.go/content.go. Remove once upstream exposes equivalent role dispatch.",
+      "reason": "Windows Select All is an application action for repository lists, but native text focus must retain the original toolkit editing role. Expose only Window.SelectAll forwarding the existing performRole implementation. No editing algorithm, engine input behavior, web UI or synthetic keys are added; verified against v0.10.0 menu.go/content.go. Remove once upstream exposes equivalent role dispatch.",
       "files": [
         {
           "path": "gitowl_editing.go",
@@ -92,7 +92,7 @@
     {
       "path": "third_party/patches/mygo/number-labels.patch",
       "sha256": "7fb6d2a62edca32ec8bb065966851beccec06c68d29963c4174a5bcecddd05bb",
-      "reason": "The v0.9.0 NumberInput exposes hard-coded English Increase/Decrease accessibility actions in Chinese interfaces. Translate only those action labels for the two shipped Chinese locales, preserving the original control, parser, bounds and stepping. Covered by the production-control regression TestNativeNumberActionsFollowInterfaceLanguage; remove once upstream localizes these labels.",
+      "reason": "The v0.10.0 NumberInput exposes hard-coded English Increase/Decrease accessibility actions in Chinese interfaces. Translate only those action labels for the two shipped Chinese locales, preserving the original control, parser, bounds and stepping. Covered by the production-control regression TestNativeNumberActionsFollowInterfaceLanguage; remove once upstream localizes these labels.",
       "files": [
         {
           "path": "ui/number.go",
@@ -103,18 +103,18 @@
     },
     {
       "path": "third_party/patches/mygo/consumed-system-keys.patch",
-      "sha256": "7c1ca835db2fc96ba13450b128f6599ee2be7cf4dab8f1f335aaf0535cbda3e5",
-      "reason": "MyGo v0.9.0 opens Shift+F10 context menus but returns the key as unconsumed, while its Windows surface also ignores consumed named system keys. Report successful context-menu ownership and honor the existing SurfaceEvent consumption contract so Windows does not open a second main menu. Unconsumed Alt/F10 keep their native path. Covered by UI consumption and Windows dispatch regressions plus native desktop acceptance. Remove once upstream contains equivalent fixes.",
+      "sha256": "fd5c8e78bd05434a01f074d8698cc5bbb94d3a45707a2dadc60d98a170b566be",
+      "reason": "MyGo v0.10.0 opens Shift+F10 context menus but returns the key as unconsumed, while its Windows surface also ignores consumed named system keys. Report successful context-menu ownership and honor the existing SurfaceEvent consumption contract so Windows does not open a second main menu. Unconsumed Alt/F10 keep their native path. Covered by UI consumption and Windows dispatch regressions plus native desktop acceptance. Remove once upstream contains equivalent fixes.",
       "files": [
         {
           "path": "ui/input.go",
-          "before": "b033cc72279a0e89f13e494ff73e1d05f3f9d22a4ab905e4fc7d9db80c94f1a3",
-          "after": "229e3575b3a3942fa22ec712852a07c536ea575fd6a89301c31123733a31c868"
+          "before": "9d2bd9fbac0d01ef71c5454229f9d44f5b6f23a6dad8be586525d7c5f8e7ce9f",
+          "after": "92adacd18eaa5180c0e762104e0dae1c28d01f899e4f60075573b64b6e25c917"
         },
         {
           "path": "internal/windows/surface.go",
-          "before": "2c4a355a53a62c221dedfb2cdaf9aed89249c5e0c7b6d8f429b173cb28c47424",
-          "after": "d36dc525aadad87dddfb969d0db9d510be21ba2f2b39bee6060a3ea9689c6d84"
+          "before": "6b9cdb85684b730a94081b632ad82d0affab38310aa2da91e2ca0d9b3d14cf95",
+          "after": "0cf86630e87b5de35ad6b0e19e3fa736ef9f97f27e7219c48c644288ac05a7b3"
         },
         {
           "path": "ui/gitowl_context_key_test.go",
@@ -130,13 +130,13 @@
     },
     {
       "path": "third_party/patches/mygo/single-instance-framing.patch",
-      "sha256": "28b3485ae86ea79316b49bff2506afaa5d846ebaae9d624c7b53061eb40a32c3",
-      "reason": "MyGo v0.9.0 waits for EOF after receiving the complete single-instance JSON object. Windows AF_UNIX can delay write-side EOF, so the two-second read deadline discards valid CLI/deep-link launches. Decode one bounded JSON object as the message boundary; retain the size limit, deadline, schema, original event dispatch and sender protocol. Regression keeps the sender open, checks fragmented delivery, and runs original single-instance/identifier tests. Remove once upstream provides equivalent object framing.",
+      "sha256": "7ffd785b1b00619d417a739bfecbb8987292a060090fce86ca1ad8a0e185c4c6",
+      "reason": "MyGo v0.10.0 waits for EOF after receiving the complete single-instance JSON object. Windows AF_UNIX can delay write-side EOF, so the two-second read deadline discards valid CLI/deep-link launches. Decode one bounded JSON object as the message boundary; retain the size limit, deadline, schema, original event dispatch and sender protocol. Regression keeps the sender open, checks fragmented delivery, and runs original single-instance/identifier tests. Remove once upstream provides equivalent object framing.",
       "files": [
         {
           "path": "single_instance.go",
-          "before": "ad92e9f8cd0c21a82367044c3542766216b87c0274a9539ba508b90a8f9c7814",
-          "after": "6fd7d8d652a69664a9040615755bbff802fda83173ac02fde02cfb61241f4dca"
+          "before": "d48f5e54c4c921b768d2277db0f608cc52adcb40d5e8331b74b356fe4fec03b0",
+          "after": "ae0449a89e3e79428570f209c2fe5c0ef0f81d8082c8b72bc610c5e137d945f9"
         },
         {
           "path": "gitowl_single_instance_test.go",
@@ -147,25 +147,25 @@
     },
     {
       "path": "third_party/patches/mygo/resource-hidden-directories.patch",
-      "sha256": "d77026aa405e1b42e73afc04e76075d9c60709d3edcc43fb218ef63aba898ece",
-      "reason": "MyGo v0.9.0 skips hidden directories while copying explicitly listed resources. The original Desktop runtime contains Copilot plugin manifests and Git ignore templates under .plugin/.github directories, so the fixed package must preserve those directories while continuing to omit hidden entries from the project's own resources tree. The regression covers both listed-resource preservation and the existing repository-resource exclusions; remove once upstream preserves listed hidden directories equivalently.",
+      "sha256": "a757bc6b92ffd9c2902171c91bcbe76ea9a7632b762232eb56118ec774fcfae2",
+      "reason": "MyGo v0.10.0 skips hidden directories while copying explicitly listed resources. The original Desktop runtime contains Copilot plugin manifests and Git ignore templates under .plugin/.github directories, so the fixed package must preserve those directories while continuing to omit hidden entries from the project's own resources tree. The regression covers both listed-resource preservation and the existing repository-resource exclusions; remove once upstream preserves listed hidden directories equivalently.",
       "files": [
         {
           "path": "cmd/mygo/resources.go",
-          "before": "c37972df4db03483cab623ad610caef1e9883d6734312cbe3c8c012d98cfe442",
-          "after": "092dd73f03435dd0247232c0fe336dba394a5af271342f15a872feed84a7020b"
+          "before": "bf43dd41389ae631cbeb085d33769cd7e7b5cf7d33b2f2f075cf52dadbe55726",
+          "after": "619f64e4c6668bd77eb2a57730535dbe559a463c084b008bb263afbb88f02583"
         },
         {
           "path": "cmd/mygo/resources_test.go",
-          "before": "30bb606aef2a02c7c6a0c2a355fdf726e5b014f183c1e1cc67ad93dbf3063793",
-          "after": "c80f38609c7bc5540158f9a7457875f33c0fc1c2d5a69dd2fe8c23cf05d83669"
+          "before": "9ca74de9d9c86b68b86f0913235206e57a98dcc9831f647aa4b3b9809b0164f2",
+          "after": "bd285e2575a4dd7589fb90aa80ba7fc3f1aa7a810d3a20135e13989697aa5e88"
         }
       ]
     },
     {
       "path": "third_party/patches/mygo/fixed-split.patch",
-      "sha256": "c9609525be04fd0b67ac533eb2e36f2ce351bb3ed43797496a39f14f322d0f3d",
-      "reason": "MyGo v0.9.0 Split always allows divider pointer and keyboard resizing. SplitFixed reuses the same native pane tree but disables only the divider and its drag handle, preserving child focus, draft undo and scrolling when Gitowl collapses its diff. Existing split constructors keep their behavior; the public facade is regenerated with go generate ./ui. Gitowl view tests cover locked changes/history panels, reopening, resizing and retained drafts.",
+      "sha256": "4103e5a6a335a5040566c0969832e5d5d0213c9a693ff7ce0d29d6085fab62c7",
+      "reason": "MyGo v0.10.0 Split always allows divider pointer and keyboard resizing. SplitFixed reuses the same native pane tree but disables only the divider and its drag handle, preserving child focus, draft undo and scrolling when Gitowl collapses its diff. Existing split constructors keep their behavior; the public facade is regenerated with go generate ./ui. Gitowl view tests cover locked changes/history panels, reopening, resizing and retained drafts.",
       "files": [
         {
           "path": "ui/split.go",
@@ -174,8 +174,8 @@
         },
         {
           "path": "ui/api_gen.go",
-          "before": "548df13674674a099f69fcfd11c610a88de91b1c4a42942733ca6d5add73ab5c",
-          "after": "3ac8a10fba18ebceaf8d02ebf4393b311bfb528db53cc5d0d866559286c08403"
+          "before": "f867043afe7c8d0b49fb3467acadeb5b2b399a0026408ac978e5a56924b0cef2",
+          "after": "cc2995a626c80cc39577952cb441b12f9a920506b975d8cc0a017a13d94e9dce"
         }
       ]
     }

@@ -1,3 +1,4 @@
+diff --git a/single_instance.go b/single_instance.go
 --- a/single_instance.go
 +++ b/single_instance.go
 @@ -5,6 +5,7 @@
@@ -6,19 +7,20 @@
  	"encoding/hex"
 +	"encoding/json/jsontext"
  	"encoding/json/v2"
- 	"errors"
  	"io"
-@@ -129,7 +130,9 @@
+ 	"log"
+@@ -204,7 +205,8 @@
  		go func() {
  			defer conn.Close()
  			_ = conn.SetDeadline(time.Now().Add(2 * time.Second))
 -			data, err := io.ReadAll(io.LimitReader(conn, 1<<20))
-+			// One JSON object is one launch message. Do not wait for write-side
-+			// EOF: Windows local sockets can delay it after all bytes arrived.
++			// A complete JSON value is the launch boundary; Windows may delay EOF.
 +			data, err := jsontext.NewDecoder(io.LimitReader(conn, 1<<20)).ReadValue()
  			if err != nil {
  				return
  			}
+diff --git a/gitowl_single_instance_test.go b/gitowl_single_instance_test.go
+new file mode 100644
 --- /dev/null
 +++ b/gitowl_single_instance_test.go
 @@ -0,0 +1,53 @@

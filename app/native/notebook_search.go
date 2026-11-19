@@ -68,6 +68,7 @@ func searchNotebook(ctx context.Context, root, mode, query string) ([]string, er
 	}
 	defer tree.Close()
 	query = strings.TrimSpace(query)
+	foldedQuery := strings.ToLower(query)
 	if query == "" && (mode == "text" || mode == "backlinks") {
 		return nil, nil
 	}
@@ -91,14 +92,17 @@ func searchNotebook(ctx context.Context, root, mode, query string) ([]string, er
 		var match bool
 		switch mode {
 		case "files":
-			match = strings.Contains(lower, strings.ToLower(query))
+			match = strings.Contains(lower, foldedQuery)
 		case "wiki":
 			match = wiki.Same(strings.TrimSuffix(d.Name(), filepath.Ext(d.Name())), query) || wiki.Same(strings.TrimSuffix(name, filepath.Ext(name)), query)
 		default:
 			if mode == "backlinks" && !strings.HasSuffix(lower, ".md") && !strings.HasSuffix(lower, ".markdown") {
 				return nil
 			}
-			data, err := tree.ReadFile(filepath.FromSlash(name))
+			data, err := readNotebookFile(tree, filepath.FromSlash(name))
+			if errors.Is(err, errNotebookTooLarge) {
+				return nil
+			}
 			if err != nil {
 				return err
 			}
@@ -109,7 +113,7 @@ func searchNotebook(ctx context.Context, root, mode, query string) ([]string, er
 			if mode == "backlinks" {
 				match = wiki.LinksTo(text, query)
 			} else {
-				match = strings.Contains(strings.ToLower(text), strings.ToLower(query))
+				match = strings.Contains(strings.ToLower(text), foldedQuery)
 			}
 		}
 		if match {
@@ -160,6 +164,9 @@ func (a *app) notebookSearchDialog(c *ui.Context) {
 			hint = "LinkTarget"
 		}
 		query := ui.SearchField(c.Key("note-query"), &s.query).FillWidth().AutoFocus().Label(bookLabel(c, hint)).Placeholder(bookLabel(c, hint)).OnChange(a.runNotebookSearch)
+		if s.mode == "text" || s.mode == "backlinks" {
+			ui.Text(c, bookLabel(c, "SearchLimit")).TextColor(c.Theme().TextMuted).FillWidth()
+		}
 		results := s.results
 		openResult := func(name string) {
 			n.searchOpen = false

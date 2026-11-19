@@ -4308,6 +4308,36 @@ func (msgs Messages) EditorConflict() string {
 	return Catalog.Format(msgs.locale, "editorConflict", nil)
 }
 
+// EditorTooLarge says "This file exceeds the editor's 8 MiB limit. Open it in an external editor."
+// in the language the app shows.
+func EditorTooLarge() string { return In(i18n.Locale()).EditorTooLarge() }
+
+// EditorTooLarge says "This file exceeds the editor's 8 MiB limit. Open it in an external editor."
+// in the language of msgs.
+func (msgs Messages) EditorTooLarge() string {
+	return Catalog.Format(msgs.locale, "editorTooLarge", nil)
+}
+
+// EditorSearchLimit says "Content search includes text files up to 8 MiB each."
+// in the language the app shows.
+func EditorSearchLimit() string { return In(i18n.Locale()).EditorSearchLimit() }
+
+// EditorSearchLimit says "Content search includes text files up to 8 MiB each."
+// in the language of msgs.
+func (msgs Messages) EditorSearchLimit() string {
+	return Catalog.Format(msgs.locale, "editorSearchLimit", nil)
+}
+
+// EditorLinkError says "Open a project file, an HTTP(S) link or an email address."
+// in the language the app shows.
+func EditorLinkError() string { return In(i18n.Locale()).EditorLinkError() }
+
+// EditorLinkError says "Open a project file, an HTTP(S) link or an email address."
+// in the language of msgs.
+func (msgs Messages) EditorLinkError() string {
+	return Catalog.Format(msgs.locale, "editorLinkError", nil)
+}
+
 // EditorOutline says "Outline"
 // in the language the app shows.
 func EditorOutline() string { return In(i18n.Locale()).EditorOutline() }

@@ -1,7 +1,7 @@
 diff --git a/ui/input.go b/ui/input.go
 --- a/ui/input.go
 +++ b/ui/input.go
-@@ -982,7 +982,8 @@
+@@ -1168,7 +1168,8 @@
  		return true
  	}
  	if (key == KeyContextMenu && mods == 0 || key == KeyF10 && mods == Shift) && !rt.claimed(k) && rt.menuKey() {
@@ -14,7 +14,7 @@ diff --git a/ui/input.go b/ui/input.go
 diff --git a/internal/windows/surface.go b/internal/windows/surface.go
 --- a/internal/windows/surface.go
 +++ b/internal/windows/surface.go
-@@ -922,7 +922,7 @@
+@@ -1003,7 +1003,7 @@
  		}
  		// Alt+F4, Alt+Space and F10 keep working, and Alt the menu bar, unless
  		// the content took it as a key of its own.

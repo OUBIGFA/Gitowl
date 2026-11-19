@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,7 +19,36 @@ var (
 	errNotebookPath     = errors.New("editor.path")
 	errNotebookBinary   = errors.New("editor.binary")
 	errNotebookConflict = errors.New("editor.conflict")
+	errNotebookTooLarge = errors.New("editor.tooLarge")
 )
+
+// Bound both editor buffers and per-file search reads. The same limit is
+// stated in the editor error and content-search UI in every language.
+const notebookTextLimit = 8 << 20
+
+func readNotebookFile(root *os.Root, name string) ([]byte, error) {
+	f, err := root.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	info, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
+	if !info.Mode().IsRegular() {
+		return nil, errNotebookPath
+	}
+	if info.Size() > notebookTextLimit {
+		return nil, errNotebookTooLarge
+	}
+	// Stat is only an early rejection; the file may grow while it is read.
+	data, err := io.ReadAll(io.LimitReader(f, notebookTextLimit+1))
+	if len(data) > notebookTextLimit {
+		return nil, errNotebookTooLarge
+	}
+	return data, err
+}
 
 type notebookDocument struct {
 	imageContext     context.Context
@@ -73,14 +103,7 @@ func openNotebookDocument(project, name string) (*notebookDocument, error) {
 		return nil, err
 	}
 	defer root.Close()
-	info, err := root.Stat(name)
-	if err != nil {
-		return nil, err
-	}
-	if !info.Mode().IsRegular() {
-		return nil, errNotebookPath
-	}
-	data, err := root.ReadFile(name)
+	data, err := readNotebookFile(root, name)
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +204,7 @@ func (d *notebookDocument) save() error {
 	if err != nil {
 		return err
 	}
-	current, err := root.ReadFile(d.name)
+	current, err := readNotebookFile(root, d.name)
 	if err != nil {
 		return err
 	}

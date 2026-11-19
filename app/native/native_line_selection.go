@@ -170,10 +170,26 @@ func (a *app) allFileCheckState() ui.CheckState {
 	if a.status == nil || len(a.status.Files) == 0 {
 		return ui.CheckOff
 	}
+	// Do not rescan the entire kernel file list for every checkbox. Preserve
+	// partial-line state while whole-file clicks are still being acknowledged.
+	partial := make(map[string]bool)
+	if a.coreSnapshot != nil && a.coreSnapshot.Selected != nil {
+		for _, file := range a.coreSnapshot.Selected.Files {
+			if file.Inclusion == "partial" {
+				partial[file.Path] = true
+			}
+		}
+	}
 	all, none := true, true
 	for _, file := range a.status.Files {
-		state := a.fileCheckState(file.Path)
-		all, none = all && state == ui.CheckOn, none && state == ui.CheckOff
+		if partial[file.Path] {
+			return ui.CheckMixed
+		}
+		included := a.included[file.Path]
+		all, none = all && included, none && !included
+		if !all && !none {
+			return ui.CheckMixed
+		}
 	}
 	if all {
 		return ui.CheckOn

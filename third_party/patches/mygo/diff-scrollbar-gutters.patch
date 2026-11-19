@@ -1,8 +1,7 @@
 diff --git a/ui/editor/paint.go b/ui/editor/paint.go
-index 2f9e2f70fc..7145722e63 100644
 --- a/ui/editor/paint.go
 +++ b/ui/editor/paint.go
-@@ -49,6 +49,9 @@ func (ed *editor) layout(w, h, scale float32) {
+@@ -49,6 +49,9 @@
  	}
  	ed.viewH, ed.laidW = h, w
  	wrap := ed.o.wrap != ed.toggledWrap
@@ -12,7 +11,7 @@ index 2f9e2f70fc..7145722e63 100644
  	ww := w - ed.textX - ed.trackWidth() - 4
  	if ed.o.wrapColumn > 0 {
  		ww = min(ww, float32(ed.o.wrapColumn)*v.charWidth)
-@@ -108,7 +111,7 @@ func (ed *editor) paint(p *ui.Painter, r ui.Rect) {
+@@ -112,7 +115,7 @@
  	// editor as high as its content.
  	clip := p.Visible()
  	y0 := ed.scrollY + float64(max(0, clip.Y-r.Y))
@@ -21,7 +20,7 @@ index 2f9e2f70fc..7145722e63 100644
  	// The horizontal scroll bar at the bottom of what shows, as an editor
  	// as high as its content may run far below the window's.
  	ed.hbarY = max(0, min(r.H, clip.Y+clip.H-r.Y)) - ed.barWidth()
-@@ -151,12 +154,18 @@ func (ed *editor) paint(p *ui.Painter, r ui.Rect) {
+@@ -155,12 +158,18 @@
  	if ed.replacementsMoved() {
  		ed.services.Invalidate()
  	}

@@ -19,6 +19,11 @@
   "allowScripts": {
     "koffi": false
   },
+  "overrides": {
+    "@github/copilot-sdk": {
+      "zod": "4.6.6"
+    }
+  },
   "dependencies": {
     "@anthropic-ai/sdk": "1.6.0",
     "@floating-ui/react-dom": "^2.1.2",

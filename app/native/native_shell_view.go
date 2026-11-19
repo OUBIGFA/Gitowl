@@ -38,10 +38,10 @@ func tintedSurface(c *ui.Context, button ui.Element) ui.Element {
 // the task bar. Icons identify direction; counts come from the original
 // branch's ahead/behind, so the action with work to do stands out.
 func (a *app) coreRemoteControls(c *ui.Context, tx locales.Messages) {
-	selected := a.coreSnapshot.Selected
-	if a.coreSnapshot == nil || selected == nil {
+	if a.coreSnapshot == nil || a.coreSnapshot.Selected == nil {
 		return
 	}
+	selected := a.coreSnapshot.Selected
 	reason := ""
 	switch {
 	case !a.ready:

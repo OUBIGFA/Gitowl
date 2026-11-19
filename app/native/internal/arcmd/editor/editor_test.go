@@ -79,8 +79,30 @@ func TestIMEIsOneRichTransaction(t *testing.T) {
 	}
 	tt.Compose("候选", 2)
 	tt.Key(0, ui.KeyEscape)
+	// The OS input method owns Escape during composition. MyGo 0.10 models
+	// that filter; deliver the resulting cancellation, rather than assuming
+	// the composing key reaches the editor's normal keyboard handler.
+	tt.Compose("", 0)
 	if !reflect.DeepEqual(e.Doc, before) {
 		t.Fatal("cancel changed rich content")
+	}
+}
+
+func TestIMEEmptyCompositionRestoresSelectionAndRichContent(t *testing.T) {
+	e, tt := newTester("A😀 **cafe**")
+	focus(e, tt)
+	e.SetSelection(4, 8)
+	tt.Frame()
+	before, selection := e.Doc.Clone(), e.Selection()
+	tt.Compose("候选", 2)
+	// Native IMEs may cancel without delivering any keyboard event at all.
+	tt.Compose("", 0)
+	if e.Composing() || e.Selection() != selection || !reflect.DeepEqual(e.Doc, before) {
+		t.Fatal("IME cancellation lost the selected text, formatting or selection")
+	}
+	tt.Key(ui.Cmd, ui.KeyZ)
+	if !reflect.DeepEqual(e.Doc, before) {
+		t.Fatal("canceled composition created an undo transaction")
 	}
 }
 func TestGraphemeDeletion(t *testing.T) {

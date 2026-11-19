@@ -214,6 +214,8 @@ func TestLargeDocument200kInteractiveEditingAndIME(t *testing.T) {
 	// Cancel an active composition via Escape.
 	tt.Compose("quxiao", 6)
 	tt.Key(0, ui.KeyEscape)
+	// An IME consumes Escape and reports that its marked text was canceled.
+	tt.Compose("", 0)
 	if e.Composing() {
 		t.Fatal("Escape did not cancel active composition")
 	}

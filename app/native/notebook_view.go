@@ -324,7 +324,7 @@ func (a *app) notebookView(c *ui.Context, tx locales.Messages, colors workspaceC
 				for _, e := range []struct {
 					value error
 					key   string
-				}{{errNotebookPath, "Path"}, {errNotebookBinary, "Binary"}, {errNotebookConflict, "Conflict"}} {
+				}{{errNotebookPath, "Path"}, {errNotebookBinary, "Binary"}, {errNotebookConflict, "Conflict"}, {errNotebookTooLarge, "TooLarge"}, {errNotebookLink, "LinkError"}} {
 					if errors.Is(n.err, e.value) {
 						msg = bookLabel(c, e.key)
 						break
@@ -395,6 +395,7 @@ func (a *app) notebookView(c *ui.Context, tx locales.Messages, colors workspaceC
 				},
 				Outline: n.outline, OutlineInToolbar: true, SetOutline: func(open bool) { n.outline = open },
 				OpenWiki: func(name string) { a.startNotebookSearch("wiki", name) },
+				OpenLink: func(url string) { a.openNotebookLink(d, url) },
 			}).Grow(1).FillWidth().MinHeight(0)
 		})
 	}, func() {

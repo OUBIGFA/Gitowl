@@ -186,6 +186,13 @@ func (b *Buffer) SetMarkedText(r *ui.TextInputRange, text string, selected ui.Te
 		b.refused = text != ""
 		return
 	}
+	// Input methods report cancellation as empty marked text; they consume
+	// Escape themselves. Restore the pre-composition document and selection,
+	// rather than keeping an empty marked range or replacing selected content.
+	if text == "" {
+		b.cancelComposition()
+		return
+	}
 	b.sync()
 	target := b.Selection().Range
 	if b.mark != nil {

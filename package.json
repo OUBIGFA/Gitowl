@@ -76,6 +76,14 @@
     "npm": ">= 11.17.0"
   },
   "overrides": {
+    "@babel/runtime@<7.26.10": "7.26.10",
+    "glob@>=9.0.0": "14.0.6",
+    "minimatch@>=7.0.0": "11.0.9",
+    "semver@>=6.0.0 <6.3.1": "6.3.1",
+    "legal-eagle": {
+      "underscore": "1.13.8"
+    },
+    "katex": "0.19.1",
     "@github/markdownlint-github": {
       "markdown-it": "14.3.3"
     },

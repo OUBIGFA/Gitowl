@@ -71,6 +71,80 @@ func TestNotebookRejectsGitMetadataAndBinaryFiles(t *testing.T) {
 	}
 }
 
+func TestNotebookLargeTextDoesNotEnterEditorOrContentSearch(t *testing.T) {
+	root := t.TempDir()
+	large := []byte("needle" + strings.Repeat("x", 8<<20))
+	if err := os.WriteFile(filepath.Join(root, "large.txt"), large, 0600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "small.txt"), []byte("needle"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := openNotebookDocument(root, "large.txt"); err == nil {
+		t.Error("an oversized file entered the interactive editor")
+	}
+	hits, err := searchNotebook(t.Context(), root, "text", "needle")
+	if err != nil || !slices.Equal(hits, []string{"small.txt"}) {
+		t.Errorf("bounded content search: %v, %v", hits, err)
+	}
+	// The size limit must not hide files from filename search.
+	hits, err = searchNotebook(t.Context(), root, "files", "large")
+	if err != nil || !slices.Equal(hits, []string{"large.txt"}) {
+		t.Errorf("filename search: %v, %v", hits, err)
+	}
+}
+
+func TestNotebookLinkUsesNativeBrowser(t *testing.T) {
+	a := designEvidenceApp(t, time.Now(), "changes")
+	a.repo.Path = t.TempDir()
+	if err := os.WriteFile(filepath.Join(a.repo.Path, "links.md"), []byte("Visit [our site](https://example.com/path?q=1)."), 0600); err != nil {
+		t.Fatal(err)
+	}
+	var opened string
+	a.openExternal = func(url string) error { opened = url; return nil }
+	a.openNote("links.md")
+	tt := designEvidenceTester(a, 1180, 760, "en", false)
+	a.notes().current.rich.SetSelection(8, 8)
+	a.notes().current.rich.EditLink()
+	tt.Frame()
+	if err := tt.Click("Open link"); err != nil {
+		t.Fatal(err)
+	}
+	if opened != "https://example.com/path?q=1" {
+		t.Fatalf("link did not reach the native browser: %q", opened)
+	}
+}
+
+func TestNotebookLinksStayWithinFileAndURLBoundaries(t *testing.T) {
+	a := designEvidenceApp(t, time.Now(), "changes")
+	a.repo.Path = t.TempDir()
+	if err := os.WriteFile(filepath.Join(a.repo.Path, "linked note.md"), []byte("linked note"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	d := &notebookDocument{root: a.repo.Path, name: "notes/source.md"}
+	var opened []string
+	a.openExternal = func(url string) error { opened = append(opened, url); return nil }
+	a.openNotebookLink(d, "../linked%20note.md")
+	if a.notebook.err != nil || a.notes().current.name != "linked note.md" {
+		t.Fatalf("relative project link: %v", a.notebook.err)
+	}
+	for _, raw := range []string{"file:///C:/Windows/system32/cmd.exe", "javascript:alert(1)", "gitowl://open", "../../outside.txt", "https://user:password@example.com", "https://example.com/\x00"} {
+		a.openNotebookLink(d, raw)
+		if a.notebook.err == nil || len(opened) != 0 {
+			t.Fatalf("unsafe link was accepted: %q", raw)
+		}
+	}
+	for _, raw := range []string{"https://example.com", "mailto:reader@example.com", "//example.com/path"} {
+		a.openNotebookLink(d, raw)
+		if a.notebook.err != nil {
+			t.Fatalf("safe link %q: %v", raw, a.notebook.err)
+		}
+	}
+	if len(opened) != 3 || opened[2] != "https://example.com/path" {
+		t.Fatalf("browser requests: %v", opened)
+	}
+}
+
 func TestNotebookTreeSortControls(t *testing.T) {
 	a := designEvidenceApp(t, time.Now(), "changes")
 	a.repo.Path = t.TempDir()
@@ -211,6 +285,15 @@ func TestNotebookSearchLayout(t *testing.T) {
 			}
 			tt.Move(0, 0)
 			saveDesignEvidence(t, tt, fmt.Sprintf("quick-open-%s-%t.png", locale, dark))
+			n.search.mode = "text"
+			tt.Frame()
+			if !tt.HasText(locales.Catalog.Format(locale, "editorSearchLimit", nil)) {
+				t.Fatal("content search did not state its file-size boundary")
+			}
+			visibleControl(t, tt, locales.Catalog.Format(locale, "editorClose", nil), 900, 620)
+			saveDesignEvidence(t, tt, fmt.Sprintf("content-search-%s-%t.png", locale, dark))
+			n.search.mode = "files"
+			tt.Frame()
 			tt.Key(0, ui.KeyDown)
 			if n.search.active != 1 {
 				t.Fatal("Down did not select the next search result")
@@ -231,12 +314,21 @@ func TestNotebookSearchLayout(t *testing.T) {
 }
 
 func TestNotebookWorkspaceOpensFilesAndSwitchesModes(t *testing.T) {
-	for _, tc := range []struct {
+	type scenario struct {
 		width, height int
 		locale        string
 		dark          bool
-	}{{1180, 760, "en", false}, {900, 620, "zh-Hans", true}, {1180, 760, "zh-Hant", false}} {
-		t.Run(tc.locale, func(t *testing.T) {
+	}
+	var scenarios []scenario
+	for _, size := range [][2]int{{900, 620}, {1180, 760}} {
+		for _, locale := range []string{"en", "zh-Hans", "zh-Hant"} {
+			for _, dark := range []bool{false, true} {
+				scenarios = append(scenarios, scenario{size[0], size[1], locale, dark})
+			}
+		}
+	}
+	for _, tc := range scenarios {
+		t.Run(fmt.Sprintf("%s/%d/dark=%t", tc.locale, tc.width, tc.dark), func(t *testing.T) {
 			a := designEvidenceApp(t, time.Now(), "changes")
 			root := t.TempDir()
 			a.repo.Path = root
@@ -261,7 +353,7 @@ func TestNotebookWorkspaceOpensFilesAndSwitchesModes(t *testing.T) {
 			visibleControl(t, tt, locales.Catalog.Format(tc.locale, "editorSave", nil), tc.width, tc.height)
 			tt.Move(2, 2)
 			tt.Advance(time.Second)
-			saveDesignEvidence(t, tt, "notebook-"+tc.locale+".png")
+			saveDesignEvidence(t, tt, fmt.Sprintf("notebook-%s-%d-dark-%t.png", tc.locale, tc.width, tc.dark))
 			if err := tt.Click(locales.Catalog.Format(tc.locale, "editorCode", nil)); err != nil {
 				t.Fatal(err)
 			}

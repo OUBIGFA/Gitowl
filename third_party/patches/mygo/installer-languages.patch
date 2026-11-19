@@ -1,3 +1,4 @@
+diff --git a/cmd/mygo/nsis.go b/cmd/mygo/nsis.go
 --- a/cmd/mygo/nsis.go
 +++ b/cmd/mygo/nsis.go
 @@ -216,7 +216,7 @@
@@ -109,6 +110,7 @@
  	for _, prefix := range []string{"", "un."} {
  		out.WriteString(`; Quits the app running from the folder on the stack.
  Function ` + prefix + `CloseApp
+diff --git a/cmd/mygo/nsis_test.go b/cmd/mygo/nsis_test.go
 --- a/cmd/mygo/nsis_test.go
 +++ b/cmd/mygo/nsis_test.go
 @@ -583,7 +583,7 @@
@@ -120,6 +122,8 @@
  	} {
  		at := 0
  		for _, s := range order {
+diff --git a/cmd/mygo/gitowl_installer_test.go b/cmd/mygo/gitowl_installer_test.go
+new file mode 100644
 --- /dev/null
 +++ b/cmd/mygo/gitowl_installer_test.go
 @@ -0,0 +1,27 @@
@@ -150,6 +154,8 @@
 +		t.Fatal("stuck-process messages must use the chosen language")
 +	}
 +}
+diff --git a/cmd/mygo/gitowl_uninstall_windows_test.go b/cmd/mygo/gitowl_uninstall_windows_test.go
+new file mode 100644
 --- /dev/null
 +++ b/cmd/mygo/gitowl_uninstall_windows_test.go
 @@ -0,0 +1,136 @@

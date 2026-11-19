@@ -2,7 +2,7 @@
   "source": "https://github.com/Ciao1019/ArcMD",
   "revision": "27322d387268751932624ef83a7c580cb0b068d5",
   "license": "MIT",
-  "note": "Native Markdown editor and its package dependencies. Go imports are relocated. Embedded KaTeX typefaces use the SIL Open Font License.",
+  "note": "Native Markdown editor and its package dependencies. Go imports are relocated. Embedded KaTeX typefaces use the SIL Open Font License. The local buffer handles empty marked text as IME cancellation, restoring original content and selection; tests deliver the OS cancellation event modeled by MyGo 0.10.",
   "files": [
     {
       "source": "internal/editor/access.go",

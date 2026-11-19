@@ -26,13 +26,16 @@ func (a *app) workspaceChangesList(c *ui.Context) bool {
 		return false
 	}
 	selected := a.coreSnapshot.Selected
-	var files []backend.KernelFile
+	// Resolve each visible ID once. Nested scans made every frame quadratic
+	// in the number of changed files, before the native list could virtualize.
+	byID := make(map[string]backend.KernelFile, len(selected.Files))
+	for _, file := range selected.Files {
+		byID[file.ID] = file
+	}
+	files := make([]backend.KernelFile, 0, len(w.VisibleFileIDs))
 	for _, id := range w.VisibleFileIDs {
-		for _, file := range selected.Files {
-			if file.ID == id {
-				files = append(files, file)
-				break
-			}
+		if file, ok := byID[id]; ok {
+			files = append(files, file)
 		}
 	}
 	renderWorkspaceChangesList(c, &a.nativeWorkspaceState, a.changesList.list(), files, selected.SelectedFileIDs, selected.Repository.Path, a.ready, a.composerLocked(), workspaceChangesCallbacks{

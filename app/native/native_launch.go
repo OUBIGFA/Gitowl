@@ -2,6 +2,8 @@ package main
 
 import (
 	"errors"
+	"net/url"
+	"strings"
 
 	"github.com/OUBIGFA/Gitowl/app/native/internal/backend"
 )
@@ -14,11 +16,20 @@ func (a *app) routeCoreLaunch(options nativeLaunchOptions) {
 		a.openErr = errors.New("the original Desktop kernel is not running")
 		return
 	}
+	if options.protocolURL != "" && !supportedApplicationURL(options.protocolURL) {
+		a.openErr = errors.New("unsupported application URL")
+		return
+	}
+	callback, _ := url.Parse(options.protocolURL)
+	isOAuth := callback != nil && strings.EqualFold(callback.Hostname(), "oauth")
+	// A launch can arrive before the first state or during first-run setup.
+	// Its repository popup must not cover the author form. OAuth is the one
+	// exception: sign-in needs its original callback to complete Welcome.
+	if (a.coreSnapshot == nil || a.coreSnapshot.Welcome) && !isOAuth {
+		a.coreDeferredLaunches = append(a.coreDeferredLaunches, options)
+		return
+	}
 	if options.protocolURL != "" {
-		if !supportedApplicationURL(options.protocolURL) {
-			a.openErr = errors.New("unsupported application URL")
-			return
-		}
 		core, ctx := a.core, a.ctx
 		a.queueCore(nativeOperation{
 			call: func() (backend.KernelResult, error) {
