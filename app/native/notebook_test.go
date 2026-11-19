@@ -94,6 +94,30 @@ func TestNotebookLargeTextDoesNotEnterEditorOrContentSearch(t *testing.T) {
 	}
 }
 
+func TestNotebookGrowingBufferCanBeSavedAgain(t *testing.T) {
+	root := t.TempDir()
+	name := "growing.txt"
+	if err := os.WriteFile(filepath.Join(root, name), []byte("small"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	d, err := openNotebookDocument(root, name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	d.code.Buffer.Set(strings.Repeat("x", notebookTextLimit+1))
+	if err := d.save(); err != nil {
+		t.Fatal(err)
+	}
+	d.code.Buffer.Set("small again")
+	if err := d.save(); err != nil {
+		t.Fatal("a file grown by this editor cannot be saved again:", err)
+	}
+	data, err := os.ReadFile(filepath.Join(root, name))
+	if err != nil || string(data) != "small again" {
+		t.Fatalf("saved file: %q, %v", data, err)
+	}
+}
+
 func TestNotebookLinkUsesNativeBrowser(t *testing.T) {
 	a := designEvidenceApp(t, time.Now(), "changes")
 	a.repo.Path = t.TempDir()

@@ -7,7 +7,7 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $runtimeManifest = Get-Content (Join-Path $root 'third_party/native-runtimes.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 if ($Preview -and ($runtimeManifest.schemaVersion -ne 2 -or $runtimeManifest.packaging.previewReady -ne $true)) {
-    throw ('Preview packaging is blocked: original Desktop CLI/OAuth acceptance is pending. ' + ($runtimeManifest.packaging.blockers -join ' '))
+    throw ('GITOWL_PREVIEW_NOT_READY: original Desktop frontend acceptance is pending. ' + ($runtimeManifest.packaging.blockers -join ' '))
 }
 if ($BuildNumber -notmatch '^[0-9]{14}$') { throw 'BuildNumber must use yyyyMMddHHmmss' }
 $env:PATH = (Join-Path $root '.local/toolchains/node-v24.22.1-win-x64') + ';' + $env:PATH

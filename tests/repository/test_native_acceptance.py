@@ -62,7 +62,9 @@ class NativeAcceptanceEntryTests(unittest.TestCase):
             }), encoding='utf-8')
             result = self.run_entry(root, '-Preview')
             self.assertNotEqual(result.returncode, 0)
-            self.assertIn(b'original Desktop CLI/OAuth acceptance is pending', result.stderr)
+            # PowerShell 7 wraps and colors messages according to host width.
+            # The stable error identifier names the gate on every platform.
+            self.assertIn(b'GITOWL_PREVIEW_NOT_READY', result.stderr)
             self.assertFalse((root / 'output').exists())
             self.assertFalse((root / '_temp').exists())
 

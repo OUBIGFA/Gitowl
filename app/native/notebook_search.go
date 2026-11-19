@@ -99,7 +99,7 @@ func searchNotebook(ctx context.Context, root, mode, query string) ([]string, er
 			if mode == "backlinks" && !strings.HasSuffix(lower, ".md") && !strings.HasSuffix(lower, ".markdown") {
 				return nil
 			}
-			data, err := readNotebookFile(tree, filepath.FromSlash(name))
+			data, err := readNotebookFile(tree, filepath.FromSlash(name), notebookTextLimit)
 			if errors.Is(err, errNotebookTooLarge) {
 				return nil
 			}

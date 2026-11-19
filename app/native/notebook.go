@@ -26,7 +26,7 @@ var (
 // stated in the editor error and content-search UI in every language.
 const notebookTextLimit = 8 << 20
 
-func readNotebookFile(root *os.Root, name string) ([]byte, error) {
+func readNotebookFile(root *os.Root, name string, limit int64) ([]byte, error) {
 	f, err := root.Open(name)
 	if err != nil {
 		return nil, err
@@ -39,12 +39,12 @@ func readNotebookFile(root *os.Root, name string) ([]byte, error) {
 	if !info.Mode().IsRegular() {
 		return nil, errNotebookPath
 	}
-	if info.Size() > notebookTextLimit {
+	if info.Size() > limit {
 		return nil, errNotebookTooLarge
 	}
 	// Stat is only an early rejection; the file may grow while it is read.
-	data, err := io.ReadAll(io.LimitReader(f, notebookTextLimit+1))
-	if len(data) > notebookTextLimit {
+	data, err := io.ReadAll(io.LimitReader(f, limit+1))
+	if int64(len(data)) > limit {
 		return nil, errNotebookTooLarge
 	}
 	return data, err
@@ -103,7 +103,7 @@ func openNotebookDocument(project, name string) (*notebookDocument, error) {
 		return nil, err
 	}
 	defer root.Close()
-	data, err := readNotebookFile(root, name)
+	data, err := readNotebookFile(root, name, notebookTextLimit)
 	if err != nil {
 		return nil, err
 	}
@@ -204,7 +204,13 @@ func (d *notebookDocument) save() error {
 	if err != nil {
 		return err
 	}
-	current, err := readNotebookFile(root, d.name)
+	// An already-open buffer may grow past the opening limit while edited.
+	// Compare against its last saved size so subsequent saves still work;
+	// reading one extra byte is enough to reject externally enlarged files.
+	current, err := readNotebookFile(root, d.name, int64(len(d.original)))
+	if errors.Is(err, errNotebookTooLarge) {
+		return fmt.Errorf("%w: %s", errNotebookConflict, d.name)
+	}
 	if err != nil {
 		return err
 	}

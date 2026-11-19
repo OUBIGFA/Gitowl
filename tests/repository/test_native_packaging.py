@@ -23,7 +23,7 @@ class NativePackagingTests(unittest.TestCase):
             cwd=ROOT, capture_output=True,
         )
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn(b'original Desktop CLI/OAuth acceptance is pending', result.stderr)
+        self.assertIn(b'GITOWL_PREVIEW_NOT_READY', result.stderr)
         self.assertEqual(installer.read_bytes() if installer.is_file() else None, before)
 
     def test_runtime_resources_and_preview_gate_are_original_electron_only(self):
