@@ -10,7 +10,7 @@ import { kernelMediaErrorMessage } from './media-presentation'
 import { executeKernelCommand } from './execute-command'
 import { parseKernelCommand } from './command-validation'
 import { projectKernelState } from './state-projection'
-import { SnapshotPushEncoder } from './snapshot-sections'
+import { SnapshotPushEncoder, SnapshotScheduler } from './snapshot-sections'
 import * as ipcRenderer from '../lib/ipc-renderer'
 import { sendReady } from '../ui/main-process-proxy'
 import { migrateRendererGUID } from '../lib/get-renderer-guid'
@@ -69,10 +69,11 @@ const pushes = new SnapshotPushEncoder()
 function pushState() {
   ipcRenderer.send('native-kernel-state', pushes.encode(snapshot()))
 }
+const scheduledPush = new SnapshotScheduler(pushState)
 
 const stateUpdates = presenter.onDidUpdate(() => {
   if (loaded) {
-    pushState()
+    scheduledPush.schedule()
   }
 })
 runtime.appStore.onDidError(error => {
@@ -112,6 +113,7 @@ ipcRenderer.on('menu-event', (_, name) => {
 })
 window.addEventListener('beforeunload', () => {
   window.clearTimeout(dateRefreshTimer)
+  scheduledPush.dispose()
   stateUpdates.dispose()
   startup.dispose()
   presenter.dispose()

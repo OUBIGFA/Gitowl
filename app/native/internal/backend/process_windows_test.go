@@ -48,11 +48,12 @@ func processScheduling(t *testing.T, pid uint32) (class uintptr, eco bool) {
 	return class, state.StateMask&powerThrottlingExecutionSpeed != 0
 }
 
-// The tree starts the way Chromium leaves a hidden renderer: idle priority
-// class with EcoQoS. Children inherit the idle class from their parent.
+// After both fixture processes have started, reproduce Chromium's hidden
+// renderer scheduling: idle priority with EcoQoS. Starting the launcher idle
+// can starve it before it creates its child on a busy machine, testing fixture
+// startup rather than the production scheduling restoration.
 func TestOwnedTreeIsRestoredToNormalSchedulingForShutdown(t *testing.T) {
 	cmd := exec.Command("cmd.exe", "/d", "/c", "ping -n 30 127.0.0.1 >nul")
-	cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: idlePriorityClass}
 	owned, err := startOwnedCommand(cmd)
 	if err != nil {
 		t.Fatal(err)
@@ -75,6 +76,9 @@ func TestOwnedTreeIsRestoredToNormalSchedulingForShutdown(t *testing.T) {
 	for _, pid := range ids {
 		handle, err := syscall.OpenProcess(processSetInformation|processQueryLimitedInformation, false, pid)
 		if err != nil {
+			t.Fatal(err)
+		}
+		if result, _, err := setPriorityClass.Call(uintptr(handle), idlePriorityClass); result == 0 {
 			t.Fatal(err)
 		}
 		eco := powerThrottlingState{Version: 1, ControlMask: powerThrottlingExecutionSpeed, StateMask: powerThrottlingExecutionSpeed}

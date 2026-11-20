@@ -3,7 +3,6 @@ import { after, it } from 'node:test'
 import { EventEmitter } from 'events'
 import { ipcRenderer } from 'electron'
 import { NativeStartup } from '../../src/native-kernel/startup'
-import { Repository } from '../../src/models/repository'
 import { CloningRepository } from '../../src/models/cloning-repository'
 import { projectKernelState } from '../../src/native-kernel/state-projection'
 import { seed } from '../helpers/assisted-commit'
@@ -89,8 +88,16 @@ it(
       'first.txt': 'before\n',
       'second.txt': 'before\n',
     })
-    const selected = new Repository(selectedFixture.path, 101, null, false)
-    const other = new Repository(otherFixture.path, 102, null, false)
+    // Selected projects now refresh their visible working tree as well as the
+    // count. Persist real rows so metadata refreshes use the actual store.
+    const selected = await appStore['repositoriesStore'].addRepository(
+      selectedFixture.path,
+      join(selectedFixture.path, '.git')
+    )
+    const other = await appStore['repositoriesStore'].addRepository(
+      otherFixture.path,
+      join(otherFixture.path, '.git')
+    )
     const repositories = [selected, other]
     const cloning = new CloningRepository(
       join(other.path, 'pending-clone'),

@@ -288,7 +288,6 @@ import {
   moveWorktree,
   getCommitRangeDiff,
   getCommitRangeChangedFiles,
-  updateRemoteHEAD,
   getBranchMergeBaseChangedFiles,
   getBranchMergeBaseDiff,
   checkoutCommit,
@@ -808,6 +807,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
   private preferAbsoluteDates: boolean = false
 
   private cachedRepoRulesets = new Map<number, IAPIRepoRuleset>()
+  private readonly branchProtectionRefreshes = new Map<string, Promise<void>>()
 
   /**
    * The current account and GitHub repository of each working directory,
@@ -1684,6 +1684,28 @@ export class AppStore extends TypedBaseStore<IAppState> {
     this.emitUpdate()
   }
 
+  /** Remote metadata must not hold the Git operation or inherit its lease. */
+  private refreshBranchProtectionInBackground(repository: Repository): void {
+    const { tip } = this.gitStoreCache.get(repository)
+    const key = `${repository.hash}:${
+      tip.kind === TipState.Valid ? tip.branch.name : ''
+    }`
+    if (this.branchProtectionRefreshes.has(key)) {
+      return
+    }
+    const refresh = withoutRepositoryGitAccess(() =>
+      this.refreshBranchProtectionState(repository)
+        .catch(error =>
+          log.warn(
+            'Unable to refresh branch protection after synchronization',
+            error
+          )
+        )
+        .finally(() => this.branchProtectionRefreshes.delete(key))
+    )
+    this.branchProtectionRefreshes.set(key, refresh)
+  }
+
   private async refreshBranchProtectionState(repository: Repository) {
     if (!this.isCurrentAssociation(repository)) {
       return
@@ -1775,7 +1797,13 @@ export class AppStore extends TypedBaseStore<IAppState> {
 
       if (
         cachedRepoRulesets !== this.cachedRepoRulesets ||
-        !this.isCurrentAssociation(repository)
+        !this.isCurrentAssociation(repository) ||
+        this.gitStoreCache.get(repository).tip.kind !== TipState.Valid ||
+        findRemoteBranchName(
+          this.gitStoreCache.get(repository).tip,
+          this.gitStoreCache.get(repository).currentRemote,
+          gitHubRepo
+        ) !== branchName
       ) {
         return
       }
@@ -6201,14 +6229,14 @@ export class AppStore extends TypedBaseStore<IAppState> {
           this.updatePushPullFetchProgress(repository, {
             kind: 'generic',
             title,
-            description: 'Fast-forwarding branches',
             value: pushWeight + fetchWeight,
           })
         )
-        await this.fastForwardBranches(
-          repository,
-          options?.assistedCommit !== undefined
-        )
+        // Assisted runs retain their verified publication transaction. Normal
+        // sync leaves other local branches alone, as Git fetch/pull do.
+        if (options?.assistedCommit !== undefined) {
+          await this.fastForwardBranches(repository, true)
+        }
         observe(() =>
           this.updatePushPullFetchProgress(repository, {
             kind: 'generic',
@@ -6216,8 +6244,13 @@ export class AppStore extends TypedBaseStore<IAppState> {
             value: 0.95,
           })
         )
-        await this.refreshBranchProtectionState(repository)
+        if (options?.assistedCommit !== undefined) {
+          await this.refreshBranchProtectionState(repository)
+        }
         await this._refreshRepository(repository)
+        if (options?.assistedCommit === undefined) {
+          this.refreshBranchProtectionInBackground(repository)
+        }
       }
       if (assistedObserver?.verifyFollowUpOwner === undefined) {
         await refresh()
@@ -6442,7 +6475,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
           }
 
           let aborted = false
-          const pullSucceeded = await gitStore
+          await gitStore
             .performFailableOperation(
               async () => {
                 await pullRepo(repository, remote, {
@@ -6460,20 +6493,6 @@ export class AppStore extends TypedBaseStore<IAppState> {
             )
             .catch(err => (aborted ? false : Promise.reject(err)))
 
-          // If the pull failed we shouldn't try to update the remote HEAD
-          // because there's a decent chance that it failed either because we
-          // didn't have the correct credentials (which we won't this time
-          // either) or because there's a network error which likely will
-          // persist for the next operation as well.
-          if (pullSucceeded) {
-            // Updating the local HEAD symref isn't critical so we don't want
-            // to show an error message to the user and have them retry the
-            // entire pull operation if it fails.
-            await updateRemoteHEAD(repository, remote, false).catch(e =>
-              log.error('Failed updating remote HEAD', e)
-            )
-          }
-
           const refreshStartProgress = pullWeight + fetchWeight
           const refreshTitle = __DARWIN__
             ? 'Refreshing Repository'
@@ -6482,11 +6501,8 @@ export class AppStore extends TypedBaseStore<IAppState> {
           this.updatePushPullFetchProgress(repository, {
             kind: 'generic',
             title: refreshTitle,
-            description: 'Fast-forwarding branches',
             value: refreshStartProgress,
           })
-
-          await this.fastForwardBranches(repository)
 
           this.updatePushPullFetchProgress(repository, {
             kind: 'generic',
@@ -6498,11 +6514,8 @@ export class AppStore extends TypedBaseStore<IAppState> {
             await gitStore.reconcileHistory(mergeBase)
           }
 
-          // manually refresh branch protections after the push, to ensure
-          // any new branch will immediately report as protected
-          await this.refreshBranchProtectionState(repository)
-
           await this._refreshRepository(repository)
+          this.refreshBranchProtectionInBackground(repository)
         } finally {
           this.updatePushPullFetchProgress(repository, null)
         }
@@ -7079,11 +7092,8 @@ export class AppStore extends TypedBaseStore<IAppState> {
         this.updatePushPullFetchProgress(repository, {
           kind: 'generic',
           title: refreshTitle,
-          description: 'Fast-forwarding branches',
           value: fetchWeight,
         })
-
-        await this.fastForwardBranches(repository)
 
         this.updatePushPullFetchProgress(repository, {
           kind: 'generic',
@@ -7091,11 +7101,8 @@ export class AppStore extends TypedBaseStore<IAppState> {
           value: fetchWeight + refreshWeight * 0.5,
         })
 
-        // manually refresh branch protections after the push, to ensure
-        // any new branch will immediately report as protected
-        await this.refreshBranchProtectionState(repository)
-
         await this._refreshRepository(repository)
+        this.refreshBranchProtectionInBackground(repository)
       } finally {
         this.updatePushPullFetchProgress(repository, null)
 

@@ -521,6 +521,70 @@ describe('AppStore explicitly adding repositories', () => {
       assert.strictEqual(pullRequestsOf(updated).length, 1)
     })
 
+    it('does not apply delayed branch protection to a newly selected branch', async t => {
+      const initial = await setupDraft(t)
+      const github = await stores.repositoriesStore.upsertGitHubRepository(
+        endpoint,
+        apiRepository,
+        alice.login
+      )
+      const repository = await stores.repositoriesStore.setGitHubRepository(
+        initial,
+        github,
+        alice.login
+      )
+      appStore['adoptRepository'](repository)
+      const { rawGit } = await import('../../helpers/assisted-commit')
+      await rawGit(repository, ['commit', '--allow-empty', '-m', 'Initial'])
+      const gitStore = appStore['gitStoreCache'].get(repository)
+      await gitStore.loadRemotes()
+      await gitStore.loadStatus()
+      let entered!: () => void
+      let release!: () => void
+      const started = new Promise<void>(resolve => {
+        entered = resolve
+      })
+      const held = new Promise<void>(resolve => {
+        release = resolve
+      })
+      t.mock.method(API, 'fromAccount', () =>
+        createMockAPI({
+          fetchPushControl: async (_owner, _name, branch) => {
+            if (branch !== 'new-selection') {
+              entered()
+              await held
+            }
+            return {
+              allow_actor: branch === 'new-selection',
+              required_status_checks: [],
+              required_approving_review_count: 0,
+              pattern: null,
+              required_signatures: false,
+              required_linear_history: false,
+              allow_deletions: false,
+              allow_force_pushes: false,
+            }
+          },
+          fetchAllRepoRulesets: async () => [],
+          fetchRepoRulesForBranch: async () => [],
+        })
+      )
+      const pending = appStore['refreshBranchProtectionState'](repository)
+      try {
+        await started
+        await rawGit(repository, ['checkout', '-b', 'new-selection'])
+        await gitStore.loadStatus()
+      } finally {
+        release()
+        await pending
+      }
+      assert.equal(
+        stores.repositoryStateCache.get(repository).changesState
+          .currentBranchProtected,
+        false
+      )
+    })
+
     describe('worktrees', () => {
       async function setupWorktree(t: TestContext) {
         const { setupEmptyRepository } = await import(

@@ -8,9 +8,11 @@ Gitowl 基于 [GitHub Desktop](https://github.com/desktop/desktop) 的公开源�
 | `gemoji`、`gitignore`、`choosealicense.com` | 上游通过 `.gitmodules` 引用的资源 | 以各自仓库和快照中的许可证为准 | 更新 submodule 修订前核对来源、许可证和变更 |
 | `vendor/*` | 上游随源码发布的本地依赖 | 以各组件自身许可证文件和 `package.json` 为准 | 不把上游应用许可证推定为传递依赖许可证 |
 | ArcMD | Markdown 编辑器、公式、图表和双链解析 | MIT，随编辑器分发的 KaTeX 字体为 SIL OFL 1.1 | [来源、修订与校验值](arcmd.json)，[许可证](licenses/arcmd/LICENSE) |
-| MyGo | Gitowl 原生 UI 测试构建 | MIT，锁定 v0.8.3，尚未完成全功能迁移 | 精确版本、安装器语言与 DiffState 原生菜单有限补丁见 [mygo.json](mygo.json)；运行时及传递依赖、许可证校验见 [native-runtimes.json](native-runtimes.json) |
+| MyGo | Gitowl 原生 UI | MIT，锁定 v0.10.0 | 精确版本、安装器语言与原生组件有限补丁见 [mygo.json](mygo.json)；运行时及传递依赖、许可证校验见 [native-runtimes.json](native-runtimes.json) |
 
 同源二开的实现调查与取舍见 [fork-evaluation.md](fork-evaluation.md)，具体源码修订、用途和 SHA-256 见 [research-sources.json](research-sources.json)。这些登记描述研究输入，不把参考项目声明的功能推定为 Gitowl 已完成的功能。
+
+2026-11-20 起不再要求完整复用上游内核。同步与刷新提速的成熟方案调查见 [performance-evaluation.md](performance-evaluation.md)；本轮没有复制参考客户端代码或新增运行时依赖。
 
 原生图标采用未修改的 Lucide 资源，版本、许可和每个文件的校验见 [native-icons.json](native-icons.json)；上游图标预览采用原 @primer/octicons SVG，完整登记见 [octicons.json](octicons.json)。设计审查使用 Impeccable 的操作型界面/重设计指引，以及 Damir Sokolovsky（[@heydamir](https://github.com/heydamir/unslop)）的 unslop 检查清单；开发工具版本、执行范围与许可证见 [design-tools.json](design-tools.json)。它们不进入应用运行时，HTML/CSS 检测结果也不用于宣称 MyGo 原生界面通过验收。
 

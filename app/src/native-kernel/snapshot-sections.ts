@@ -1,6 +1,34 @@
 import type { INativeKernelSnapshot } from './protocol'
 import type { IKernelWorkspaceDTO } from './workspace-projection'
 
+/** Progress and store callbacks can fire many times in one native frame.
+ * Build the latest pushed snapshot once per frame, independent of Chromium's
+ * hidden-window animation timer. Command replies remain immediate and complete.
+ */
+export class SnapshotScheduler {
+  private timer: ReturnType<typeof setTimeout> | undefined
+  private disposed = false
+
+  public constructor(private readonly push: () => void) {}
+
+  public schedule(): void {
+    if (this.disposed || this.timer !== undefined) {
+      return
+    }
+    this.timer = setTimeout(() => {
+      this.timer = undefined
+      if (!this.disposed) {
+        this.push()
+      }
+    }, 16)
+  }
+
+  public dispose(): void {
+    this.disposed = true
+    clearTimeout(this.timer)
+  }
+}
+
 type Selected = NonNullable<INativeKernelSnapshot['selected']>
 type Loose<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 

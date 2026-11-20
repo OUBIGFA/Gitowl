@@ -13,6 +13,10 @@ async function getFetchArgs(
   recurseSubmodules: boolean
 ) {
   return [
+    // Git learns the remote's HEAD during this connection. Reuse that result
+    // instead of opening another connection with `remote set-head -a`.
+    '-c',
+    'fetch.followRemoteHEAD=always',
     'fetch',
     ...(progressCallback ? ['--progress'] : []),
     '--prune',

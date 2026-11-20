@@ -2,6 +2,8 @@
 
 核查日期：2026-11-06。本文记录源码调查和拟采用的行为，不表示 MyGo 迁移或桌面验收已完成。下载的源码只保存在忽略目录；未把其他 fork 的实现整包导入 Gitowl。文件修订与内容校验见 [research-sources.json](research-sources.json)。
 
+2026-11-20 边界更新：下文保留首次迁移的历史调查。Gitowl 已转向性能优先，不再要求完整上游内核或全部功能一致；新的运行时取舍以 [performance-evaluation.md](performance-evaluation.md) 和 [实现边界](../references/native-installer.md#实现边界) 为准。账户隔离、凭据保护和所保留功能的正确性要求继续适用。
+
 ## 参考来源
 
 | 项目 | 核查修订 | 同源关系与用途 | 许可 |

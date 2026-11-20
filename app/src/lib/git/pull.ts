@@ -115,6 +115,10 @@ export async function pull(
 
   const args = [
     ...gitRebaseArguments(),
+    // The child fetch can update the remote HEAD in the same transfer.
+    // An explicit per-remote preference still takes precedence.
+    '-c',
+    'fetch.followRemoteHEAD=always',
     'pull',
     ...(await getDefaultPullDivergentBranchArguments(repository)),
     options?.recurseSubmodules === false

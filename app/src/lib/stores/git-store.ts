@@ -71,7 +71,6 @@ import {
   deleteTag,
   MergeResult,
   createBranch,
-  updateRemoteHEAD,
   getRemoteHEAD,
   MergeOptions,
 } from '../git'
@@ -1197,7 +1196,7 @@ export class GitStore extends BaseStore {
       type: RetryActionType.Fetch,
       repository: repo,
     }
-    const fetchSucceeded = await this.performFailableOperation(
+    await this.performFailableOperation(
       async () => {
         await fetchRepo(
           repo,
@@ -1210,20 +1209,6 @@ export class GitStore extends BaseStore {
       },
       { backgroundTask, retryAction }
     )
-
-    // If the pull failed we shouldn't try to update the remote HEAD
-    // because there's a decent chance that it failed either because we
-    // didn't have the correct credentials (which we won't this time
-    // either) or because there's a network error which likely will
-    // persist for the next operation as well.
-    if (fetchSucceeded) {
-      // Updating the local HEAD symref isn't critical so we don't want
-      // to show an error message to the user and have them retry the
-      // entire pull operation if it fails.
-      await updateRemoteHEAD(repo, remote, backgroundTask).catch(e =>
-        log.error('Failed updating remote HEAD', e)
-      )
-    }
   }
 
   /**

@@ -184,6 +184,12 @@ before(async () => {
           return result
         }
         const result = await actualExec(args, path, options)
+        // Command-local Git configuration precedes the subcommand. Keep the
+        // fault at the acknowledged fetch boundary, not at a fixed argv slot.
+        let commandIndex = 0
+        while (args[commandIndex] === '-c') {
+          commandIndex += 2
+        }
         if (
           afterPublicationTrackingProbe !== undefined &&
           pushArguments.length > 0 &&
@@ -206,7 +212,7 @@ before(async () => {
         if (
           afterFollowUpFetch !== undefined &&
           pushArguments.length > 0 &&
-          args[0] === 'fetch' &&
+          args[commandIndex] === 'fetch' &&
           args.includes('--') &&
           args.at(-1) === 'origin'
         ) {

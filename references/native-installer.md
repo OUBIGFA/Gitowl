@@ -18,7 +18,7 @@ npm run build:native
 
 可选验收记录由 `script/native-acceptance.ts` 绑定源码、运行时、可执行文件、真实命令输出和桌面证据。固定构建调用方式为 `npm run build:native -- -AcceptanceReceipt <验收记录路径>`。显式提供记录时，仍必须包含 17 组统一检查，以及同一源码的三轮通过审查、三语言 × 两主题 × 两尺寸的窗口检查和规定交互场景。独立审查记录要求审查者不同于实施者；同一助手复核必须使用 `single-agent-native-review`，记录实际实施者、复核原因和 `sourceReview`，不能宣称独立审查。两种方式使用相同的测试、截图和问题关闭门槛。缺失或过期的记录不会阻止生成固定安装器；显式传入收据时才会在本地构建中校验它。`-Preview` 另受 `third_party/native-runtimes.json` 中的预览资格约束；该预览检查与可选本地验收收据分开，不能把本地平台证据重新变成固定包发布门槛。
 
-原内核与 MyGo 控件的隔离验收入口为：
+当前业务层与 MyGo 控件的隔离验收入口为：
 
 ```powershell
 npm run test:kernel
@@ -40,7 +40,7 @@ npm run test:kernel
 npm run prepare:native-runtime
 ```
 
-该入口先检查锁文件、已登记 Electron dist 整树、Git、trampoline、process-proxy、printenvz、Copilot 平台包与 Koffi 字节；只在源码、锁定输入、二进制登记和全部产物（含许可证）均一致时复用。缓存失效时清理 `out/`，调用原 `app/webpack.production.ts` 的六个生产目标，再执行原 `script/build.ts` 的依赖、Git/凭据 helper、Copilot、emoji、平台资源与许可证复制规则；设置明确 `GITOWL_NATIVE_BUILD=1` 以从 MyGo 配置取得产品编译名称/版本（普通上游构建不变），不使用开发 seed-profile 或研究 `native-service.js`。原 `compile:prod` 硬编码 4 GiB heap 在当前 SDK 六目标构建中 OOM，适配入口使用同一配置/构建脚本并将 buildtool heap 增至 8 GiB，不改编译目标或内核。
+该入口先检查锁文件、已登记 Electron dist 整树、Git、trampoline、process-proxy、printenvz、Copilot 平台包与 Koffi 字节；只在源码、锁定输入、二进制登记和全部产物（含许可证）均一致时复用。缓存失效时清理 `out/`，由 `app/webpack.production.ts` 编译原生包使用的五个目标：main、native-kernel、crash、CLI 和 highlighter，再执行 `script/build.ts` 的依赖、Git/凭据 helper、Copilot、emoji、平台资源与许可证复制规则。`GITOWL_NATIVE_BUILD=1` 从 MyGo 配置取得产品编译名称/版本，并排除兼容 React renderer；不使用开发 seed-profile 或研究 `native-service.js`。编译进程使用 8 GiB heap 上限。
 
 产物布局为 `output/native-runtime/desktop-kernel/electron.exe` 和 `desktop-kernel/app/main.js`，安装后与 Gitowl 可执行文件同级，Go 与 CLI 均从 `desktop-kernel/...` 解析内核路径；Electron 按已匹配 `package.json.main` 的 app 目录启动，使官方 default-app loader 读取固定 `0.1.0` 产品版本（直接 main.js 文件启动会误报 Electron 版本）；隐藏 Chromium 仅加载 `native-kernel.html`，不打包兼容 React renderer。Electron 官方 MIT LICENSE / Chromium notices 原样保留；20 MiB Chromium notices 的公开材料按 UTF-8 换行边界拆为不足 8 MiB 的登记片段，拼接 SHA256 必须等于官方整文件（安装运行时仍保留一个完整原文件），遵守仓库单文件 10 MiB 上限。另附原 Git、npm allowlist 与原生模块许可证。`build-info.json` 明确 `originalCore: desktop/desktop`、`presentationComplete: false`、`channel: research-preview` 和 runtime inputHash；这不是发布或完整前端验收声明。
 
@@ -50,21 +50,23 @@ Windows 的 Copilot SDK 直接启动原 `copilot-runtime.exe`，不再经过原�
 
 源码/登记或父任务在编译中变化时拒绝写可复用 receipt，须待输入稳定后重跑。正常准备不会更新 `output/release/`；runtime smoke、身份和 CLI 检查可作为本地证据，不是固定包或线上发布的必要条件。
 
-`build-info.json` 记录测试包实际范围。`fullFeatureParity: false` 表示仍未完成所有上游功能，不能当作可发布版本。构建通过不等于全部功能验收通过；安装版生命周期检查不是发布门槛。当前没有代码签名，系统可能提示未知发布者；没有配置公开更新源。
+`build-info.json` 记录测试包实际范围。`originalCore: desktop/desktop` 标识源码来源；`fullFeatureParity: false` 表示未声明完整上游功能一致，不再作为性能优先方案的发布否决条件。发布仍需明确授权及当前范围的功能验证。构建通过不等于全部功能验收通过；安装版生命周期检查不是发布门槛。当前没有代码签名，系统可能提示未知发布者；没有配置公开更新源。
 
 ## 实现边界
 
-**Gitowl 仅重写前端，内核直接复用 `desktop/desktop`，所有功能和行为必须一致。** MyGo 默认启动器仅连接真实 Desktop 内核；低层 Node 服务保留为前期调查与回归材料，不是启动器选项或可交付内核。当前尚未取得完整本地验收记录；旧 UI 测试包不能作为当前源码的交付包。
+**2026-11-20 起，Gitowl 以快速响应为优先，不再要求严格复用上游内核或保留全部上游行为。** 允许复用其他成熟实现、替换内部模块及裁剪收益不足的重型功能；须先调研和测量，并保留核心 Git、凭据、本地改动保护与错误恢复。此次选择保留成熟 Git 命令和当前 Electron 宿主，直接精简同步及刷新路径。方案依据见 [运行性能调查](../third_party/performance-evaluation.md)，验证记录见 [运行性能](runtime-performance.md)。
 
-共享运行时位于 `app/src/ui/app-runtime.ts`：原前端与原生内核 host 必须使用同一处上游 Store/Dispatcher 装配及错误处理链。原生表现层命令位于 `app/src/native-kernel/desktop-presenter.ts`，直接转发给原 Dispatcher，不持有另一个仓库、账户或业务状态缓存。Electron 的原存储、网络、IPC 和平台运行环境按需要保留为内核宿主；不得在隐藏窗口挂载 React 前端或将网页呈现冒充 MyGo。
+当前共享运行时位于 `app/src/ui/app-runtime.ts`，装配 Store/Dispatcher 和错误处理链。原生表现层命令位于 `app/src/native-kernel/desktop-presenter.ts`。Electron 暂时继续承担存储、网络、IPC 和平台环境；这些是当前实现事实，不是今后必须保留的内核边界。界面仍使用 MyGo 原生控件。
 
-MyGo 负责布局、本地化、原生控件和交互桥接。账户登录、Copilot、fetch/pull/push、普通/部分行提交、LFS/hook、stash、历史改写、冲突恢复、PR、通知、深链及所有平台行为必须逐项接到原内核并验证；不得把直接调用几个低层 Git 函数或声明清单一致当成完成迁移。
+MyGo 负责布局、本地化、原生控件和交互桥接。保留功能按实际用户行为验证；裁剪功能明确记录范围，不再要求逐项照搬上游入口。旧低层 Node 服务仍是研究材料，本轮没有切换到该服务；不把声明清单或编译通过当作功能验收。
 
 差异看板收起时，文件改动页与历史页使用相同的居中宽度；展开后才使用右侧全部可用区域。两页共用同一个原生分栏、折叠开关与差异样式，左侧文件列表、草稿或历史记录保留原位。普通文件选择不自动展开，显式展开按钮或审阅入口才打开看板。标题和“纳入本次保存”区域保留 16 DIP 水平内边距，原生滚动条预留轨道空间。逐段上下文展开直接调用原 `text-diff-expansion`，保留原差异身份和行选择；MyGo 仅呈现上、下展开控件。
 
-侧边栏在启动配置写入完成后立即更新所有本地项目的改动数量，并按 5 秒周期重复读取，不依赖项目是否选中。读取复用原 AppStore 的 Git 状态和操作锁，不为本地计数触发 fetch 或 pull；远端后台刷新仍沿用上游策略。项目切换不再排队等待上一次选择的远端资料请求。“获取”和“拉取”直接调用原 Dispatcher；保留的原生界面集成测试验证获取与拉取的区别及本地未提交改动的保留。
+启动配置写入完成后，本地项目初始化改动数量，之后通过操作系统文件通知触发刷新；200 毫秒内的突发事件合并，选中项目优先，Git 操作占用时延后。工作树的独立 Git 目录与公共目录一起监听。每 60 秒校准本地状态，每 5 分钟校准完整元数据；失败监听每分钟重试，恢复时完整校准，失败写日志。普通文件改动只刷新选中项目的工作目录，元数据变化立即刷新仓库。后台计数不触发 fetch/pull。
 
-刷新继续使用原 Dispatcher / AppStore。原生表现层只生成当前文件页的上下文菜单，避免在改动页反复检查未打开的历史文件；工作目录、选择、菜单设置和操作状态未变化时复用原菜单的纯显示数据。执行菜单时仍用当前上游状态重新验证。
+“获取”和“拉取”复用 Git 同一连接更新远端 HEAD，移除额外的 `remote set-head -a` 远端请求。普通获取、拉取和推送不再自动快进未检出的其他本地分支；分支保护资料异步更新，不延长同步忙碌状态。专用辅助提交事务继续保留其已验证的发布收尾。用户显式设置的 `remote.<name>.followRemoteHEAD` 优先，应用不修改持久 Git 配置。
+
+刷新使用已适配的 Dispatcher / AppStore。同一帧的多次状态变更合并为一次推送；命令结果与交互请求保持独立。原生表现层只生成当前文件页的上下文菜单，避免在改动页反复检查未打开的历史文件；工作目录、选择、菜单设置和操作状态未变化时复用原菜单的纯显示数据。执行菜单时仍用当前状态重新验证。
 
 “保存版本”按本地摘要是否为空立即更新可点击状态，输入期间不等待草稿同步或后台规则校验。提交仍按队列先保存草稿，再执行原规则、警告和 Git 提交流程。MyGo 原生分体按钮的菜单用于选择“保存版本”或“保存版本并推送”，主按钮文字、提示和快捷键随选择一致变化，选择写入现有原生设置文件并在重启后保留。菜单按内容确定宽度，选择本身不执行 Git 操作。只有点击主按钮或使用快捷键后才保存；选择推送时，只有本地提交成功后才调用原推送流程。取消或提交失败不推送，推送失败保留本地提交并显示原错误。修改已推送提交时仍经过原强制推送确认。
 
