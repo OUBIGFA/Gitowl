@@ -4,6 +4,8 @@
 
 ## 构建
 
+Gitowl 的测试、编译和安装器打包全部在本地完成。发布时上传本地核验通过的安装包、同名 `.sha256` 和 `build-info.json`；不触发、重跑或等待线上构建。上游比较 CI 和 Release 草稿自动流程在 Gitowl 仓库禁用，源码中的上游任务仅保留作对照。线上保留仓库检查及无需编译的 JavaScript/TypeScript、Python 扫描；Go 检查和产品验收在本地运行。
+
 仅运行本轮相关测试、不运行整包运行时冒烟时，在这次构建进程中设置 `GITOWL_SKIP_RUNTIME_SMOKE=1`。默认仍运行冒烟测试；显式跳过会输出提示，并在固定包 `build-info.json` 中记录 `runtimeSmoke: skipped-by-request`，不表示该检查通过。源码、依赖、资源清单与安装器校验保持不变。
 
 在根目录使用已有 Node/npm 锁定工具链完成 `npm ci`，准备 Go 1.27.3，再暂存本次可审查源文件。最终交付入口为：

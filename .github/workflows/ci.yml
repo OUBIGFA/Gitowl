@@ -51,6 +51,8 @@ env:
 jobs:
   lint:
     name: Lint
+    # Gitowl validates and builds locally; retain upstream jobs for comparison.
+    if: github.repository == 'desktop/desktop'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -78,6 +80,7 @@ jobs:
         run: git diff --name-status --exit-code
   build:
     name: ${{ matrix.friendlyName }} ${{ matrix.arch }}
+    if: github.repository == 'desktop/desktop'
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
@@ -209,6 +212,7 @@ jobs:
           if-no-files-found: error
   e2e-smoke:
     name: E2E Smoke ${{ matrix.friendlyName }} ${{ matrix.arch }}
+    if: github.repository == 'desktop/desktop'
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read

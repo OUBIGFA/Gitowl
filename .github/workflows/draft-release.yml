@@ -30,6 +30,8 @@ permissions:
 jobs:
   draft-release:
     name: Draft Release
+    # Gitowl uploads reviewed installers built locally, without release branches.
+    if: github.repository == 'desktop/desktop'
     runs-on: ubuntu-latest
 
     steps:
