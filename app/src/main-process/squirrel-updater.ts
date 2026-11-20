@@ -166,7 +166,11 @@ function writeShellScriptCLITrampoline(binPath: string): Promise<void> {
   sh "$DIR/${versionedPath}" "$@"`
   const trampolinePath = Path.join(binPath, native?.command ?? 'github')
 
-  return writeFile(trampolinePath, trampoline, { encoding: 'utf8', mode: 755 })
+  // File modes are octal; decimal 755 removes the owner's read permission.
+  return writeFile(trampolinePath, trampoline, {
+    encoding: 'utf8',
+    mode: 0o755,
+  })
 }
 
 /** Spawn the Squirrel.Windows `Update.exe` with a command. */

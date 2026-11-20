@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { mkdir, mkdtemp, readFile } from 'fs/promises'
+import { mkdir, mkdtemp, readFile, stat } from 'fs/promises'
 import { join, resolve } from 'path'
 import { it, mock } from 'node:test'
 
@@ -45,9 +45,13 @@ it('native install, upgrade and uninstall maintain only the Gitowl CLI entry', a
     const bin = join(install, 'bin')
     await lifecycle.handleNativeCLIEvent(['app', '--gitowl-install-cli'])
     assert.equal(userPath, `C:\\Tools;C:\\Desktop\\bin;${bin}`)
+    if (process.platform !== 'win32') {
+      // POSIX runners expose the permissions used by the shell trampoline.
+      assert.equal((await stat(join(bin, 'gitowl'))).mode & 0o700, 0o700)
+    }
     const batch = await readFile(join(bin, 'gitowl.bat'), 'utf8')
     const shell = await readFile(join(bin, 'gitowl'), 'utf8')
-    assert.match(batch, /desktop-kernel\\app\\static\\github\.bat/)
+    assert.match(batch, /desktop-kernel[\\/]app[\\/]static[\\/]github\.bat/)
     assert.match(shell, /desktop-kernel\/app\/static\/github\.sh/)
     assert.doesNotMatch(batch + shell, /GitHubDesktop\.exe|Update\.exe/)
     await lifecycle.handleNativeCLIEvent(['app', '--gitowl-install-cli'])

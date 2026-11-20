@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { it } from 'node:test'
-import { readFile, writeFile } from 'fs/promises'
+import { readFile, realpath, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { runInNewContext } from 'vm'
 import webpack, { Configuration, Stats } from 'webpack'
@@ -59,7 +59,9 @@ it('uses distinct persistent caches for each target and build mode', () => {
 })
 
 it('reuses compiled modules while invalidating changed source and compile-time identity', async context => {
-  const root = await createTempDirectory(context)
+  // Webpack resolves symlinks; macOS temp paths may start with /var while
+  // modules resolve under /private/var. Use the same physical context.
+  const root = await realpath(await createTempDirectory(context))
   await writeFile(join(root, 'build.js'), 'module.exports = {}\n')
   await writeFile(join(root, 'entry.js'), 'module.exports = BUILD_ID\n')
   const cache = production(true)[0].cache

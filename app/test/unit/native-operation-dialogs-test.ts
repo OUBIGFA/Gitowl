@@ -1106,7 +1106,9 @@ describe(
       await mkdir(hooks)
       await writeFile(
         join(hooks, 'pre-commit'),
-        '#!/bin/sh\necho fixture rejection >&2\nexit 1\n'
+        '#!/bin/sh\necho fixture rejection >&2\nexit 1\n',
+        // Git ignores non-executable hooks on POSIX systems.
+        { mode: 0o755 }
       )
       await git(path, ['config', 'core.hooksPath', hooks])
       const popup = await show({

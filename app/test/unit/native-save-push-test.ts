@@ -150,7 +150,9 @@ it('saves locally by default and pushes only after the explicitly requested save
   await mkdir(join(fixture.path, '.git', 'hooks'), { recursive: true })
   await writeFile(
     join(fixture.path, '.git', 'hooks', 'pre-commit'),
-    '#!/bin/sh\nexit 1\n'
+    '#!/bin/sh\nexit 1\n',
+    // Keep real hook rejection active on POSIX runners as well as Windows.
+    { mode: 0o755 }
   )
   const rejected = save('Rejected save must not push', true)
   for (
@@ -171,12 +173,14 @@ it('saves locally by default and pushes only after the explicitly requested save
 
   await writeFile(
     join(fixture.path, '.git', 'hooks', 'pre-commit'),
-    '#!/bin/sh\nexit 0\n'
+    '#!/bin/sh\nexit 0\n',
+    { mode: 0o755 }
   )
   await mkdir(join(remote, 'hooks'), { recursive: true })
   await writeFile(
     join(remote, 'hooks', 'pre-receive'),
-    '#!/bin/sh\necho "Fixture rejects push" >&2\nexit 1\n'
+    '#!/bin/sh\necho "Fixture rejects push" >&2\nexit 1\n',
+    { mode: 0o755 }
   )
   assert.equal(await save('Local save survives a rejected push', true), true)
   const afterRejectedPush = await git(['rev-parse', 'HEAD'])

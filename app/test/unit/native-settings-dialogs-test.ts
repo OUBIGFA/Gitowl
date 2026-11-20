@@ -161,7 +161,11 @@ describe('native settings partition with original core', () => {
       'settings.notificationsDenied'
     )
     await reply(p, 'notificationSettings')
-    assert.deepEqual(opened, ['ms-settings:notifications'])
+    assert.deepEqual(opened, [
+      process.platform === 'darwin'
+        ? 'x-apple.systempreferences:com.apple.preference.notifications'
+        : 'ms-settings:notifications',
+    ])
     await reply(p, 'change', { notificationsEnabled: false })
     assert.equal(
       view(p).fields.some(f => f.id === 'notificationPermission'),
