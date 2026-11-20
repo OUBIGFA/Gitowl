@@ -13,7 +13,7 @@ import (
 // All variants retain MyGo's native focus, keyboard and accessibility behavior.
 // Only their surface, spacing and Lucide content differ from the default button.
 func quietSurface(c *ui.Context, button ui.Element) ui.Element {
-	button.Radius(8).TextColor(c.Theme().Text)
+	button.Radius(radiusControl).TextColor(c.Theme().Text)
 	if !button.IsDisabled() && button.Pressed() {
 		button.Background(c.Theme().SurfacePressed)
 	} else if !button.IsDisabled() && button.Hovered() {
@@ -23,7 +23,7 @@ func quietSurface(c *ui.Context, button ui.Element) ui.Element {
 }
 
 func quietButton(c *ui.Context, label, icon string) ui.Element {
-	button := ui.ButtonBase(c).MinHeight(36).Padding(6, 10).Gap(8).Label(label)
+	button := ui.ButtonBase(c).MinHeight(36).Padding(6, 10).Gap(8).AlignItems(ui.Center).Label(label)
 	quietSurface(c, button).Children(func() {
 		if icon != "" {
 			ui.Icon(c, icons[icon]).FontSize(18).Shrink(0)
@@ -34,7 +34,7 @@ func quietButton(c *ui.Context, label, icon string) ui.Element {
 }
 
 func iconButton(c *ui.Context, label, icon string) ui.Element {
-	button := ui.ButtonBase(c).Size(36, 36).Padding(9).Label(label).Tooltip(label)
+	button := ui.ButtonBase(c).Size(36, 36).Padding(9).Center().Label(label).Tooltip(label)
 	quietSurface(c, button).Children(func() {
 		ui.Icon(c, icons[icon]).FontSize(18)
 	})
@@ -84,8 +84,8 @@ func fileStatusPill(c *ui.Context, tx locales.Messages, status string, submodule
 	if submodule {
 		label, color = tx.FileSubmodule(), t.TextMuted
 	}
-	return ui.Box(c.Key("status")).Shrink(0).Padding(1, 8).Radius(6).Background(color.Alpha(0.12)).Children(func() {
-		ui.Text(c, label).FontSize(t.Rem(13.0 / 15)).TextColor(color).NoWrap()
+	return ui.Box(c.Key("status")).Shrink(0).Padding(2, 8).Radius(radiusInner).Background(color.Alpha(0.12)).Children(func() {
+		ui.Text(c, label).FontSize(t.Rem(12.5 / 15)).TextColor(color).NoWrap()
 	})
 }
 
@@ -119,7 +119,7 @@ func workspaceDiffSeparatorWithActions(c *ui.Context, sep ui.Element, section *e
 		if _, suffix, ok := strings.Cut(strings.TrimPrefix(section.Header, "@@"), "@@"); ok && strings.TrimSpace(suffix) != "" {
 			context = strings.TrimSpace(suffix)
 		}
-		ui.Row(c).Grow(1).AlignSelf(ui.Stretch).Padding(0, 8).Radius(6).Background(c.Theme().SurfaceHover).
+		ui.Row(c).Grow(1).AlignSelf(ui.Stretch).AlignItems(ui.Center).Padding(2, 10).Radius(radiusInner).Background(c.Theme().SurfaceHover).
 			Label(tx.DiffSection()).Tooltip(tx.RawDiffRange(section.Header)).Children(func() {
 			if actions != nil {
 				actions(c)

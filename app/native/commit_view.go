@@ -8,8 +8,12 @@ import (
 // The composer stays in the file pane while its diff opens or closes. Its
 // stable parent and keys preserve native editing state through resizing.
 func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
-	_, height := c.Size()
+	width, height := c.Size()
 	narrow := a.isChangesWorkspace() && a.diffPanelLayout.width < 420
+	if a.core != nil && a.repo != nil && a.notebook.width > 0 {
+		rightPane := width - a.nativeRailWidth(c) - 32 - a.notebook.width - 12
+		narrow = rightPane < 460
+	}
 	// Reviewing a file at a short window: the diff is what is being read. The
 	// actions wrap to two rows there, so tighten the spacing above them (every
 	// label stays) to keep a usable code viewport. Padding is unchanged so Save
@@ -19,8 +23,12 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 	if compact {
 		margin, gap = 6, 6
 	}
+	composerBorder := c.Theme().Background.Mix(c.Theme().Text, 0.14)
+	if c.Preferences().HighContrast {
+		composerBorder = c.Theme().Border
+	}
 	ui.Column(c.Key("commit-form:"+a.repo.Path)).Shrink(0).FillWidth().Margin(margin, 0, 0, 0).Padding(12).Gap(gap).
-		Border(1, c.Theme().Border).Radius(12).Background(c.Theme().Surface).
+		Border(1, composerBorder).Radius(radiusSurface).Background(c.Theme().Surface).
 		OnShortcut(ui.Ctrl, ui.KeyEnter, a.saveVersion).Children(func() {
 		// Sources and output language remain visible; they are negotiated and
 		// applied from real settings receipts, never invented demonstration data.
@@ -47,7 +55,7 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 			if vm != nil && vm.DefaultSummary != nil {
 				placeholder = *vm.DefaultSummary
 			}
-			input := ui.TextInput(c.Key("commit-summary"), &a.commitSummary).FillWidth().MinHeight(36).Padding(6, 8).FontSize(c.Theme().Rem(16.0 / 15)).
+			input := ui.TextInput(c.Key("commit-summary"), &a.commitSummary).FillWidth().MinHeight(36).Padding(8, 12).FontSize(c.Theme().Rem(15.0 / 15)).
 				Placeholder(placeholder).Label(tx.CommitSummary()).Disabled(a.composerLocked()).OnChange(a.generationDraftEdited)
 			a.focusCoreCommitMessage(input)
 			if a.coreFocusTarget == "focus-changes" && (a.status == nil || len(a.status.Files) == 0) {
@@ -56,12 +64,12 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 			}
 			var description ui.CollapsibleParts
 			inlineHint := vm != nil && vm.SummaryLengthWarning && a.reviewingFile && height < 700
-			ui.Row(c).FillWidth().Gap(12).Children(func() {
+			ui.Row(c).FillWidth().Gap(8).AlignItems(ui.Center).Children(func() {
 				description = ui.CollapsibleBase(c.Key("description-disclosure"), &a.descriptionOpen)
-				quietSurface(c, description.Trigger).MinHeight(28).Padding(4, 8).Gap(8).AlignSelf(ui.Start).
+				quietSurface(c, description.Trigger).MinHeight(28).Padding(4, 6).Gap(6).AlignItems(ui.Center).AlignSelf(ui.Start).
 					Label(tx.CommitDescription()).Children(func() {
-					ui.Icon(c, icons["chevron-right"]).FontSize(16).Rotate(90 * description.Progress())
-					ui.Text(c, tx.CommitDescription()).FontSize(c.Theme().Rem(14.0 / 15)).NoWrap().TextColor(c.Theme().Text)
+					ui.Icon(c, icons["chevron-right"]).FontSize(15).Rotate(90 * description.Progress())
+					ui.Text(c, tx.CommitDescription()).FontSize(c.Theme().Rem(14.0 / 15)).NoWrap().TextColor(c.Theme().TextMuted)
 					if inlineHint {
 						ui.Spacer(c)
 						ui.Text(c, nativeDialogLabel(c.Locale(), "commit.summaryHint")).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted).SingleLine().MinWidth(0)
@@ -70,6 +78,7 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 				if inlineHint {
 					description.Trigger.Description(nativeDialogLabel(c.Locale(), "commit.summaryHint"))
 				}
+				ui.Spacer(c)
 				selectionCount()
 			})
 			description.Panel(func() {
@@ -129,76 +138,78 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 				a.coreGenerationMenu(c, tx)
 			}
 			ui.Spacer(c)
-			if vm == nil || vm.Mode != "copilot" {
-				if a.generating {
-					quietButton(c.Key("stop-generation"), tx.StopGeneration(), "x").Height(36).OnClick(a.stopGeneration)
-				} else {
-					label := tx.GenerateMessage()
-					if narrow {
-						label = tx.GenerateMessageShort()
+			ui.Row(c.Key("composer-primary-actions")).Shrink(1).MinWidth(0).AlignItems(ui.Center).Justify(ui.End).Wrap().Gap(gap).Children(func() {
+				if vm == nil || vm.Mode != "copilot" {
+					if a.generating {
+						quietButton(c.Key("stop-generation"), tx.StopGeneration(), "x").Height(36).OnClick(a.stopGeneration)
+					} else {
+						label := tx.GenerateMessage()
+						if narrow {
+							label = tx.GenerateMessageShort()
+						}
+						ui.Button(c.Key("generate-message"), label).Label(tx.GenerateMessage()).Height(40).Padding(8, 12).FontWeight(500).
+							Tooltip(a.generationTooltip(tx)).Disabled(!a.generationActionEnabled()).OnClick(a.requestGeneration)
 					}
-					ui.Button(c.Key("generate-message"), label).Label(tx.GenerateMessage()).Height(40).Padding(8, 16).FontWeight(500).
-						Tooltip(a.generationTooltip(tx)).Disabled(!a.generationActionEnabled()).OnClick(a.requestGeneration)
 				}
-			}
-			saveLabel := tx.SaveVersion()
-			if saveAndPush {
-				saveLabel = tx.SaveVersionAndPush()
-			}
-			if vm != nil && vm.Amending && !saveAndPush {
-				saveLabel = nativeDialogLabel(c.Locale(), "commit.amendSave")
-			}
-			if vm != nil && vm.Mode == "copilot" {
-				saveLabel = nativeDialogLabel(c.Locale(), "commit.assistedSave")
-			}
-			if a.savingVersion {
-				saveLabel = tx.SavingVersion()
+				saveLabel := tx.SaveVersion()
 				if saveAndPush {
-					saveLabel = tx.SavingVersionAndPush()
+					saveLabel = tx.SaveVersionAndPush()
 				}
-			}
-			shownSaveLabel := saveLabel
-			if narrow && !a.savingVersion && !saveAndPush && (vm == nil || vm.Mode != "copilot" && !vm.Amending) {
-				shownSaveLabel = tx.SaveVersionShort()
-			}
-			saveTooltip, saveDisabled := tx.SaveVersionTooltip(), !a.canSaveVersion()
-			if saveAndPush {
-				saveTooltip = tx.SaveVersionAndPushTooltip()
-				saveDisabled = saveDisabled || a.coreRemotePending || a.coreSnapshot.Selected.RemoteInProgress
-			}
-			// Save and its advanced options stay together on the right, including
-			// at the minimum width when the model selector wraps above them.
-			ui.Row(c.Key("commit-save-group")).Shrink(0).AlignItems(ui.Center).Gap(12).Children(func() {
-				var save ui.Element
-				if a.core != nil && (vm == nil || vm.Mode != "copilot") {
-					// Use MyGo's joined control, including its focus group, arrow
-					// keys and menu accessibility. The menu only selects the default;
-					// the primary button and shortcut execute it.
-					parts := ui.PrimarySplitButton(c.Key("save-version"), shownSaveLabel)
-					parts.Group.Height(40).Disabled(!a.canSaveVersion())
-					parts.Arrow.Label(tx.SaveOptions()).Tooltip(tx.SaveOptions()).PopoverMenuButton(func(m *ui.Menu) {
-						if m.Item(tx.SaveVersion()).Radio(!a.windowPreferences.PushAfterCommit).Chosen() {
-							a.selectSaveAction(false)
-						}
-						if m.Item(tx.SaveVersionAndPush()).Radio(a.windowPreferences.PushAfterCommit).Chosen() {
-							a.selectSaveAction(true)
-						}
-					}, ui.PopoverMenuButtonOptions{At: ui.AnchorBottomEnd, Self: ui.AnchorTopEnd, Panel: func(panel ui.Element) {
-						// Override the toolkit's 180-DIP floor; labels and native
-						// choice marks determine this short menu's natural width.
-						panel.MinWidth(0)
-					}})
-					save = parts.Button
-				} else {
-					save = ui.PrimaryButton(c.Key("save-version"), shownSaveLabel)
+				if vm != nil && vm.Amending && !saveAndPush {
+					saveLabel = nativeDialogLabel(c.Locale(), "commit.amendSave")
 				}
-				save.Height(40).Padding(8, 16).FontWeight(500).Label(saveLabel).
-					Tooltip(saveTooltip + " · " + tx.SaveShortcut() + " · " + tx.IncludedFiles(len(a.included))).Disabled(saveDisabled).OnClick(a.saveVersion)
-				if a.coreFocusTarget == "commit-submit" {
-					save.Focus()
-					a.coreFocusTarget = ""
+				if vm != nil && vm.Mode == "copilot" {
+					saveLabel = nativeDialogLabel(c.Locale(), "commit.assistedSave")
 				}
-				a.nativeCommitOptions(c)
+				if a.savingVersion {
+					saveLabel = tx.SavingVersion()
+					if saveAndPush {
+						saveLabel = tx.SavingVersionAndPush()
+					}
+				}
+				shownSaveLabel := saveLabel
+				if narrow && !a.savingVersion && !saveAndPush && (vm == nil || vm.Mode != "copilot" && !vm.Amending) {
+					shownSaveLabel = tx.SaveVersionShort()
+				}
+				saveTooltip, saveDisabled := tx.SaveVersionTooltip(), !a.canSaveVersion()
+				if saveAndPush {
+					saveTooltip = tx.SaveVersionAndPushTooltip()
+					saveDisabled = saveDisabled || a.coreRemotePending || a.coreSnapshot.Selected.RemoteInProgress
+				}
+				// Save and its advanced options stay together on the right, including
+				// at the minimum width when the model selector wraps above them.
+				ui.Row(c.Key("commit-save-group")).Shrink(0).AlignItems(ui.Center).Gap(8).Children(func() {
+					var save ui.Element
+					if a.core != nil && (vm == nil || vm.Mode != "copilot") {
+						// Use MyGo's joined control, including its focus group, arrow
+						// keys and menu accessibility. The menu only selects the default;
+						// the primary button and shortcut execute it.
+						parts := ui.PrimarySplitButton(c.Key("save-version"), shownSaveLabel)
+						parts.Group.Height(40).Disabled(!a.canSaveVersion())
+						parts.Arrow.Label(tx.SaveOptions()).Tooltip(tx.SaveOptions()).PopoverMenuButton(func(m *ui.Menu) {
+							if m.Item(tx.SaveVersion()).Radio(!a.windowPreferences.PushAfterCommit).Chosen() {
+								a.selectSaveAction(false)
+							}
+							if m.Item(tx.SaveVersionAndPush()).Radio(a.windowPreferences.PushAfterCommit).Chosen() {
+								a.selectSaveAction(true)
+							}
+						}, ui.PopoverMenuButtonOptions{At: ui.AnchorBottomEnd, Self: ui.AnchorTopEnd, Panel: func(panel ui.Element) {
+							// Override the toolkit's 180-DIP floor; labels and native
+							// choice marks determine this short menu's natural width.
+							panel.MinWidth(0)
+						}})
+						save = parts.Button
+					} else {
+						save = ui.PrimaryButton(c.Key("save-version"), shownSaveLabel)
+					}
+					save.Height(40).Padding(8, 14).FontWeight(500).Label(saveLabel).
+						Tooltip(saveTooltip + " · " + tx.SaveShortcut() + " · " + tx.IncludedFiles(len(a.included))).Disabled(saveDisabled).OnClick(a.saveVersion)
+					if a.coreFocusTarget == "commit-submit" {
+						save.Focus()
+						a.coreFocusTarget = ""
+					}
+					a.nativeCommitOptions(c)
+				})
 			})
 		})
 	})

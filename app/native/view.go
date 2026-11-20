@@ -40,6 +40,10 @@ func (a *app) view(c *ui.Context) {
 	if width < 1100 {
 		padding = 24
 	}
+	headerPadding := padding
+	if editorWorkspace {
+		headerPadding = 16
+	}
 	available := min(float32(1440), width-a.nativeRailWidth(c)) - 2*padding
 	if expandedDiff {
 		available = width - a.nativeRailWidth(c) - padding
@@ -47,13 +51,13 @@ func (a *app) view(c *ui.Context) {
 	ui.Row(c).Fill().AlignItems(ui.Stretch).FontWeight(400).Children(func() {
 		a.projectRail(c, tx, colors)
 		ui.Column(c.Key("workspace-canvas")).Grow(1).MinWidth(0).FillHeight().Children(func() {
-			a.workspaceTitleBar(c, tx, padding)
+			a.workspaceTitleBar(c, tx, headerPadding)
 			if a.repo != nil {
-				a.workspaceTaskBar(c, tx, colors, padding)
+				a.workspaceTaskBar(c, tx, colors, headerPadding)
 			}
 			content := ui.Column(c.Key("workspace-content")).Grow(1).MinHeight(0).FillWidth()
 			if editorWorkspace {
-				content.Padding(8, 12, 16, 12)
+				content.Padding(10, 16, 16, 16)
 			} else if expandedDiff {
 				// The diff pane owns everything right of the overview: it runs to
 				// the window's right and bottom edges instead of a centered column.
@@ -68,7 +72,7 @@ func (a *app) view(c *ui.Context) {
 					case a.repo == nil:
 						a.noProject(c, tx)
 					case editorWorkspace:
-						a.notebookView(c, tx, colors, width-a.nativeRailWidth(c)-24)
+						a.notebookView(c, tx, colors, width-a.nativeRailWidth(c)-32)
 					case fileWorkspace:
 						a.fileWorkspace(c, tx, colors, available)
 					case a.workspaceStashView(c):
@@ -102,16 +106,17 @@ func (a *app) view(c *ui.Context) {
 
 func (a *app) projectRail(c *ui.Context, tx locales.Messages, colors workspaceColors) {
 	bar := c.TitleBar()
-	ui.Column(c.Key("project-rail")).Width(a.nativeRailWidth(c)).Shrink(0).FillHeight().Background(colors.rail).Children(func() {
+	ui.Column(c.Key("project-rail")).Width(a.nativeRailWidth(c)).Shrink(0).FillHeight().Background(colors.rail).
+		BorderWidth(0, 1, 0, 0).BorderColor(colors.hairline).Children(func() {
 		ui.Row(c.Key("brand-titlebar")).Height(max(48, bar.Height)).Padding(0, 16, 0, 20+bar.Left).
-			Gap(10).DragWindow().Children(func() {
+			AlignItems(ui.Center).Gap(10).DragWindow().Children(func() {
 			if a.logo != nil {
 				ui.Image(c, a.logo).Size(24, 24).Fit(ui.Contain).Label(tx.AppName()).Shrink(0)
 			}
 			ui.Text(c, tx.AppName()).FontSize(c.Theme().Rem(17.0 / 15)).FontWeight(500).NoWrap()
 		})
-		ui.Column(c).Grow(1).MinHeight(0).Padding(12, 12, 0, 12).Gap(4).Children(func() {
-			quietButton(c.Key("open-repository"), tx.OpenRepository(), "plus").Height(36).FillWidth().Justify(ui.Start).
+		ui.Column(c).Grow(1).MinHeight(0).Padding(8, 12, 0, 12).Gap(4).Children(func() {
+			quietButton(c.Key("open-repository"), tx.OpenRepository(), "plus").Height(36).Padding(6, 8).FillWidth().Justify(ui.Start).
 				Disabled(!a.ready || a.savingVersion).OnClick(a.showOpen)
 			if a.core != nil && a.repo != nil {
 				a.notebookRail(c, tx, colors)
@@ -123,7 +128,7 @@ func (a *app) projectRail(c *ui.Context, tx locales.Messages, colors workspaceCo
 				// A second current-project heading would duplicate context and
 				// push the task navigation away from the chosen project.
 				if a.core == nil {
-					ui.Row(c.Key("current-project")).Height(44).Padding(0, 10).Margin(20, 0, 8, 0).Gap(10).
+					ui.Row(c.Key("current-project")).Height(44).Padding(0, 8).Margin(20, 0, 8, 0).Gap(10).AlignItems(ui.Center).
 						Tooltip(a.repo.Path).Children(func() {
 						ui.Icon(c, icons["folder-open"]).FontSize(18).Shrink(0).TextColor(c.Theme().TextMuted)
 						ui.Text(c, a.repo.Name).FontWeight(500).SingleLine().Grow(1).MinWidth(0)
@@ -131,11 +136,11 @@ func (a *app) projectRail(c *ui.Context, tx locales.Messages, colors workspaceCo
 				}
 			}
 		})
-		ui.Column(c).Padding(16).Gap(12).Children(func() {
+		ui.Column(c).Padding(10, 12, 12, 12).Gap(8).BorderWidth(1, 0, 0, 0).BorderColor(colors.hairline).Children(func() {
 			if a.core == nil && !a.commitCapable {
-				ui.Text(c, tx.ReadOnly()).FontSize(c.Theme().Rem(14.0/15)).TextColor(c.Theme().TextMuted).Padding(0, 10)
+				ui.Text(c, tx.ReadOnly()).FontSize(c.Theme().Rem(14.0/15)).TextColor(c.Theme().TextMuted).Padding(0, 8)
 			}
-			quietButton(c.Key("settings"), tx.Settings(), "settings").Height(40).FillWidth().Justify(ui.Start).
+			quietButton(c.Key("settings"), tx.Settings(), "settings").Height(36).Padding(6, 8).FillWidth().Justify(ui.Start).
 				OnClick(func() { a.showSettings(settingsInterface) })
 		})
 	})
@@ -144,9 +149,9 @@ func (a *app) projectRail(c *ui.Context, tx locales.Messages, colors workspaceCo
 // Task navigation belongs to the selected project. Keeping it out of the
 // repository collection gives each selection one unambiguous meaning.
 func (a *app) workspaceTaskBar(c *ui.Context, tx locales.Messages, colors workspaceColors, padding float32) {
-	ui.Column(c.Key("workspace-taskbar")).FillWidth().Shrink(0).Padding(8, padding, 8, padding).
+	ui.Column(c.Key("workspace-taskbar")).FillWidth().Shrink(0).Padding(6, padding, 8, padding).
 		BorderWidth(0, 0, 1, 0).BorderColor(colors.hairline).Gap(8).Children(func() {
-		ui.Row(c).FillWidth().Gap(4).Children(func() {
+		ui.Row(c).FillWidth().AlignItems(ui.Center).Gap(6).Children(func() {
 			if a.core == nil {
 				a.reviewTabs(c, tx, colors)
 			}
@@ -164,7 +169,7 @@ func (a *app) reviewTabs(c *ui.Context, tx locales.Messages, colors workspaceCol
 		label string
 		tab   int
 	}{{tx.Changes(), changesTab}, {tx.History(), historyTab}} {
-		button := ui.ButtonBase(c.Key(nav.tab)).Height(36).Padding(8, 12).Gap(8).Label(nav.label)
+		button := ui.ButtonBase(c.Key(nav.tab)).Height(32).Padding(6, 12).Gap(6).AlignItems(ui.Center).Label(nav.label)
 		quietSurface(c, button)
 		if a.tab == nav.tab {
 			button.Background(colors.selected).FontWeight(500).Value(tx.CurrentPage())
@@ -172,7 +177,7 @@ func (a *app) reviewTabs(c *ui.Context, tx locales.Messages, colors workspaceCol
 		button.Children(func() {
 			ui.Text(c, nav.label).NoWrap()
 			if nav.tab == changesTab && a.status != nil {
-				ui.Text(c, i18n.FormatNumber(c.Locale(), len(a.status.Files), i18n.NumberOptions{})).FontSize(c.Theme().Rem(14.0 / 15)).FontFeatures("tnum").TextColor(c.Theme().TextMuted)
+				ui.Text(c, i18n.FormatNumber(c.Locale(), len(a.status.Files), i18n.NumberOptions{})).FontSize(c.Theme().Rem(13.0 / 15)).FontFeatures("tnum").TextColor(c.Theme().TextMuted)
 			}
 		}).OnClick(func() { a.navigateWorkspace(nav.tab) })
 	}
@@ -183,7 +188,7 @@ func (a *app) workspaceTitleBar(c *ui.Context, tx locales.Messages, padding floa
 	// MyGo/system owns the caption buttons. The entire otherwise quiet top
 	// band drags the window, and real controls stay clear of its reserved room.
 	ui.Row(c.Key("workspace-titlebar")).Height(max(48, bar.Height)).Shrink(0).
-		Padding(0, bar.Right+padding, 0, padding).Gap(12).DragWindow().Children(func() {
+		Padding(0, bar.Right+padding, 0, padding).AlignItems(ui.Center).Gap(10).DragWindow().Children(func() {
 		if a.repo != nil {
 			ui.Text(c, a.repo.Name).SingleLine().MinWidth(0).MaxWidth(260).Shrink(1).FontWeight(500).Tooltip(a.repo.Path)
 			if a.core != nil {
@@ -324,7 +329,7 @@ func (a *app) changesOverview(c *ui.Context, tx locales.Messages, colors workspa
 		}
 		return
 	}
-	ui.Row(c).Height(36).Gap(16).Margin(0, 0, 4, 0).Children(func() {
+	ui.Row(c).Height(34).Padding(0, 4, 0, 12).Gap(12).AlignItems(ui.Center).Margin(0, 0, 4, 0).Children(func() {
 		if a.commitCapable {
 			all := a.allFileCheckState()
 			// The native checkbox acts on the complete real collection, not
@@ -353,7 +358,7 @@ func (a *app) fileList(c *ui.Context, tx locales.Messages, files []backend.File,
 	scrollbarWidth := c.Theme().ScrollbarStyle.Resolve(c.Theme()).TrackWidth
 	ui.List(c.Key("files"), state, len(files), func(i int) {
 		file := files[i]
-		row := ui.Row(c).Height(48).Padding(0, 4).Gap(4).Radius(8)
+		row := ui.Row(c).Height(48).Padding(0, 4).Gap(4).AlignItems(ui.Center).Radius(radiusControl)
 		if a.tab == changesTab && a.included[file.Path] {
 			row.Background(colors.selected.Alpha(0.55))
 		}
@@ -479,9 +484,9 @@ func (a *app) diffPane(c *ui.Context, tx locales.Messages, width float32) {
 					directory = d
 				}
 			}
-			ui.Text(c, name).FontSize(c.Theme().Rem(18.0 / 15)).FontWeight(500).SingleLine().Shrink(1).MinWidth(0).Tooltip(label).Role(ui.RoleHeading).Level(1).Label(label)
-			if directory != "" {
-				ui.Text(c, directory).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted).SingleLine().Shrink(2).MinWidth(0).Tooltip(label)
+			ui.Text(c, name).FontSize(c.Theme().Rem(17.0 / 15)).FontWeight(500).SingleLine().Shrink(1).MinWidth(0).Tooltip(label).Role(ui.RoleHeading).Level(1).Label(label)
+			if directory != "" && width >= 420 {
+				ui.Text(c, directory).FontSize(c.Theme().Rem(13.5 / 15)).TextColor(c.Theme().TextMuted).SingleLine().Shrink(3).MinWidth(0).Tooltip(label)
 			}
 			if added, deleted := patchStats(a.preview); added+deleted > 0 && !a.loadingDiff {
 				changeStats(c, tx, added, deleted)
@@ -496,46 +501,52 @@ func (a *app) diffPane(c *ui.Context, tx locales.Messages, width float32) {
 				Disabled(a.composerLocked() || !a.ready).OnChange(func() { a.changeIncluded(file.Path, included == ui.CheckOn) })
 		}
 	}
-	options := func() {
+	optionsControls := func() {
 		if a.preview != nil && len(a.preview.patches) > 0 {
-			ui.Row(c.Key("review-options")).FillWidth().Gap(12).Wrap().Margin(0, 0, 8, 0).Children(func() {
-				layout := a.diffLayout
-				if w := a.nativeWorkspace(); w != nil {
-					layout = int(editor.DiffUnified)
-					if w.SideBySide {
-						layout = int(editor.DiffSplit)
-					}
+			layout := a.diffLayout
+			if w := a.nativeWorkspace(); w != nil {
+				layout = int(editor.DiffUnified)
+				if w.SideBySide {
+					layout = int(editor.DiffSplit)
 				}
-				// Show the effective narrow layout without losing the saved
-				// preference or hiding settings behind a popover.
-				if width < 760 {
-					layout = int(editor.DiffUnified)
+			}
+			// Show the effective narrow layout without losing the saved
+			// preference or hiding settings behind a popover.
+			if width < 760 {
+				layout = int(editor.DiffUnified)
+			}
+			control := ui.Segmented(c.Key("diff-layout"), &layout, tx.SideBySide(), tx.Unified()).Label(tx.DiffLayout()).Disabled(width < 760).OnChange(func() {
+				if a.nativeWorkspace() != nil {
+					a.workspaceAction(backend.KernelWorkspaceAction{Type: "diff.option", Option: "sideBySide", Value: layout == int(editor.DiffSplit)})
+				} else {
+					a.diffLayout = layout
 				}
-				control := ui.Segmented(c.Key("diff-layout"), &layout, tx.SideBySide(), tx.Unified()).Label(tx.DiffLayout()).Disabled(width < 760).OnChange(func() {
-					if a.nativeWorkspace() != nil {
-						a.workspaceAction(backend.KernelWorkspaceAction{Type: "diff.option", Option: "sideBySide", Value: layout == int(editor.DiffSplit)})
-					} else {
-						a.diffLayout = layout
-					}
-				})
-				if width < 760 {
-					control.Tooltip(tx.NarrowDiffLayout()).Description(tx.NarrowDiffLayout())
-				}
-				ui.Checkbox(c.Key("wrap-lines"), &a.wrap, tx.WrapLines())
 			})
+			if width < 760 {
+				control.Tooltip(tx.NarrowDiffLayout()).Description(tx.NarrowDiffLayout())
+			}
+			ui.Checkbox(c.Key("wrap-lines"), &a.wrap, tx.WrapLines())
 		}
 	}
 	if inline {
-		ui.Row(c.Key("diff-heading")).FillWidth().MinHeight(36).Gap(8).Margin(0, 0, 4, 0).Children(func() {
+		ui.Row(c.Key("diff-heading")).FillWidth().MinHeight(36).Gap(8).AlignItems(ui.Center).Margin(0, 0, 8, 0).Children(func() {
 			title()
+			if a.core != nil && a.repo != nil && selected {
+				if width < 520 {
+					iconButton(c.Key("edit-review-file"), bookLabel(c, "Edit"), "file-code").Size(32, 32).Padding(7).OnClick(func() { a.openNote(file.Path) })
+				} else {
+					quietButton(c.Key("edit-review-file"), bookLabel(c, "Edit"), "file-code").Height(32).MinHeight(32).Padding(4, 10).Gap(6).FontSize(c.Theme().Rem(14.0 / 15)).OnClick(func() { a.openNote(file.Path) })
+				}
+			}
 			a.workspaceDiffToggle(c, tx)
 		})
-		ui.Row(c.Key("diff-controls")).FillWidth().Gap(8).Wrap().Margin(0, 0, 8, 0).Children(func() {
+		ui.Row(c.Key("diff-controls")).FillWidth().Gap(12).AlignItems(ui.Center).Wrap().Margin(0, 0, 10, 0).Children(func() {
 			inclusion()
 			a.nativeDiffControls(c, true)
+			optionsControls()
 		})
 	} else {
-		ui.Row(c.Key("diff-heading")).Gap(12).Margin(0, 0, 8, 0).Children(func() {
+		ui.Row(c.Key("diff-heading")).Gap(12).AlignItems(ui.Center).Margin(0, 0, 8, 0).Children(func() {
 			iconButton(c.Key("back-to-overview"), back, "arrow-left").OnClick(a.backFromReview)
 			title()
 			inclusion()
@@ -545,9 +556,11 @@ func (a *app) diffPane(c *ui.Context, tx locales.Messages, width float32) {
 		})
 	}
 	if selected && file.OldPath != "" {
-		ui.Text(c, tx.PreviousPath(file.OldPath)).TextColor(c.Theme().TextMuted).Margin(0, 0, 12, 0)
+		ui.Text(c, tx.PreviousPath(file.OldPath)).TextColor(c.Theme().TextMuted).Margin(0, 0, 10, 0)
 	}
-	options()
+	if !inline && a.preview != nil && len(a.preview.patches) > 0 {
+		ui.Row(c.Key("review-options")).FillWidth().Gap(12).AlignItems(ui.Center).Wrap().Margin(0, 0, 8, 0).Children(optionsControls)
+	}
 	if a.diffErr != nil {
 		showError(c, tx.FailedDiff(a.diffErr.Error()))
 		ui.Spacer(c)

@@ -263,7 +263,7 @@ func renderWorkspaceBanner(c *ui.Context, state *nativeWorkspaceState, banner *b
 	// Original Banner focuses its first action after 200ms. Its timeout begins
 	// only after focus leaves and is cancelled on focus-in, not on mount.
 	var focusTarget ui.Element
-	row := ui.Row(c.Key("workspace-banner")).FillWidth().Gap(12).Wrap().Padding(10, 12).Margin(0, 0, 12, 0).Background(c.Theme().Surface).Radius(8).Role(ui.RoleStatus).Children(func() {
+	row := ui.Row(c.Key("workspace-banner")).FillWidth().Gap(12).AlignItems(ui.Center).Wrap().Padding(10, 12).Margin(0, 0, 12, 0).Background(c.Theme().Surface).Border(1, c.Theme().Border).Radius(radiusControl).Role(ui.RoleStatus).Children(func() {
 		ui.Text(c, workspaceLabel(c.Locale(), banner.LabelKey, banner.Data...)).Grow(1).MinWidth(160)
 		for index, action := range banner.Actions {
 			key := action
@@ -309,7 +309,7 @@ func (a *app) workspaceConflictControls(c *ui.Context) {
 		return
 	}
 	conflict := w.Conflict
-	ui.Row(c.Key("workspace-conflict-recovery")).FillWidth().Gap(8).Wrap().Padding(12).Margin(0, 0, 12, 0).Background(c.Theme().Surface).Radius(8).Children(func() {
+	ui.Row(c.Key("workspace-conflict-recovery")).FillWidth().Gap(8).AlignItems(ui.Center).Wrap().Padding(12).Margin(0, 0, 12, 0).Background(c.Theme().Surface).Border(1, c.Theme().Border).Radius(radiusControl).Children(func() {
 		ui.Column(c).Grow(1).MinWidth(160).Gap(4).Children(func() {
 			ui.Text(c, workspaceLabel(c.Locale(), "workspace.conflicts."+conflict.Kind)).FontWeight(500).Role(ui.RoleStatus)
 			ui.Text(c, workspaceLabel(c.Locale(), "workspace.conflicts.remaining", fmt.Sprint(conflict.Remaining))).TextColor(c.Theme().TextMuted)
@@ -336,7 +336,7 @@ func (a *app) workspaceNavigationView(c *ui.Context) {
 	}
 	label := func(key string) string { return workspaceLabel(c.Locale(), "workspace."+key) }
 	if a.tab == historyTab {
-		ui.Row(c.Key("workspace-compare-controls")).FillWidth().Gap(8).Wrap().Margin(0, 0, 4, 0).Children(func() {
+		ui.Row(c.Key("workspace-compare-controls")).FillWidth().Gap(8).AlignItems(ui.Center).Wrap().Margin(0, 0, 8, 0).Children(func() {
 			// The tab names the page. Only the comparison actions live here.
 			ui.Spacer(c)
 			anchor := quietButton(c.Key("workspace-compare"), label("compare"), "git-branch").OnClick(func() {
@@ -381,7 +381,7 @@ func (a *app) workspaceNavigationView(c *ui.Context) {
 		})
 		return
 	}
-	ui.Row(c.Key("workspace-changes-tools")).FillWidth().Gap(8).Wrap().Margin(0, 0, 12, 0).Children(func() {
+	ui.Row(c.Key("workspace-changes-tools")).FillWidth().Gap(8).AlignItems(ui.Center).Wrap().Margin(0, 0, 8, 0).Children(func() {
 		if w.Stash != nil {
 			quietButton(c.Key("workspace-stash"), label("viewStash"), "history").Disabled(a.workspacePending > 0).OnClick(func() { a.reviewingFile = false; a.workspaceAction(backend.KernelWorkspaceAction{Type: "stash.view"}) })
 		}
@@ -395,7 +395,7 @@ func (a *app) workspaceNavigationView(c *ui.Context) {
 				a.workspaceFilesFilter = w.FilesFilter
 				a.workspaceFilterIdentity = identity
 			}
-			ui.TextInput(c.Key("workspace-filter-files"), &a.workspaceFilesFilter.FilterText).Label(label("filterFiles")).Placeholder(label("filterFiles")).Grow(1).MinWidth(160).OnChange(func() {
+			ui.TextInput(c.Key("workspace-filter-files"), &a.workspaceFilesFilter.FilterText).Height(36).Label(label("filterFiles")).Placeholder(label("filterFiles")).Grow(1).MinWidth(160).OnChange(func() {
 				a.workspaceAction(backend.KernelWorkspaceAction{Type: "files.filter", Filter: a.workspaceFilesFilter})
 			})
 			var active []string

@@ -25,7 +25,7 @@ func workspaceSelect[T comparable](c *ui.Context, value *T, label, placeholder s
 		}
 	}
 	selectBox := ui.SelectBase(c, value)
-	trigger := selectBox.Trigger.MinHeight(40).MinWidth(0).Padding(8, 10).Gap(8).Radius(8).
+	trigger := selectBox.Trigger.MinHeight(40).MinWidth(0).Padding(8, 10).Gap(8).Radius(radiusControl).
 		Border(1, c.Theme().Border).Background(c.Theme().Surface).Label(label).Value(shown).Disabled(disabled)
 	trigger.Children(func() {
 		color := c.Theme().Text
@@ -36,11 +36,11 @@ func workspaceSelect[T comparable](c *ui.Context, value *T, label, placeholder s
 		ui.Icon(c, icons["chevron-down"]).FontSize(16).Shrink(0).TextColor(c.Theme().TextMuted)
 	})
 	selectBox.Popup(func(panel ui.Element) {
-		panel.Margin(4, 0, 0, 0).Padding(4).Radius(8).Background(c.Theme().Surface).
+		panel.Margin(4, 0, 0, 0).Padding(4).Radius(radiusControl).Background(c.Theme().Surface).
 			Border(1, c.Theme().Border)
 		ui.Scroll(c).Height(min(264, float32(len(choices)*42))).FillWidth().Gap(2).Children(func() {
 			for _, choice := range choices {
-				item := selectBox.Item(choice.value).MinHeight(40).Padding(8, 10).Gap(8).Radius(6).
+				item := selectBox.Item(choice.value).MinHeight(40).Padding(8, 10).Gap(8).Radius(radiusInner).
 					Label(choice.label)
 				if item.Highlighted() {
 					item.Background(c.Theme().SurfacePressed)

@@ -378,14 +378,18 @@ func renderNativeDialog(c *ui.Context, tx locales.Messages, popup *backend.Kerne
 		ID   int
 	}{"native-dialog", *popup.ID}), &open, func(back, panel ui.Element) {
 		back.Background(ui.RGBA(0, 0, 0, 0.3))
-		panel.Width(preferences.width).Height(preferences.height).Padding(24).Gap(16).Radius(12).
+		hairline := c.Theme().Background.Mix(c.Theme().Text, 0.10)
+		if c.Preferences().HighContrast {
+			hairline = c.Theme().Border
+		}
+		panel.Width(preferences.width).Height(preferences.height).Padding(24).Gap(16).Radius(radiusSurface).
 			Border(1, c.Theme().Border).Background(c.Theme().Background).Clip().Label(title)
 		if !form.presentedLayout.measured && form.err == nil && (popup.Error == nil || *popup.Error == "") {
 			// Cold layout and the original load finish before the first paint.
 			// The backdrop still owns modality and Escape; only the panel waits.
 			panel.Invisible()
 		}
-		ui.Row(c).FillWidth().Shrink(0).Children(func() {
+		ui.Row(c).FillWidth().Shrink(0).AlignItems(ui.Center).Padding(0, 0, 12, 0).BorderWidth(0, 0, 1, 0).BorderColor(hairline).Children(func() {
 			ui.Text(c, title).FontSize(c.Theme().Rem(22.0 / 15)).FontWeight(500).Role(ui.RoleHeading).Level(1).Grow(1)
 			if navigation != nil {
 				canClose := slices.ContainsFunc(popup.Actions, func(action backend.KernelDialogAction) bool {
@@ -396,7 +400,8 @@ func renderNativeDialog(c *ui.Context, tx locales.Messages, popup *backend.Kerne
 		})
 		ui.Row(c.Key("dialog-body")).Grow(1).MinHeight(0).FillWidth().AlignItems(ui.Stretch).Gap(24).Children(func() {
 			if navigation != nil {
-				ui.Column(c.Key("dialog-navigation")).Width(preferences.navigation).Shrink(0).FillHeight().Gap(4).Children(func() {
+				ui.Column(c.Key("dialog-navigation")).Width(preferences.navigation).Shrink(0).FillHeight().
+					Padding(0, 16, 0, 0).BorderWidth(0, 1, 0, 0).BorderColor(hairline).Gap(4).Children(func() {
 					for _, choice := range navigation.Choices {
 						label := nativeDialogChoiceLabel(c.Locale(), choice.Label)
 						button := quietButton(c.Key(choice.ID), label, settingsNavigationIcon(popup.Type, choice.ID)).MinHeight(36).FillWidth().Justify(ui.Start).
@@ -447,7 +452,8 @@ func renderNativeDialog(c *ui.Context, tx locales.Messages, popup *backend.Kerne
 		if form.section != "" {
 			return
 		}
-		ui.Row(c.Key("dialog-footer")).Gap(8).Wrap().Justify(ui.End).FillWidth().Shrink(0).Children(func() {
+		ui.Row(c.Key("dialog-footer")).Gap(8).Wrap().AlignItems(ui.Center).Justify(ui.End).FillWidth().Shrink(0).
+			Padding(12, 0, 0, 0).BorderWidth(1, 0, 0, 0).BorderColor(hairline).Children(func() {
 			if form.validating() {
 				ui.Text(c, tx.PopupCheckingFields()).Role(ui.RoleStatus).TextColor(c.Theme().TextMuted).Grow(1)
 			}
@@ -638,18 +644,18 @@ func renderNativeDialogSelect(c *ui.Context, field backend.KernelDialogField, va
 		}
 	}
 	selectBox := ui.SelectBase(c, value)
-	trigger := selectBox.Trigger.MinHeight(40).MinWidth(0).FillWidth().Padding(8, 10).Gap(8).Radius(8).
+	trigger := selectBox.Trigger.MinHeight(40).MinWidth(0).FillWidth().Padding(8, 10).Gap(8).Radius(radiusControl).
 		Border(1, c.Theme().Border).Background(c.Theme().Surface).Label(label).Value(shown).Disabled(disabled)
 	trigger.Children(func() {
 		ui.Text(c, shown).SingleLine().Grow(1).MinWidth(0)
 		ui.Icon(c, icons["chevron-down"]).FontSize(16).Shrink(0).TextColor(c.Theme().TextMuted)
 	})
 	selectBox.Popup(func(panel ui.Element) {
-		panel.Margin(4, 0, 0, 0).Padding(4).Radius(8).Background(c.Theme().Surface).Border(1, c.Theme().Border)
+		panel.Margin(4, 0, 0, 0).Padding(4).Radius(radiusControl).Background(c.Theme().Surface).Border(1, c.Theme().Border)
 		ui.Scroll(c).Height(min(280, float32(len(field.Choices)*42))).FillWidth().Gap(2).Children(func() {
 			for _, choice := range field.Choices {
 				text := nativeDialogChoiceLabel(c.Locale(), choice.Label)
-				item := selectBox.Item(choice.ID).MinHeight(40).Padding(8, 10).Radius(6).Label(text).Disabled(choice.Disabled)
+				item := selectBox.Item(choice.ID).MinHeight(40).Padding(8, 10).Radius(radiusInner).Label(text).Disabled(choice.Disabled)
 				if item.Highlighted() {
 					item.Background(c.Theme().SurfacePressed)
 				}

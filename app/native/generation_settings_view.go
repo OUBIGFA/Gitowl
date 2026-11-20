@@ -57,7 +57,7 @@ func (a *app) settingsDialog(c *ui.Context, tx locales.Messages) {
 	if ui.DialogBase(c.Key("settings-dialog"), &a.settingsModal, func(back, panel ui.Element) {
 		back.Background(ui.RGBA(0, 0, 0, 0.3))
 		panel.Width(840).Height(552).MaxWidthPercent(94).MaxHeightPercent(90).Padding(0).Gap(0).
-			Radius(12).Border(1, c.Theme().Border).Background(c.Theme().Background).Clip()
+			Radius(radiusSurface).Border(1, c.Theme().Border).Background(c.Theme().Background).Clip()
 		ui.Row(c).Height(64).Shrink(0).Padding(0, 24).Gap(16).Children(func() {
 			ui.Text(c, tx.Settings()).FontSize(c.Theme().Rem(22.0 / 15)).FontWeight(500).Grow(1)
 			iconButton(c.Key("close-settings"), tx.Close(), "x").OnClick(a.closeSettings)

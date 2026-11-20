@@ -146,7 +146,7 @@ func (a *app) configureNativeDiffSelection(c *ui.Context, patchIndex int, state 
 			icon, key = "check", "workspace.excludeLines"
 		}
 		label := nativeDialogLabel(c.Locale(), key)
-		button.Background(c.Theme().Surface).Radius(4).Label(label).Tooltip(label).
+		button.Background(c.Theme().Surface).Radius(radiusInner).Label(label).Tooltip(label).
 			Disabled(len(ids) == 0 || a.composerLocked() || a.coreInclusionPending != 0).
 			Children(func() { ui.Icon(c, icons[icon]).FontSize(14) })
 	}

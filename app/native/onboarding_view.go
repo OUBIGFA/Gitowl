@@ -83,17 +83,25 @@ func renderKernelOnboarding(c *ui.Context, tx locales.Messages, state *backend.K
 		actions.Advance("Start")
 	}
 	ui.Row(c.Key("kernel-onboarding")).Fill().AlignItems(ui.Stretch).FontWeight(400).Children(func() {
-		ui.Column(c.Key("setup-rail")).Width(projectRailWidth).FillHeight().Shrink(0).Background(colors.rail).Children(func() {
+		ui.Column(c.Key("setup-rail")).Width(projectRailWidth).FillHeight().Shrink(0).Background(colors.rail).
+			BorderWidth(0, 1, 0, 0).BorderColor(colors.hairline).Children(func() {
 			bar := c.TitleBar()
-			ui.Row(c).Height(max(48, bar.Height)).Padding(0, 20, 0, 20+bar.Left).DragWindow().Children(func() {
+			ui.Row(c).Height(max(48, bar.Height)).Padding(0, 20, 0, 20+bar.Left).AlignItems(ui.Center).DragWindow().Children(func() {
 				ui.Text(c, tx.AppName()).FontSize(c.Theme().Rem(17.0 / 15)).FontWeight(500)
 			})
-			ui.Column(c).Padding(32, 20).Gap(16).Label(tx.OnboardingSteps()).Children(func() {
+			ui.Column(c).Padding(24, 12).Gap(6).Label(tx.OnboardingSteps()).Children(func() {
 				for i, label := range []string{tx.OnboardingAccountStep(), tx.OnboardingAuthorStep()} {
-					text := ui.Text(c, label).TextColor(c.Theme().TextMuted)
-					if (i == 1) == (state.Step == "ConfigureGit") {
-						text.TextColor(c.Theme().Text).FontWeight(500).Current(ui.CurrentStep)
+					active := (i == 1) == (state.Step == "ConfigureGit")
+					row := ui.Row(c.Key(i)).FillWidth().Padding(8, 12).Radius(radiusControl).AlignItems(ui.Center)
+					if active {
+						row.Background(colors.selected)
 					}
+					row.Children(func() {
+						text := ui.Text(c, label).TextColor(c.Theme().TextMuted)
+						if active {
+							text.TextColor(c.Theme().Text).FontWeight(500).Current(ui.CurrentStep)
+						}
+					})
 				}
 			})
 			ui.Spacer(c)

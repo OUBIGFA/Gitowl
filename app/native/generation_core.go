@@ -160,7 +160,7 @@ func (a *app) coreGenerationMenu(c *ui.Context, tx locales.Messages) {
 	caption := name + " · " + language
 	// A quiet chip, not a full-width field: the model is a setting of the
 	// generate action beside it, chosen rarely and read at a glance.
-	anchor := ui.ButtonBase(c.Key("generation-settings-summary")).Height(36).Padding(6, 8).Gap(6).Shrink(1).MinWidth(0).MaxWidth(320).
+	anchor := ui.ButtonBase(c.Key("generation-settings-summary")).Height(36).Padding(6, 8).Gap(6).AlignItems(ui.Center).Shrink(1).MinWidth(0).MaxWidth(240).
 		Label(tx.GenerationModel() + " / " + tx.GenerationLanguage()).Value(caption).Tooltip(tx.GenerationModel() + " · " + caption)
 	quietSurface(c, anchor).Children(func() {
 		ui.Icon(c, icons["bot"]).FontSize(16).Shrink(0).TextColor(c.Theme().TextMuted)

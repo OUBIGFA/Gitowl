@@ -105,7 +105,7 @@ func historyTag(c *ui.Context, tx locales.Messages, tag string, unpushed bool, a
 	if unpushed {
 		color, background, tooltip = accent, accent.Alpha(0.1), tx.TagNotPushed(tag)
 	}
-	ui.Row(c.Key("tag:"+tag)).Shrink(0).Gap(4).Padding(1, 8).Radius(999).Background(background).AlignItems(ui.Center).Tooltip(tooltip).Children(func() {
+	ui.Row(c.Key("tag:"+tag)).Shrink(0).Gap(4).Padding(2, 8).Radius(radiusPill).Background(background).AlignItems(ui.Center).Tooltip(tooltip).Children(func() {
 		ui.Icon(c, icons["tag"]).FontSize(12).TextColor(color)
 		ui.Text(c, tag).FontSize(t.Rem(13.0 / 15)).TextColor(color).SingleLine().MaxWidth(140)
 	})
@@ -201,14 +201,15 @@ func renderWorkspaceHistoryList(c *ui.Context, state *nativeWorkspaceState, list
 	list := ui.List(c.Key("workspace-history-list"), listState, len(rows), func(i int) {
 		if rows[i].commit < 0 {
 			// The pinned heading needs the canvas color, or records show through.
-			ui.Row(c.Key("day:"+rows[i].day)).FillWidth().Padding(12, 4, 2, 4).Gap(12).AlignItems(ui.Center).Background(baseTheme.Background).Children(func() {
-				ui.Text(c, historyDayLabel(c, rows[i].date)).FontSize(small).FontWeight(500).TextColor(baseTheme.Text).NoWrap().Role(ui.RoleHeading).Level(2)
+			ui.Row(c.Key("day:"+rows[i].day)).FillWidth().Padding(14, 4, 4, 4).Gap(10).AlignItems(ui.Center).Background(baseTheme.Background).Children(func() {
+				ui.Text(c, historyDayLabel(c, rows[i].date)).FontSize(c.Theme().Rem(13.0 / 15)).FontWeight(500).TextColor(baseTheme.TextMuted).NoWrap().Role(ui.RoleHeading).Level(2)
+				ui.Box(c).Grow(1).Height(1).Background(baseTheme.Background.Mix(baseTheme.Text, 0.10))
 			})
 			return
 		}
 		commit := commits[rows[i].commit]
 		chosen := state.workspaceHistorySelection.Has(commit.SHA)
-		surface, border := baseTheme.Surface, baseTheme.Background.Mix(baseTheme.Text, 0.14)
+		surface, border := baseTheme.Surface, baseTheme.Background.Mix(baseTheme.Text, 0.11)
 		if chosen {
 			surface, border = baseTheme.Surface.Mix(baseTheme.Text, 0.015), baseTheme.Focus
 		}
@@ -218,12 +219,12 @@ func renderWorkspaceHistoryList(c *ui.Context, state *nativeWorkspaceState, list
 				border = baseTheme.Focus
 			}
 		}
-		row := ui.Column(c.Key(commit.SHA)).FillWidth().Padding(14, 16, 10, 16).Gap(10).Background(surface).Border(1, border).Radius(8).Label(commit.Summary)
+		row := ui.Column(c.Key(commit.SHA)).FillWidth().Padding(14, 16, 12, 16).Gap(10).Background(surface).Border(1, border).Radius(radiusControl).Label(commit.Summary)
 		row.Children(func() {
-			ui.Text(c.Key("title"), commit.Summary).FillWidth().MinWidth(0).MaxLines(2).FontSize(c.Theme().Rem(17.0 / 15)).FontWeight(600).TextColor(baseTheme.Text).Tooltip(commit.Summary)
-			ui.Row(c.Key("author")).FillWidth().MinWidth(0).Gap(8).AlignItems(ui.Center).Children(func() {
+			ui.Text(c.Key("title"), commit.Summary).FillWidth().MinWidth(0).MaxLines(2).FontSize(c.Theme().Rem(16.0 / 15)).FontWeight(500).TextColor(baseTheme.Text).Tooltip(commit.Summary)
+			ui.Row(c.Key("author")).FillWidth().MinWidth(0).Gap(8).Wrap().AlignItems(ui.Center).Children(func() {
 				authorAvatar(c, commit.AuthorName)
-				ui.Text(c, commit.AuthorName).SingleLine().Grow(1).MinWidth(0).FontSize(small).TextColor(baseTheme.Text).Tooltip(commit.AuthorName + " <" + commit.AuthorEmail + ">")
+				ui.Text(c, commit.AuthorName).SingleLine().Grow(1).MinWidth(56).FontSize(small).TextColor(baseTheme.Text).Tooltip(commit.AuthorName + " <" + commit.AuthorEmail + ">")
 				when, full := historyTimeLabel(c, commit)
 				ui.Text(c, when).NoWrap().Shrink(0).FontSize(small).FontFeatures("tnum").TextColor(baseTheme.TextMuted).Tooltip(full)
 				if key, icon := historySync(workspace, selected, commit.SHA); key != "" {
@@ -232,9 +233,9 @@ func renderWorkspaceHistoryList(c *ui.Context, state *nativeWorkspaceState, list
 						color = baseTheme.Accent
 					}
 					label := workspaceLabel(locale, key)
-					ui.Row(c.Key("sync")).Shrink(0).Padding(3, 8).Gap(4).Radius(4).Background(color.Alpha(0.08)).AlignItems(ui.Center).Label(label).Children(func() {
-						ui.Icon(c, icons[icon]).FontSize(14).TextColor(color)
-						ui.Text(c, label).FontSize(small).TextColor(color).NoWrap()
+					ui.Row(c.Key("sync")).Shrink(0).Padding(2, 8).Gap(4).Radius(radiusInner).Background(color.Alpha(0.08)).AlignItems(ui.Center).Label(label).Children(func() {
+						ui.Icon(c, icons[icon]).FontSize(13).TextColor(color)
+						ui.Text(c, label).FontSize(c.Theme().Rem(12.5 / 15)).TextColor(color).NoWrap()
 					})
 				}
 			})
@@ -422,21 +423,21 @@ func (a *app) workspaceHistoryReview(c *ui.Context) bool {
 	a.commitFilesList.list().Key = func(i int) any { return files[i].ID }
 	ui.List(c.Key("workspace-history-files"), a.commitFilesList.list(), len(files), func(i int) {
 		file := files[i]
-		button := ui.ButtonBase(c.Key(file.ID)).MinHeight(40).FillWidth().Padding(6, 8).Gap(12).Label(tx.OpenFile(file.Path)).Tooltip(file.Path).Disabled(!a.ready)
+		button := ui.ButtonBase(c.Key(file.ID)).MinHeight(38).FillWidth().Padding(4, 8).Gap(8).AlignItems(ui.Center).Label(tx.OpenFile(file.Path)).Tooltip(file.Path).Disabled(!a.ready)
 		quietSurface(c, button).Children(func() {
-			ui.Icon(c, icons[fileIcon(file.Path, file.IsSubmodule)]).FontSize(18).Shrink(0).TextColor(c.Theme().TextMuted)
+			ui.Icon(c, icons[fileIcon(file.Path, file.IsSubmodule)]).FontSize(16).Shrink(0).TextColor(c.Theme().TextMuted)
 			// The name leads; its folder is context, as in the changes list.
 			ui.Text(c, path.Base(file.Path)).SingleLine().Shrink(1).MinWidth(0)
 			if directory := path.Dir(file.Path); directory != "." {
-				ui.Text(c, directory).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted).SingleLine().Grow(1).MinWidth(0)
+				ui.Text(c, directory).FontSize(c.Theme().Rem(13.5 / 15)).TextColor(c.Theme().TextMuted).SingleLine().Grow(1).MinWidth(0)
 			} else {
 				ui.Spacer(c)
 			}
-			ui.Text(c, fileStatus(tx, file.Status)).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(fileStatusColor(c.Theme(), file.Status)).NoWrap().Shrink(0)
-			ui.Icon(c, icons["chevron-right"]).FontSize(18).Shrink(0).TextColor(c.Theme().TextMuted)
+			fileStatusPill(c, tx, file.Status, file.IsSubmodule)
+			ui.Icon(c, icons["chevron-right"]).FontSize(16).Shrink(0).TextColor(c.Theme().TextMuted)
 		}).OnClick(func() { a.reviewWorkspacePath(file.Path) })
 		a.fileContextMenu(c, button, file.ID)
-	}).Height(min(c.Theme().Rem(12), float32(len(files))*40)).FillWidth().Margin(4, 0, 0, 0).Label(tx.ChangedFiles())
+	}).Height(min(c.Theme().Rem(12), float32(len(files))*38)).FillWidth().Margin(4, 0, 0, 0).Label(tx.ChangedFiles())
 	return true
 }
 

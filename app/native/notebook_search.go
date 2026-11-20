@@ -211,7 +211,7 @@ func (a *app) notebookSearchDialog(c *ui.Context) {
 			}
 		})
 		ui.Button(c.Key("close-search"), bookLabel(c, "Close")).AlignSelf(ui.End).OnClick(func() { n.searchOpen = false })
-	}).Width(500)
+	}).Width(500).Padding(20).Gap(12).Radius(radiusSurface)
 	if !n.searchOpen && s.cancel != nil {
 		s.cancel()
 	}

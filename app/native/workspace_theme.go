@@ -12,6 +12,15 @@ import (
 // and density without stealing the central review canvas from small windows.
 const projectRailWidth float32 = 232
 
+// Canonical border-radius scale across the entire native UI. Inner elements
+// always use a radius smaller than or equal to their enclosing container.
+const (
+	radiusSurface float32 = 12  // Modals, dialogs, composer container
+	radiusControl float32 = 8   // Buttons, inputs, selects, tabs, rows, commit cards, banners
+	radiusInner   float32 = 6   // Nested items inside controls, status pills, sync badges, hunk headers
+	radiusPill    float32 = 999 // True capsule release tags
+)
+
 var (
 	dangerOnDark  = ui.Hex("#ffadd1")
 	dangerOnLight = ui.Hex("#92244e")
@@ -38,7 +47,7 @@ func workspaceFont(locale string) string {
 func setWorkspaceTheme(c *ui.Context) workspaceColors {
 	t := *c.Theme()
 	t.Font, t.FontSize = workspaceFont(c.Locale()), 15*max(1, c.Preferences().TextScale)
-	t.Radius, t.Spacing = 8, 4
+	t.Radius, t.Spacing = radiusControl, 4
 	colors := workspaceColors{rail: t.Surface, selected: t.SurfacePressed, hairline: t.Border}
 	if !c.Preferences().HighContrast {
 		if t.Dark {

@@ -91,13 +91,18 @@ func renderPreferencePage(c *ui.Context, popup *backend.KernelPopupPresentation,
 		return !slices.ContainsFunc(group.fields, func(id string) bool { _, ok := fields[id]; return ok })
 	})
 	ui.Column(c.Key("preference-page")).FillWidth().Gap(24).Shrink(0).Children(func() {
+		hairline := c.Theme().Background.Mix(c.Theme().Text, 0.10)
+		if c.Preferences().HighContrast {
+			hairline = c.Theme().Border
+		}
 		columns := max(1, min(2, layout.columns))
 		for start := 0; start < len(groups); start += columns {
 			ui.Row(c.Key(start)).FillWidth().Gap(24).Shrink(0).AlignItems(ui.Start).Children(func() {
 				for _, group := range groups[start:min(start+columns, len(groups))] {
-					ui.Column(c.Key(group.title)).Grow(1).Basis(0).MinWidth(0).Gap(16).Shrink(0).Children(func() {
+					ui.Column(c.Key(group.title)).Grow(1).Basis(0).MinWidth(0).Gap(14).Shrink(0).Children(func() {
 						if group.title != "" {
-							ui.Text(c, nativeDialogLabel(c.Locale(), group.title)).FontSize(c.Theme().Rem(16.0 / 15)).FontWeight(500).Role(ui.RoleHeading).Level(3)
+							ui.Text(c, nativeDialogLabel(c.Locale(), group.title)).FillWidth().FontSize(c.Theme().Rem(13.0 / 15)).FontWeight(500).
+								TextColor(c.Theme().TextMuted).Padding(0, 0, 6, 0).BorderWidth(0, 0, 1, 0).BorderColor(hairline).Role(ui.RoleHeading).Level(3)
 						}
 						for _, id := range group.fields {
 							renderField(id, group.title)
@@ -133,11 +138,16 @@ func renderPreferencePage(c *ui.Context, popup *backend.KernelPopupPresentation,
 		}
 		if len(remaining) > 0 {
 			ui.Column(c.Key("remaining-fields")).FillWidth().Gap(16).Shrink(0).Children(func() {
-				ui.Box(c).FillWidth().Height(1).Background(c.Theme().Border).Shrink(0)
+				ui.Box(c).FillWidth().Height(1).Background(hairline).Shrink(0)
 				for start := 0; start < len(remaining); start += columns {
 					ui.Row(c.Key(start)).FillWidth().Gap(24).Shrink(0).AlignItems(ui.End).Children(func() {
 						for _, id := range remaining[start:min(start+columns, len(remaining))] {
-							ui.Column(c.Key(id)).Grow(1).Basis(0).MinWidth(0).Children(func() { renderField(id, "") })
+							col := ui.Column(c.Key(id)).Grow(1).Basis(0).MinWidth(0)
+							if field, ok := fields[id]; ok && field.Kind == "checkbox" {
+								// Vertically center standalone checkboxes beside 40-DIP inputs/selects.
+								col.MinHeight(40).Justify(ui.Center)
+							}
+							col.Children(func() { renderField(id, "") })
 						}
 					})
 				}

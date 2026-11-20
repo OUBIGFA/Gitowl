@@ -75,7 +75,7 @@ func renderWorkspaceChangesList(c *ui.Context, state *nativeWorkspaceState, list
 	scrollbarWidth := baseTheme.ScrollbarStyle.Resolve(baseTheme).TrackWidth
 	list := ui.List(c.Key("workspace-changed-files"), listState, len(files), func(i int) {
 		file := files[i]
-		row := ui.Row(c.Key(file.ID)).Height(48).FillWidth().Padding(0, 4).Gap(8).Radius(6).Label(file.Path)
+		row := ui.Row(c.Key(file.ID)).Height(44).FillWidth().Padding(0, 4).Gap(8).AlignItems(ui.Center).Radius(radiusControl).Label(file.Path)
 		row.Children(func() {
 			included := callbacks.checkState(file.Path)
 			// Inclusion is independent of row selection. Keep the checkbox's
@@ -83,11 +83,11 @@ func renderWorkspaceChangesList(c *ui.Context, state *nativeWorkspaceState, list
 			c.SetTheme(baseTheme)
 			ui.CheckboxState(c.Key("include-file"), &included, "").Size(32, 32).Padding(8).Label(tx.IncludeFile(file.Path)).Tooltip(tx.IncludeFile(file.Path)).Disabled(locked || !ready).OnChange(func() { callbacks.include(file.Path, included == ui.CheckOn) })
 			c.SetTheme(&listTheme)
-			ui.Row(c.Key("review-file-region")).Grow(1).MinWidth(0).FillHeight().Gap(8).Disabled(!ready).Children(func() {
-				ui.Icon(c, icons[fileIcon(file.Path, file.IsSubmodule)]).FontSize(18).Shrink(0).TextColor(c.Theme().TextMuted)
+			ui.Row(c.Key("review-file-region")).Grow(1).MinWidth(0).FillHeight().AlignItems(ui.Center).Gap(8).Disabled(!ready).Children(func() {
+				ui.Icon(c, icons[fileIcon(file.Path, file.IsSubmodule)]).FontSize(17).Shrink(0).TextColor(c.Theme().TextMuted)
 				ui.Text(c, path.Base(file.Path)).SingleLine().Shrink(1).MinWidth(0).Tooltip(file.Path)
 				if directory := path.Dir(file.Path); directory != "." {
-					ui.Text(c, directory).FontSize(c.Theme().Rem(14.0 / 15)).TextColor(c.Theme().TextMuted).SingleLine().Grow(1).MinWidth(0).Tooltip(file.Path)
+					ui.Text(c, directory).FontSize(c.Theme().Rem(13.5 / 15)).TextColor(c.Theme().TextMuted).SingleLine().Grow(1).Shrink(3).MinWidth(0).Padding(0, 4, 0, 0).Tooltip(file.Path)
 				} else {
 					ui.Spacer(c)
 				}
@@ -98,13 +98,14 @@ func renderWorkspaceChangesList(c *ui.Context, state *nativeWorkspaceState, list
 			})
 			// Inherit the list's selected foreground, rather than resetting a
 			// dark selected row to the unselected theme's dark text color.
-			ui.ButtonBase(c.Key("review-file")).Size(36, 36).Padding(9).Radius(8).Label(tx.OpenFile(file.Path)).Tooltip(tx.OpenFile(file.Path)).Disabled(!ready).
-				Children(func() { ui.Icon(c, icons["chevron-right"]).FontSize(18) }).OnClick(func() { callbacks.review(file.Path) })
+			ui.ButtonBase(c.Key("review-file")).Size(32, 32).Padding(8).Center().Radius(radiusInner).Label(tx.OpenFile(file.Path)).Tooltip(tx.OpenFile(file.Path)).Disabled(!ready).
+				Children(func() { ui.Icon(c, icons["chevron-right"]).FontSize(16).TextColor(baseTheme.TextMuted) }).OnClick(func() { callbacks.review(file.Path) })
 		})
 		if callbacks.contextMenu != nil {
 			callbacks.contextMenu(c, row, file.ID)
 		}
-	}).Grow(1).MinHeight(0).FillWidth().Gap(2).Padding(4, scrollbarWidth, 0, 0).Label(tx.ChangedFiles())
+	}).Grow(1).MinHeight(0).FillWidth().Gap(2).Padding(6, scrollbarWidth, 0, 0).
+		BorderWidth(1, 0, 0, 0).BorderColor(baseTheme.Background.Mix(baseTheme.Text, 0.10)).Label(tx.ChangedFiles())
 	if list.Changed() {
 		var ids []string
 		for _, file := range files {

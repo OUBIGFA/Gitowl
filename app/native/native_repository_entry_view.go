@@ -79,9 +79,9 @@ func renderRepositoryEntryFields(c *ui.Context, popup *backend.KernelPopupPresen
 			if f, ok := field("tab"); ok {
 				selected := slices.IndexFunc(f.Choices, func(choice backend.KernelDialogChoice) bool { return choice.ID == form.values[f.ID].text })
 				tabs := ui.TabsBase(c.Key("source"), &selected, len(f.Choices))
-				tabs.List.FillWidth().Gap(4).Padding(4).Radius(8).Background(c.Theme().SurfaceHover).Label(nativeDialogLabel(c.Locale(), f.LabelKey)).Children(func() {
+				tabs.List.FillWidth().Gap(4).Padding(4).Radius(radiusControl).Background(c.Theme().SurfaceHover).Label(nativeDialogLabel(c.Locale(), f.LabelKey)).Children(func() {
 					for i, choice := range f.Choices {
-						tab := tabs.Tab(i).MinHeight(36).Grow(1).Basis(0).Padding(6, 12).Radius(6).
+						tab := tabs.Tab(i).MinHeight(36).Grow(1).Basis(0).Padding(6, 12).Radius(radiusInner).
 							Disabled(form.busy || f.Disabled || choice.Disabled).Label(nativeDialogChoiceLabel(c.Locale(), choice.Label))
 						if selected == i {
 							tab.Background(c.Theme().Surface).FontWeight(500)

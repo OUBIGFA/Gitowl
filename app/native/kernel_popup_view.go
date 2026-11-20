@@ -88,7 +88,7 @@ func renderKernelPopup(c *ui.Context, tx locales.Messages, popup *backend.Kernel
 		backdropClicked = back.Clicked()
 		back.Background(ui.RGBA(0, 0, 0, 0.3))
 		panel.Width(640).MaxWidthPercent(94).
-			Padding(24).Gap(16).Radius(12).Border(1, c.Theme().Border).
+			Padding(24).Gap(16).Radius(radiusSurface).Border(1, c.Theme().Border).
 			Background(c.Theme().Background).Clip().Label(title)
 		ui.Text(c, title).FontSize(c.Theme().Rem(22.0 / 15)).FontWeight(500).Role(ui.RoleHeading).Level(1).Shrink(0)
 		// Size the prompt from its parameters. Only diagnostics and account

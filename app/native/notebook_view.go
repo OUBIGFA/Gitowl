@@ -208,12 +208,13 @@ func (a *app) notebookRail(c *ui.Context, tx locales.Messages, colors workspaceC
 		a.coreProjectList(c, tx, colors)
 		return
 	}
-	ui.Row(c).FillWidth().Height(36).AlignItems(ui.Center).Gap(4).Children(func() {
-		ui.Text(c, bookLabel(c, "Files")).Grow(1).FontWeight(500)
+	ui.Row(c).FillWidth().MinHeight(36).Padding(8, 0, 2, 8).Margin(4, 0, 0, 0).AlignItems(ui.Center).Gap(4).
+		BorderWidth(1, 0, 0, 0).BorderColor(colors.hairline).Children(func() {
+		ui.Text(c, bookLabel(c, "Files")).Grow(1).FontSize(c.Theme().Rem(13.0 / 15)).FontWeight(500).TextColor(c.Theme().TextMuted)
 		notebookIcon(c, "find-files", bookLabel(c, "Search"), "search", func() { a.startNotebookSearch("files", "") })
 		notebookIcon(c, "reload-tree", tx.Refresh(), "refresh-cw", func() { n.err = p.load(a.repo.Path) })
 	})
-	ui.Row(c.Key("tree-sort")).FillWidth().Height(36).AlignItems(ui.Center).Gap(4).Children(func() {
+	ui.Row(c.Key("tree-sort")).FillWidth().Height(34).Margin(0, 0, 4, 0).AlignItems(ui.Center).Gap(6).Children(func() {
 		method := 0
 		if p.sortByTime {
 			method = 1
@@ -249,7 +250,7 @@ func (a *app) notebookRail(c *ui.Context, tx locales.Messages, colors workspaceC
 				icon = "chevron-down"
 			}
 		}
-		el := ui.ButtonBase(c.Key(row.name)).Justify(ui.Start).Height(32).FillWidth().Padding(3, 6, 3, float32(6+min(7, row.depth)*12)).Gap(6).Label(label).Tooltip(row.name)
+		el := ui.ButtonBase(c.Key(row.name)).Justify(ui.Start).AlignItems(ui.Center).Height(32).FillWidth().Padding(0, 8, 0, float32(8+min(7, row.depth)*14)).Gap(6).Label(label).Tooltip(row.name)
 		quietSurface(c, el)
 		if p.current != nil && p.current.name == row.name {
 			el.Background(colors.selected)
@@ -261,7 +262,7 @@ func (a *app) notebookRail(c *ui.Context, tx locales.Messages, colors workspaceC
 			ui.Icon(c, icons[icon]).FontSize(15).Shrink(0)
 			ui.Text(c, label).SingleLine().TruncateMiddle().Grow(1).MinWidth(0)
 			if kind := status[row.name]; kind != "" {
-				ui.Text(c, fileStatus(tx, kind)).SingleLine().TextColor(fileStatusColor(c.Theme(), kind)).FontSize(12)
+				ui.Text(c, fileStatus(tx, kind)).SingleLine().Shrink(0).TextColor(fileStatusColor(c.Theme(), kind)).FontSize(c.Theme().Rem(12.0 / 15))
 			}
 		}).OnClick(func() {
 			if row.folder {
@@ -277,7 +278,7 @@ func (a *app) notebookRail(c *ui.Context, tx locales.Messages, colors workspaceC
 // Paths can be wider than their container. Keep both ends readable and
 // expose the complete path on hover and to assistive technology.
 func notebookPathButton(c *ui.Context, text, icon, fullPath string) ui.Element {
-	b := ui.ButtonBase(c).Height(32).Padding(0, 8).Gap(8).Justify(ui.Start).Clip().Label(text).Tooltip(fullPath)
+	b := ui.ButtonBase(c).Height(32).Padding(0, 8).Gap(8).Justify(ui.Start).AlignItems(ui.Center).Clip().Label(text).Tooltip(fullPath)
 	return quietSurface(c, b).Children(func() {
 		ui.Icon(c, icons[icon]).FontSize(16).Shrink(0)
 		ui.Text(c, text).MinWidth(0).Shrink(1).SingleLine().TruncateMiddle()
@@ -285,7 +286,7 @@ func notebookPathButton(c *ui.Context, text, icon, fullPath string) ui.Element {
 }
 
 func notebookIcon(c *ui.Context, id, label, icon string, action func()) {
-	b := ui.ButtonBase(c.Key(id)).Size(32, 32).Padding(8).Label(label).Tooltip(label)
+	b := ui.ButtonBase(c.Key(id)).Size(32, 32).Padding(8).Center().Label(label).Tooltip(label)
 	quietSurface(c, b).Children(func() { ui.Icon(c, icons[icon]).FontSize(16) }).OnClick(action)
 }
 func (a *app) notebookView(c *ui.Context, tx locales.Messages, colors workspaceColors, width float32) {
@@ -296,27 +297,31 @@ func (a *app) notebookView(c *ui.Context, tx locales.Messages, colors workspaceC
 	}
 	n.width = max(width*.38, min(n.width, width-min(280, width*.41)))
 	ui.Split(c.Key("notebook-split"), &n.width, func() {
-		ui.Column(c.Key("note-pane")).Fill().MinWidth(0).Padding(0, 10, 0, 0).Children(func() {
-			ui.ScrollHorizontal(c.Key("note-tabs")).Height(36).FillWidth().Children(func() {
-				ui.Row(c).AlignItems(ui.Center).Gap(4).Children(func() {
-					for _, d := range p.docs {
-						title := filepath.Base(d.name)
-						if d.dirty() {
-							title += " *"
+		ui.Column(c.Key("note-pane")).Fill().MinWidth(0).Padding(0, 12, 0, 0).Children(func() {
+			ui.Row(c.Key("note-tabs-bar")).Height(40).FillWidth().Padding(0, 0, 8, 0).Margin(0, 0, 10, 0).
+				AlignItems(ui.Center).BorderWidth(0, 0, 1, 0).BorderColor(colors.hairline).Children(func() {
+				ui.ScrollHorizontal(c.Key("note-tabs")).Height(32).Grow(1).MinWidth(0).Children(func() {
+					ui.Row(c).AlignItems(ui.Center).Gap(4).Children(func() {
+						for _, d := range p.docs {
+							title := filepath.Base(d.name)
+							if d.dirty() {
+								title += " *"
+							}
+							tab := notebookPathButton(c.Key(d.name), title, fileIcon(d.name, false), d.name).MaxWidth(208).
+								Role(ui.RoleTab).AccessSelected(p.current == d && !a.reviewingFile)
+							if p.current == d && !a.reviewingFile {
+								tab.Background(colors.selected).FontWeight(500)
+							}
+							tab.OnClick(func() { p.current = d; a.backFromReview() })
 						}
-						tab := notebookPathButton(c.Key(d.name), title, fileIcon(d.name, false), d.name).MaxWidth(208).
-							Role(ui.RoleTab).AccessSelected(p.current == d && !a.reviewingFile)
-						if p.current == d && !a.reviewingFile {
-							tab.Background(colors.selected)
+						if !a.reviewingFile {
+							a.workspaceDiffToggle(c, tx)
 						}
-						tab.OnClick(func() { p.current = d; a.backFromReview() })
-					}
-					if !a.reviewingFile {
-						a.workspaceDiffToggle(c, tx)
-					}
-					if a.reviewingFile {
-						quietButton(c.Key("review-tab"), tx.Changes(), "git-branch").Height(30).OnClick(a.backFromReview)
-					}
+						if a.reviewingFile {
+							reviewTab := quietButton(c.Key("review-tab"), tx.Changes(), "git-branch").Height(32).MinHeight(32).Padding(6, 12).OnClick(a.backFromReview)
+							reviewTab.Background(colors.selected).FontWeight(500)
+						}
+					})
 				})
 			})
 			if n.err != nil {
@@ -334,19 +339,10 @@ func (a *app) notebookView(c *ui.Context, tx locales.Messages, colors workspaceC
 			}
 			d := p.current
 			if a.reviewingFile {
-				var name string
-				if a.tab == changesTab && a.status != nil && a.changeIndex >= 0 && a.changeIndex < len(a.status.Files) {
-					name = a.status.Files[a.changeIndex].Path
-				} else if a.tab == historyTab && a.changeset != nil && a.commitFileIndex >= 0 && a.commitFileIndex < len(a.changeset.Files) {
-					name = a.changeset.Files[a.commitFileIndex].Path
-				}
-				if name != "" {
-					quietButton(c.Key("edit-review-file"), bookLabel(c, "Edit"), "file-code").Height(30).OnClick(func() { a.openNote(name) })
-				}
 				theme := *c.Theme()
 				style := theme.ScrollbarStyle.Resolve(&theme)
 				theme.ScrollbarStyle.TrackWidth = max(style.TrackWidth, style.ThumbWidth+12)
-				ui.Themed(c.Key("notebook-diff"), &theme).Grow(1).MinHeight(0).FillWidth().Children(func() { a.diffPane(c, tx, n.width-10) })
+				ui.Themed(c.Key("notebook-diff"), &theme).Grow(1).MinHeight(0).FillWidth().Children(func() { a.diffPane(c, tx, n.width-12) })
 				return
 			}
 			if d == nil {
@@ -355,10 +351,10 @@ func (a *app) notebookView(c *ui.Context, tx locales.Messages, colors workspaceC
 				ui.Spacer(c)
 				return
 			}
-			ui.Row(c.Key("note-tools")).Height(40).FillWidth().AlignItems(ui.Center).Gap(4).Children(func() {
-				ui.Text(c, filepath.ToSlash(d.name)).SingleLine().TruncateMiddle().Grow(1).MinWidth(0).Tooltip(d.name).TextColor(c.Theme().TextMuted)
+			ui.Row(c.Key("note-tools")).Height(36).FillWidth().Padding(0, 2).Margin(0, 0, 8, 0).AlignItems(ui.Center).Gap(4).Children(func() {
+				ui.Text(c, filepath.ToSlash(d.name)).FontSize(c.Theme().Rem(13.0 / 15)).SingleLine().TruncateMiddle().Grow(1).MinWidth(0).Tooltip(d.name).TextColor(c.Theme().TextMuted)
 				if d.rich != nil && d.rich.OutlineAvailable() {
-					toggle := quietButton(c.Key("note-outline"), bookLabel(c, "Outline"), "").Height(32).MinHeight(32).
+					toggle := quietButton(c.Key("note-outline"), bookLabel(c, "Outline"), "").Height(30).MinHeight(30).Padding(4, 10).
 						Expanded(d.rich.OutlineOpen()).OnClick(d.rich.ToggleOutline)
 					if d.rich.OutlineOpen() {
 						toggle.Background(colors.selected)
@@ -369,9 +365,9 @@ func (a *app) notebookView(c *ui.Context, tx locales.Messages, colors workspaceC
 					if d.rich != nil {
 						key = "Code"
 					}
-					quietButton(c.Key("note-mode"), bookLabel(c, key), "").Height(32).MinHeight(32).OnClick(d.switchMode)
+					quietButton(c.Key("note-mode"), bookLabel(c, key), "").Height(30).MinHeight(30).Padding(4, 10).OnClick(d.switchMode)
 				}
-				quietButton(c.Key("save-note"), bookLabel(c, "Save"), "").Height(32).MinHeight(32).Disabled(!d.dirty()).OnClick(func() { a.saveNote(d) })
+				quietButton(c.Key("save-note"), bookLabel(c, "Save"), "").Height(30).MinHeight(30).Padding(4, 10).Disabled(!d.dirty()).OnClick(func() { a.saveNote(d) })
 				notebookIcon(c, "close-note", bookLabel(c, "Close"), "x", func() {
 					if d.dirty() {
 						n.closing = d
@@ -400,7 +396,8 @@ func (a *app) notebookView(c *ui.Context, tx locales.Messages, colors workspaceC
 		})
 	}, func() {
 		ui.Column(c.Key("review-pane")).Fill().MinWidth(0).Padding(0, 0, 0, 12).Children(func() {
-			ui.Row(c.Key("review-tabs")).FillWidth().Height(36).Gap(4).Children(func() { a.reviewTabs(c, tx, colors) })
+			ui.Row(c.Key("review-tabs")).FillWidth().Height(40).Padding(0, 0, 8, 0).Margin(0, 0, 12, 0).
+				AlignItems(ui.Center).Gap(4).BorderWidth(0, 0, 1, 0).BorderColor(colors.hairline).Children(func() { a.reviewTabs(c, tx, colors) })
 			if a.workspaceStashView(c) {
 				return
 			}

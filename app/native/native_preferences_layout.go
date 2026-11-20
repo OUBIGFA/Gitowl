@@ -224,6 +224,10 @@ func measurePreferencesWithin(c *ui.Context, popup *backend.KernelPopupPresentat
 		w, _ := preferenceTextSize(c, 0, section.label, c.Theme().FontSize)
 		navWidth, navCount = max(navWidth, w+20+settingsNavigationIconWidth(popup.Type, section.id)), navCount+1
 	}
+	if navWidth > 0 {
+		// Reserve room for the navigation rail's right padding (16) and hairline border (1).
+		navWidth += 17
+	}
 	pages := popup.LayoutPages
 	if len(pages) == 0 {
 		pages = []backend.KernelDialogLayoutPage{{Fields: nativeDialogContentFields(popup), Actions: popup.Actions}}
@@ -257,7 +261,7 @@ func measurePreferencesWithin(c *ui.Context, popup *backend.KernelPopupPresentat
 	_, titleHeight := preferenceTextSize(c, 0, nativeDialogLabel(c.Locale(), popup.TitleKey), c.Theme().Rem(22.0/15))
 	_, lineHeight := preferenceTextSize(c, 0, "Ag", c.Theme().FontSize)
 	navHeight := max(float32(36), lineHeight+12)
-	chrome := float32(48+32) + max(float32(40), lineHeight+16) + max(36, titleHeight)
+	chrome := float32(48+32+26) + max(float32(40), lineHeight+16) + max(36, titleHeight)
 	navGap := float32(0)
 	if navWidth > 0 {
 		navGap = 24
