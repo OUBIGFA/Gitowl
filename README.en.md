@@ -25,7 +25,7 @@ Gitowl is a local desktop app that helps you see what changed in your project fo
 <td><img src="assets/readme/preview-history-en.png" width="420" alt="Gitowl History timeline view"><br>History timeline</td>
 </tr>
 <tr>
-<td><img src="assets/readme/preview-dark-en.png" width="420" alt="Gitowl Dark appearance view"><br>Dark appearance</td>
+<td><img src="assets/readme/preview-dark-en.png" width="420" alt="Gitowl Markdown editor in dark appearance"><br>Markdown editing (dark appearance)</td>
 <td><img src="assets/readme/preview-settings-en.png" width="420" alt="Gitowl Language and appearance settings"><br>Language and appearance settings</td>
 </tr>
 </table>
@@ -46,7 +46,7 @@ Gitowl is a local desktop app that helps you see what changed in your project fo
 ## Quick start
 
 1. **Open a project.** Click **Open project…** on the left. Add an existing folder on your computer, create a new folder, or download one from your account.
-2. **Review your changes.** Open **File changes** and select the files to include. Click any file to check its changes on the right.
+2. **Review your changes.** Open **File changes** on the right and select the files to include. Click any file to check its changes in the center panel.
 3. **Write a short note and save.** Enter a title in **Version summary**, or click **Generate message** to write a draft. Click **Save version**, or press `Ctrl+Enter`.
 4. **Sync when ready.** Click **Pull updates** to download new changes from online. Click **Push changes** to upload your saved versions.
 
