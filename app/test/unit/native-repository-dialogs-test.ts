@@ -20,6 +20,7 @@ import { Account } from '../../src/models/account'
 import { Owner } from '../../src/models/owner'
 import { GitHubRepository } from '../../src/models/github-repository'
 import { listWorktrees } from '../../src/lib/git'
+import { acquireAssistedCommitGitLease } from '../../src/lib/git/repository-operation'
 import {
   validateRepositoryClonePath,
   resolveRepositoryCloneInfo,
@@ -92,12 +93,35 @@ after(async () => {
   // A fixed delay can delete a fixture while its history diff still uses it.
   runtime.repositoriesStore['emitter'].dispose()
   await runtime.appStore._selectRepository(null)
-  await Promise.all(
-    [...runtime.appStore['repositoryRefreshes'].values()].flatMap(pending => [
-      ...pending,
-    ])
+  while (runtime.appStore['repositoryRefreshes'].size > 0) {
+    await Promise.all(
+      [...runtime.appStore['repositoryRefreshes'].values()].flatMap(pending => [
+        ...pending,
+      ])
+    )
+  }
+  // Removed menu targets can still have admitted Git reads. The current list
+  // omits them, so drain every cached working directory before deleting files.
+  const paths = new Set(
+    [...runtime.appStore['gitStoreCache']['repositories'].values()].map(
+      r => r.path
+    )
   )
-  window.close()
+  const leases = await Promise.all(
+    [...paths].map(path => acquireAssistedCommitGitLease(path))
+  )
+  try {
+    window.close()
+    // Keep the fixture's Git discovery boundary in place throughout removal.
+    await rm(fixture, {
+      recursive: true,
+      force: true,
+      maxRetries: 10,
+      retryDelay: 100,
+    })
+  } finally {
+    leases.forEach(lease => lease.release())
+  }
   if (previousGlobal === undefined) {
     delete process.env.GIT_CONFIG_GLOBAL
   } else {
@@ -113,12 +137,6 @@ after(async () => {
   } else {
     process.env.GIT_CEILING_DIRECTORIES = previousCeiling
   }
-  await rm(fixture, {
-    recursive: true,
-    force: true,
-    maxRetries: 10,
-    retryDelay: 100,
-  })
 })
 async function git(args: string[], path: string) {
   assert.ok(
