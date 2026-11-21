@@ -77,22 +77,19 @@ it('stages only the original compiled callback scheme, without credentials or un
 describe('Gitowl packaged CLI resources', () => {
   it('resolves the fixed MyGo installation, never a Squirrel bin or Desktop command', () => {
     const root = resolve('_temp/native-full-ui/installation with spaces')
-    assert.deepEqual(
-      nativeCLIPaths(join(root, 'desktop-kernel/electron.exe')),
-      {
-        bin: join(root, 'bin'),
-        command: 'gitowl',
-        batch: join(root, 'desktop-kernel/app/static/github.bat'),
-        shell: join(root, 'desktop-kernel/app/static/github.sh'),
-      }
-    )
+    assert.deepEqual(nativeCLIPaths(join(root, 'backend/node.exe')), {
+      bin: join(root, 'bin'),
+      command: 'gitowl',
+      batch: join(root, 'backend/static/github.bat'),
+      shell: join(root, 'backend/static/github.sh'),
+    })
   })
   it('keeps the original cli.js parser in both flattened Windows launch resources', async () => {
     const batch = await readFile('script/native-windows-cli.bat', 'utf8')
     const shell = await readFile('script/native-windows-cli.sh', 'utf8')
-    assert.match(batch, /ELECTRON_RUN_AS_NODE=1/)
+    assert.match(batch, /node\.exe/)
     assert.match(batch, /\.\.\\cli\.js/)
-    assert.match(shell, /ELECTRON_RUN_AS_NODE=1/)
+    assert.match(shell, /node\.exe/)
     assert.match(shell, /\.\.\/cli\.js/)
     assert.doesNotMatch(batch + shell, /GitHubDesktop\.exe/)
   })

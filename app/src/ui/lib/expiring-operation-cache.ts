@@ -1,3 +1,4 @@
+import { scheduleTimeout, cancelTimer, HostTimer } from '../../lib/host-timers'
 const isPending = <T>(item: unknown | Promise<T>): item is Promise<T> =>
   typeof item === 'object' && item !== null && 'then' in item
 
@@ -9,7 +10,7 @@ const isPending = <T>(item: unknown | Promise<T>): item is Promise<T> =>
 export class ExpiringOperationCache<TKey, T> {
   private readonly data: Map<
     string,
-    { item: T; timeoutId?: number } | Promise<T>
+    { item: T; timeoutId?: HostTimer } | Promise<T>
   > = new Map()
 
   public constructor(
@@ -45,7 +46,7 @@ export class ExpiringOperationCache<TKey, T> {
     const item = {
       item: value,
       timeoutId: isFinite(timeout)
-        ? window.setTimeout(() => {
+        ? scheduleTimeout(() => {
             if (this.data.get(cacheKey) === item) {
               this.data.delete(cacheKey)
             }
@@ -66,7 +67,7 @@ export class ExpiringOperationCache<TKey, T> {
 
     if (cached && !isPending(cached)) {
       if (cached.timeoutId !== undefined) {
-        window.clearTimeout(cached.timeoutId)
+        cancelTimer(cached.timeoutId)
       }
     }
 

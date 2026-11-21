@@ -160,17 +160,23 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 						t.Fatal("native draggable divider missing")
 					}
 					x, y := divider.Bounds.X+divider.Bounds.W/2, divider.Bounds.Y+divider.Bounds.H/2
+					delta, key := float32(40), ui.KeyLeft
+					if size[0] == 900 {
+						// At minimum width the changes pane is already at its
+						// safe minimum. Drag the divider toward the editor.
+						delta, key = -40, ui.KeyRight
+					}
 					tt.Press(x, y)
-					tt.Move(x+40, y)
-					tt.Release(x+40, y)
+					tt.Move(x+delta, y)
+					tt.Release(x+delta, y)
 					tt.Frame()
 					resized := visibleControl(t, tt, tx.DiffTitle(), size[0], size[1])
-					if resized.W <= diff.W || resized.X != diff.X {
+					if (resized.W-diff.W)*delta <= 0 || resized.X != diff.X {
 						t.Fatalf("drag did not resize the right pane: before=%+v after=%+v", diff, resized)
 					}
-					tt.Key(0, ui.KeyLeft)
+					tt.Key(0, key)
 					keyboard := visibleControl(t, tt, tx.DiffTitle(), size[0], size[1])
-					if keyboard.W >= resized.W {
+					if (keyboard.W-resized.W)*delta >= 0 {
 						t.Fatal("focused native divider did not resize with the keyboard")
 					}
 					resized = keyboard

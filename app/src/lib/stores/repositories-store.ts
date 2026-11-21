@@ -235,14 +235,16 @@ export class RepositoriesStore extends TypedBaseStore<
       this.db.gitHubRepositories,
       this.db.owners,
       async () => {
-        const repos = new Array<Repository>()
-
-        for (const dbRepo of await this.db.repositories.toArray()) {
-          assertNonNullable(dbRepo.id, 'no id after loading from db')
-          repos.push(await this.toRepository(dbRepo))
-        }
-
-        return repos
+        const records = await this.db.repositories.toArray()
+        // Start related reads together in this same snapshot transaction.
+        // Serial awaits for local records add no database work and can outlive
+        // the SQLite IndexedDB driver's transaction-active microtask window.
+        return Promise.all(
+          records.map(dbRepo => {
+            assertNonNullable(dbRepo.id, 'no id after loading from db')
+            return this.toRepository(dbRepo)
+          })
+        )
       }
     )
   }

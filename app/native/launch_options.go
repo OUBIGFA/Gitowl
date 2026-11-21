@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/sha256"
 	"flag"
 	"fmt"
 	"io"
@@ -8,8 +9,15 @@ import (
 	"strings"
 )
 
+// Isolated development profiles must not forward a launch to the installed
+// application's single-instance socket, which is keyed by application name.
+func nativeProfileIdentity(profile string) string {
+	digest := sha256.Sum256([]byte(filepath.Clean(profile)))
+	return fmt.Sprintf("Gitowl Dev %x", digest[:8])
+}
+
 type nativeLaunchOptions struct {
-	entry, electron, profile                string
+	entry, node, profile                    string
 	openPath, cloneURL, branch, protocolURL string
 }
 
@@ -20,7 +28,7 @@ func parseNativeLaunchOptions(args []string, workingDirectory string) (nativeLau
 	flags := flag.NewFlagSet("gitowl", flag.ContinueOnError)
 	flags.SetOutput(io.Discard)
 	flags.StringVar(&options.entry, "kernel", "", "original Desktop app entry")
-	flags.StringVar(&options.electron, "electron", "", "original Electron executable")
+	flags.StringVar(&options.node, "node", "", "Node backend executable")
 	flags.StringVar(&options.profile, "user-data", "", "isolated development profile")
 	flags.StringVar(&options.openPath, "cli-open", "", "original open-repository action")
 	flags.StringVar(&options.cloneURL, "cli-clone", "", "original clone-url action")

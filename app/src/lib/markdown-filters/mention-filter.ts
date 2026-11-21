@@ -1,3 +1,4 @@
+import { markdownDocument, markdownNodeFilter } from './document-context'
 import { GitHubRepository } from '../../models/github-repository'
 import { getHTMLURL } from '../api'
 import { INodeFilter } from './node-filter'
@@ -68,12 +69,12 @@ export class MentionFilter implements INodeFilter {
    * or anchor tag.
    */
   public createFilterTreeWalker(doc: Document): TreeWalker {
-    return doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, {
+    return doc.createTreeWalker(doc.body, markdownNodeFilter().SHOW_TEXT, {
       acceptNode: function (node) {
         return node.parentNode !== null &&
           ['CODE', 'PRE', 'A'].includes(node.parentNode.nodeName)
-          ? NodeFilter.FILTER_SKIP
-          : NodeFilter.FILTER_ACCEPT
+          ? markdownNodeFilter().FILTER_SKIP
+          : markdownNodeFilter().FILTER_ACCEPT
       },
     })
   }
@@ -113,7 +114,7 @@ export class MentionFilter implements INodeFilter {
       const link = this.createLinkElement(userNameRef)
       const refPosition = match.index === 0 ? 0 : match.index + 1
       const textBefore = text.slice(lastMatchEndingPosition, refPosition)
-      const textNodeBefore = document.createTextNode(textBefore)
+      const textNodeBefore = markdownDocument().createTextNode(textBefore)
       nodes.push(textNodeBefore)
       nodes.push(link)
 
@@ -122,7 +123,7 @@ export class MentionFilter implements INodeFilter {
 
     const trailingText = text.slice(lastMatchEndingPosition)
     if (trailingText !== '') {
-      nodes.push(document.createTextNode(trailingText))
+      nodes.push(markdownDocument().createTextNode(trailingText))
     }
 
     return nodes
@@ -134,7 +135,7 @@ export class MentionFilter implements INodeFilter {
   private createLinkElement(userNameRef: string) {
     const baseHref = getHTMLURL(this.repository.endpoint)
     const href = `${baseHref}/${userNameRef.slice(1)}`
-    const anchor = document.createElement('a')
+    const anchor = markdownDocument().createElement('a')
     anchor.textContent = userNameRef
     anchor.href = href
     return anchor

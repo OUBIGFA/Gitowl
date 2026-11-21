@@ -181,7 +181,7 @@ export const nativeExecutablePath = (suite: Suite, receiptPath: string) =>
     : `${receiptPath}.exe`
 
 export const runtimeReceiptPath = 'output/native-runtime/runtime-receipt.json'
-export const runtimePath = 'output/native-runtime/desktop-kernel'
+export const runtimePath = 'output/native-runtime/backend'
 export const usesNativeAssets = (suite: Suite) =>
   [
     'go-modules',
@@ -521,15 +521,16 @@ export async function validateRuntime(root: string, reference: Artifact) {
   check(reference.path === runtimeReceiptPath, 'Wrong runtime receipt path')
   const receipt = await evidenceJSON(root, reference)
   check(
-    receipt.schemaVersion === 2 &&
+    receipt.schemaVersion === 3 &&
+      receipt.host === 'node' &&
       receipt.originalCore === 'desktop/desktop' &&
       isSHA(receipt.inputHash),
     'Invalid original runtime receipt'
   )
   check(
     receipt.buildFlags?.NODE_ENV === 'production' &&
-      receipt.buildFlags.GITOWL_NATIVE_BUILD === '1' &&
-      receipt.buildFlags.RELEASE_CHANNEL === 'research-preview',
+      receipt.buildFlags.host === 'node' &&
+      receipt.buildFlags.RELEASE_CHANNEL === 'production',
     'Not the registered isolated production runtime'
   )
   check(
@@ -540,10 +541,10 @@ export async function validateRuntime(root: string, reference: Artifact) {
     check(isSHA(file.sha256), 'Invalid runtime file SHA')
     // Git for Windows ships this system shell startup file, not a user
     // profile. Its bytes remain checked against the original runtime receipt.
-    const gitSystemProfile = file.path === 'app/git/etc/profile'
+    const gitSystemProfile = file.path === 'git/etc/profile'
     check(
       gitSystemProfile ||
-        !/(?:native-service|seed-profile|(?:^|\/)node\.exe$|^app\/renderer\.|(?:^|\/)(?:test|tests|__tests__|profiles?)(?:\/|$))/i.test(
+        !/(?:native-service|seed-profile|(?:^|\/)electron\.exe$|^renderer\.|(?:^|\/)(?:test|tests|__tests__|profiles?)(?:\/|$))/i.test(
           file.path
         ),
       `Test/research resource in shipping runtime: ${file.path}`
@@ -563,56 +564,54 @@ export async function validateRuntime(root: string, reference: Artifact) {
   )
   const paths = new Set(receipt.files.map((f: Artifact) => f.path))
   for (const name of [
-    'electron.exe',
-    'LICENSE',
-    'LICENSES.chromium.html',
-    'app/main.js',
-    'app/native-kernel.js',
-    'app/native-kernel.html',
-    'app/native-launch.json',
-    'app/koffi.node',
-    'app/git/cmd/git.exe',
-    'app/git/ucrt64/libexec/git-core/git-credential-desktop.exe',
-    'app/desktop-trampoline/desktop-askpass-trampoline.exe',
-    'app/process-proxy.exe',
-    'app/printenvz.exe',
-    'app/copilot/prebuilds/win32-x64/copilot-runtime.exe',
-    'app/copilot/prebuilds/win32-x64/runtime.node',
-    'app/static/licenses.json',
-    'app/emoji.json',
-    'app/native-kernel.js.map',
-    'app/main.js.map',
-    'app/package.json',
-  ]) {
-    check(paths.has(name), `Missing original runtime asset: ${name}`)
-  }
-  for (const name of ['app/native-kernel.js.map', 'app/main.js.map']) {
-    const map = JSON.parse(
-      await readFile(await safePath(root, `${runtimePath}/${name}`), 'utf8')
-    )
-    check(
-      Array.isArray(map.sources) && map.sources.length > 0,
-      'Missing runtime source map inputs'
-    )
-    check(
-      !map.sources.some((s: string) =>
-        /native-service|seed-profile|app\/test\//.test(s)
-      ),
-      'Production bundle includes a test/research entry'
-    )
-    // Webpack virtual URLs are valid. Absolute local drive/POSIX paths are not.
-    check(
-      !map.sources.some((s: string) =>
-        /^(?:[a-z]:[\\/]|\/|file:\/\/)/i.test(s)
-      ),
-      'Machine-local source path in shipping map'
-    )
-  }
-  const pkg = JSON.parse(
+    'node.exe',
+    'Node-LICENSE.txt',
+    'main.js',
+    'migration.js',
+    'cli.js',
+    'install-cli.js',
+    'image-worker.js',
+    'native-launch.json',
+    'koffi.node',
+    'git/cmd/git.exe',
+    'git/ucrt64/libexec/git-core/git-credential-desktop.exe',
+    'desktop-trampoline/desktop-askpass-trampoline.exe',
+    'process-proxy.exe',
+    'printenvz.exe',
+    'copilot/prebuilds/win32-x64/copilot-runtime.exe',
+    'copilot/prebuilds/win32-x64/runtime.node',
+    'static/licenses.json',
+    'emoji.json',
+    'node-runtime-sources.json',
+    'package.json',
+  ])
+    {check(paths.has(name), `Missing production runtime asset: ${name}`)}
+  const sources = JSON.parse(
     await readFile(
-      await safePath(root, `${runtimePath}/app/package.json`),
+      await safePath(root, `${runtimePath}/node-runtime-sources.json`),
       'utf8'
     )
+  )
+  check(
+    Array.isArray(sources) && sources.length > 0,
+    'Missing runtime source inputs'
+  )
+  check(
+    !sources.some((source: string) =>
+      /native-service|seed-profile|app\/test\/|node_modules\/electron\//.test(
+        source
+      )
+    ),
+    'Production bundle includes a test/research/Electron entry'
+  )
+  check(
+    !sources.some((source: string) =>
+      /^(?:[a-z]:[\\/]|\/|file:\/\/)/i.test(source)
+    ),
+    'Machine-local source path in runtime inventory'
+  )
+  const pkg = JSON.parse(
+    await readFile(await safePath(root, `${runtimePath}/package.json`), 'utf8')
   )
   check(
     pkg.productName === 'Gitowl' &&
@@ -635,7 +634,8 @@ export async function validateRuntime(root: string, reference: Artifact) {
       JSON.stringify([
         '../static/logos/gitowl/logo.png',
         '../static/logos/gitowl/icons',
-        '../../output/native-runtime/desktop-kernel',
+        '../../third_party/licenses/arcmd',
+        '../../output/native-runtime/backend',
         '../../output/native-runtime/build-info.json',
       ]),
     'Unreviewed/private resource in native package'
@@ -1095,8 +1095,9 @@ export function validateInstalledFileList(text: string) {
     JSON.stringify(entries) ===
       JSON.stringify([
         'Gitowl.exe',
+        'arcmd',
+        'backend',
         'build-info.json',
-        'desktop-kernel',
         'icons',
         'logo.png',
       ]),
@@ -1161,7 +1162,8 @@ export async function validatePackagedAssets(
   const stage = await safePath(root, directory)
   const allowed = new Set([
     'Gitowl.exe',
-    'desktop-kernel',
+    'backend',
+    'arcmd',
     'icons',
     'logo.png',
     'build-info.json',
@@ -1181,7 +1183,7 @@ export async function validatePackagedAssets(
   check(
     await reusableRuntime(
       await safePath(root, runtimeReceiptPath),
-      await safePath(root, `${directory}/desktop-kernel`),
+      await safePath(root, `${directory}/backend`),
       acceptance.runtimeInputHash
     ),
     'Packaged runtime differs from accepted runtime'

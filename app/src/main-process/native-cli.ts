@@ -8,7 +8,7 @@ export function nativeCLIPaths(executable: string) {
   return {
     bin: Path.join(root, 'bin'),
     command: 'gitowl',
-    batch: Path.join(kernel, 'app/static/github.bat'),
-    shell: Path.join(kernel, 'app/static/github.sh'),
+    batch: Path.join(kernel, 'static/github.bat'),
+    shell: Path.join(kernel, 'static/github.sh'),
   }
 }

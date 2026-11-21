@@ -1,47 +1,6 @@
 {
-  "schemaVersion": 2,
-  "electron": {
-    "package": "electron",
-    "version": "44.9.1",
-    "lockfile": "package-lock.json",
-    "lockKey": "node_modules/electron",
-    "source": "https://github.com/electron/electron/releases/download/v44.9.1/electron-v44.9.1-win32-x64.zip",
-    "integrity": "sha512-x/tECFFDa2OFNjMObFH0EGKWrCnFZPOR1wP2iMIVt0STecGl8FmDXdaiaryY0kf8mtw9kSLP2yK8dfdaWkfDmw==",
-    "role": "original Desktop kernel host",
-    "platform": "win32-x64",
-    "archiveSha256": "41bd7900bd42d0f49110a81617876137041fbbf473466920248ddb076349ef91",
-    "checksumsSource": "https://github.com/electron/electron/releases/download/v44.9.1/SHASUMS256.txt",
-    "checksumsSha256": "3abbb83b04f0765942d9a512b652fda89505087c60f38cf4d4b5ee2e6ec69b31",
-    "executableSha256": "1432afee01d6a788f11cb6649efd271923e1e490beef688c24d31f47965013aa",
-    "distTreeSha256": "fe4ca6a88ac109c4739d2eb3d9d16b2631efc0622ffc33c9ce0cd97b9dce11c7",
-    "distFileCount": 73,
-    "license": "MIT and Chromium bundled third-party notices",
-    "licenses": [
-      {
-        "path": "third_party/licenses/native/electron-LICENSE",
-        "runtimePath": "LICENSE",
-        "sha256": "5154e165bd6c2cc0cfbcd8916498c7abab0497923bafcd5cb07673fe8480087d"
-      },
-      {
-        "runtimePath": "LICENSES.chromium.html",
-        "sha256": "e6e6b1f9cb0f32235412be113de7716333e88121f9159a0ea0ff3be652021af7",
-        "parts": [
-          {
-            "path": "third_party/licenses/native/electron-Chromium-notices-1.html",
-            "sha256": "b5887c0d54cbf46a1e52d097f9e8b0a3a2f7d0cb682cd6fc8e2f14ec6952a499"
-          },
-          {
-            "path": "third_party/licenses/native/electron-Chromium-notices-2.html",
-            "sha256": "2cb8d26877c8feac67d7d510fbb5447a97484d42b06492249c157558c7fce32a"
-          },
-          {
-            "path": "third_party/licenses/native/electron-Chromium-notices-3.html",
-            "sha256": "373203f727b72b1c02fd3858214ea8b164559b8554a426a0461190f711a280e0"
-          }
-        ]
-      }
-    ]
-  },
+  "schemaVersion": 3,
+  "host": "node",
   "bundledInputs": [
     {
       "package": "dugite",
@@ -84,7 +43,7 @@
       "source": "file:../vendor/desktop-trampoline",
       "integrity": null,
       "path": "app/node_modules/desktop-trampoline/build/Release/desktop-askpass-trampoline.exe",
-      "sha256": "3f31b999eaf7495c918a9f2b8e1d43efd5acbcc6cb7271ea50c709bad1245c8f"
+      "sha256": "1f254c75fe9050e0a31e9f2248ff2baefe8de7d104680c5166623d894afd88a0"
     },
     {
       "package": "desktop-trampoline",
@@ -94,7 +53,7 @@
       "source": "file:../vendor/desktop-trampoline",
       "integrity": null,
       "path": "app/node_modules/desktop-trampoline/build/Release/desktop-credential-helper-trampoline.exe",
-      "sha256": "aaabb36ca6e4f3d7d777f1029bee9ae877ad6d067aa4ab397dbc5847f6285f5a"
+      "sha256": "613e425bb19d1680ec8da611ab8740f06335aa6331c6092527af933e24e5cd47"
     },
     {
       "package": "process-proxy",
@@ -115,6 +74,167 @@
       "integrity": null,
       "path": "node_modules/printenvz/build/Release/printenvz.exe",
       "sha256": "6207a08cf9b21f5d00742f8b9c7bcd46fadc6765a169e9297accdf167854f715"
+    },
+    {
+      "package": "indexeddbshim",
+      "version": "19.0.8",
+      "lockfile": "app/package-lock.json",
+      "lockKey": "node_modules/indexeddbshim",
+      "source": "https://registry.npmjs.org/indexeddbshim/-/indexeddbshim-19.0.8.tgz",
+      "integrity": "sha512-rdnHkGFJm7GUs8TT1syiWJz3Roe7dXk3PEamutvl1ED84L1fM08AzoP5Yi1kl0XhTJxE1xtv99aNEwBtqQYWaQ==",
+      "path": "app/node_modules/indexeddbshim",
+      "treeSha256": "7a6511238545f8884d93d7ebb008e9a5fcecbeb17e971a6eade5a7e1f36519ce",
+      "fileCount": 113,
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/npm_indexeddbshim-LICENSE-APACHE.txt",
+          "sha256": "c38b5f754d279021e58c5cab1e4f9b25891bd2ed03964f42c5b9533085006239"
+        },
+        {
+          "path": "third_party/licenses/native/npm_indexeddbshim-LICENSE-MIT.txt",
+          "sha256": "7e6abf974005cb8f7a3cbd6250fc31309659f46a29a95f8192cab28c16a3b9ac"
+        }
+      ]
+    },
+    {
+      "package": "websql-configurable",
+      "version": "4.1.0",
+      "lockfile": "app/package-lock.json",
+      "lockKey": "node_modules/websql-configurable",
+      "source": "https://registry.npmjs.org/websql-configurable/-/websql-configurable-4.1.0.tgz",
+      "integrity": "sha512-EsVxHtOa4WMCEmRCxMl+H3Lp0tLwkAGBT693CoPCAw1YE5ZEX9TuVGwpvo9Jy/7ieBUod1Jm4gRDLEEjEwjONA==",
+      "path": "app/node_modules/websql-configurable",
+      "treeSha256": "c91c193ede1fa3e963b5b92e4492ba3163669b2a0ed52ddf95abd3b1cc7c068c",
+      "fileCount": 51,
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/npm_websql-configurable-LICENSE",
+          "sha256": "bf41d90b4fb789f6eac84eafedafe33695311236732f4efe8e3ebf9f4521c719"
+        }
+      ]
+    },
+    {
+      "package": "better-sqlite3",
+      "version": "13.2.0",
+      "lockfile": "app/package-lock.json",
+      "lockKey": "node_modules/better-sqlite3",
+      "source": "https://registry.npmjs.org/better-sqlite3/-/better-sqlite3-13.2.0.tgz",
+      "integrity": "sha512-Z8Q/9x/uNyKxA1v4FNodyItRVRw1TeKBrmj32JhxhR0ceNcBY+wMobt/Bv7M7TzwPAXjnZRtNaEsATnUZSKWZQ==",
+      "path": "app/node_modules/better-sqlite3",
+      "treeSha256": "abe1c3376b414c6656c1bce463765e48679dc4afaad4473ea1640963ea9f5970",
+      "fileCount": 87,
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/npm_better-sqlite3-LICENSE",
+          "sha256": "09856b52897c91ab67e7456ef43067019f31dfd3b87fda72e655736b1ebdee55"
+        }
+      ]
+    },
+    {
+      "package": "@imagemagick/magick-wasm",
+      "version": "0.0.46",
+      "lockfile": "app/package-lock.json",
+      "lockKey": "node_modules/@imagemagick/magick-wasm",
+      "source": "https://registry.npmjs.org/@imagemagick/magick-wasm/-/magick-wasm-0.0.46.tgz",
+      "integrity": "sha512-0HKJmmqUTFwXm6Z/1lGtOx7JE/FpZiJg8sXBnAho1NgzunEOkgUILU7rskUnYbtdG/hJiFe9viVatWuWDZ9S0g==",
+      "path": "app/node_modules/@imagemagick/magick-wasm",
+      "treeSha256": "0c3791e616a5cbe0604cd84ad2679e5184234022ddb5d3f40aa561dbe54c50ff",
+      "fileCount": 9,
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/npm_imagemagick_magick-wasm-LICENSE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        },
+        {
+          "path": "third_party/licenses/native/npm_imagemagick_magick-wasm-NOTICE",
+          "sha256": "253997f509bd6a2397b4cb33a4e6ecd671feec8c09117b03fd698e6e824e2e68"
+        }
+      ]
+    },
+    {
+      "package": "upng-js",
+      "version": "2.1.0",
+      "lockfile": "app/package-lock.json",
+      "lockKey": "node_modules/upng-js",
+      "source": "https://registry.npmjs.org/upng-js/-/upng-js-2.1.0.tgz",
+      "integrity": "sha512-d3xzZzpMP64YkjP5pr8gNyvBt7dLk/uGI67EctzDuVp4lCZyVMo0aJO6l/VDlgbInJYDY6cnClLoBp29eKWI6g==",
+      "path": "app/node_modules/upng-js",
+      "treeSha256": "b566de884e2ae844577d65892547dd3874fde4df9f4325a9ab9b9e3e37e14017",
+      "fileCount": 4,
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/npm_upng-js-LICENSE",
+          "sha256": "c1fb8861eca211bf5aea574358aba7039396c0c1824c2a1477cc126d398efd89"
+        }
+      ]
+    },
+    {
+      "package": "jsdom",
+      "version": "27.4.0",
+      "lockfile": "app/package-lock.json",
+      "lockKey": "node_modules/jsdom",
+      "source": "https://registry.npmjs.org/jsdom/-/jsdom-27.4.0.tgz",
+      "integrity": "sha512-mjzqwWRD9Y1J1KUi7W97Gja1bwOOM5Ug0EZ6UDK3xS7j7mndrkwozHtSblfomlzyB4NepioNt+B2sOSzczVgtQ==",
+      "path": "app/node_modules/jsdom",
+      "treeSha256": "1a87ab27351dc3cc2d01c5fe62a2d06dbeb4ae31d4d1791227c85f4b227a6013",
+      "fileCount": 557,
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/npm_jsdom-LICENSE.txt",
+          "sha256": "242d37e7cab25cbafc36cc973ee88f9345fddf066afe4f72b7ac3d9ad4e24cce"
+        }
+      ]
+    },
+    {
+      "package": "undici",
+      "version": "8.13.1",
+      "lockfile": "app/package-lock.json",
+      "lockKey": "node_modules/undici",
+      "source": "https://registry.npmjs.org/undici/-/undici-8.13.1.tgz",
+      "integrity": "sha512-Kt7EaPjh0s93lJH/PmW3d5rhkcpUa6fS3jqZ7+YGxNd9L7Xy/i827xe4C2uhhq+pJebM4tQOl5AgHmW11G5Skg==",
+      "path": "app/node_modules/undici",
+      "treeSha256": "1b755d1b9899b01266e0ac34e3c41ddf11453235d4f53ab0dcad3d2723ef309c",
+      "fileCount": 218,
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/npm_undici-LICENSE",
+          "sha256": "a6db8096b2707bc0102d256917d4d33f298ba36d8c3f25de067a2b5bb379db27"
+        }
+      ]
+    },
+    {
+      "package": "typeson-registry",
+      "version": "15.0.0",
+      "lockfile": "app/package-lock.json",
+      "lockKey": "node_modules/typeson-registry",
+      "source": "https://registry.npmjs.org/typeson-registry/-/typeson-registry-15.0.0.tgz",
+      "integrity": "sha512-stB6pW/dtIRSwUnWiWTAKKLX+doIU/R7/jNo0NyiVRNgIzRwx+Wyqp4WVbvHpdkmPxuz/8Kx1befcHrD4sSluQ==",
+      "path": "app/node_modules/typeson-registry",
+      "treeSha256": "bddd8ae9a85b03a797c708160eed35dd341c3e98d10bacab9d85dd9394c804c5",
+      "fileCount": 308,
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/npm_typeson-registry-LICENSE-MIT.txt",
+          "sha256": "844fc6fe4c1aea9e0b1d9a01a2a676a48af41b92730cd34a69e7f07ee2d9e176"
+        }
+      ]
+    },
+    {
+      "package": "canvas",
+      "version": "3.2.3",
+      "lockfile": "app/package-lock.json",
+      "lockKey": "node_modules/canvas",
+      "source": "https://registry.npmjs.org/canvas/-/canvas-3.2.3.tgz",
+      "integrity": "sha512-PzE5nJZPz72YUAfo8oTp0u3fqqY7IzlTubneAihqDYAUcBk7ryeCmBbdJBEdaH0bptSOe2VT2Zwcb3UaFyaSWw==",
+      "path": "app/node_modules/canvas",
+      "treeSha256": "b6e88ba3837653bb235d773edf4f7f08e1e0ccdeae198a8d9fd4f75ab64fe578",
+      "fileCount": 209,
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/npm_canvas-LICENSE.txt",
+          "sha256": "d653de7328f017cd593cd28eadd19483af37e681121715bfbe74e3666a580b25"
+        }
+      ]
     }
   ],
   "packaging": {
@@ -128,7 +248,7 @@
     ]
   },
   "node": {
-    "role": "build-tool-only",
+    "role": "production-backend-and-build-tool",
     "version": "24.22.1",
     "source": "https://nodejs.org/dist/v24.22.1/node-v24.22.1-win-x64.zip",
     "executableSha256": "d702daa815eabbff763c7d3808e235cf031cf2ca70211b56847bc72f51e240e5",
@@ -325,7 +445,7 @@
     },
     {
       "path": "app/package-lock.json",
-      "sha256": "88149ac11498ce2c44efc4a58e143f062314c92b2912c7d2ede861da4f91cf6b"
+      "sha256": "01b83ad92949f1b86eb88016205ed51e2ae0189e49ce46ad2b0d05ee3de0554b"
     },
     {
       "path": "app/native/go.mod",

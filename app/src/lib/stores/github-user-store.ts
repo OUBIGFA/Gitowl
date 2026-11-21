@@ -1,3 +1,4 @@
+import { scheduleTimeout, HostTimer } from '../host-timers'
 import { Account } from '../../models/account'
 import { GitHubRepository } from '../../models/github-repository'
 import { API } from '../api'
@@ -33,7 +34,7 @@ interface IQueryCache {
  */
 export class GitHubUserStore extends BaseStore {
   private queryCache: IQueryCache | null = null
-  private pruneQueryCacheTimeoutId: number | null = null
+  private pruneQueryCacheTimeoutId: HostTimer | null = null
 
   public constructor(private readonly database: GitHubUserDatabase) {
     super()
@@ -180,7 +181,7 @@ export class GitHubUserStore extends BaseStore {
   ) {
     this.clearCachePruneTimeout()
     this.queryCache = { repository, users }
-    this.pruneQueryCacheTimeoutId = window.setTimeout(() => {
+    this.pruneQueryCacheTimeoutId = scheduleTimeout(() => {
       this.pruneQueryCacheTimeoutId = null
       this.queryCache = null
     }, QueryCacheTimeout)

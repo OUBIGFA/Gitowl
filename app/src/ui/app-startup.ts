@@ -75,10 +75,7 @@ export class AppStartup {
     ipcRenderer.on('certificate-error', this.onCertificateError)
   }
 
-  private onLaunchStats = (
-    _: Electron.IpcRendererEvent,
-    stats: ILaunchStats
-  ) => {
+  private onLaunchStats = (_: unknown, stats: ILaunchStats) => {
     console.info(`App ready time: ${stats.mainReadyTime}ms`)
     console.info(`Load time: ${stats.loadTime}ms`)
     console.info(`Renderer ready time: ${stats.rendererReadyTime}ms`)
@@ -86,7 +83,7 @@ export class AppStartup {
   }
 
   private onCertificateError = (
-    _: Electron.IpcRendererEvent,
+    _: unknown,
     certificate: Electron.Certificate,
     _error: string,
     url: string

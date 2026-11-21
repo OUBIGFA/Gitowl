@@ -1,6 +1,5 @@
 import { RequestResponseChannels, RequestChannels } from './ipc-shared'
-// eslint-disable-next-line no-restricted-imports
-import { ipcRenderer, IpcRendererEvent } from 'electron'
+import { getDesktopHost, DesktopHostEvent } from './desktop-host'
 
 /**
  * Send a message to the main process via channel and expect a result
@@ -11,7 +10,7 @@ export function invoke<T extends keyof RequestResponseChannels>(
   channel: T,
   ...args: Parameters<RequestResponseChannels[T]>
 ): ReturnType<RequestResponseChannels[T]> {
-  return ipcRenderer.invoke(channel, ...args) as any
+  return getDesktopHost().invoke(channel, args) as any
 }
 
 /**
@@ -22,7 +21,7 @@ export function send<T extends keyof RequestChannels>(
   channel: T,
   ...args: Parameters<RequestChannels[T]>
 ): void {
-  return ipcRenderer.send(channel, ...args) as any
+  return getDesktopHost().send(channel, args)
 }
 
 /**
@@ -33,8 +32,9 @@ export function sendSync<T extends keyof RequestChannels>(
   channel: T,
   ...args: Parameters<RequestChannels[T]>
 ): void {
-  // eslint-disable-next-line no-sync
-  return ipcRenderer.sendSync(channel, ...args) as any
+  // The single backend handles lifecycle signals in-process. No synchronous
+  // cross-process request blocks Git while the presenter is waiting for it.
+  return getDesktopHost().send(channel, args)
 }
 
 /**
@@ -45,11 +45,11 @@ export function sendSync<T extends keyof RequestChannels>(
 export function on<T extends keyof RequestChannels>(
   channel: T,
   listener: (
-    event: IpcRendererEvent,
+    event: DesktopHostEvent,
     ...args: Parameters<RequestChannels[T]>
   ) => void
 ) {
-  ipcRenderer.on(channel, listener as any)
+  getDesktopHost().events.on(channel, listener)
 }
 
 /**
@@ -60,11 +60,11 @@ export function on<T extends keyof RequestChannels>(
 export function once<T extends keyof RequestChannels>(
   channel: T,
   listener: (
-    event: IpcRendererEvent,
+    event: DesktopHostEvent,
     ...args: Parameters<RequestChannels[T]>
   ) => void
 ) {
-  ipcRenderer.once(channel, listener as any)
+  getDesktopHost().events.once(channel, listener)
 }
 
 /**
@@ -75,9 +75,9 @@ export function once<T extends keyof RequestChannels>(
 export function removeListener<T extends keyof RequestChannels>(
   channel: T,
   listener: (
-    event: IpcRendererEvent,
+    event: DesktopHostEvent,
     ...args: Parameters<RequestChannels[T]>
   ) => void
 ) {
-  ipcRenderer.removeListener(channel, listener as any)
+  getDesktopHost().events.removeListener(channel, listener)
 }

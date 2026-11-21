@@ -23,6 +23,7 @@ const sent: unknown[][] = []
 Object.assign(ipcRenderer, {
   send: (...args: unknown[]) => sent.push(args),
   on: ipc.on.bind(ipc),
+  emit: ipc.emit.bind(ipc),
   once: ipc.once.bind(ipc),
   removeListener: ipc.removeListener.bind(ipc),
 })

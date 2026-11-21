@@ -1,3 +1,4 @@
+import { markdownNodeFilter } from './document-context'
 import { isElement } from './is-element'
 import { INodeFilter } from './node-filter'
 import { githubAssetVideoRegex } from './video-url-regex'
@@ -15,11 +16,11 @@ export class VideoTagFilter implements INodeFilter {
    * Video link filter matches on video tags that src does not match a github user asset url.
    */
   public createFilterTreeWalker(doc: Document): TreeWalker {
-    return doc.createTreeWalker(doc.body, NodeFilter.SHOW_ELEMENT, {
+    return doc.createTreeWalker(doc.body, markdownNodeFilter().SHOW_ELEMENT, {
       acceptNode: function (el: Element) {
         return !isElement(el, 'video') || githubAssetVideoRegex.test(el.src)
-          ? NodeFilter.FILTER_SKIP
-          : NodeFilter.FILTER_ACCEPT
+          ? markdownNodeFilter().FILTER_SKIP
+          : markdownNodeFilter().FILTER_ACCEPT
       },
     })
   }

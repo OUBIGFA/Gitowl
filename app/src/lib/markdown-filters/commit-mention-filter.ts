@@ -1,3 +1,4 @@
+import { markdownDocument, markdownNodeFilter } from './document-context'
 import { GitHubRepository } from '../../models/github-repository'
 import { getHTMLURL } from '../api'
 import { INodeFilter } from './node-filter'
@@ -157,14 +158,14 @@ export class CommitMentionFilter implements INodeFilter {
    * end in a commit sha.
    */
   public createFilterTreeWalker(doc: Document): TreeWalker {
-    return doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, {
+    return doc.createTreeWalker(doc.body, markdownNodeFilter().SHOW_TEXT, {
       acceptNode: node => {
         return (node.parentNode !== null &&
           ['CODE', 'PRE', 'A'].includes(node.parentNode.nodeName)) ||
           node.textContent === null ||
           !this.endBoundedSha.test(node.textContent)
-          ? NodeFilter.FILTER_SKIP
-          : NodeFilter.FILTER_ACCEPT
+          ? markdownNodeFilter().FILTER_SKIP
+          : markdownNodeFilter().FILTER_ACCEPT
       },
     })
   }
@@ -201,7 +202,7 @@ export class CommitMentionFilter implements INodeFilter {
       }
 
       const textBefore = text.slice(lastMatchEndingPosition, match.index)
-      nodes.push(document.createTextNode(textBefore))
+      nodes.push(markdownDocument().createTextNode(textBefore))
       nodes.push(link)
 
       const { shaRange, ownerSpecifiedSha, boundedSha } = match.groups
@@ -211,7 +212,7 @@ export class CommitMentionFilter implements INodeFilter {
 
     const trailingText = text.slice(lastMatchEndingPosition)
     if (trailingText !== '') {
-      nodes.push(document.createTextNode(trailingText))
+      nodes.push(markdownDocument().createTextNode(trailingText))
     }
 
     return nodes
@@ -317,7 +318,7 @@ export class CommitMentionFilter implements INodeFilter {
   ) {
     const baseHref = getHTMLURL(this.repository.endpoint)
     const href = `${baseHref}/${repoOwner}/${repoName}/${view}/${ref}`
-    const anchor = document.createElement('a')
+    const anchor = markdownDocument().createElement('a')
     anchor.innerHTML = `${refPreface ?? ''}<tt>${ref}</tt>`
     anchor.href = href
     return anchor

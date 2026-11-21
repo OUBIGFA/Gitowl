@@ -1,7 +1,7 @@
-import parseDDS from 'parse-dds'
 import { createHash, randomUUID } from 'crypto'
 import type { Image as RepositoryImage } from '../models/diff'
-import { convertDDSImage } from '../ui/diff/image-diffs/dds-converter'
+import { decodeImageFrame } from './node-image-decoder'
+import { decodeNativeImage } from './image-worker-client'
 
 /** Pixel presentation only. No filesystem, Git, account or network authority. */
 export interface INativeMediaCommand {
@@ -31,9 +31,6 @@ interface IMedia {
   readonly fingerprint: string
   readonly owners: Set<object>
   readonly image: RepositoryImage
-  element?: HTMLImageElement
-  decoder?: ImageDecoder
-  initialization?: Promise<void>
   frame?: { index: number; pixels: Promise<IPixels> }
   frames: number
   repetitions: number
@@ -72,10 +69,6 @@ export function withMediaProjection<T>(
       }
       if (!seen.has(id) && entry.owners.size === 0) {
         entry.closed = true
-        entry.decoder?.close()
-        if (entry.element) {
-          entry.element.src = ''
-        }
         media.delete(id)
         if (contentIDs.get(entry.fingerprint) === id) {
           contentIDs.delete(entry.fingerprint)
@@ -153,159 +146,19 @@ export function parseNativeMediaCommand(
   return value as unknown as INativeMediaCommand
 }
 
-// Bound copies before allocating RGBA buffers; decoder failures remain a local
-// preview error and cannot consume the original kernel's entire heap.
-function frameSize(width: number, height: number): number {
-  const size = width * height * 4
-  if (
-    !Number.isSafeInteger(width) ||
-    !Number.isSafeInteger(height) ||
-    width <= 0 ||
-    height <= 0 ||
-    !Number.isSafeInteger(size) ||
-    size > 256 * 1024 * 1024
-  ) {
-    throw new Error('Image exceeds the decoded preview memory budget')
-  }
-  return size
-}
-
-async function initialize(entry: IMedia) {
-  const type = entry.image.mediaType
-  // Chromium owns PNG/WebP/GIF animation compositing, disposal, timing and
-  // repetition. No fcTL/ANMF parser or approximated first-frame animation.
-  if (
-    ['image/png', 'image/webp', 'image/gif'].includes(type) &&
-    typeof ImageDecoder !== 'undefined' &&
-    (await ImageDecoder.isTypeSupported(type))
-  ) {
-    // Original <img> consumes contents, not the potentially pooled backing
-    // ArrayBuffer in rawContents. Decode exactly those displayed source bytes.
-    const data = Uint8Array.from(Buffer.from(entry.image.contents, 'base64'))
-    entry.decoder = new ImageDecoder({ data, type, preferAnimation: true })
-    await entry.decoder.tracks.ready
-    const track = entry.decoder.tracks.selectedTrack
-    if (track === null) {
-      throw new Error('Image has no display track')
-    }
-    entry.frames = track.frameCount
-    entry.repetitions = Number.isFinite(track.repetitionCount)
-      ? track.repetitionCount
-      : -1
-  }
-  const animationRequired =
-    type === 'image/gif' ||
-    (type === 'image/png' &&
-      Buffer.from(entry.image.contents, 'base64').includes(
-        Buffer.from('acTL')
-      )) ||
-    (type === 'image/webp' &&
-      Buffer.from(entry.image.contents, 'base64').includes(Buffer.from('ANIM')))
-  if (animationRequired && entry.decoder === undefined) {
-    throw new Error('Chromium animation decoding is unavailable')
-  }
-  if (entry.closed) {
-    entry.decoder?.close()
-    throw new Error('Image is no longer displayed')
-  }
-}
-
-function ddsImageURL(image: RepositoryImage): string {
-  const raw = Uint8Array.from(Buffer.from(image.contents, 'base64')).buffer
-  const metadata = parseDDS(raw)
-  const [width, height] = metadata.images[0].shape
-  frameSize(width, height)
-  return convertDDSImage(raw)
-}
-
 async function pixels(entry: IMedia, index: number): Promise<IPixels> {
-  await (entry.initialization ??= initialize(entry))
-  if (entry.closed || index >= entry.frames) {
-    throw new Error('Image frame is no longer available')
-  }
-  if (entry.decoder !== undefined) {
-    const { image } = await entry.decoder.decode({
-      frameIndex: index,
-      completeFramesOnly: true,
-    })
-    try {
-      const rect =
-        image.visibleRect ??
-        new DOMRect(0, 0, image.codedWidth, image.codedHeight)
-      const width = rect.width,
-        height = rect.height
-      frameSize(image.displayWidth, image.displayHeight)
-      if (width !== image.displayWidth || height !== image.displayHeight) {
-        // Let Chromium apply its display geometry, never assume coded pixels
-        // equal display pixels or reproduce crop/orientation math ourselves.
-        const canvas = document.createElement('canvas')
-        canvas.width = image.displayWidth
-        canvas.height = image.displayHeight
-        const context = canvas.getContext('2d', { willReadFrequently: true })
-        if (context === null) {
-          throw new Error('Image conversion is unavailable')
-        }
-        context.drawImage(image, 0, 0, canvas.width, canvas.height)
-        const rgba = context.getImageData(0, 0, canvas.width, canvas.height)
-        return {
-          data: new Uint8Array(rgba.data.buffer),
-          width: canvas.width,
-          height: canvas.height,
-          duration: image.duration ?? 100000,
-        }
-      }
-      const options: VideoFrameCopyToOptions = {
-        format: 'RGBA',
-        colorSpace: 'srgb',
-        rect,
-        layout: [{ offset: 0, stride: width * 4 }],
-      }
-      const size = frameSize(width, height)
-      if (image.allocationSize(options) !== size) {
-        throw new Error('Unexpected Chromium image plane allocation')
-      }
-      const data = new Uint8Array(size)
-      const layout = await image.copyTo(data, options)
-      if (
-        layout.length !== 1 ||
-        layout[0].offset !== 0 ||
-        layout[0].stride !== width * 4
-      ) {
-        throw new Error('Unexpected Chromium image plane layout')
-      }
-      return { data, width, height, duration: image.duration ?? 100000 }
-    } finally {
-      image.close()
-    }
-  }
-  // Same image-resource security mode as original <img>: detached data URL,
-  // never SVG markup in the Node-enabled document, object/iframe or external URL.
-  // Canvas is imaging conversion only and is never mounted or shown as UI.
-  const image = new window.Image()
-  entry.element = image
-  image.src =
-    entry.image.mediaType === 'image/vnd-ms.dds'
-      ? ddsImageURL(entry.image)
-      : `data:${entry.image.mediaType};base64,${entry.image.contents}`
-  await image.decode()
-  frameSize(image.naturalWidth, image.naturalHeight)
-  const canvas = document.createElement('canvas')
-  canvas.width = image.naturalWidth
-  canvas.height = image.naturalHeight
-  const context = canvas.getContext('2d', { willReadFrequently: true })
-  if (context === null) {
-    throw new Error('Image conversion is unavailable')
-  }
-  context.drawImage(image, 0, 0)
-  const rgba = context.getImageData(0, 0, canvas.width, canvas.height)
-  entry.element = undefined
-  image.src = ''
-  return {
-    data: new Uint8Array(rgba.data.buffer),
-    width: canvas.width,
-    height: canvas.height,
-    duration: 100000,
-  }
+  if (entry.closed) {throw new Error('Image is no longer displayed')}
+  const decoded = await (process.env.GITOWL_NODE_CORE === '1'
+    ? decodeNativeImage
+    : decodeImageFrame)(
+    Buffer.from(entry.image.contents, 'base64'),
+    index,
+    entry.image.mediaType
+  )
+  if (entry.closed) {throw new Error('Image is no longer displayed')}
+  entry.frames = decoded.frames
+  entry.repetitions = decoded.repetitions
+  return decoded
 }
 
 // Bounded diagnostic vocabulary: decoder failures never echo data URLs, SVG
@@ -316,9 +169,7 @@ export function kernelMediaErrorMessage(error: unknown): string {
     'Image frame is no longer available',
     'Image decoding timed out',
     'Image exceeds the decoded preview memory budget',
-    'Chromium animation decoding is unavailable',
-    'Unexpected Chromium image plane allocation',
-    'Unexpected Chromium image plane layout',
+    'Image decoding returned an invalid pixel plane',
   ])
   if (error instanceof Error && messages.has(error.message)) {
     return error.message
@@ -333,10 +184,10 @@ export function kernelMediaErrorMessage(error: unknown): string {
       'NotSupportedError',
     ])
     if (names.has(error.name)) {
-      return `Chromium image decoder: ${error.name}`
+      return `Image decoder: ${error.name}`
     }
   }
-  return 'The original image decoder could not display this image'
+  return 'The image decoder could not display this image'
 }
 
 /** Bounded chunks never compete with a Git/recovery result for a 64 MiB frame.
@@ -366,11 +217,6 @@ export async function readKernelMedia(
     ])
   } catch (error) {
     entry.closed = true
-    entry.decoder?.close()
-    if (entry.element) {
-      entry.element.src = ''
-    }
-    entry.element = undefined
     entry.frame = undefined
     throw error
   } finally {

@@ -172,6 +172,19 @@ export function hasRepositoryGitOperations(path: string): boolean {
   )
 }
 
+/** After the host stops admission and background schedulers, keep the process
+ * alive until existing Git work has delivered its real outcome.
+ */
+export async function waitForRepositoryGitOperations(): Promise<void> {
+  for (;;) {
+    const pending = [...new Set(repositories.values())].flatMap(repository =>
+      [...repository.operations].map(operation => operation.done)
+    )
+    if (pending.length === 0) {return}
+    await Promise.all(pending)
+  }
+}
+
 /** Reject competing Desktop mutations, including non-Git work preceding a command. */
 export function assertRepositoryGitAvailable(path: string): void {
   if (isRepositoryGitPaused(path)) {

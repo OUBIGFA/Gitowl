@@ -24,7 +24,7 @@
     "banner": 15,
     "failure-recovery": 13,
     "foldout": 6,
-    "ipc-request": 56,
+    "ipc-request": 57,
     "ipc-request-response": 28,
     "menu-event": 87,
     "popup": 97,
@@ -504,6 +504,14 @@
       "member": "minimize-window",
       "category": "ipc-request",
       "signature": "() => void"
+    },
+    {
+      "id": "RequestChannels:native-activity",
+      "source_file": "app/src/lib/ipc-shared.ts",
+      "symbol": "RequestChannels",
+      "member": "native-activity",
+      "category": "ipc-request",
+      "signature": "(kind: UiActivityKind) => void"
     },
     {
       "id": "RequestChannels:native-kernel-failure",

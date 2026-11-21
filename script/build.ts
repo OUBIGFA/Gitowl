@@ -2,26 +2,12 @@
 /// <reference path="./globals.d.ts" />
 
 import * as cp from 'child_process'
-import frontMatter from 'front-matter'
+import { generateLicenseMetadataFromSource } from './licenses/generate-license-metadata'
 import * as os from 'os'
 import * as path from 'path'
 import { getPrintenvzPath } from 'printenvz'
 import { getProxyCommandPath } from 'process-proxy'
 import { externals } from '../app/webpack.common'
-
-interface IChooseALicense {
-  readonly title: string
-  readonly nickname?: string
-  readonly featured?: boolean
-  readonly hidden?: boolean
-}
-
-export interface ILicense {
-  readonly name: string
-  readonly featured: boolean
-  readonly body: string
-  readonly hidden: boolean
-}
 
 type DesktopPackageArch = 'arm64' | 'x64'
 type DesktopPackagePlatform = 'darwin' | 'linux' | 'win32'
@@ -56,8 +42,6 @@ import {
   cpSync,
   existsSync,
   mkdirSync,
-  readdirSync,
-  readFileSync,
   rmSync,
   unlinkSync,
   writeFileSync,
@@ -469,60 +453,9 @@ function copyDependencies() {
 }
 
 function generateLicenseMetadata(outRoot: string) {
-  const chooseALicense = path.join(outRoot, 'static', 'choosealicense.com')
-  const licensesDir = path.join(chooseALicense, '_licenses')
-
-  const files = readdirSync(licensesDir)
-
-  const licenses = new Array<ILicense>()
-  for (const file of files) {
-    const fullPath = path.join(licensesDir, file)
-    const contents = readFileSync(fullPath, 'utf8')
-    const result = frontMatter<IChooseALicense>(contents)
-
-    const licenseText = result.body.trim()
-    // ensure that any license file created in the app does not trigger the
-    // "no newline at end of file" warning when viewing diffs
-    const licenseTextWithNewLine = `${licenseText}\n`
-
-    const license: ILicense = {
-      name: result.attributes.nickname || result.attributes.title,
-      featured: result.attributes.featured || false,
-      hidden:
-        result.attributes.hidden === undefined || result.attributes.hidden,
-      body: licenseTextWithNewLine,
-    }
-
-    if (!license.hidden) {
-      licenses.push(license)
-    }
-  }
-
-  const licensePayload = path.join(outRoot, 'static', 'available-licenses.json')
-  const text = JSON.stringify(licenses)
-  writeFileSync(licensePayload, text, 'utf8')
-
-  // embed the license alongside the generated license payload
-  const chooseALicenseLicense = path.join(chooseALicense, 'LICENSE.md')
-  const licenseDestination = path.join(
-    outRoot,
-    'static',
-    'LICENSE.choosealicense.md'
-  )
-
-  const licenseText = readFileSync(chooseALicenseLicense, 'utf8')
-  const licenseWithHeader = `GitHub Desktop uses licensing information provided by choosealicense.com.
-
-The bundle in available-licenses.json has been generated from a source list provided at https://github.com/github/choosealicense.com, which is made available under the below license:
-
-------------
-
-${licenseText}`
-
-  writeFileSync(licenseDestination, licenseWithHeader, 'utf8')
-
-  // sweep up the choosealicense directory as the important bits have been bundled in the app
-  rmSync(chooseALicense, { recursive: true, force: true })
+  const source = path.join(outRoot, 'static', 'choosealicense.com')
+  generateLicenseMetadataFromSource(source, outRoot)
+  rmSync(source, { recursive: true, force: true })
 }
 
 function getNotarizationOptions(): IOSXNotarizeOptions | undefined {

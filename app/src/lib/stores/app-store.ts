@@ -1,3 +1,4 @@
+import { scheduleTimeout } from '../host-timers'
 import { resolveCommitGenerationAccount } from '../commit-generation/generation-account'
 import { ProviderStore } from '../commit-generation/provider-store'
 import {
@@ -976,10 +977,14 @@ export class AppStore extends TypedBaseStore<IAppState> {
       error => this.emitError(error)
     )
 
-    window.addEventListener('resize', () => {
-      this.updateResizableConstraints()
-      this.emitUpdate()
-    })
+    // Native panes are constrained by MyGo. Only the upstream comparison UI
+    // observes browser geometry; the business layer never invents a viewport.
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', () => {
+        this.updateResizableConstraints()
+        this.emitUpdate()
+      })
+    }
 
     this.initializeWindowState()
     this.initializeZoomFactor()
@@ -1007,7 +1012,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
       this.refreshIndicatorForRepository
     )
 
-    window.setTimeout(() => {
+    scheduleTimeout(() => {
       if (this.repositoryIndicatorsEnabled) {
         this.repositoryIndicatorUpdater.start()
       }
@@ -1379,9 +1384,11 @@ export class AppStore extends TypedBaseStore<IAppState> {
 
     this.emitQueued = true
 
-    window.requestAnimationFrame(() => {
-      this.emitUpdateNow()
-    })
+    if (typeof window !== 'undefined') {
+      window.requestAnimationFrame(() => this.emitUpdateNow())
+    } else {
+      queueMicrotask(() => this.emitUpdateNow())
+    }
   }
 
   protected emitError(error: Error) {
@@ -2609,6 +2616,14 @@ export class AppStore extends TypedBaseStore<IAppState> {
     }
   }
 
+  /** Stop new periodic work before the Node host drains admitted operations. */
+  public stopBackgroundTasks(): void {
+    this.stopBackgroundFetching()
+    this.stopPullRequestUpdater()
+    this.stopBackgroundPruner()
+    this.repositoryIndicatorUpdater.stop()
+  }
+
   private refreshMentionables(repository: Repository) {
     const account = getAccountForRepository(this.accounts, repository)
     if (!account || !isRepositoryWithGitHubRepository(repository)) {
@@ -3045,6 +3060,9 @@ export class AppStore extends TypedBaseStore<IAppState> {
    * dimensions change.
    */
   private updateResizableConstraints() {
+    if (typeof window === 'undefined') {
+      return
+    }
     const showWorktreeDropdown = this.isWorktreeDropdownVisible()
 
     // The combined width of the toolbar buttons (worktree, branch, push/pull).
@@ -3739,7 +3757,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
       })
     }
 
-    if (forceButtonFocus) {
+    if (forceButtonFocus && typeof document !== 'undefined') {
       const repoSideBar = document.getElementById('repository-sidebar')
       const button = repoSideBar?.querySelector(
         '.tab-bar-item.selected'
@@ -12620,6 +12638,9 @@ export class AppStore extends TypedBaseStore<IAppState> {
   }
 
   private isResizePaneActive() {
+    if (typeof document === 'undefined') {
+      return this.resizablePaneActive
+    }
     if (document.activeElement === null) {
       return false
     }

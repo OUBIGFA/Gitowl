@@ -1,7 +1,8 @@
+import { scheduleTimeout, cancelTimer, HostTimer } from '../../lib/host-timers'
 /** A utility class which allows for throttling arbitrary functions */
 export class ThrottledScheduler {
   private delay: number
-  private timeoutId: number | null = null
+  private timeoutId: HostTimer | null = null
 
   /**
    * Initialize a new instance of the ThrottledScheduler class
@@ -20,13 +21,13 @@ export class ThrottledScheduler {
    */
   public queue(func: () => void) {
     this.clear()
-    this.timeoutId = window.setTimeout(func, this.delay)
+    this.timeoutId = scheduleTimeout(func, this.delay)
   }
 
   /** Resets the scheduler and unschedules queued callback (if any) */
   public clear() {
     if (this.timeoutId != null) {
-      window.clearTimeout(this.timeoutId)
+      cancelTimer(this.timeoutId)
     }
   }
 }

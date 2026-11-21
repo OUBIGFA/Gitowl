@@ -1,3 +1,4 @@
+import { markdownDocument, markdownNodeFilter } from './document-context'
 import { isElement } from './is-element'
 import { INodeFilter } from './node-filter'
 import { githubAssetVideoRegex } from './video-url-regex'
@@ -20,11 +21,11 @@ export class VideoLinkFilter implements INodeFilter {
    * user asset.
    */
   public createFilterTreeWalker(doc: Document): TreeWalker {
-    return doc.createTreeWalker(doc.body, NodeFilter.SHOW_ELEMENT, {
+    return doc.createTreeWalker(doc.body, markdownNodeFilter().SHOW_ELEMENT, {
       acceptNode: (el: Element) =>
         this.getGithubVideoLink(el) === null
-          ? NodeFilter.FILTER_SKIP
-          : NodeFilter.FILTER_ACCEPT,
+          ? markdownNodeFilter().FILTER_SKIP
+          : markdownNodeFilter().FILTER_ACCEPT,
     })
   }
 
@@ -49,7 +50,7 @@ export class VideoLinkFilter implements INodeFilter {
       return null
     }
 
-    const videoNode = document.createElement('video')
+    const videoNode = markdownDocument().createElement('video')
     videoNode.src = videoSrc
     return [videoNode]
   }

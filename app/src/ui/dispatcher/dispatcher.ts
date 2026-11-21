@@ -113,6 +113,7 @@ import {
   executeMenuItem,
   moveToApplicationsFolder,
   isWindowFocused,
+  focusWindow,
 } from '../main-process-proxy'
 import {
   CommitStatusStore,
@@ -2309,7 +2310,7 @@ export class Dispatcher {
             log.info(
               `refocusing the main window after the OAuth flow is completed`
             )
-            window.focus()
+            focusWindow()
           }
         }
         break

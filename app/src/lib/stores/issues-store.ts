@@ -1,3 +1,4 @@
+import { scheduleTimeout, HostTimer } from '../host-timers'
 import { IssuesDatabase, IIssue } from '../databases/issues-database'
 import { API, IAPIIssue } from '../api'
 import { Account } from '../../models/account'
@@ -29,7 +30,7 @@ interface IQueryCache {
 export class IssuesStore {
   private db: IssuesDatabase
   private queryCache: IQueryCache | null = null
-  private pruneQueryCacheTimeoutId: number | null = null
+  private pruneQueryCacheTimeoutId: HostTimer | null = null
 
   /** Initialize the store with the given database. */
   public constructor(db: IssuesDatabase) {
@@ -201,7 +202,7 @@ export class IssuesStore {
   ) {
     this.clearCachePruneTimeout()
     this.queryCache = { repository, issues }
-    this.pruneQueryCacheTimeoutId = window.setTimeout(() => {
+    this.pruneQueryCacheTimeoutId = scheduleTimeout(() => {
       this.pruneQueryCacheTimeoutId = null
       this.queryCache = null
     }, QueryCacheTimeout)

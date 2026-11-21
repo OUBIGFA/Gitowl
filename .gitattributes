@@ -9,6 +9,10 @@
 # trailing spaces are license text, not our merge/formatting edits. Per-part
 # UTF-8, size and concatenated official SHA-256 are checked by repository tests.
 /third_party/licenses/native/electron-Chromium-notices-*.html -text -diff -whitespace
+# Registered upstream license bytes retain their official SHA-256, including
+# line endings and whitespace. Source edits still use the normal checks.
+/third_party/licenses/native/node-LICENSE -text -whitespace
+/third_party/licenses/native/npm_* -text -whitespace
 *.png binary
 *.jpg binary
 *.jpeg binary

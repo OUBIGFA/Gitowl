@@ -25,7 +25,7 @@ it(
       Object.assign(globalThis, { __APP_NAME__: 'Gitowl' })
       process.env.ELECTRON_RUN_AS_NODE = '1'
       process.argv = [
-        'electron.exe',
+        'node.exe',
         'cli.js',
         'clone',
         '-b',
@@ -41,7 +41,7 @@ it(
       ])
       // Assert the executable chosen by the production parser itself. Its
       // source path has the same two-level depth as desktop-kernel/app/cli.js.
-      assert.equal(launches[0].executable, resolve('app/Gitowl.exe'))
+      assert.equal(launches[0].executable, resolve('app/src/Gitowl.exe'))
       assert.equal(process.env.ELECTRON_RUN_AS_NODE, undefined)
     } finally {
       process.argv = argv

@@ -258,7 +258,7 @@ func TestKernelRejectsReducedServiceSnapshot(t *testing.T) {
 	}
 }
 
-func TestKernelConfigKeepsOwnedPathsAndElectronBootstrap(t *testing.T) {
+func TestKernelConfigKeepsOwnedPathsAndNodeBootstrap(t *testing.T) {
 	data := t.TempDir()
 	config, err := ResolveKernelConfig("fixture/resources", data, "", "")
 	if err != nil {
@@ -268,7 +268,7 @@ func TestKernelConfigKeepsOwnedPathsAndElectronBootstrap(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if config.UserData != expectedData || !filepath.IsAbs(config.Entry) || !strings.HasSuffix(filepath.ToSlash(config.Entry), "desktop-kernel/app/main.js") {
+	if config.UserData != expectedData || !filepath.IsAbs(config.Entry) || !strings.HasSuffix(filepath.ToSlash(config.Entry), "backend/main.js") {
 		t.Fatalf("wrong default paths: %+v", config)
 	}
 	if _, err := ResolveKernelConfig("resources", "", "entry.js", "electron"); err == nil {
@@ -276,12 +276,15 @@ func TestKernelConfigKeepsOwnedPathsAndElectronBootstrap(t *testing.T) {
 	}
 	t.Setenv("ELECTRON_RUN_AS_NODE", "1")
 	t.Setenv("NODE_OPTIONS", "--require=unrelated-script")
+	t.Setenv("NODE_PATH", "unrelated-modules")
+	t.Setenv("GITOWL_NODE_CORE", "0")
+	t.Setenv("GITOWL_NATIVE_EXECUTABLE", "unrelated-executable")
 	t.Setenv("GITOWL_USER_DATA", "unrelated-profile")
 	t.Setenv("GITOWL_CREDENTIAL_NAMESPACE", "upstream-namespace")
 	for _, item := range kernelEnvironment(data) {
 		key, value, _ := strings.Cut(item, "=")
 		switch strings.ToUpper(key) {
-		case "ELECTRON_RUN_AS_NODE", "NODE_OPTIONS", "GITOWL_CREDENTIAL_NAMESPACE":
+		case "ELECTRON_RUN_AS_NODE", "NODE_OPTIONS", "NODE_PATH", "GITOWL_NODE_CORE", "GITOWL_NATIVE_EXECUTABLE", "GITOWL_CREDENTIAL_NAMESPACE":
 			t.Fatalf("inherited altered kernel realm: %s", key)
 		case "GITOWL_USER_DATA":
 			if value != data {

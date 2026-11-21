@@ -1,4 +1,5 @@
 export * from './build-default-menu'
+export * from './electron-default-menu'
 export * from './ensure-item-ids'
 export * from './menu-event'
 export * from './crash-menu'

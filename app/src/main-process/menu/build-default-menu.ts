@@ -1,15 +1,15 @@
-import { Menu, shell, app, BrowserWindow } from 'electron'
+import { shell } from '../../lib/app-shell'
+import { getDesktopHost } from '../../lib/desktop-host'
+import type { IMenuTemplate } from '../../models/menu-template'
 import { ensureItemIds } from './ensure-item-ids'
 import { MenuEvent } from './menu-event'
 import { truncateWithEllipsis } from '../../lib/truncate-with-ellipsis'
 import { getLogDirectoryPath } from '../../lib/logging/get-log-path'
-import { UNSAFE_openDirectory } from '../shell'
 import {
   enableCopilotAppHandoff,
   enableWorktreeSupport,
 } from '../../lib/feature-flag'
 import { MenuLabelsEvent } from '../../models/menu-labels'
-import * as ipcWebContents from '../ipc-webcontents'
 import { mkdir } from 'fs/promises'
 import { buildTestMenu } from './build-test-menu'
 
@@ -35,12 +35,8 @@ enum ZoomDirection {
   Out,
 }
 
-export const separator: Electron.MenuItemConstructorOptions = {
+export const separator: IMenuTemplate = {
   type: 'separator',
-}
-
-export function buildDefaultMenu(params: MenuLabelsEvent): Electron.Menu {
-  return Menu.buildFromTemplate(buildDefaultMenuTemplate(params))
 }
 
 export function buildDefaultMenuTemplate({
@@ -54,7 +50,7 @@ export function buildDefaultMenuTemplate({
   isStashedChangesVisible = false,
   askForConfirmationWhenStashingAllChanges = true,
   isChangesFilterVisible = true,
-}: MenuLabelsEvent): Electron.MenuItemConstructorOptions[] {
+}: MenuLabelsEvent): IMenuTemplate[] {
   contributionTargetDefaultBranch = truncateWithEllipsis(
     contributionTargetDefaultBranch,
     25
@@ -68,7 +64,7 @@ export function buildDefaultMenuTemplate({
     ? showPullRequestLabel
     : createPullRequestLabel
 
-  const template = new Array<Electron.MenuItemConstructorOptions>()
+  const template = new Array<IMenuTemplate>()
 
   if (__DARWIN__) {
     template.push({
@@ -107,7 +103,7 @@ export function buildDefaultMenuTemplate({
     })
   }
 
-  const fileMenu: Electron.MenuItemConstructorOptions = {
+  const fileMenu: IMenuTemplate = {
     label: __DARWIN__ ? 'File' : '&File',
     submenu: [
       {
@@ -133,7 +129,7 @@ export function buildDefaultMenuTemplate({
   }
 
   if (!__DARWIN__) {
-    const fileItems = fileMenu.submenu as Electron.MenuItemConstructorOptions[]
+    const fileItems = fileMenu.submenu as IMenuTemplate[]
     const exitAccelerator = __WIN32__ ? 'Alt+F4' : 'CmdOrCtrl+Q'
 
     fileItems.push(
@@ -283,11 +279,7 @@ export function buildDefaultMenuTemplate({
         // chorded shortcuts, but this menu item is not a user-facing feature
         // so we are going to keep this one around.
         accelerator: 'CmdOrCtrl+Alt+R',
-        click(item: any, focusedWindow: Electron.BaseWindow | undefined) {
-          if (focusedWindow instanceof BrowserWindow) {
-            focusedWindow.reload()
-          }
-        },
+        click: () => getDesktopHost().send('reload-window', []),
         visible: __RELEASE_CHANNEL__ === 'development',
       },
       {
@@ -298,11 +290,8 @@ export function buildDefaultMenuTemplate({
         accelerator: (() => {
           return __DARWIN__ ? 'Alt+Command+I' : 'Ctrl+Shift+I'
         })(),
-        click(item: any, focusedWindow: Electron.BaseWindow | undefined) {
-          if (focusedWindow instanceof BrowserWindow) {
-            focusedWindow.webContents.toggleDevTools()
-          }
-        },
+        click: () => getDesktopHost().send('show-devtools', []),
+        visible: false,
       },
     ],
   })
@@ -538,7 +527,7 @@ export function buildDefaultMenuTemplate({
     })
   }
 
-  const submitIssueItem: Electron.MenuItemConstructorOptions = {
+  const submitIssueItem: IMenuTemplate = {
     label: __DARWIN__ ? 'Report Issue…' : 'Report issue…',
     click() {
       shell
@@ -547,18 +536,18 @@ export function buildDefaultMenuTemplate({
     },
   }
 
-  const contactSupportItem: Electron.MenuItemConstructorOptions = {
+  const contactSupportItem: IMenuTemplate = {
     label: __DARWIN__ ? 'Contact GitHub Support…' : '&Contact GitHub support…',
     click() {
       shell
         .openExternal(
-          `https://github.com/contact?from_desktop_app=1&app_version=${app.getVersion()}`
+          `https://github.com/contact?from_desktop_app=1&app_version=${__APP_VERSION__}`
         )
         .catch(err => log.error('Failed opening contact support page', err))
     },
   }
 
-  const showUserGuides: Electron.MenuItemConstructorOptions = {
+  const showUserGuides: IMenuTemplate = {
     label: 'Show User Guides',
     click() {
       shell
@@ -567,7 +556,7 @@ export function buildDefaultMenuTemplate({
     },
   }
 
-  const showKeyboardShortcuts: Electron.MenuItemConstructorOptions = {
+  const showKeyboardShortcuts: IMenuTemplate = {
     label: __DARWIN__ ? 'Show Keyboard Shortcuts' : 'Show keyboard shortcuts',
     click() {
       shell
@@ -584,12 +573,12 @@ export function buildDefaultMenuTemplate({
     ? 'S&how logs in Explorer'
     : 'S&how logs in your File Manager'
 
-  const showLogsItem: Electron.MenuItemConstructorOptions = {
+  const showLogsItem: IMenuTemplate = {
     label: showLogsLabel,
     click() {
       const logPath = getLogDirectoryPath()
       mkdir(logPath, { recursive: true })
-        .then(() => UNSAFE_openDirectory(logPath))
+        .then(() => shell.openPath(logPath))
         .catch(err => log.error('Failed opening logs directory', err))
     },
   }
@@ -652,35 +641,12 @@ function getStashedChangesLabel(isStashedChangesVisible: boolean): string {
   return __DARWIN__ ? 'Show Stashed Changes' : 'Sho&w stashed changes'
 }
 
-type ClickHandler = (
-  menuItem: Electron.MenuItem,
-  browserWindow: Electron.BaseWindow | undefined,
-  event: Electron.KeyboardEvent
-) => void
+type ClickHandler = (...args: unknown[]) => void
 
-/**
- * Utility function returning a Click event handler which, when invoked, emits
- * the provided menu event over IPC.
- */
+/** Reuse the menu's original action selection with the actual native host. */
 export function emit(name: MenuEvent): ClickHandler {
-  return (_, focusedWindow) => {
-    // focusedWindow can be null if the menu item was clicked without the window
-    // being in focus. A simple way to reproduce this is to click on a menu item
-    // while in DevTools. Since Desktop only supports one window at a time we
-    // can be fairly certain that the first BrowserWindow we find is the one we
-    // want.
-    const window =
-      focusedWindow instanceof BrowserWindow
-        ? focusedWindow
-        : BrowserWindow.getAllWindows()[0]
-    if (window !== undefined) {
-      // The MyGo owner is the only visible window in native mode. A menu
-      // event must not accidentally show the hidden original Electron host.
-      if (!window.isVisible() && process.env.GITOWL_NATIVE_CORE !== '1') {
-        window.show()
-      }
-      ipcWebContents.send(window.webContents, 'menu-event', name)
-    }
+  return () => {
+    getDesktopHost().events.emit('menu-event', undefined, name)
   }
 }
 
@@ -705,38 +671,23 @@ function findClosestValue(arr: Array<number>, value: number) {
  * about a change in zoom factor if necessary.
  */
 function zoom(direction: ZoomDirection): ClickHandler {
-  return (menuItem, window) => {
-    if (!(window instanceof BrowserWindow)) {
-      return
-    }
-
-    const { webContents } = window
-
-    if (direction === ZoomDirection.Reset) {
-      webContents.zoomFactor = 1
-      ipcWebContents.send(webContents, 'zoom-factor-changed', 1)
-    } else {
-      const rawZoom = webContents.zoomFactor
-      const zoomFactors =
-        direction === ZoomDirection.In ? ZoomInFactors : ZoomOutFactors
-
-      // So the values that we get from zoomFactor property are floating point
-      // precision numbers from chromium, that don't always round nicely, so
-      // we'll have to do a little trick to figure out which of our supported
-      // zoom factors the value is referring to.
-      const currentZoom = findClosestValue(zoomFactors, rawZoom)
-
-      const nextZoomLevel = zoomFactors.find(f =>
-        direction === ZoomDirection.In ? f > currentZoom : f < currentZoom
-      )
-
-      // If we couldn't find a zoom level (likely due to manual manipulation
-      // of the zoom factor in devtools) we'll just snap to the closest valid
-      // factor we've got.
-      const newZoom = nextZoomLevel === undefined ? currentZoom : nextZoomLevel
-
-      webContents.zoomFactor = newZoom
-      ipcWebContents.send(webContents, 'zoom-factor-changed', newZoom)
-    }
+  return () => {
+    const host = getDesktopHost()
+    void host
+      .invoke('get-current-window-zoom-factor', [])
+      .then(value => {
+        const rawZoom = typeof value === 'number' ? value : 1
+        const factors =
+          direction === ZoomDirection.In ? ZoomInFactors : ZoomOutFactors
+        const current = findClosestValue(factors, rawZoom)
+        const next =
+          direction === ZoomDirection.Reset
+            ? 1
+            : factors.find(f =>
+                direction === ZoomDirection.In ? f > current : f < current
+              ) ?? current
+        host.send('set-window-zoom-factor', [next])
+      })
+      .catch(error => log.error('Could not update window zoom', error))
   }
 }

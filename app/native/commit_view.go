@@ -18,7 +18,7 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 	// actions wrap to two rows there, so tighten the spacing above them (every
 	// label stays) to keep a usable code viewport. Padding is unchanged so Save
 	// keeps its exact position when review opens.
-	compact := a.reviewingFile && height < 700
+	compact := height < 700
 	margin, gap := float32(16), float32(8)
 	if compact {
 		margin, gap = 6, 6
@@ -80,6 +80,7 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 				}
 				ui.Spacer(c)
 				selectionCount()
+				a.nativeCommitOptions(c)
 			})
 			description.Panel(func() {
 				// Give long descriptions more editing space as the window grows.
@@ -138,7 +139,7 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 				a.coreGenerationMenu(c, tx)
 			}
 			ui.Spacer(c)
-			ui.Row(c.Key("composer-primary-actions")).Shrink(1).MinWidth(0).AlignItems(ui.Center).Justify(ui.End).Wrap().Gap(gap).Children(func() {
+			ui.Row(c.Key("composer-primary-actions")).Shrink(0).MinWidth(0).AlignItems(ui.Center).Justify(ui.End).Gap(gap).Children(func() {
 				if vm == nil || vm.Mode != "copilot" {
 					if a.generating {
 						quietButton(c.Key("stop-generation"), tx.StopGeneration(), "x").Height(36).OnClick(a.stopGeneration)
@@ -208,7 +209,9 @@ func (a *app) commitForm(c *ui.Context, tx locales.Messages) {
 						save.Focus()
 						a.coreFocusTarget = ""
 					}
-					a.nativeCommitOptions(c)
+					if vm != nil && vm.Mode == "copilot" {
+						a.nativeCommitOptions(c)
+					}
 				})
 			})
 		})

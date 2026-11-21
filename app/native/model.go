@@ -69,6 +69,7 @@ type app struct {
 	coreSignInForm            kernelSignInForm
 	coreInitialPath           string
 	coreDeferredLaunches      []nativeLaunchOptions
+	coreDeferredNotifications []string
 	coreZoom                  float64
 	coreWindowAction          func(string)
 	corePresentationActions   []string
@@ -76,6 +77,7 @@ type app struct {
 	coreFocusTarget           string
 	setCoreTheme              func(string)
 	coreWindowState           func() backend.KernelWindowState
+	corePlatform              func(context.Context, backend.KernelPlatformRequest) (any, error)
 	update                    func(func())
 	ctx                       context.Context
 	cancel                    context.CancelFunc

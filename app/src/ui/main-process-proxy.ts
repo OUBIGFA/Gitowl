@@ -242,7 +242,7 @@ export const quitApp = sendProxy('quit-app', 0)
 
 /** Subscribes to auto updater error events originating from the main process */
 export function onAutoUpdaterError(
-  errorHandler: (evt: Electron.IpcRendererEvent, error: Error) => void
+  errorHandler: (evt: unknown, error: Error) => void
 ) {
   ipcRenderer.on('auto-updater-error', errorHandler)
 }

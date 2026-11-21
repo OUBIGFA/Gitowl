@@ -119,10 +119,7 @@ export class CrashApp extends React.Component<CrashAppProps, ICrashAppState> {
     this.setState({ windowState })
   }
 
-  private onWindowStateChanged = (
-    _: Electron.IpcRendererEvent,
-    windowState: WindowState
-  ) => {
+  private onWindowStateChanged = (_: unknown, windowState: WindowState) => {
     this.setState({ windowState })
   }
 

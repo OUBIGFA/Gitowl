@@ -1,3 +1,4 @@
+import { markdownDocument, markdownNodeFilter } from './document-context'
 import { INodeFilter } from './node-filter'
 import { fileURLToPath } from 'url'
 import { readFile } from 'fs/promises'
@@ -33,12 +34,12 @@ export class EmojiFilter implements INodeFilter {
    * Emoji filter iterates on all text nodes that are not inside a pre or code tag.
    */
   public createFilterTreeWalker(doc: Document): TreeWalker {
-    return doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, {
+    return doc.createTreeWalker(doc.body, markdownNodeFilter().SHOW_TEXT, {
       acceptNode: function (node) {
         return node.parentNode !== null &&
           ['CODE', 'PRE'].includes(node.parentNode.nodeName)
-          ? NodeFilter.FILTER_SKIP
-          : NodeFilter.FILTER_ACCEPT
+          ? markdownNodeFilter().FILTER_SKIP
+          : markdownNodeFilter().FILTER_ACCEPT
       },
     })
   }
@@ -82,7 +83,8 @@ export class EmojiFilter implements INodeFilter {
 
       const emojiPosition = text.indexOf(emojiKey)
       const textBeforeEmoji = text.slice(0, emojiPosition)
-      const textNodeBeforeEmoji = document.createTextNode(textBeforeEmoji)
+      const textNodeBeforeEmoji =
+        markdownDocument().createTextNode(textBeforeEmoji)
       nodes.push(textNodeBeforeEmoji)
       nodes.push(emojiNode)
 
@@ -90,7 +92,7 @@ export class EmojiFilter implements INodeFilter {
     }
 
     if (text !== '') {
-      const trailingTextNode = document.createTextNode(text)
+      const trailingTextNode = markdownDocument().createTextNode(text)
       nodes.push(trailingTextNode)
     }
 
@@ -106,14 +108,14 @@ export class EmojiFilter implements INodeFilter {
   ): Promise<HTMLImageElement | HTMLSpanElement | null> {
     try {
       if (emoji.emoji) {
-        const emojiSpan = document.createElement('span')
+        const emojiSpan = markdownDocument().createElement('span')
         emojiSpan.classList.add('emoji')
         emojiSpan.textContent = emoji.emoji
         return emojiSpan
       }
 
       const dataURI = await this.getBase64FromImageUrl(emoji.url)
-      const emojiImg = new Image()
+      const emojiImg = markdownDocument().createElement('img')
       emojiImg.classList.add('emoji')
       emojiImg.src = dataURI
       emojiImg.alt = emoji.description ?? ''

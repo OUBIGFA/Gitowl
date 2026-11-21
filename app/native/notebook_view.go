@@ -295,7 +295,13 @@ func (a *app) notebookView(c *ui.Context, tx locales.Messages, colors workspaceC
 	if n.width == 0 {
 		n.width = width * .54
 	}
-	n.width = max(width*.38, min(n.width, width-min(280, width*.41)))
+	minimumPane := min(float32(280), width*.41)
+	if a.tab == changesTab {
+		// Reserve enough room for the native Save split button and one full
+		// change row when a larger window is reduced to its supported minimum.
+		minimumPane = min(float32(340), width*.55)
+	}
+	n.width = max(width*.38, min(n.width, width-minimumPane))
 	ui.Split(c.Key("notebook-split"), &n.width, func() {
 		ui.Column(c.Key("note-pane")).Fill().MinWidth(0).Padding(0, 12, 0, 0).Children(func() {
 			ui.Row(c.Key("note-tabs-bar")).Height(40).FillWidth().Padding(0, 0, 8, 0).Margin(0, 0, 10, 0).

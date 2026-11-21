@@ -1,4 +1,4 @@
-import { IpcRendererEvent } from 'electron'
+import type { DesktopHostEvent } from './desktop-host'
 import * as ipcRenderer from './ipc-renderer'
 
 /**
@@ -11,7 +11,7 @@ export function installAuthenticatedImageTokenHandler(
 ) {
   let disposed = false
   const listener = async (
-    _event: IpcRendererEvent,
+    _event: DesktopHostEvent,
     requestId: number,
     endpoint: string,
     token: string

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { it } from 'node:test'
 import { mkdir, writeFile } from 'node:fs/promises'
+import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
 import { Repository } from '../../src/models/repository'
@@ -34,8 +35,10 @@ it('refreshes changes promptly, coalesces a burst, stays idle and closes its wat
   t.after(() => watcher.dispose())
   watcher.start()
   await eventually(() => refreshes.length === 1)
+  // Deliver one event-loop burst. Awaiting each disk write can span several
+  // debounce windows on a busy machine, correctly causing several refreshes.
   for (let n = 0; n < 20; n++) {
-    await writeFile(join(path, `file-${n}.txt`), 'changed')
+    writeFileSync(join(path, `file-${n}.txt`), 'changed')
   }
   await eventually(() => refreshes.length === 2)
   await delay(700)

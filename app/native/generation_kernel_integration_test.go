@@ -194,11 +194,17 @@ func exerciseOriginalKernelGeneration(t *testing.T, h originalGenerationView) {
 		t.Fatalf("actual original-kernel SDK request lost selection/language boundaries: count=%d, messages=%+v", count, messages)
 	}
 	h.click(tx.GenerateMessage())
-	select {
-	case <-started:
-	case <-time.After(30 * time.Second):
-		t.Fatal("the second original request did not reach the HTTP cancellation fixture")
-	}
+	// The native parent must keep processing its real proxy request while the
+	// backend starts HTTP. A blocking channel wait freezes this fixture's UI
+	// queue, unlike the running application's event loop.
+	h.await(func() bool {
+		select {
+		case <-started:
+			return true
+		default:
+			return false
+		}
+	})
 	h.await(func() bool { return a.generating })
 	h.click(tx.StopGeneration())
 	h.await(func() bool { return a.corePending == 0 && !a.generating && a.core.InFlight() == 0 })

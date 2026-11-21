@@ -69,15 +69,21 @@ export class UiActivityMonitor implements IUiActivityMonitor {
   }
 
   private startTracking() {
-    document.addEventListener('mousedown', this.onMouseDown)
-    document.addEventListener('keydown', this.onKeyDown)
+    if (typeof document !== 'undefined') {
+      document.addEventListener('mousedown', this.onMouseDown)
+      document.addEventListener('keydown', this.onKeyDown)
+    }
+    ipcRenderer.on('native-activity', this.onNativeActivity)
 
     ipcRenderer.on('menu-event', this.onMenuEvent)
   }
 
   private stopTracking() {
-    document.removeEventListener('mousedown', this.onMouseDown)
-    document.removeEventListener('keydown', this.onKeyDown)
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('mousedown', this.onMouseDown)
+      document.removeEventListener('keydown', this.onKeyDown)
+    }
+    ipcRenderer.removeListener('native-activity', this.onNativeActivity)
 
     ipcRenderer.removeListener('menu-event', this.onMenuEvent)
   }
@@ -99,6 +105,8 @@ export class UiActivityMonitor implements IUiActivityMonitor {
   }
 
   private onMenuEvent = () => this.emit('menu')
+  private onNativeActivity = (_: unknown, kind: UiActivityKind) =>
+    this.emit(kind)
 }
 
 const interactionTargets = new Set(

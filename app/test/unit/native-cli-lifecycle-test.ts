@@ -40,7 +40,7 @@ it('native install, upgrade and uninstall maintain only the Gitowl CLI entry', a
   try {
     Object.assign(globalThis, { __APP_NAME__: 'Gitowl' })
     Object.defineProperty(process, 'execPath', {
-      value: join(install, 'desktop-kernel/electron.exe'),
+      value: join(install, 'backend/node.exe'),
     })
     const bin = join(install, 'bin')
     await lifecycle.handleNativeCLIEvent(['app', '--gitowl-install-cli'])
@@ -51,8 +51,8 @@ it('native install, upgrade and uninstall maintain only the Gitowl CLI entry', a
     }
     const batch = await readFile(join(bin, 'gitowl.bat'), 'utf8')
     const shell = await readFile(join(bin, 'gitowl'), 'utf8')
-    assert.match(batch, /desktop-kernel[\\/]app[\\/]static[\\/]github\.bat/)
-    assert.match(shell, /desktop-kernel\/app\/static\/github\.sh/)
+    assert.match(batch, /backend[\\/]static[\\/]github\.bat/)
+    assert.match(shell, /backend\/static\/github\.sh/)
     assert.doesNotMatch(batch + shell, /GitHubDesktop\.exe|Update\.exe/)
     await lifecycle.handleNativeCLIEvent(['app', '--gitowl-install-cli'])
     assert.equal(userPath, `C:\\Tools;C:\\Desktop\\bin;${bin}`)

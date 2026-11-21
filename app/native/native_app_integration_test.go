@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -31,7 +32,7 @@ func TestNativePreferencesFitAllOriginalPages(t *testing.T) {
 
 func exerciseOriginalKernelView(t *testing.T, scenario string) {
 	t.Helper()
-	entry, electron := os.Getenv("GITOWL_KERNEL_ENTRY"), os.Getenv("GITOWL_KERNEL_ELECTRON")
+	entry, electron := os.Getenv("GITOWL_KERNEL_ENTRY"), os.Getenv("GITOWL_KERNEL_NODE")
 	if entry == "" || electron == "" {
 		t.Skip("run npm run test:kernel with the compiled original Desktop kernel")
 	}
@@ -93,6 +94,8 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 	}
 
 	a := newCoreApp(nil, nil)
+	a.corePlatform = kernelTestPlatform(work)
+	seedKernelTestSettings(t, electron, filepath.Join(work, "data"), true)
 	a.windowPreferencesPath = filepath.Join(work, "data", "window-preferences.json")
 	a.windowPreferences, err = readWindowPreferences(a.windowPreferencesPath)
 	if err != nil {
@@ -100,7 +103,7 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 	}
 	updates := make(chan func(), 1000)
 	a.update = func(fn func()) { updates <- fn }
-	core, err := backend.StartKernel(backend.KernelConfig{Electron: electron, Entry: entry, UserData: filepath.Join(work, "data")}, func(event backend.KernelEvent) {
+	core, err := backend.StartKernel(backend.KernelConfig{Node: electron, Entry: entry, UserData: filepath.Join(work, "data")}, func(event backend.KernelEvent) {
 		updates <- func() { a.receiveCoreEvent(event) }
 	})
 	if err != nil {
@@ -178,6 +181,7 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 	tx := locales.In(locale)
 	await := func(done func() bool) {
 		t.Helper()
+		_, callFile, callLine, _ := runtime.Caller(1)
 		deadline := time.NewTimer(30 * time.Second)
 		defer deadline.Stop()
 		// Kernel state and native layout settle independently. Keep the real
@@ -196,7 +200,7 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 			case <-core.Done():
 				t.Fatalf("original kernel disconnected: %v", core.Err())
 			case <-deadline.C:
-				t.Fatalf("original UI action did not settle: scenario=%s pending=%d snapshot=%+v errors=%v/%v/%v", scenario, a.corePending, a.coreSnapshot, a.serviceErr, a.openErr, a.diffErr)
+				t.Fatalf("original UI action did not settle: scenario=%s at %s:%d pending=%d selected=%+v errors=%v/%v/%v", scenario, callFile, callLine, a.corePending, a.coreSnapshot.Selected, a.serviceErr, a.openErr, a.diffErr)
 			}
 		}
 		tt.Frame()
@@ -449,6 +453,15 @@ func exerciseOriginalKernelView(t *testing.T, scenario string) {
 	}
 	assertChanges("commit-summary typing")
 	if scenario == "save-en" {
+		tt.SetSize(884, 611)
+		tt.Advance(time.Second)
+		save := visibleControl(t, tt, tx.SaveVersion(), 884, 611)
+		if save.H != 40 {
+			t.Fatalf("minimum native frame clips Save: %+v", save)
+		}
+		visibleControl(t, tt, tx.OpenFile("selected.txt"), 884, 611)
+		tt.SetSize(1180, 760)
+		tt.Advance(time.Second)
 		// A context menu targets its own row, including keyboard invocation,
 		// without changing the selected project's draft or refreshing its state.
 		targetPath := filepath.Join(work, "menu-target")

@@ -1,3 +1,4 @@
+import { scheduleTimeout, cancelTimer, HostTimer } from './host-timers'
 /**
  * Wrap a promise in a minimum timeout, so that it only returns after both the
  * timeout and promise have completed.
@@ -16,14 +17,14 @@ export function promiseWithMinimumTimeout<T>(
 }
 
 /**
- * `async`/`await`-friendly wrapper around `window.setTimeout` for places where
+ * `async`/`await`-friendly wrapper around `scheduleTimeout` for places where
  * callers want to defer async work and avoid the ceremony of this setup and
  * using callbacks
  *
  * @param timeout the time to wait before resolving the promise (in milliseconds)
  */
 export async function sleep(timeout: number): Promise<void> {
-  return new Promise(resolve => window.setTimeout(resolve, timeout))
+  return new Promise(resolve => scheduleTimeout(resolve, timeout))
 }
 
 /**
@@ -40,14 +41,14 @@ export async function timeout<T>(
   timeout: number,
   fallbackValue: T
 ): Promise<T> {
-  let timeoutId: number | null = null
+  let timeoutId: HostTimer | null = null
   const timeoutPromise = new Promise<T>(resolve => {
-    timeoutId = window.setTimeout(() => resolve(fallbackValue), timeout)
+    timeoutId = scheduleTimeout(() => resolve(fallbackValue), timeout)
   })
 
   return Promise.race([promise, timeoutPromise]).finally(() => {
     if (timeoutId !== null) {
-      window.clearTimeout(timeoutId)
+      cancelTimer(timeoutId)
     }
   })
 }

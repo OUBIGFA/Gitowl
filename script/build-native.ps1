@@ -6,7 +6,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $runtimeManifest = Get-Content (Join-Path $root 'third_party/native-runtimes.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-if ($Preview -and ($runtimeManifest.schemaVersion -ne 2 -or $runtimeManifest.packaging.previewReady -ne $true)) {
+if ($Preview -and ($runtimeManifest.schemaVersion -ne 3 -or $runtimeManifest.packaging.previewReady -ne $true)) {
     throw ('GITOWL_PREVIEW_NOT_READY: original Desktop frontend acceptance is pending. ' + ($runtimeManifest.packaging.blockers -join ' '))
 }
 if ($BuildNumber -notmatch '^[0-9]{14}$') { throw 'BuildNumber must use yyyyMMddHHmmss' }
@@ -58,7 +58,7 @@ try {
         & npm.cmd run check:features
         Check-Exit 'Upstream feature declarations'
         & npm.cmd run test:kernel
-        Check-Exit 'Original Desktop Electron kernel and native presentation tests'
+        Check-Exit 'Node backend and native presentation tests'
         & python tools/record_native_dependencies.py --check
         Check-Exit 'Native dependency receipts'
     }
@@ -74,7 +74,7 @@ try {
         $env:MYGO_LDFLAGS = "-X main.BuildNumber=$BuildNumber"
         & npm.cmd run prepare:native-runtime
         Check-Exit 'Prepare checked runtime and licenses'
-        $env:GITOWL_RUNTIME_SMOKE = Join-Path $root 'output/native-runtime/desktop-kernel'
+        $env:GITOWL_RUNTIME_SMOKE = Join-Path $root 'output/native-runtime/backend'
         if ($Preview) {
             Push-Location app/native
             try {
@@ -94,6 +94,7 @@ try {
             sourceTree=$sourceTree; sourceSnapshot='staged Git inputs'
             authenticodeSigned=$false; fullFeatureParity=($null -ne $acceptance)
             originalCore='desktop/desktop'; presentationComplete=($null -ne $acceptance)
+            runtimeHost='node'; embeddedBrowser=$false
             runtimeInputHash=(Get-Content 'output/native-runtime/runtime-receipt.json' -Raw -Encoding UTF8 | ConvertFrom-Json).inputHash
             runtimeSmoke=if ($env:GITOWL_SKIP_RUNTIME_SMOKE -eq '1') { 'skipped-by-request' } else { 'passed' }
             desktopAcceptance=if ($null -ne $acceptance) { 'source-bound-parent-review' } else { 'not-required' }; installedAcceptance='not-required'; channel='research-preview'

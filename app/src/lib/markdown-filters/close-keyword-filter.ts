@@ -1,3 +1,4 @@
+import { markdownDocument, markdownNodeFilter } from './document-context'
 import { GitHubRepository } from '../../models/github-repository'
 import { isElement } from './is-element'
 import { issueUrl } from './issue-link-filter'
@@ -84,13 +85,13 @@ export class CloseKeywordFilter implements INodeFilter {
    *  code, or anchor tag.
    */
   public createFilterTreeWalker(doc: Document): TreeWalker {
-    return doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, {
+    return doc.createTreeWalker(doc.body, markdownNodeFilter().SHOW_TEXT, {
       acceptNode: node => {
         return (node.parentNode !== null &&
           ['CODE', 'PRE', 'A'].includes(node.parentNode.nodeName)) ||
           node.textContent === null
-          ? NodeFilter.FILTER_SKIP
-          : NodeFilter.FILTER_ACCEPT
+          ? markdownNodeFilter().FILTER_SKIP
+          : markdownNodeFilter().FILTER_ACCEPT
       },
     })
   }
@@ -132,7 +133,7 @@ export class CloseKeywordFilter implements INodeFilter {
       const span = this.createTooltipContent(closeText, issueDesc)
 
       const textBefore = text.slice(lastMatchEndingPosition, match.index)
-      nodes.push(document.createTextNode(textBefore))
+      nodes.push(markdownDocument().createTextNode(textBefore))
       nodes.push(span)
 
       lastMatchEndingPosition = match.index + closeText.length
@@ -140,7 +141,7 @@ export class CloseKeywordFilter implements INodeFilter {
 
     const trailingText = text.slice(lastMatchEndingPosition)
     if (trailingText !== '') {
-      nodes.push(document.createTextNode(trailingText))
+      nodes.push(markdownDocument().createTextNode(trailingText))
     }
 
     return nodes
@@ -180,7 +181,7 @@ export class CloseKeywordFilter implements INodeFilter {
   }
 
   private createTooltipContent(closesText: string, issueNumber: string) {
-    const tooltipSpan = document.createElement('span')
+    const tooltipSpan = markdownDocument().createElement('span')
     tooltipSpan.textContent = closesText
     tooltipSpan.classList.add('issue-keyword')
     tooltipSpan.ariaLabel = `This ${

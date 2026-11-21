@@ -22,7 +22,7 @@ const run = (...args: Array<string>) => {
     // the MyGo owner may create or focus the original kernel in native builds.
     const executable =
       __APP_NAME__ === 'Gitowl'
-        ? join(__dirname, '../../Gitowl.exe')
+        ? join(__dirname, '../Gitowl.exe')
         : join(__dirname, `../../GitHubDesktop${__DEV__ ? '-dev' : ''}.exe`)
     spawn(executable, args, {
       detached: true,

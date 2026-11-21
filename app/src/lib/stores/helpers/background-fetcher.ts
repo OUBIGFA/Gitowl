@@ -1,3 +1,4 @@
+import { scheduleTimeout, cancelTimer, HostTimer } from '../../host-timers'
 import { Repository } from '../../../models/repository'
 import { GitHubRepository } from '../../../models/github-repository'
 import { API } from '../../api'
@@ -26,7 +27,7 @@ const SkewUpperBound = 30 * 1000
 /** The class which handles doing background fetches of the repository. */
 export class BackgroundFetcher {
   /** The handle for our setTimeout invocation. */
-  private timeoutHandle: number | null = null
+  private timeoutHandle: HostTimer | null = null
 
   /** Flag to indicate whether `stop` has been called. */
   private stopped = false
@@ -52,7 +53,7 @@ export class BackgroundFetcher {
     }
 
     if (withInitialSkew) {
-      this.timeoutHandle = window.setTimeout(
+      this.timeoutHandle = scheduleTimeout(
         () => this.performAndScheduleFetch(gitHubRepository),
         skewInterval()
       )
@@ -70,7 +71,7 @@ export class BackgroundFetcher {
 
     const handle = this.timeoutHandle
     if (handle) {
-      window.clearTimeout(handle)
+      cancelTimer(handle)
       this.timeoutHandle = null
     }
   }
@@ -110,7 +111,7 @@ export class BackgroundFetcher {
       return
     }
 
-    this.timeoutHandle = window.setTimeout(
+    this.timeoutHandle = scheduleTimeout(
       () => this.performAndScheduleFetch(repository),
       interval
     )

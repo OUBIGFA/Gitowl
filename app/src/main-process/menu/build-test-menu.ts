@@ -1,4 +1,4 @@
-import { MenuItemConstructorOptions } from 'electron'
+import type { IMenuTemplate as MenuItemConstructorOptions } from '../../models/menu-template'
 import { enableTestMenuItems } from '../../lib/feature-flag'
 import { emit, separator } from './build-default-menu'
 

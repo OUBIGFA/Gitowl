@@ -1,3 +1,4 @@
+import { scheduleTimeout, cancelTimer, HostTimer } from '../../host-timers'
 import { Account } from '../../../models/account'
 import { RepositoryWithGitHubRepository } from '../../../models/repository'
 import { PullRequestCoordinator } from '../pull-request-coordinator'
@@ -21,7 +22,7 @@ const MaxPullRequestRefreshFrequency = 2 * 60 * 1000
  * indicated by the `MaxPullRequestRefreshFrequency` variable.
  */
 export class PullRequestUpdater {
-  private timeoutId: number | null = null
+  private timeoutId: HostTimer | null = null
   private running = false
 
   public constructor(
@@ -48,7 +49,7 @@ export class PullRequestUpdater {
   private scheduleTick(timeout: number = PullRequestInterval) {
     if (this.running) {
       const due = Math.max(timeout - this.getTimeSinceLastRefresh(), 0)
-      this.timeoutId = window.setTimeout(() => this.tick(), due)
+      this.timeoutId = scheduleTimeout(() => this.tick(), due)
     }
   }
 
@@ -71,7 +72,7 @@ export class PullRequestUpdater {
   public stop() {
     if (this.running) {
       if (this.timeoutId !== null) {
-        window.clearTimeout(this.timeoutId)
+        cancelTimer(this.timeoutId)
         this.timeoutId = null
       }
       this.running = false

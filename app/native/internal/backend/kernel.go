@@ -331,6 +331,7 @@ type KernelFailure struct {
 // KernelEvent is emitted in wire order. A handler only schedules UI-thread
 // work and must not synchronously call the client from its reader goroutine.
 type KernelEvent struct {
+	Platform           *KernelPlatformRequest
 	Dialog             *KernelFileDialog
 	External           *KernelExternalRequest
 	Snapshot           *KernelSnapshot
@@ -341,21 +342,21 @@ type KernelEvent struct {
 }
 
 type KernelConfig struct {
-	Electron string
+	Node     string
 	Entry    string
 	UserData string
 }
 
-func ResolveKernelConfig(resources, userData, entry, electron string) (KernelConfig, error) {
+func ResolveKernelConfig(resources, userData, entry, node string) (KernelConfig, error) {
 	if entry == "" {
-		entry = filepath.Join(resources, "desktop-kernel", "app", "main.js")
+		entry = filepath.Join(resources, "backend", "main.js")
 	}
-	if electron == "" {
-		name := "electron"
+	if node == "" {
+		name := "node"
 		if runtime.GOOS == "windows" {
 			name += ".exe"
 		}
-		electron = filepath.Join(resources, "desktop-kernel", name)
+		node = filepath.Join(resources, "backend", name)
 	}
 	if userData == "" {
 		return KernelConfig{}, errors.New("missing MyGo user data directory")
@@ -369,13 +370,13 @@ func ResolveKernelConfig(resources, userData, entry, electron string) (KernelCon
 	if err != nil {
 		return KernelConfig{}, fmt.Errorf("kernel user data: %w", err)
 	}
-	if strings.ContainsAny(electron, `/\`) && !filepath.IsAbs(electron) {
-		electron, err = filepath.Abs(electron)
+	if strings.ContainsAny(node, `/\`) && !filepath.IsAbs(node) {
+		node, err = filepath.Abs(node)
 		if err != nil {
-			return KernelConfig{}, fmt.Errorf("Electron path: %w", err)
+			return KernelConfig{}, fmt.Errorf("Node path: %w", err)
 		}
 	}
-	return KernelConfig{Electron: electron, Entry: entry, UserData: userData}, nil
+	return KernelConfig{Node: node, Entry: entry, UserData: userData}, nil
 }
 
 func kernelEnvironment(userData string) []string {
@@ -383,18 +384,16 @@ func kernelEnvironment(userData string) []string {
 	for _, item := range os.Environ() {
 		key, _, _ := strings.Cut(item, "=")
 		switch strings.ToUpper(key) {
-		case "ELECTRON_RUN_AS_NODE", "ELECTRON_NO_ATTACH_CONSOLE", "NODE_OPTIONS", "LOCAL_GIT_DIRECTORY", "GIT_EXEC_PATH", "GITOWL_USER_DATA", "GITOWL_NATIVE_CORE", "GITOWL_CREDENTIAL_NAMESPACE":
+		case "ELECTRON_RUN_AS_NODE", "ELECTRON_NO_ATTACH_CONSOLE", "NODE_OPTIONS", "NODE_PATH", "LOCAL_GIT_DIRECTORY", "GIT_EXEC_PATH", "GITOWL_USER_DATA", "GITOWL_NATIVE_CORE", "GITOWL_NODE_CORE", "GITOWL_NATIVE_EXECUTABLE", "GITOWL_CREDENTIAL_NAMESPACE":
 			continue
 		}
 		env = append(env, item)
 	}
-	// Electron's Windows bootstrap must not replace the owned pipes with a
-	// console. Its EOF-only process.stdin is separately handled by native-mode.
-	return append(env, "GITOWL_USER_DATA="+userData, "ELECTRON_NO_ATTACH_CONSOLE=1")
+	// Ignore executable-injection and old Electron flags at the process boundary.
+	return append(env, "GITOWL_USER_DATA="+userData)
 }
 
-// Kernel owns no Git/credential/business state. It connects the MyGo presenter
-// to the original Electron main and non-mounted AppStore/Dispatcher renderer.
+// Kernel connects MyGo to the single Node business owner over inherited pipes.
 type Kernel struct {
 	client  *Client
 	service *Service
@@ -415,7 +414,7 @@ func NewKernel(reader io.ReadCloser, writer io.WriteCloser, onEvent func(KernelE
 	return k
 }
 
-// StartKernel launches Electron as Electron, never as a reduced Node service.
+// StartKernel launches the complete business runtime in plain Node.
 func StartKernel(config KernelConfig, onEvent func(KernelEvent)) (*Kernel, error) {
 	stat, err := os.Stat(config.Entry)
 	if err != nil {
@@ -427,26 +426,20 @@ func StartKernel(config KernelConfig, onEvent func(KernelEvent)) (*Kernel, error
 	if !filepath.IsAbs(config.UserData) {
 		return nil, errors.New("Desktop kernel user data must be an absolute MyGo path")
 	}
-	if err := os.MkdirAll(config.UserData, 0o755); err != nil {
+	if err := os.MkdirAll(config.UserData, 0o700); err != nil {
 		return nil, fmt.Errorf("Desktop kernel user data: %w", err)
 	}
-	application := config.Entry
-	// Electron's default-app loader reads package identity only when launched
-	// with the application directory. A direct main.js override remains a dev
-	// entry, but a prepared native runtime must use its adjacent package.json.
-	if data, readErr := os.ReadFile(filepath.Join(filepath.Dir(config.Entry), "package.json")); readErr == nil {
-		var pkg struct {
-			Main string `json:"main"`
-		}
-		if json.Unmarshal(data, &pkg) == nil && pkg.Main != "" && filepath.Clean(filepath.Join(filepath.Dir(config.Entry), pkg.Main)) == filepath.Clean(config.Entry) {
-			application = filepath.Dir(config.Entry)
-		}
+	if err := prepareKernelData(config); err != nil {
+		return nil, err
 	}
-	cmd := exec.Command(config.Electron, application, "--gitowl-native-core")
+	cmd := exec.Command(config.Node, "--conditions=import", "--use-system-ca", "--experimental-webstorage", "--localstorage-file="+filepath.Join(config.UserData, "backend-data", "settings.sqlite"), config.Entry)
 	cmd.Dir = filepath.Dir(config.Entry)
-	cmd.Env = kernelEnvironment(config.UserData)
+	cmd.Env = append(kernelEnvironment(config.UserData), "LOCAL_GIT_DIRECTORY="+filepath.Join(cmd.Dir, "git"))
+	if executable, err := os.Executable(); err == nil {
+		cmd.Env = append(cmd.Env, "GITOWL_NATIVE_EXECUTABLE="+executable)
+	}
 	k := &Kernel{onEvent: onEvent, closeDone: make(chan struct{})}
-	s, err := startProcess(cmd, "Electron", k.receiveEvent, false)
+	s, err := startProcess(cmd, "Node", k.receiveEvent, false)
 	if err != nil {
 		return nil, err
 	}
@@ -493,6 +486,12 @@ func validateKernelSnapshot(snapshot KernelSnapshot) error {
 func (k *Kernel) receiveEvent(method string, params json.RawMessage) error {
 	var event KernelEvent
 	switch method {
+	case "platform.request":
+		var request KernelPlatformRequest
+		if err := json.Unmarshal(params, &request); err != nil || request.ID <= 0 || request.Operation == "" || request.Args == nil {
+			return &ProtocolError{"invalid native platform request"}
+		}
+		event.Platform = &request
 	case "external.open":
 		var request KernelExternalRequest
 		if err := json.Unmarshal(params, &request); err != nil || request.ID <= 0 || request.URL == "" || strings.ContainsRune(request.URL, '\x00') {

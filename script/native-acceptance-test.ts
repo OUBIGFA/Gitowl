@@ -146,7 +146,8 @@ async function fixture(t: { after: (fn: () => Promise<void>) => void }) {
     resources: [
       '../static/logos/gitowl/logo.png',
       '../static/logos/gitowl/icons',
-      '../../output/native-runtime/desktop-kernel',
+      '../../third_party/licenses/arcmd',
+      '../../output/native-runtime/backend',
       '../../output/native-runtime/build-info.json',
     ],
   })
@@ -172,45 +173,44 @@ async function fixture(t: { after: (fn: () => Promise<void>) => void }) {
   await file('.local/mygo-gitowl-0.8.1/ui.go', 'fixture original MyGo')
   await file('.local/mygo-gitowl-0.8.1/.gitowl-patch', hash('fixture archive'))
   for (const path of [
-    'electron.exe',
-    'LICENSE',
-    'LICENSES.chromium.html',
-    'app/main.js',
-    'app/native-kernel.js',
-    'app/native-kernel.html',
-    'app/native-launch.json',
-    'app/koffi.node',
-    'app/git/cmd/git.exe',
-    'app/git/ucrt64/libexec/git-core/git-credential-desktop.exe',
-    'app/desktop-trampoline/desktop-askpass-trampoline.exe',
-    'app/process-proxy.exe',
-    'app/printenvz.exe',
-    'app/copilot/prebuilds/win32-x64/copilot-runtime.exe',
-    'app/copilot/prebuilds/win32-x64/runtime.node',
-    'app/static/licenses.json',
-    'app/emoji.json',
-  ]) {
-    await file(`${runtimePath}/${path}`, `fixture ${path}`)
-  }
-  for (const path of ['app/main.js.map', 'app/native-kernel.js.map']) {
-    await json(`${runtimePath}/${path}`, {
-      sources: ['webpack://gitowl/./app/src/native-kernel/renderer.ts'],
-    })
-  }
-  await json(`${runtimePath}/app/package.json`, {
+    'node.exe',
+    'Node-LICENSE.txt',
+    'main.js',
+    'migration.js',
+    'cli.js',
+    'install-cli.js',
+    'image-worker.js',
+    'native-launch.json',
+    'koffi.node',
+    'git/cmd/git.exe',
+    'git/ucrt64/libexec/git-core/git-credential-desktop.exe',
+    'desktop-trampoline/desktop-askpass-trampoline.exe',
+    'process-proxy.exe',
+    'printenvz.exe',
+    'copilot/prebuilds/win32-x64/copilot-runtime.exe',
+    'copilot/prebuilds/win32-x64/runtime.node',
+    'static/licenses.json',
+    'emoji.json',
+  ])
+    {await file(`${runtimePath}/${path}`, `fixture ${path}`)}
+  await json(`${runtimePath}/node-runtime-sources.json`, [
+    'app/src/native-kernel/node-runtime.ts',
+  ])
+  await json(`${runtimePath}/package.json`, {
     productName: 'Gitowl',
     version: '0.1.0',
     bundleID: 'io.github.oubigfa.gitowl',
     main: 'main.js',
   })
   const runtime = await json(runtimeReceiptPath, {
-    schemaVersion: 2,
+    schemaVersion: 3,
+    host: 'node',
     originalCore: 'desktop/desktop',
     inputHash: hash('fixture-inputs'),
     buildFlags: {
       NODE_ENV: 'production',
-      GITOWL_NATIVE_BUILD: '1',
-      RELEASE_CHANNEL: 'research-preview',
+      host: 'node',
+      RELEASE_CHANNEL: 'production',
     },
     files: await inventory(join(root, runtimePath)),
   })
@@ -743,10 +743,7 @@ it('extracts actual reporter formats and rejects PASS, empty suites, skips and m
 
 it('allows the bundled Git system profile while rejecting actual profile directories', async t => {
   const f = await fixture(t)
-  await f.file(
-    `${runtimePath}/app/git/etc/profile`,
-    '# Git system shell startup\n'
-  )
+  await f.file(`${runtimePath}/git/etc/profile`, '# Git system shell startup\n')
   const receipt = JSON.parse(
     await readFile(join(f.root, runtimeReceiptPath), 'utf8')
   )
@@ -763,12 +760,12 @@ it('allows the bundled Git system profile while rejecting actual profile directo
 it('validates every runtime byte and rejects test-seed/harness files even with a rehashed receipt', async t => {
   const f = await fixture(t)
   await validateRuntime(f.root, f.runtime)
-  await f.file(`${runtimePath}/app/main.js`, 'tampered output')
+  await f.file(`${runtimePath}/main.js`, 'tampered output')
   await assert.rejects(
     validateRuntime(f.root, f.runtime),
     /Runtime bytes differ/
   )
-  await f.file(`${runtimePath}/app/main.js`, 'fixture app/main.js')
+  await f.file(`${runtimePath}/main.js`, 'fixture main.js')
   await f.file(`${runtimePath}/app/seed-profile.js`, 'test seed must not ship')
   const receipt = JSON.parse(
     await readFile(join(f.root, runtimeReceiptPath), 'utf8')
@@ -847,7 +844,7 @@ it('rejects worker self-attestation, pending findings, component screenshots and
 })
 
 it('validates the exact MyGo installed-file list, including no private or traversing entries', () => {
-  const valid = 'Gitowl.exe\nbuild-info.json\ndesktop-kernel\nicons\nlogo.png\n'
+  const valid = 'Gitowl.exe\narcmd\nbuild-info.json\nbackend\nicons\nlogo.png\n'
   validateInstalledFileList(valid)
   for (const invalid of [
     valid + 'profile\n',

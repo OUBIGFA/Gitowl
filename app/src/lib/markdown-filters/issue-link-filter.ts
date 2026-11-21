@@ -1,3 +1,4 @@
+import { markdownNodeFilter } from './document-context'
 import escapeRegExp from 'lodash/escapeRegExp'
 import { GitHubRepository } from '../../models/github-repository'
 import { getHTMLURL } from '../api'
@@ -57,15 +58,15 @@ export class IssueLinkFilter implements INodeFilter {
    * - https://github.com/github/github/discussions/99872#discussioncomment-1858985
    */
   public createFilterTreeWalker(doc: Document): TreeWalker {
-    return doc.createTreeWalker(doc.body, NodeFilter.SHOW_ELEMENT, {
+    return doc.createTreeWalker(doc.body, markdownNodeFilter().SHOW_ELEMENT, {
       acceptNode: (el: Element) => {
         return (el.parentNode !== null &&
           ['CODE', 'PRE', 'A'].includes(el.parentNode.nodeName)) ||
           !isElement(el, 'a') ||
           el.href !== el.innerText ||
           !this.isGitHubIssuePullDiscussionLink(el)
-          ? NodeFilter.FILTER_SKIP
-          : NodeFilter.FILTER_ACCEPT
+          ? markdownNodeFilter().FILTER_SKIP
+          : markdownNodeFilter().FILTER_ACCEPT
       },
     })
   }

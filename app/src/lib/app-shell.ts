@@ -1,4 +1,4 @@
-import { shell as electronShell } from 'electron'
+import { getDesktopHost } from './desktop-host'
 import * as Path from 'path'
 
 import { Repository } from '../models/repository'
@@ -45,11 +45,12 @@ export const shell: IAppShell = {
   // on Windows. Therefore, we must invoke it from the main process. See
   // https://github.com/electron/electron/issues/29598
   moveItemToTrash,
-  beep: electronShell.beep,
+  beep: () => getDesktopHost().send('beep', []),
   openExternal,
   showItemInFolder,
   showFolderContents,
-  openPath: electronShell.openPath,
+  openPath: path =>
+    getDesktopHost().invoke('open-path', [path]) as Promise<string>,
 }
 
 /**

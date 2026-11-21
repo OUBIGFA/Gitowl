@@ -62,7 +62,7 @@ describe('original Desktop runtime receipts', () => {
       join(__dirname, 'native-windows-cli.bat'),
       'utf8'
     )
-    assert.match(trampoline, /electron\.exe/)
+    assert.match(trampoline, /node\.exe/)
     assert.match(trampoline, /cli\.js/)
     assert.doesNotMatch(trampoline, /GitHubDesktop\.exe/i)
   })

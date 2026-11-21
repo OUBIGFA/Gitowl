@@ -26,40 +26,22 @@ class NativePackagingTests(unittest.TestCase):
         self.assertIn(b'GITOWL_PREVIEW_NOT_READY', result.stderr)
         self.assertEqual(installer.read_bytes() if installer.is_file() else None, before)
 
-    def test_runtime_resources_and_preview_gate_are_original_electron_only(self):
+    def test_runtime_resources_use_node_without_shipping_electron(self):
         config = json.loads((ROOT / 'app/native/mygo.json').read_text(encoding='utf-8'))
-        self.assertIn('../../output/native-runtime/desktop-kernel', config['resources'])
+        self.assertIn('../../output/native-runtime/backend', config['resources'])
+        self.assertNotIn('../../output/native-runtime/desktop-kernel', config['resources'])
         self.assertNotIn('../../output/native-runtime/service', config['resources'])
         manifest = json.loads((ROOT / 'third_party/native-runtimes.json').read_text(encoding='utf-8'))
-        self.assertEqual(manifest['schemaVersion'], 2)
-        self.assertEqual(manifest['node']['role'], 'build-tool-only')
+        self.assertEqual(manifest['schemaVersion'], 3)
+        self.assertEqual(manifest['node']['role'], 'production-backend-and-build-tool')
         self.assertEqual(manifest['packaging']['originalCore'], 'desktop/desktop')
         self.assertFalse(manifest['packaging']['presentationComplete'])
         self.assertFalse(manifest['packaging']['previewReady'])
         self.assertTrue(manifest['packaging']['blockers'])
-        electron = manifest['electron']
-        locked = json.loads((ROOT / 'package-lock.json').read_text(encoding='utf-8'))['packages']['node_modules/electron']
-        self.assertEqual(electron['version'], locked['version'])
-        self.assertEqual(electron['integrity'], locked['integrity'])
-        base = 'https://github.com/electron/electron/releases/download/v' + electron['version'] + '/'
-        self.assertEqual(electron['source'], base + 'electron-v' + electron['version'] + '-win32-x64.zip')
-        self.assertEqual(electron['checksumsSource'], base + 'SHASUMS256.txt')
-        for key in ('archiveSha256', 'checksumsSha256', 'executableSha256', 'distTreeSha256'):
-            self.assertRegex(electron[key], r'\A[0-9a-f]{64}\Z')
-        self.assertGreater(electron['distFileCount'], 20)
-        self.assertEqual({item['runtimePath'] for item in electron['licenses']}, {'LICENSE', 'LICENSES.chromium.html'})
-        for item in electron['licenses']:
-            if 'parts' in item:
-                data = b''
-                for part in item['parts']:
-                    content = (ROOT / part['path']).read_bytes()
-                    self.assertLess(len(content), 10 * 1024 * 1024)
-                    content.decode('utf-8')
-                    self.assertEqual(hashlib.sha256(content).hexdigest(), part['sha256'])
-                    data += content
-            else:
-                data = (ROOT / item['path']).read_bytes()
-            self.assertEqual(hashlib.sha256(data).hexdigest(), item['sha256'])
+        self.assertNotIn('electron', manifest)
+        self.assertEqual(manifest['host'], 'node')
+        self.assertRegex(manifest['node']['executableSha256'], r'\A[0-9a-f]{64}\Z')
+        self.assertRegex(manifest['node']['archiveSha256'], r'\A[0-9a-f]{64}\Z')
         packages = {item['package'] for item in manifest['bundledInputs']}
         self.assertTrue({'dugite', 'desktop-trampoline', 'process-proxy', 'printenvz', '@github/copilot-sdk-win32-x64', '@koromix/koffi-win32-x64'} <= packages)
         for item in manifest['bundledInputs']:

@@ -86,6 +86,27 @@ func (a *app) connectCore(initialPath string) {
 	})
 }
 
+// A notification can launch the process before its business state is ready.
+// Keep its OS ID until the original notifications store has loaded.
+func (a *app) routeCoreNotification(id string) {
+	if a.closed {
+		return
+	}
+	if a.core == nil || a.coreSnapshot == nil {
+		a.coreDeferredNotifications = append(a.coreDeferredNotifications, id)
+		return
+	}
+	go func() {
+		if err := a.core.PlatformEvent(a.ctx, "notification-event", "click", id); err != nil {
+			a.update(func() {
+				if !a.closed {
+					a.openErr = err
+				}
+			})
+		}
+	}()
+}
+
 func coreFiles(files []backend.KernelFile) []backend.File {
 	out := make([]backend.File, len(files))
 	for i, file := range files {
@@ -136,6 +157,13 @@ func (a *app) applyCoreSnapshot(snapshot backend.KernelSnapshot) {
 		a.setCoreTheme(snapshot.Appearance.Theme)
 	}
 	a.coreSnapshot = &snapshot
+	if len(a.coreDeferredNotifications) > 0 {
+		pending := a.coreDeferredNotifications
+		a.coreDeferredNotifications = nil
+		for _, id := range pending {
+			a.routeCoreNotification(id)
+		}
+	}
 	if !snapshot.Welcome && len(a.coreDeferredLaunches) > 0 {
 		pending := a.coreDeferredLaunches
 		a.coreDeferredLaunches = nil
@@ -279,6 +307,25 @@ func (a *app) coreReference() (backend.KernelRepositoryReference, bool) {
 func (a *app) receiveCoreEvent(event backend.KernelEvent) {
 	if a.closed {
 		return
+	}
+	if event.Platform != nil {
+		request, perform, core, ctx := *event.Platform, a.corePlatform, a.core, a.ctx
+		go func() {
+			var value any
+			var err error
+			if perform == nil {
+				err = errors.New("native platform service is unavailable")
+			} else {
+				value, err = perform(ctx, request)
+			}
+			if replyErr := core.ReplyPlatform(ctx, request.ID, value, err); replyErr != nil {
+				a.update(func() {
+					if !a.closed {
+						a.openErr = replyErr
+					}
+				})
+			}
+		}()
 	}
 	if event.Dialog != nil {
 		request, choose, core, ctx := *event.Dialog, a.chooseFile, a.core, a.ctx

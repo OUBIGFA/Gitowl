@@ -1,5 +1,6 @@
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
+import { withMarkdownDocument } from '../../lib/markdown-filters/document-context'
 import {
   buildCustomMarkDownNodeFilterPipe,
   ICustomMarkdownFilterOptions,
@@ -53,15 +54,34 @@ export async function dialogMarkdownLinks(
   baseHref?: string,
   cancelled: () => boolean = () => false
 ) {
-  const doc = document.implementation.createHTMLDocument('')
-  if (baseHref !== undefined) {
-    const base = doc.createElement('base')
-    base.href = baseHref
-    doc.head.append(base)
+  // JSDOM supplies an inert parser only: no scripts, resources, browser globals
+  // or visible HTML are installed. Keep the existing sanitizer/filter pipeline.
+  const dom =
+    typeof document === 'undefined'
+      ? new (await import('jsdom')).JSDOM('', {
+          url: baseHref ?? 'https://github.com/',
+        })
+      : undefined
+  const doc =
+    dom?.window.document ?? document.implementation.createHTMLDocument('')
+  try {
+    if (baseHref !== undefined) {
+      const base = doc.createElement('base')
+      base.href = baseHref
+      doc.head.append(base)
+    }
+    doc.body.innerHTML = dom
+      ? DOMPurify(
+          dom.window as unknown as Parameters<typeof DOMPurify>[0]
+        ).sanitize(marked(markdown, { gfm: true, breaks: true }))
+      : sanitizeDialogMarkdown(markdown)
+    await withMarkdownDocument(doc, () =>
+      applyDialogMarkdownFilters(doc, options, cancelled, () => {})
+    )
+    return Array.from(doc.querySelectorAll('a'))
+      .filter(a => /^https?:/.test(a.protocol))
+      .map(a => ({ label: a.textContent ?? a.href, url: a.href }))
+  } finally {
+    dom?.window.close()
   }
-  doc.body.innerHTML = sanitizeDialogMarkdown(markdown)
-  await applyDialogMarkdownFilters(doc, options, cancelled, () => {})
-  return Array.from(doc.querySelectorAll('a'))
-    .filter(a => /^https?:/.test(a.protocol))
-    .map(a => ({ label: a.textContent ?? a.href, url: a.href }))
 }

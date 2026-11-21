@@ -1,4 +1,11 @@
-function getItemId(template: Electron.MenuItemConstructorOptions) {
+interface IIdentifiedMenuItem {
+  id?: string
+  label?: string
+  role?: string
+  submenu?: unknown
+}
+
+function getItemId(template: IIdentifiedMenuItem) {
   return template.id || template.label || template.role || 'unknown'
 }
 
@@ -14,7 +21,7 @@ function getItemId(template: Electron.MenuItemConstructorOptions) {
  * explicitly been given duplicate ids.
  */
 export function ensureItemIds(
-  template: ReadonlyArray<Electron.MenuItemConstructorOptions>,
+  template: ReadonlyArray<IIdentifiedMenuItem>,
   prefix = '@',
   seenIds = new Set<string>()
 ) {
@@ -34,9 +41,8 @@ export function ensureItemIds(
     item.id = id
     seenIds.add(id)
 
-    if (item.submenu) {
-      const subMenuTemplate =
-        item.submenu as ReadonlyArray<Electron.MenuItemConstructorOptions>
+    if (Array.isArray(item.submenu)) {
+      const subMenuTemplate = item.submenu as ReadonlyArray<IIdentifiedMenuItem>
       ensureItemIds(subMenuTemplate, item.id, seenIds)
     }
   }

@@ -23,6 +23,7 @@ import { DesktopNotificationPermission } from 'desktop-notifications'
 import { NotificationCallback } from 'desktop-notifications'
 import { DesktopAliveEvent } from './stores/alive-store'
 import { CLIAction } from './cli-action'
+import type { UiActivityKind } from '../ui/lib/ui-activity-monitor'
 
 /** Initialization failed before the original renderer became ready. */
 type NativeKernelInitializationFailure = 'initialization'
@@ -34,6 +35,7 @@ type NativeKernelInitializationFailure = 'initialization'
  * the two over the untyped IPC framework.
  */
 export type RequestChannels = {
+  'native-activity': (kind: UiActivityKind) => void
   'native-kernel-request': (request: INativeKernelRequest) => void
   'native-kernel-response': (response: NativeKernelResponse) => void
   'native-kernel-state': (snapshot: NativeKernelStatePush) => void

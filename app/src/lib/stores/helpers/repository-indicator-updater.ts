@@ -1,3 +1,4 @@
+import { scheduleTimeout, cancelTimer, HostTimer } from '../../host-timers'
 import { Repository } from '../../../models/repository'
 
 /**
@@ -18,7 +19,7 @@ const skew = Math.ceil(Math.random() * SkewUpperBound)
 
 export class RepositoryIndicatorUpdater {
   private running = false
-  private refreshTimeoutId: number | null = null
+  private refreshTimeoutId: HostTimer | null = null
   private paused = false
   private pausePromise: Promise<void> = Promise.resolve()
   private resolvePausePromise: (() => void) | null = null
@@ -61,7 +62,7 @@ export class RepositoryIndicatorUpdater {
         `[RepositoryIndicatorUpdater] Last refresh: ${lastRefreshText}, scheduling in ${timeoutText}`
       )
 
-      this.refreshTimeoutId = window.setTimeout(
+      this.refreshTimeoutId = scheduleTimeout(
         () => this.refreshAllRepositories(),
         timeout
       )
@@ -129,7 +130,7 @@ export class RepositoryIndicatorUpdater {
 
   private clearRefreshTimeout() {
     if (this.refreshTimeoutId !== null) {
-      window.clearTimeout(this.refreshTimeoutId)
+      cancelTimer(this.refreshTimeoutId)
       this.refreshTimeoutId = null
     }
   }

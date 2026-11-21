@@ -1,3 +1,4 @@
+import { scheduleInterval, cancelTimer, HostTimer } from '../host-timers'
 import pLimit from 'p-limit'
 import QuickLRU from 'quick-lru'
 
@@ -126,7 +127,7 @@ export class CommitStatusStore {
   /** The list of signed-in accounts, kept in sync with the accounts store */
   private accounts: ReadonlyArray<Account> = []
 
-  private backgroundRefreshHandle: number | null = null
+  private backgroundRefreshHandle: HostTimer | null = null
   private refreshQueued = false
 
   /**
@@ -196,7 +197,7 @@ export class CommitStatusStore {
    */
   public startBackgroundRefresh() {
     if (this.backgroundRefreshHandle === null) {
-      this.backgroundRefreshHandle = window.setInterval(
+      this.backgroundRefreshHandle = scheduleInterval(
         () => this.queueRefresh(),
         BackgroundRefreshInterval
       )
@@ -214,7 +215,7 @@ export class CommitStatusStore {
    */
   public stopBackgroundRefresh() {
     if (this.backgroundRefreshHandle !== null) {
-      window.clearInterval(this.backgroundRefreshHandle)
+      cancelTimer(this.backgroundRefreshHandle)
       this.backgroundRefreshHandle = null
     }
   }

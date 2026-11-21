@@ -1,3 +1,4 @@
+import { scheduleInterval, HostTimer } from '../../host-timers'
 import {
   Repository,
   isRepositoryWithGitHubRepository,
@@ -60,7 +61,7 @@ const DefaultPruneOptions: PruneRuntimeOptions = {
 }
 
 export class BranchPruner {
-  private timer: number | null = null
+  private timer: HostTimer | null = null
 
   public constructor(
     private readonly repository: Repository,
@@ -82,7 +83,7 @@ export class BranchPruner {
     }
 
     await this.pruneLocalBranches(DefaultPruneOptions)
-    this.timer = window.setInterval(
+    this.timer = scheduleInterval(
       () => this.pruneLocalBranches(DefaultPruneOptions),
       BackgroundPruneMinimumInterval
     )

@@ -14,6 +14,8 @@ Gitowl 基于 [GitHub Desktop](https://github.com/desktop/desktop) 的公开源�
 
 2026-11-20 起不再要求完整复用上游内核。同步与刷新提速的成熟方案调查见 [performance-evaluation.md](performance-evaluation.md)；本轮没有复制参考客户端代码或新增运行时依赖。
 
+2026-11-21 的后台迁移直接复用现有 Git/账户/恢复实现，将生产宿主改为 Node。SQLite 存储、ImageMagick/UPNG 解码、Undici 网络与独立 Markdown 解析组件的精确版本、源包和许可证见 [native-runtimes.json](native-runtimes.json)。完整用途与迁移方式见 [后台说明](../references/node-backend.md)。保留的 Electron 许可证和旧入口用于上游/迁移对照，不进入新生产包。
+
 原生图标采用未修改的 Lucide 资源，版本、许可和每个文件的校验见 [native-icons.json](native-icons.json)；上游图标预览采用原 @primer/octicons SVG，完整登记见 [octicons.json](octicons.json)。设计审查使用 Impeccable 的操作型界面/重设计指引，以及 Damir Sokolovsky（[@heydamir](https://github.com/heydamir/unslop)）的 unslop 检查清单；开发工具版本、执行范围与许可证见 [design-tools.json](design-tools.json)。它们不进入应用运行时，HTML/CSS 检测结果也不用于宣称 MyGo 原生界面通过验收。
 
 小型公开测试夹具可以进入 `references/` 或现有测试夹具目录；模型、字体、安装包、真实用户数据、下载缓存和未确认许可的二进制资源放在被忽略的 `.local/` 或发布资产中。需要公开分发的第三方材料先补齐来源、版权、SPDX 标识、文件 SHA-256 和修改范围，再进入源码或构建流程。

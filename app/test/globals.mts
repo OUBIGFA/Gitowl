@@ -3,6 +3,11 @@ import 'global-jsdom/register'
 import { mock } from 'node:test'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { EventEmitter } from 'node:events'
+import { createRequire } from 'node:module'
+const { installDesktopHost } = createRequire(import.meta.url)(
+  '../src/lib/desktop-host'
+) as typeof import('../src/lib/desktop-host')
 
 // These constants are defined by Webpack at build time, but since tests aren't
 // built with Webpack we need to make sure these exist at runtime.
@@ -42,6 +47,7 @@ Object.assign(globalThis, {
   BroadcastChannel: undefined,
 })
 
+const fixtureEvents = new EventEmitter()
 mock.module('electron', {
   namedExports: {
     shell: {
@@ -57,7 +63,35 @@ mock.module('electron', {
           ? join(tmpdir(), 'desktop-unit', `${name}`)
           : undefined
       ),
-      on: mock.fn(x => {}),
+      on: fixtureEvents.on.bind(fixtureEvents),
+      once: fixtureEvents.once.bind(fixtureEvents),
+      removeListener: fixtureEvents.removeListener.bind(fixtureEvents),
+      emit: fixtureEvents.emit.bind(fixtureEvents),
     },
   },
+})
+
+// Existing store tests replace this historical boundary. Route that fixture to
+// the new host so the same behavior assertions keep exercising the real stores.
+const boundary = await import('electron')
+const events = new EventEmitter()
+events.on = ((channel, callback) => {
+  boundary.ipcRenderer.on(String(channel), callback)
+  return events
+}) as typeof events.on
+events.once = ((channel, callback) => {
+  boundary.ipcRenderer.once(String(channel), callback)
+  return events
+}) as typeof events.once
+events.removeListener = ((channel, callback) => {
+  boundary.ipcRenderer.removeListener(String(channel), callback)
+  return events
+}) as typeof events.removeListener
+events.emit = ((channel, ...args) =>
+  boundary.ipcRenderer.emit(channel, ...args)) as typeof events.emit
+installDesktopHost({
+  userData: join(tmpdir(), 'desktop-unit'),
+  events,
+  send: (channel, args) => boundary.ipcRenderer.send(channel, ...args),
+  invoke: (channel, args) => boundary.ipcRenderer.invoke(channel, ...args),
 })

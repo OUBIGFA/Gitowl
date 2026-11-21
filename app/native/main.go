@@ -1,6 +1,5 @@
-// Gitowl's visible frontend is MyGo native UI. Its production launch connects
-// to the original Desktop Electron kernel; the old reduced Node/Git service is
-// no longer a launcher option or a substitute for the full upstream runtime.
+// Gitowl's MyGo frontend owns the native window and platform APIs. The single
+// Node backend runs the directly reused Git/account/recovery business runtime.
 package main
 
 import (
@@ -28,16 +27,16 @@ func main() {
 	}
 	options, err := parseNativeLaunchOptions(os.Args[1:], workingDirectory)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Gitowl usage: gitowl [-kernel main.js] [-electron electron.exe] [repository-path]", err)
+		fmt.Fprintln(os.Stderr, "Gitowl usage: gitowl [-kernel main.js] [-node node.exe] [repository-path]", err)
 		os.Exit(2)
 	}
-	if err := run(options.entry, options.electron, options.openPath, options.profile, options); err != nil {
+	if err := run(options.entry, options.node, options.openPath, options.profile, options); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
 
-func run(entry, electron, initialPath, profile string, initialLaunch nativeLaunchOptions) error {
+func run(entry, node, initialPath, profile string, initialLaunch nativeLaunchOptions) error {
 	// Respect mygo dev's isolated name and its linked product identity. Plain
 	// go builds have no identity; normal packaged name/version never change.
 	packaged := mygo.App.Version() != ""
@@ -50,6 +49,7 @@ func run(entry, electron, initialPath, profile string, initialLaunch nativeLaunc
 			return errors.New("isolated --user-data is an absolute development-only path")
 		}
 		mygo.App.SetPath(mygo.PathUserData, profile)
+		mygo.App.SetName(nativeProfileIdentity(profile))
 	}
 	// Take the visible application's lock before spawning its one kernel. A
 	// second presenter cannot create a second repository/account state owner.
@@ -58,7 +58,7 @@ func run(entry, electron, initialPath, profile string, initialLaunch nativeLaunc
 	}
 	resources, resourceErr := mygo.App.Path(mygo.PathResources)
 	userData, userDataErr := mygo.App.Path(mygo.PathUserData)
-	config, configErr := backend.ResolveKernelConfig(resources, userData, entry, electron)
+	config, configErr := backend.ResolveKernelConfig(resources, userData, entry, node)
 	logo, logoErr := loadLogo(resources)
 	a := newCoreApp(nil, logo)
 	a.serviceErr, a.logoErr = errors.Join(resourceErr, userDataErr, configErr), logoErr
@@ -100,6 +100,7 @@ func run(entry, electron, initialPath, profile string, initialLaunch nativeLaunc
 		}
 	})
 	mygo.App.OnOpenURL(launches.openURL)
+	mygo.App.OnNotificationClick(a.routeCoreNotification)
 	mygo.App.WhenReady(func() {
 		win = mygo.NewWindow(mygo.WindowOptions{
 			Title: locales.AppName(), Width: 1180, Height: 760, MinWidth: 900, MinHeight: 620,
@@ -108,6 +109,20 @@ func run(entry, electron, initialPath, profile string, initialLaunch nativeLaunc
 		})
 		a.setCoreTheme = func(source string) { mygo.Theme.SetSource(mygo.ThemeSource(source)) }
 		a.update, a.setLocale, a.openExternal = win.Update, mygo.App.SetLocale, mygo.Shell.OpenExternal
+		a.corePlatform = nativePlatformRequest
+		mygo.Theme.OnUpdated(func() {
+			if a.core != nil {
+				go func() {
+					if err := a.core.PlatformEvent(a.ctx, "native-theme-updated"); err != nil {
+						a.update(func() {
+							if !a.closed {
+								a.openErr = err
+							}
+						})
+					}
+				}()
+			}
+		})
 		a.localeOverride = mygo.App.ChosenLocale
 		a.settingsWorkArea = func() (float32, float32) {
 			outer, content := win.Bounds(), win.ContentBounds()
@@ -299,7 +314,28 @@ func run(entry, electron, initialPath, profile string, initialLaunch nativeLaunc
 		})
 		if a.serviceErr == nil {
 			var err error
-			core, err = backend.StartKernel(config, func(event backend.KernelEvent) { win.Update(func() { a.receiveCoreEvent(event) }) })
+			legacyChecked := false
+			core, err = backend.StartKernel(config, func(event backend.KernelEvent) {
+				win.Update(func() {
+					a.receiveCoreEvent(event)
+					if packaged && event.Snapshot != nil && !legacyChecked {
+						legacyChecked = true
+						go func() {
+							path, err := legacyRuntimeDirectory(resources, userData)
+							if err == nil && path != "" {
+								err = mygo.Shell.TrashItem(path)
+							}
+							if err != nil {
+								win.Update(func() {
+									if !a.closed {
+										a.openErr = fmt.Errorf("previous runtime retained: %w", err)
+									}
+								})
+							}
+						}()
+					}
+				})
+			})
 			a.core, a.serviceErr = core, err
 			if core != nil {
 				go func() { <-core.Done(); win.Update(func() { a.serviceStopped(core.Err()) }) }()

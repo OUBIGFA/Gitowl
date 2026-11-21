@@ -1,3 +1,4 @@
+import fixtures from '../../../references/native-image-codecs.json'
 import assert from 'node:assert/strict'
 import { after, describe, it } from 'node:test'
 import { Image } from '../../src/models/diff'
@@ -13,66 +14,17 @@ after(() => window.close())
 
 describe('bounded original image presentation', () => {
   it('releases replaced owner media, retains covered media, and decodes exact contents rather than pooled backing bytes', async t => {
-    const previous = Object.getOwnPropertyDescriptor(globalThis, 'ImageDecoder')
-    const instances: Array<{ closed: boolean; data: Uint8Array }> = []
-    class Decoder {
-      public static async isTypeSupported() {
-        return true
-      }
-      public closed = false
-      public tracks = {
-        ready: Promise.resolve(),
-        selectedTrack: { frameCount: 2, repetitionCount: 0 },
-      }
-      public data: Uint8Array
-      public constructor(options: { data: Uint8Array }) {
-        this.data = options.data
-        instances.push(this)
-      }
-      public async decode() {
-        return {
-          image: {
-            displayWidth: 1,
-            displayHeight: 1,
-            codedWidth: 1,
-            codedHeight: 1,
-            visibleRect: { x: 0, y: 0, width: 1, height: 1 },
-            duration: 100000,
-            allocationSize: () => 4,
-            copyTo: async (to: Uint8Array) => {
-              to.set([255, 0, 0, 128])
-              return [{ offset: 0, stride: 4 }]
-            },
-            close: () => {},
-          },
-        }
-      }
-      public close() {
-        this.closed = true
-      }
-    }
-    Object.defineProperty(globalThis, 'ImageDecoder', {
-      value: Decoder,
-      configurable: true,
-    })
-    t.after(() => {
-      withMediaProjection(() => null)
-      if (previous) {
-        Object.defineProperty(globalThis, 'ImageDecoder', previous)
-      } else {
-        Reflect.deleteProperty(globalThis, 'ImageDecoder')
-      }
-    })
+    t.after(() => withMediaProjection(() => null))
     const owner = {}
     const a = new Image(
       new Uint8Array([99, 98, 97]).buffer,
-      Buffer.from('exact-first').toString('base64'),
+      fixtures.webp.contents,
       'image/webp',
       11
     )
     const b = new Image(
       new Uint8Array([99, 98, 97]).buffer,
-      Buffer.from('exact-second').toString('base64'),
+      fixtures.webp.previous,
       'image/webp',
       12
     )
@@ -89,30 +41,23 @@ describe('bounded original image presentation', () => {
         frame: 0,
         offset: 0,
       })
-    await read(first.mediaID!)
-    assert.equal(Buffer.from(instances[0].data).toString(), 'exact-first')
+    const frame = await read(first.mediaID!)
+    assert.equal(frame.width, 17)
+    assert.equal(frame.frames, 2)
+    assert.equal(Buffer.from(frame.contents, 'base64')[0], 255)
     const refreshed = project(
       new Image(new ArrayBuffer(0), a.contents, a.mediaType, a.bytes)
     )
     assert.equal(refreshed.mediaID, first.mediaID)
     await read(first.mediaID!)
-    assert.equal(
-      instances.length,
-      1,
-      'unchanged original image refresh restarted the codec'
-    )
     const second = project(b)
-    assert.equal(instances[0].closed, true)
     await assert.rejects(read(first.mediaID!), /no longer displayed/)
     await read(second.mediaID!)
     withMediaProjection(() => null, [owner])
     await read(second.mediaID!)
-    assert.equal(instances.length, 2)
-    assert.equal(instances[1].closed, false)
     withMediaProjection(() => {
       projectKernelMediaOwner(owner)
     }, [owner])
-    assert.equal(instances[1].closed, true)
     await assert.rejects(read(second.mediaID!), /no longer displayed/)
   })
 

@@ -26,6 +26,8 @@ export function initializeRendererNotificationHandler(
     // For notifications without a callback (from previous app sessions), we'll
     // let the notifications store to retreive the necessary data and handle
     // the event.
-    notificationsStore.onNotificationEventReceived(event, id, userInfo)
+    if (userInfo != null) {
+      notificationsStore.onNotificationEventReceived(event, id, userInfo)
+    }
   })
 }

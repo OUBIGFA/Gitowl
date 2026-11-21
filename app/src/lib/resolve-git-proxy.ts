@@ -1,9 +1,23 @@
 import { resolveProxy } from '../ui/main-process-proxy'
 import { parsePACString } from './parse-pac-string'
+import { getDesktopHost } from './desktop-host'
 
 export async function resolveGitProxy(
   url: string
 ): Promise<string | undefined> {
+  if (process.env.GITOWL_NODE_CORE === '1') {
+    // Preserve credentials and the selected proxy URL from the real system
+    // resolver. Resolution failure must not silently change network routing.
+    const proxy = (await getDesktopHost().invoke('resolve-proxy-url', [
+      url,
+    ])) as string | null
+    if (proxy !== null && __WIN32__ && proxy.startsWith('https://')) {
+      throw new Error(
+        'The bundled Git TLS backend does not support the configured HTTPS proxy'
+      )
+    }
+    return proxy ?? undefined
+  }
   // resolveProxy doesn't throw an error (at least not in the
   // current Electron version) but it could in the future and
   // it's also possible that the IPC layer could throw an

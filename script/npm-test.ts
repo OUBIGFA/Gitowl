@@ -78,14 +78,14 @@ require(process.argv[1])`,
     assert.match(stdout, /registry-js-v1\.16\.0-napi-v3-win32-x64\.tar\.gz/)
   })
 
-  it('skips only Koffi install scripts, preserving other native hooks', async t => {
+  it('blocks Koffi install scripts and runs explicitly approved native hooks', async t => {
     const root = await realpath(await createTempDirectory(t))
     const app: { readonly allowScripts?: Readonly<Record<string, boolean>> } =
       JSON.parse(
         await readFile(resolve(__dirname, '../app/package.json'), 'utf8')
       )
     await cp(resolve(__dirname, '../.npmrc'), join(root, '.npmrc'))
-    for (const name of ['koffi', 'other-native']) {
+    for (const name of ['koffi', 'canvas']) {
       const packageRoot = join(root, 'node_modules', name)
       await mkdir(packageRoot, { recursive: true })
       await writeFile(
@@ -109,7 +109,7 @@ require(process.argv[1])`,
         allowScripts: app.allowScripts,
         dependencies: {
           koffi: '1.0.0',
-          'other-native': '1.0.0',
+          canvas: '1.0.0',
         },
       })
     )
@@ -121,10 +121,10 @@ require(process.argv[1])`,
         packages: {
           '': {
             name: 'native-install-policy-test',
-            dependencies: { koffi: '1.0.0', 'other-native': '1.0.0' },
+            dependencies: { koffi: '1.0.0', canvas: '1.0.0' },
           },
           ...Object.fromEntries(
-            ['koffi', 'other-native'].map(name => [
+            ['koffi', 'canvas'].map(name => [
               `node_modules/${name}`,
               {
                 version: '1.0.0',
@@ -150,7 +150,7 @@ require(process.argv[1])`,
       code: 'ENOENT',
     })
     assert.equal(
-      await readFile(join(root, 'node_modules/other-native/hook-ran'), 'utf8'),
+      await readFile(join(root, 'node_modules/canvas/hook-ran'), 'utf8'),
       'yes'
     )
   })

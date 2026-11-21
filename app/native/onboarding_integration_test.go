@@ -38,11 +38,13 @@ func TestOriginalKernelFreshProfileCompletesNativeWelcome(t *testing.T) {
 			t.Setenv("GIT_CONFIG_GLOBAL", global)
 			t.Setenv("GIT_CONFIG_NOSYSTEM", "1")
 			t.Setenv("TEST_ENV", "1")
-			entry := filepath.Join(runtime, "app", "main.js")
+			entry := filepath.Join(runtime, "main.js")
 			updates := make(chan func(), 1000)
 			a := newCoreApp(nil, nil)
+			a.corePlatform = kernelTestPlatform(work)
+			seedKernelTestSettings(t, filepath.Join(runtime, "node.exe"), filepath.Join(work, "profile"), false)
 			a.update = func(fn func()) { updates <- fn }
-			core, err := backend.StartKernel(backend.KernelConfig{Electron: filepath.Join(runtime, "electron.exe"), Entry: entry, UserData: filepath.Join(work, "profile")}, func(event backend.KernelEvent) {
+			core, err := backend.StartKernel(backend.KernelConfig{Node: filepath.Join(runtime, "node.exe"), Entry: entry, UserData: filepath.Join(work, "profile")}, func(event backend.KernelEvent) {
 				updates <- func() { a.receiveCoreEvent(event) }
 			})
 			if err != nil {
@@ -105,7 +107,7 @@ func TestOriginalKernelFreshProfileCompletesNativeWelcome(t *testing.T) {
 			if a.coreSnapshot.Onboarding != nil {
 				t.Fatal("the native UI kept an independent completed Welcome state")
 			}
-			git := filepath.Join(runtime, "app", "git", "cmd", "git.exe")
+			git := filepath.Join(runtime, "git", "cmd", "git.exe")
 			for key, value := range map[string]string{"user.name": "Native First Run", "user.email": "first-run@example.invalid"} {
 				cmd := exec.Command(git, "config", "--file", global, "--get", key)
 				out, err := cmd.CombinedOutput()

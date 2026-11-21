@@ -1,0 +1,586 @@
+import { createInterface, Interface } from 'readline'
+import { Readable, Writable } from 'stream'
+import { EventEmitter } from 'events'
+import type {
+  INativeKernelRequest,
+  NativeKernelResponse,
+  INativeKernelSnapshot,
+} from './protocol'
+import type { NativeKernelStatePush } from './snapshot-sections'
+import type { AppMenuPresentationAction } from '../ui/app-menu-controller'
+import { isRecord } from '../lib/is-record'
+import { parseKernelCommand } from './command-validation'
+import type { NativeWindowAction } from './protocol'
+import type { WindowState } from '../lib/window-state'
+
+/** Window facts come from the actual native presenter, not a hidden browser. */
+export interface INativeWindowState {
+  readonly visible: boolean
+  readonly focused: boolean
+  readonly minimized: boolean
+  readonly state: WindowState
+  readonly zoom: number
+}
+
+export type NativeKernelFailurePhase =
+  | 'initialization'
+  | 'load'
+  | 'renderer'
+  | 'main'
+
+export interface INativeWindowPresentation {
+  showFileDialog(
+    kind: 'open' | 'save',
+    options: Electron.OpenDialogOptions | Electron.SaveDialogOptions
+  ): Promise<ReadonlyArray<string>>
+  action(action: NativeWindowAction): void
+  getState(): INativeWindowState
+  setZoom(factor: number): void
+  fail(phase: NativeKernelFailurePhase): void
+}
+
+function validID(id: unknown): id is number {
+  return typeof id === 'number' && Number.isSafeInteger(id) && id > 0
+}
+
+function windowState(value: unknown): INativeWindowState | undefined {
+  if (
+    !isRecord(value) ||
+    typeof value.visible !== 'boolean' ||
+    typeof value.focused !== 'boolean' ||
+    typeof value.minimized !== 'boolean' ||
+    !['normal', 'maximized', 'minimized', 'full-screen', 'hidden'].includes(
+      value.state as string
+    ) ||
+    typeof value.zoom !== 'number' ||
+    !Number.isFinite(value.zoom) ||
+    value.zoom < 0.25 ||
+    value.zoom > 5
+  ) {
+    return undefined
+  }
+  return {
+    visible: value.visible,
+    focused: value.focused,
+    minimized: value.minimized,
+    state: value.state as WindowState,
+    zoom: value.zoom,
+  }
+}
+
+/**
+ * The existing native pipe protocol, moved out of Electron without changing
+ * admission, EOF, write-outcome or shutdown ordering. The one Node handler owns
+ * business execution; the MyGo parent still owns presentation and OS actions.
+ */
+export class NodeKernelTransport implements INativeWindowPresentation {
+  private handler: ((request: INativeKernelRequest) => void) | undefined
+  public readonly events = new EventEmitter()
+  private attached = false
+  private ready = false
+  private readonly queued = new Map<
+    number,
+    ReturnType<typeof parseKernelCommand>
+  >()
+  private readonly pending = new Set<number>()
+  private state: INativeWindowState = {
+    visible: false,
+    focused: false,
+    minimized: false,
+    state: 'normal',
+    zoom: 1,
+  }
+  private lines: Interface | undefined
+  private outputError: Error | undefined
+  private inputClosed = false
+  private failed = false
+  private writes = 0
+  private quitStarted = false
+  private nextDialogID = 0
+  private nextExternalID = 0
+  private nextPlatformID = 0
+  private readonly platform = new Map<
+    number,
+    {
+      resolve: (value: unknown) => void
+      reject: (error: Error) => void
+    }
+  >()
+  private readonly external = new Map<number, (opened: boolean) => void>()
+  private readonly dialogs = new Map<
+    number,
+    {
+      resolve: (paths: ReadonlyArray<string>) => void
+      reject: (error: Error) => void
+    }
+  >()
+
+  public constructor(
+    private readonly input: Readable,
+    private readonly output: Writable,
+    private readonly quit: (exitCode: number) => void
+  ) {
+    this.output.on('error', error => this.outputFailed(error))
+    this.input.once('end', () => this.quitWhenSettled())
+    void this.read().catch(error => {
+      log.error('Native kernel input failed', error)
+      this.stopAdmission()
+    })
+  }
+
+  public attach(handler: (request: INativeKernelRequest) => void): void {
+    if (this.attached)
+      {throw new Error('A native transport already owns its command handler')}
+    this.attached = true
+    this.handler = handler
+  }
+
+  public publish(
+    snapshot: NativeKernelStatePush | INativeKernelSnapshot
+  ): void {
+    if (this.failed || this.outputError) {return}
+    this.ready = true
+    this.send({ jsonrpc: '2.0', method: 'kernel.state', params: snapshot })
+    for (const [id, command] of this.queued) {this.handler!({ id, command })}
+    this.queued.clear()
+  }
+
+  public respond(response: NativeKernelResponse): void {
+    if (!this.pending.delete(response.id)) {return}
+    this.send({ jsonrpc: '2.0', ...response })
+    this.quitWhenSettled()
+  }
+
+  public presentation(action: AppMenuPresentationAction): void {
+    this.send({
+      jsonrpc: '2.0',
+      method: 'kernel.presentation',
+      params: { action },
+    })
+  }
+
+  /** Failure never turns an already-dispatched write into a claimed cancellation. */
+  public fail(phase: NativeKernelFailurePhase): void {
+    if (this.failed || this.quitStarted) {
+      return
+    }
+    this.failed = true
+    this.ready = false
+    this.send({
+      jsonrpc: '2.0',
+      method: 'kernel.failure',
+      params: {
+        phase,
+        message:
+          'Desktop kernel failed; inspect the application logs before retrying an operation',
+      },
+    })
+    for (const id of this.pending) {
+      this.send({
+        jsonrpc: '2.0',
+        id,
+        error: {
+          code: -32000,
+          message: this.queued.has(id)
+            ? 'Desktop kernel failed before this action was started'
+            : 'Desktop kernel stopped; this operation may already have changed the repository',
+        },
+      })
+    }
+    this.pending.clear()
+    this.queued.clear()
+    this.handler = undefined
+    this.stopAdmission()
+  }
+
+  public fatal(): void {
+    this.fail('main')
+  }
+
+  public action(action: NativeWindowAction): void {
+    this.send({ jsonrpc: '2.0', method: 'window.action', params: { action } })
+  }
+
+  public getState(): INativeWindowState {
+    return this.state
+  }
+
+  public setZoom(factor: number): void {
+    this.send({ jsonrpc: '2.0', method: 'window.zoom', params: { factor } })
+  }
+
+  /** The visible MyGo window owns system pickers; the hidden renderer only
+   * consumes their original result. Replies bypass the waiting command queue. */
+  public showFileDialog(
+    kind: 'open' | 'save',
+    options: Electron.OpenDialogOptions | Electron.SaveDialogOptions
+  ): Promise<ReadonlyArray<string>> {
+    if (this.inputClosed || this.failed || this.outputError) {
+      return Promise.resolve([])
+    }
+    return new Promise((resolve, reject) => {
+      const id = ++this.nextDialogID
+      this.dialogs.set(id, { resolve, reject })
+      this.send({
+        jsonrpc: '2.0',
+        method: 'dialog.request',
+        params: { id, kind, options },
+      })
+    })
+  }
+
+  /** Launch from the visible native process, which owns foreground permission.
+   * The original shell/OAuth caller keeps its boolean result and continuation. */
+  public openExternal(url: string): Promise<boolean> {
+    if (this.inputClosed || this.failed || this.outputError) {
+      return Promise.resolve(false)
+    }
+    return new Promise(resolve => {
+      const id = ++this.nextExternalID
+      this.external.set(id, resolve)
+      this.send({
+        jsonrpc: '2.0',
+        method: 'external.open',
+        params: { id, url },
+      })
+    })
+  }
+
+  /** OS work is performed by the real MyGo parent. A missing parent or failed
+   * operation remains an error, never a successful no-op platform substitute.
+   */
+  public requestPlatform(
+    operation: string,
+    args: ReadonlyArray<unknown>
+  ): Promise<unknown> {
+    if (this.inputClosed || this.failed || this.outputError) {
+      return Promise.reject(
+        new Error('The native presentation host is unavailable')
+      )
+    }
+    return new Promise((resolve, reject) => {
+      const id = ++this.nextPlatformID
+      this.platform.set(id, { resolve, reject })
+      this.send({
+        jsonrpc: '2.0',
+        method: 'platform.request',
+        params: { id, operation, args },
+      })
+    })
+  }
+
+  private receivePlatformResult(id: number, value: unknown): void {
+    if (
+      !isRecord(value) ||
+      !validID(value.id) ||
+      !this.platform.has(value.id) ||
+      (value.error !== null && typeof value.error !== 'string')
+    ) {
+      this.send({
+        jsonrpc: '2.0',
+        id,
+        error: { code: -32602, message: 'Invalid native platform result' },
+      })
+      return
+    }
+    const pending = this.platform.get(value.id)!
+    this.platform.delete(value.id)
+    if (value.error !== null) {pending.reject(new Error(value.error))}
+    else {pending.resolve(value.value)}
+    this.send({ jsonrpc: '2.0', id, result: { received: true } })
+  }
+
+  private receiveExternalResult(id: number, value: unknown): void {
+    if (
+      !isRecord(value) ||
+      !validID(value.id) ||
+      typeof value.opened !== 'boolean' ||
+      !this.external.has(value.id)
+    ) {
+      this.send({
+        jsonrpc: '2.0',
+        id,
+        error: { code: -32602, message: 'Invalid native browser result' },
+      })
+      return
+    }
+    const complete = this.external.get(value.id)!
+    this.external.delete(value.id)
+    complete(value.opened)
+    this.send({ jsonrpc: '2.0', id, result: { received: true } })
+  }
+
+  private receiveDialogResult(id: number, value: unknown): void {
+    if (
+      !isRecord(value) ||
+      !validID(value.id) ||
+      !Array.isArray(value.paths) ||
+      !value.paths.every(path => typeof path === 'string') ||
+      (value.error !== null && typeof value.error !== 'string') ||
+      !this.dialogs.has(value.id)
+    ) {
+      this.send({
+        jsonrpc: '2.0',
+        id,
+        error: { code: -32602, message: 'Invalid native dialog result' },
+      })
+      return
+    }
+    const pending = this.dialogs.get(value.id)!
+    this.dialogs.delete(value.id)
+    if (value.error !== null) {
+      pending.reject(new Error(value.error))
+    } else {
+      pending.resolve(value.paths)
+    }
+    this.send({ jsonrpc: '2.0', id, result: { received: true } })
+  }
+
+  private stopAdmission(): void {
+    this.inputClosed = true
+    for (const pending of this.platform.values()) {
+      pending.reject(
+        new Error(
+          'The native presentation host closed before the operation completed'
+        )
+      )
+    }
+    this.platform.clear()
+    // No user can answer a picker after the presenter is gone. Cancel only
+    // these presentation waits; admitted Git operations still settle normally.
+    for (const pending of this.dialogs.values()) {
+      pending.resolve([])
+    }
+    this.dialogs.clear()
+    for (const complete of this.external.values()) {
+      complete(false)
+    }
+    this.external.clear()
+    this.lines?.close()
+    // Readline pauses the stream when closed. Drain without admitting more
+    // commands so the parent's acknowledged shutdown can release its pipe.
+    // Electron must observe EOF before joining a Windows blocking fd reader.
+    this.input.resume()
+    this.quitWhenSettled()
+  }
+
+  private outputFailed(error: Error): void {
+    if (this.outputError !== undefined) {
+      return
+    }
+    this.outputError = error
+    log.error(
+      'Native kernel output failed; no further actions will be admitted',
+      error
+    )
+    // These commands have not reached Dispatcher. Do not execute them once
+    // there is no longer a result channel; dispatched actions still settle.
+    for (const id of this.queued.keys()) {
+      this.pending.delete(id)
+    }
+    this.queued.clear()
+    this.stopAdmission()
+  }
+
+  private quitWhenSettled(): void {
+    if (
+      !this.inputClosed ||
+      this.pending.size !== 0 ||
+      this.writes !== 0 ||
+      (!this.failed && !this.outputError && !this.input.readableEnded) ||
+      this.quitStarted
+    ) {
+      return
+    }
+    this.quitStarted = true
+    this.quit(this.failed || this.outputError ? 1 : 0)
+  }
+
+  private send(value: unknown): void {
+    if (this.outputError !== undefined || this.quitStarted) {
+      return
+    }
+    // stdin EOF is independent of stdout: preserve every admitted outcome and
+    // wait for its write callback before quitting, including a final commit.
+    this.writes++
+    try {
+      this.output.write(JSON.stringify(value) + '\n', error => {
+        this.writes--
+        if (error) {
+          this.outputFailed(error)
+        }
+        this.quitWhenSettled()
+      })
+    } catch (error) {
+      this.writes--
+      this.outputFailed(error as Error)
+    }
+  }
+
+  private updateWindowState(id: number, value: unknown): void {
+    const next = windowState(value)
+    if (next === undefined) {
+      this.send({
+        jsonrpc: '2.0',
+        id,
+        error: { code: -32602, message: 'Invalid native window state' },
+      })
+      return
+    }
+    if (next.focused !== this.state.focused)
+      {this.events.emit(next.focused ? 'focus' : 'blur')}
+    if (next.state !== this.state.state)
+      {this.events.emit('window-state-changed', next.state)}
+    if (next.zoom !== this.state.zoom)
+      {this.events.emit('zoom-factor-changed', next.zoom)}
+    this.state = next
+    this.send({ jsonrpc: '2.0', id, result: { updated: true } })
+  }
+
+  private async read(): Promise<void> {
+    const lines = createInterface({ input: this.input, crlfDelay: Infinity })
+    this.lines = lines
+    try {
+      for await (const line of lines) {
+        if (this.inputClosed) {
+          break
+        }
+        let message: unknown
+        try {
+          if (Buffer.byteLength(line) > 8 * 1024 * 1024) {
+            throw new Error('size')
+          }
+          message = JSON.parse(line)
+        } catch {
+          this.send({
+            jsonrpc: '2.0',
+            id: null,
+            error: { code: -32700, message: 'Invalid native JSON request' },
+          })
+          continue
+        }
+        if (
+          !isRecord(message) ||
+          message.jsonrpc !== '2.0' ||
+          !validID(message.id) ||
+          typeof message.method !== 'string'
+        ) {
+          this.send({
+            jsonrpc: '2.0',
+            id: null,
+            error: { code: -32600, message: 'Invalid native request' },
+          })
+          continue
+        }
+        const id = message.id
+        // A conflicting control request must not masquerade as the outcome of
+        // an in-flight commit with the same ID. Diagnose with null, keep it alive.
+        if (this.pending.has(id)) {
+          this.send({
+            jsonrpc: '2.0',
+            id: null,
+            error: {
+              code: -32600,
+              message:
+                'Duplicate active native request ID; the original outcome remains pending',
+            },
+          })
+          continue
+        }
+        if (message.method === 'kernel.shutdown') {
+          if (this.pending.size !== 0) {
+            this.send({
+              jsonrpc: '2.0',
+              id,
+              error: {
+                code: -32001,
+                message:
+                  'Desktop actions are still pending; await their outcomes before quitting',
+              },
+            })
+          } else {
+            this.send({ jsonrpc: '2.0', id, result: { quitting: true } })
+            this.stopAdmission()
+            break
+          }
+          continue
+        }
+        if (message.method === 'kernel.windowState') {
+          this.updateWindowState(id, message.params)
+          continue
+        }
+        if (message.method === 'kernel.dialogResult') {
+          this.receiveDialogResult(id, message.params)
+          continue
+        }
+        if (message.method === 'kernel.externalResult') {
+          this.receiveExternalResult(id, message.params)
+          continue
+        }
+        if (message.method === 'kernel.platformResult') {
+          this.receivePlatformResult(id, message.params)
+          continue
+        }
+        if (message.method === 'kernel.platformEvent') {
+          const value = message.params
+          if (
+            !isRecord(value) ||
+            !Array.isArray(value.args) ||
+            ![
+              'native-theme-updated',
+              'notification-event',
+              'native-activity',
+            ].includes(value.name as string)
+          ) {
+            this.send({
+              jsonrpc: '2.0',
+              id,
+              error: { code: -32602, message: 'Invalid native platform event' },
+            })
+          } else {
+            this.events.emit(value.name as string, ...value.args)
+            this.send({ jsonrpc: '2.0', id, result: { received: true } })
+          }
+          continue
+        }
+        if (message.method !== 'kernel.command') {
+          this.send({
+            jsonrpc: '2.0',
+            id,
+            error: { code: -32601, message: 'Unknown native method' },
+          })
+          continue
+        }
+        try {
+          const command = parseKernelCommand(message.params)
+          this.pending.add(id)
+          if (this.ready && this.handler) {
+            this.handler({
+              id,
+              command,
+            })
+          } else {
+            this.queued.set(id, command)
+          }
+        } catch {
+          this.send({
+            jsonrpc: '2.0',
+            id,
+            error: {
+              code: -32602,
+              message: 'Invalid Desktop presentation command',
+            },
+          })
+        }
+      }
+    } finally {
+      lines.close()
+      log.info(
+        `Native kernel parent input closed; ${this.pending.size} admitted actions remain`
+      )
+      // No operation is replayed, killed or declared cancelled here. Its
+      // original owner remains alive until its pending outcome is flushed.
+      this.stopAdmission()
+    }
+  }
+}

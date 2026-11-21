@@ -1,3 +1,4 @@
+import { markdownDocument, markdownNodeFilter } from './document-context'
 import { GitHubRepository } from '../../models/github-repository'
 import { getHTMLURL } from '../api'
 import { INodeFilter } from './node-filter'
@@ -100,12 +101,12 @@ export class IssueMentionFilter implements INodeFilter {
    * pre, code, or anchor tag.
    */
   public createFilterTreeWalker(doc: Document): TreeWalker {
-    return doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, {
+    return doc.createTreeWalker(doc.body, markdownNodeFilter().SHOW_TEXT, {
       acceptNode: function (node) {
         return node.parentNode !== null &&
           ['CODE', 'PRE', 'A'].includes(node.parentNode.nodeName)
-          ? NodeFilter.FILTER_SKIP
-          : NodeFilter.FILTER_ACCEPT
+          ? markdownNodeFilter().FILTER_SKIP
+          : markdownNodeFilter().FILTER_ACCEPT
       },
     })
   }
@@ -153,7 +154,7 @@ export class IssueMentionFilter implements INodeFilter {
       }
 
       const textBefore = text.slice(lastMatchEndingPosition, match.index)
-      const textNodeBefore = document.createTextNode(textBefore)
+      const textNodeBefore = markdownDocument().createTextNode(textBefore)
       nodes.push(textNodeBefore)
       nodes.push(link)
 
@@ -166,7 +167,7 @@ export class IssueMentionFilter implements INodeFilter {
 
     const trailingText = text.slice(lastMatchEndingPosition)
     if (trailingText !== '') {
-      nodes.push(document.createTextNode(trailingText))
+      nodes.push(markdownDocument().createTextNode(trailingText))
     }
 
     return nodes
@@ -204,7 +205,7 @@ export class IssueMentionFilter implements INodeFilter {
     // This way they will end up at the pull request (same behavior in dotcom).
     const href = `${baseHref}/${owner}/${repo}/issues/${refNumber}`
 
-    const anchor = document.createElement('a')
+    const anchor = markdownDocument().createElement('a')
     anchor.textContent = text
     anchor.href = href
     return anchor

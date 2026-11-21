@@ -35,7 +35,7 @@ export { getHTMLURL, getDotComAPIEndpoint } from './api-endpoints'
 const envAdditionalCookies =
   process.env['DESKTOP_GITHUB_DOTCOM_ADDITIONAL_COOKIES']
 
-if (envAdditionalCookies !== undefined) {
+if (envAdditionalCookies !== undefined && typeof document !== 'undefined') {
   document.cookie += '; ' + envAdditionalCookies
 }
 
@@ -2349,7 +2349,7 @@ export function getEndpointForRepository(url: string): string {
  * http://github.mycompany.com -> https://github.mycompany.com/api/v3
  */
 export function getEnterpriseAPIURL(endpoint: string): string {
-  const { host } = new window.URL(endpoint)
+  const { host } = new URL.URL(endpoint)
 
   return isGHE(endpoint) ? `https://api.${host}/` : `https://${host}/api/v3`
 }
@@ -2383,7 +2383,7 @@ export function getOAuthAuthorizationURL(
       ? '&prompt=select_account'
       : `&login=${encodeURIComponent(login)}&allow_signup=false`
 
-  return new window.URL(
+  return new URL.URL(
     `/login/oauth/authorize?client_id=${ClientID}&scope=${scope}&state=${state}${accountParameters}`,
     urlBase
   ).toString()
@@ -2428,7 +2428,7 @@ const isKnownThirdPartyHost = (hostname: string) => {
  * an error making the discovery request
  */
 export async function isGitHubHost(url: string) {
-  const { hostname } = new window.URL(url)
+  const { hostname } = new URL.URL(url)
 
   const endpoint =
     hostname === 'github.com' || hostname === 'api.github.com'
