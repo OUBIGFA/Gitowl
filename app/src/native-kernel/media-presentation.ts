@@ -1,6 +1,5 @@
 import { createHash, randomUUID } from 'crypto'
 import type { Image as RepositoryImage } from '../models/diff'
-import { decodeImageFrame } from './node-image-decoder'
 import { decodeNativeImage } from './image-worker-client'
 
 /** Pixel presentation only. No filesystem, Git, account or network authority. */
@@ -148,9 +147,11 @@ export function parseNativeMediaCommand(
 
 async function pixels(entry: IMedia, index: number): Promise<IPixels> {
   if (entry.closed) {throw new Error('Image is no longer displayed')}
+  // The Node backend decodes only in its worker; loading the codec here too
+  // would keep a second copy of ImageMagick's and UPNG's modules resident.
   const decoded = await (process.env.GITOWL_NODE_CORE === '1'
     ? decodeNativeImage
-    : decodeImageFrame)(
+    : (await import('./node-image-decoder')).decodeImageFrame)(
     Buffer.from(entry.image.contents, 'base64'),
     index,
     entry.image.mediaType

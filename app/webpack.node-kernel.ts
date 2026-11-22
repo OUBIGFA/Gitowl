@@ -33,7 +33,18 @@ const config: webpack.Configuration = {
   },
   devtool: 'source-map',
   optimization: {
-    minimize: false,
+    // Reprint only: no compression or renaming, so names and behavior stay
+    // as written. V8 keeps each loaded chunk's source in memory, and a single
+    // non-ASCII character stores the whole multi-megabyte chunk as UTF-16;
+    // ASCII escapes and dropped comments cut the idle backend heap by ~15 MB.
+    minimize: true,
+    minimizeOptions: {
+      javascript: {
+        compress: false,
+        mangle: false,
+        format: { ascii_only: true, comments: false },
+      },
+    },
     emitOnErrors: false,
     splitChunks: { chunks: 'all' },
   },

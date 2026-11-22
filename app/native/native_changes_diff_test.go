@@ -52,7 +52,7 @@ func TestHistoryDiffUsesEditorPaneBesideTimeline(test *testing.T) {
 					tester.Move(4, 4)
 					tester.Advance(time.Second)
 					saveDesignEvidence(test, tester, fmt.Sprintf("history-diff-%s-%d-dark-%v.png", locale, size[0], dark))
-					divider, found := tester.AccessByRole(ui.RoleSplitter, "")
+					divider, found := contentDivider(tester)
 					if !found {
 						test.Fatal("history review lost the native draggable divider")
 					}
@@ -155,7 +155,7 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 					if save.X < files.X-1 {
 						t.Fatal("save controls escaped the file changes pane")
 					}
-					divider, ok := tt.AccessByRole(ui.RoleSplitter, "")
+					divider, ok := contentDivider(tt)
 					if !ok {
 						t.Fatal("native draggable divider missing")
 					}
@@ -218,7 +218,7 @@ func TestChangesDiffPanelKeepsFilesDraftAndNativeEditingAcrossLayouts(t *testing
 					a.imagePrepared = prepared
 					tt.Advance(time.Second)
 					image := visibleControl(t, tt, nativeImageLabel(locale, "preview"), size[0], size[1])
-					divider, ok = tt.AccessByRole(ui.RoleSplitter, "")
+					divider, ok = contentDivider(tt)
 					if !ok || image.X < 12 || image.X+image.W > divider.Bounds.X || math.Abs(float64(image.Y+image.H-float32(size[1]-16))) > 1 {
 						t.Fatalf("image preview lost the diff panel's safe margins: image=%+v divider=%+v", image, divider.Bounds)
 					}
@@ -235,7 +235,22 @@ func assertNotebookDiffClosed(t *testing.T, tester *ui.Tester, a *app) {
 	if a.reviewingFile {
 		t.Fatal("diff is open before selection")
 	}
-	if _, found := tester.AccessByRole(ui.RoleSplitter, ""); !found {
+	if _, found := contentDivider(tester); !found {
 		t.Fatal("editor and review splitter is missing")
 	}
+}
+
+// contentDivider is the workspace's first splitter after the project rail's
+// divider, which the production view always places first in the tree.
+func contentDivider(tester *ui.Tester) (ui.AccessInfo, bool) {
+	var splitters []ui.AccessInfo
+	for _, info := range tester.AccessAll() {
+		if info.Role == ui.RoleSplitter {
+			splitters = append(splitters, info)
+		}
+	}
+	if len(splitters) < 2 {
+		return ui.AccessInfo{}, false
+	}
+	return splitters[1], true
 }

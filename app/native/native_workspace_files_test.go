@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"slices"
 	"testing"
 	"time"
@@ -169,5 +171,101 @@ func TestWorkspaceFileClickAndNavigationOnlySelectUntilExplicitReview(t *testing
 	}
 	if !slices.Equal(reviews, []string{"b.txt"}) {
 		t.Fatalf("explicit review control did not open file: %v", reviews)
+	}
+}
+
+func TestProjectRailDragIsRememberedAcrossRestart(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "window-preferences.json")
+	a := newApp(nil, nil)
+	defer a.close()
+	a.windowPreferencesPath = path
+	a.windowPreferences, _ = readWindowPreferences(path)
+	tt := ui.NewTester(a.view, 1200, 760)
+	tt.Frame()
+	divider, ok := tt.AccessByRole(ui.RoleSplitter, "")
+	if !ok || divider.Bounds.X != projectRailWidth {
+		t.Fatalf("project rail divider = %+v, %v", divider.Bounds, ok)
+	}
+	x, y := divider.Bounds.X, divider.Bounds.Y+divider.Bounds.H/2
+	tt.Press(x, y)
+	tt.Move(x+60, y)
+	tt.Release(x+60, y)
+	tt.Frame()
+	if a.workspaceRailCurrent != projectRailWidth+60 {
+		t.Fatalf("dragged rail = %v", a.workspaceRailCurrent)
+	}
+	prefs, err := readWindowPreferences(path)
+	if err != nil || prefs.RailWidth != projectRailWidth+60 {
+		t.Fatalf("remembered rail = %+v, %v", prefs, err)
+	}
+	// A narrower window fits the rail without forgetting the chosen width.
+	tt.SetSize(860, 620)
+	tt.Frame()
+	if a.workspaceRailCurrent != 240 || a.WorkspaceRailWidth != projectRailWidth+60 {
+		t.Fatalf("narrow window rail = %v, preference %v", a.workspaceRailCurrent, a.WorkspaceRailWidth)
+	}
+
+	restarted := newApp(nil, nil)
+	defer restarted.close()
+	restarted.windowPreferencesPath = path
+	restarted.windowPreferences, _ = readWindowPreferences(path)
+	restarted.WorkspaceRailWidth = restarted.windowPreferences.RailWidth
+	again := ui.NewTester(restarted.view, 1200, 760)
+	again.Frame()
+	if divider, _ := again.AccessByRole(ui.RoleSplitter, ""); divider.Bounds.X != projectRailWidth+60 {
+		t.Fatalf("restarted rail divider at %v", divider.Bounds.X)
+	}
+}
+
+func TestDamagedLayoutPreferenceKeepsDefaults(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "window-preferences.json")
+	if err := os.WriteFile(path, []byte(`{"closeBehavior":"exit","railWidth":-5,"inspectorWidth":1e9}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	prefs, err := readWindowPreferences(path)
+	if err != nil || prefs.CloseBehavior != closeWindowExit || prefs.RailWidth != 0 || prefs.InspectorWidth != 0 {
+		t.Fatalf("damaged widths = %+v, %v", prefs, err)
+	}
+}
+
+func TestRightPaneKeepsDraggedWidthAcrossResize(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "window-preferences.json")
+	a := newApp(nil, nil)
+	defer a.close()
+	a.windowPreferencesPath = path
+	a.windowPreferences, _ = readWindowPreferences(path)
+	a.repo = &backend.Repository{ID: 1, Name: "example", Path: t.TempDir()}
+	width := float32(1000)
+	tt := ui.NewTester(func(c *ui.Context) {
+		colors := setWorkspaceTheme(c)
+		a.notebookView(c, locales.In("en"), colors, width)
+		a.saveWorkspaceLayout()
+	}, 1000, 700)
+	tt.Frame()
+	if a.notebook.width != 540 || a.notebook.inspector != 0 {
+		t.Fatalf("default split = %v / %v", a.notebook.width, a.notebook.inspector)
+	}
+	divider, ok := tt.AccessByRole(ui.RoleSplitter, "")
+	if !ok {
+		t.Fatal("right pane divider missing")
+	}
+	x, y := divider.Bounds.X, divider.Bounds.Y+divider.Bounds.H/2
+	tt.Press(x, y)
+	tt.Move(x-60, y)
+	tt.Release(x-60, y)
+	tt.Frame()
+	if a.notebook.inspector != 520 {
+		t.Fatalf("dragged right pane = %v", a.notebook.inspector)
+	}
+	// A wider window grows the editor; the right pane keeps its width.
+	width = 1200
+	tt.SetSize(1200, 700)
+	tt.Frame()
+	if a.notebook.width != 680 {
+		t.Fatalf("resized editor = %v", a.notebook.width)
+	}
+	prefs, err := readWindowPreferences(path)
+	if err != nil || prefs.InspectorWidth != 520 {
+		t.Fatalf("remembered right pane = %+v, %v", prefs, err)
 	}
 }

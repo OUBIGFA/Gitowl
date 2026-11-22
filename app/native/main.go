@@ -64,6 +64,7 @@ func run(entry, node, initialPath, profile string, initialLaunch nativeLaunchOpt
 	a.serviceErr, a.logoErr = errors.Join(resourceErr, userDataErr, configErr), logoErr
 	a.windowPreferencesPath = filepath.Join(userData, "window-preferences.json")
 	a.windowPreferences, a.windowPreferenceErr = readWindowPreferences(a.windowPreferencesPath)
+	a.WorkspaceRailWidth, a.notebook.inspector = a.windowPreferences.RailWidth, a.windowPreferences.InspectorWidth
 	defer a.close()
 	var core *backend.Kernel
 	defer func() {

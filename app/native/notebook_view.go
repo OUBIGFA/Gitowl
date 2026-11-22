@@ -35,7 +35,11 @@ type notebookWorkspace struct {
 	closing                                                     *notebookDocument
 	err                                                         error
 	width                                                       float32
-	search                                                      notebookSearch
+	// inspector is the right pane's remembered width, zero for the default
+	// share; shown and total are what the last frame laid out, so a divider
+	// move is told from a window resize, which keeps the pane's width.
+	inspector, shown, total float32
+	search                  notebookSearch
 }
 
 func (a *app) notes() *notebookProject {
@@ -292,8 +296,12 @@ func notebookIcon(c *ui.Context, id, label, icon string, action func()) {
 func (a *app) notebookView(c *ui.Context, tx locales.Messages, colors workspaceColors, width float32) {
 	n := &a.notebook
 	p := a.notes()
-	if n.width == 0 {
-		n.width = width * .54
+	if n.shown != 0 && n.width != n.shown {
+		n.inspector = n.total - n.width
+	}
+	n.width = width * .54
+	if n.inspector > 0 {
+		n.width = width - n.inspector
 	}
 	minimumPane := min(float32(280), width*.41)
 	if a.tab == changesTab {
@@ -302,6 +310,7 @@ func (a *app) notebookView(c *ui.Context, tx locales.Messages, colors workspaceC
 		minimumPane = min(float32(340), width*.55)
 	}
 	n.width = max(width*.38, min(n.width, width-minimumPane))
+	n.shown, n.total = n.width, width
 	ui.Split(c.Key("notebook-split"), &n.width, func() {
 		ui.Column(c.Key("note-pane")).Fill().MinWidth(0).Padding(0, 12, 0, 0).Children(func() {
 			ui.Row(c.Key("note-tabs-bar")).Height(40).FillWidth().Padding(0, 0, 8, 0).Margin(0, 0, 10, 0).

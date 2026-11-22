@@ -23,6 +23,10 @@ const (
 type nativeWindowPreferences struct {
 	CloseBehavior   string `json:"closeBehavior"`
 	PushAfterCommit bool   `json:"pushAfterCommit,omitempty"`
+	// Widths the user dragged the project rail and the right pane to, in
+	// DIPs; zero keeps the default. Each frame fits them to the window.
+	RailWidth      float32 `json:"railWidth,omitempty"`
+	InspectorWidth float32 `json:"inspectorWidth,omitempty"`
 }
 
 func readWindowPreferences(path string) (nativeWindowPreferences, error) {
@@ -39,6 +43,13 @@ func readWindowPreferences(path string) (nativeWindowPreferences, error) {
 	}
 	if prefs.CloseBehavior != closeWindowExit && prefs.CloseBehavior != closeWindowToTray {
 		return nativeWindowPreferences{CloseBehavior: closeWindowToTray}, fmt.Errorf("invalid window close behavior %q", prefs.CloseBehavior)
+	}
+	// A hand-edited or damaged width falls back to the default layout rather
+	// than failing the whole profile, whose close behavior is still valid.
+	for _, width := range []*float32{&prefs.RailWidth, &prefs.InspectorWidth} {
+		if !(*width > 0 && *width < 1e5) {
+			*width = 0
+		}
 	}
 	return prefs, nil
 }

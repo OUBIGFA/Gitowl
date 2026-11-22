@@ -4,6 +4,11 @@ import type { IDecodedImageFrame } from './node-image-decoder'
 
 let worker: Worker | undefined
 let nextID = 0
+// A decoder that has run keeps its ImageMagick WASM memory and isolate, about
+// 60-80 MB, for good. Stop it once no image has been asked for a while; the
+// next image pays one more worker start instead.
+const idleStopMs = 60_000
+let idleTimer: ReturnType<typeof setTimeout> | undefined
 const pending = new Map<
   number,
   {
@@ -21,6 +26,7 @@ export function decodeNativeImage(
   index: number,
   mediaType: string
 ): Promise<IDecodedImageFrame> {
+  clearTimeout(idleTimer)
   if (worker === undefined) {
     const active = new Worker(join(__dirname, 'image-worker.js'), {
       resourceLimits: { maxOldGenerationSizeMb: 384 },
@@ -32,6 +38,10 @@ export function decodeNativeImage(
       if (!request) {return}
       pending.delete(result.id)
       clearTimeout(request.timer)
+      if (pending.size === 0) {
+        idleTimer = setTimeout(() => stopImageWorker(), idleStopMs)
+        idleTimer.unref()
+      }
       if (result.error) {request.reject(new Error(result.error))}
       else {request.resolve(result.frame)}
     })
@@ -58,6 +68,7 @@ export function decodeNativeImage(
 export function stopImageWorker(
   error = new Error('Image decoding stopped during shutdown')
 ): void {
+  clearTimeout(idleTimer)
   const active = worker
   worker = undefined
   if (active) {void active.terminate()}

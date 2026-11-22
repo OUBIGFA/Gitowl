@@ -48,9 +48,13 @@ func (a *app) view(c *ui.Context) {
 	if expandedDiff {
 		available = width - a.nativeRailWidth(c) - padding
 	}
-	ui.Row(c).Fill().AlignItems(ui.Stretch).FontWeight(400).Children(func() {
+	a.nativeRailWidth(c)
+	// The rail's divider is MyGo's own splitter: drag, arrow keys once focused,
+	// and a double click back to the default width.
+	rail := ui.Split(c.Key("workspace-rail-split"), &a.workspaceRailSplit, func() {
 		a.projectRail(c, tx, colors)
-		ui.Column(c.Key("workspace-canvas")).Grow(1).MinWidth(0).FillHeight().Children(func() {
+	}, func() {
+		ui.Column(c.Key("workspace-canvas")).Fill().MinWidth(0).Children(func() {
 			a.workspaceTitleBar(c, tx, headerPadding)
 			if a.repo != nil {
 				a.workspaceTaskBar(c, tx, colors, headerPadding)
@@ -91,7 +95,10 @@ func (a *app) view(c *ui.Context) {
 				}
 			})
 		})
-	})
+	}).Fill().FontWeight(400).SplitReset(projectRailWidth)
+	if !rail.Changed() {
+		a.saveWorkspaceLayout()
+	}
 	a.openDialog(c, tx)
 	a.notebookDialogs(c)
 	a.settingsDialog(c, tx)
@@ -106,8 +113,7 @@ func (a *app) view(c *ui.Context) {
 
 func (a *app) projectRail(c *ui.Context, tx locales.Messages, colors workspaceColors) {
 	bar := c.TitleBar()
-	ui.Column(c.Key("project-rail")).Width(a.nativeRailWidth(c)).Shrink(0).FillHeight().Background(colors.rail).
-		BorderWidth(0, 1, 0, 0).BorderColor(colors.hairline).Children(func() {
+	ui.Column(c.Key("project-rail")).Fill().Background(colors.rail).Children(func() {
 		ui.Row(c.Key("brand-titlebar")).Height(max(48, bar.Height)).Padding(0, 16, 0, 20+bar.Left).
 			AlignItems(ui.Center).Gap(10).DragWindow().Children(func() {
 			if a.logo != nil {

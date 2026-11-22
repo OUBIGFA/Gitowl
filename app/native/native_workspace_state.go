@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"slices"
 	"strings"
 	"time"
@@ -61,6 +62,8 @@ type nativeWorkspaceState struct {
 	workspacePreparedDiffID           string
 	workspaceDiffWidth                float32
 	workspaceRailCurrent              float32
+	workspaceRailSplit                float32
+	workspaceLayoutSaved              [2]float32
 	workspaceRailMaximum              float32
 	WorkspaceRailWidth                float32
 }
@@ -280,6 +283,11 @@ func (a *app) workspacePresentation(action string) bool {
 
 func (a *app) nativeRailWidth(c *ui.Context) float32 {
 	width, _ := c.Size()
+	// The rail's divider writes workspaceRailSplit; a value other than the one
+	// this method last fitted is the user's drag or double-click reset.
+	if a.workspaceRailSplit != a.workspaceRailCurrent && a.workspaceRailCurrent != 0 {
+		a.WorkspaceRailWidth = max(200, min(360, a.workspaceRailSplit))
+	}
 	value := a.WorkspaceRailWidth
 	if value == 0 {
 		value = projectRailWidth
@@ -287,7 +295,29 @@ func (a *app) nativeRailWidth(c *ui.Context) float32 {
 	// Keep the unique central composer readable at the minimum window size.
 	a.workspaceRailMaximum = max(200, min(360, width-620))
 	a.workspaceRailCurrent = max(200, min(value, a.workspaceRailMaximum))
+	a.workspaceRailSplit = a.workspaceRailCurrent
 	return a.workspaceRailCurrent
+}
+
+// saveWorkspaceLayout remembers the rail and right pane widths once a drag
+// rests (frames only come with input, so a held, still pointer writes none).
+// A failed write is logged and not retried until the widths change again.
+func (a *app) saveWorkspaceLayout() {
+	widths := [2]float32{a.WorkspaceRailWidth, a.notebook.inspector}
+	if a.windowPreferencesPath == "" || widths == a.workspaceLayoutSaved {
+		return
+	}
+	a.workspaceLayoutSaved = widths
+	next := a.windowPreferences
+	next.RailWidth, next.InspectorWidth = widths[0], widths[1]
+	if next == a.windowPreferences {
+		return
+	}
+	if err := writeWindowPreferences(a.windowPreferencesPath, next); err != nil {
+		fmt.Fprintln(os.Stderr, "workspace layout preference:", err)
+		return
+	}
+	a.windowPreferences = next
 }
 
 // Called at the end of a frame. Only the focus kind is retained, never a
