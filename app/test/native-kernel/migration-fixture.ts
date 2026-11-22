@@ -10,7 +10,7 @@ async function main() {
   installNodeDatabase(destination)
   await importLegacyExport(source, join(destination, 'migration.json'))
   const db = new Dexie('MigrationFixture')
-  db.version(2).stores({ items: '++id, &[owner+name]' })
+  db.version(2).stores({ items: '++id, &[owner+name]', launches: '++' })
   const record = await db.table('items').get(7)
   assert.equal(record.owner, '账户')
   assert.equal(record.name, '项目')
@@ -24,6 +24,8 @@ async function main() {
     1
   )
   assert.equal(await db.table('items').add({ owner: 'next', name: 'next' }), 16)
+  assert.equal((await db.table('launches').get(1)).mainReadyTime, 120)
+  assert.equal(await db.table('launches').add({ mainReadyTime: 360 }), 3)
   assert.equal(localStorage.getItem('theme'), 'dark')
   assert.equal(
     JSON.parse(localStorage.getItem('providers')!).selected,

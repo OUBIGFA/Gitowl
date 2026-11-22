@@ -14,12 +14,16 @@ it(
     const exported = join(profile, 'export.bin')
     const destination = join(profile, 'new-data')
     mkdirSync(destination)
-    const env = {
+    // Match the native launcher's kernelEnvironment: an inherited
+    // ELECTRON_RUN_AS_NODE from an Electron host would start the old runtime
+    // as plain Node and hide the real legacy export path.
+    const env: NodeJS.ProcessEnv = {
       ...process.env,
       GITOWL_USER_DATA: profile,
       GITOWL_LEGACY_EXPORT: exported,
       ELECTRON_NO_ATTACH_CONSOLE: '1',
     }
+    delete env.ELECTRON_RUN_AS_NODE
     const electron = resolve('node_modules/electron/dist/electron.exe')
     assert.ok(
       existsSync(electron),

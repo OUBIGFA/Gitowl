@@ -53,8 +53,11 @@ export async function importLegacyExport(
     const opening = factory.open(database.name, database.version)
     opening.onupgradeneeded = () => {
       for (const store of database.stores) {
+        // Omit a null keyPath (out-of-line keys, e.g. StatsDatabase.launches).
+        // indexeddbshim 19 stringifies an explicit null into the in-line key
+        // path "null", which then rejects every add(value, key) below.
         const target = opening.result.createObjectStore(store.name, {
-          keyPath: store.keyPath,
+          keyPath: store.keyPath ?? undefined,
           autoIncrement: store.autoIncrement,
         })
         for (const index of store.indexes)

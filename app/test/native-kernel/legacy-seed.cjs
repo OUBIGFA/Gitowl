@@ -12,14 +12,19 @@ app.whenReady().then(async () => {
       request.onupgradeneeded = () => {
         const store = request.result.createObjectStore('items', { keyPath: 'id', autoIncrement: true });
         store.createIndex('ownerName', ['owner', 'name'], { unique: true });
+        // Out-of-line keys, like the legacy StatsDatabase launches store.
+        request.result.createObjectStore('launches', { autoIncrement: true });
       };
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
         const db = request.result;
-        const transaction = db.transaction('items', 'readwrite');
+        const transaction = db.transaction(['items', 'launches'], 'readwrite');
         transaction.objectStore('items').put({ id: 7, owner: '账户', name: '项目', date: new Date('2026-01-02T03:04:05Z') });
         transaction.objectStore('items').put({ id: 15, owner: 'removed', name: 'removed' });
         transaction.objectStore('items').delete(15);
+        transaction.objectStore('launches').add({ mainReadyTime: 120 });
+        transaction.objectStore('launches').add({ mainReadyTime: 240 });
+        transaction.objectStore('launches').delete(2);
         transaction.oncomplete = () => { db.close(); resolve(); };
         transaction.onabort = () => reject(transaction.error);
       };
