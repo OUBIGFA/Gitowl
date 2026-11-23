@@ -5,29 +5,45 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/egoist/mygo"
 )
+
+// Cleanup runs after the first backend snapshot. A failure belongs to the
+// upgrade and must not replace the result of opening a repository.
+func (a *app) recycleLegacyRuntime(resources, userData string) {
+	path, err := legacyRuntimeDirectory(resources, userData)
+	if err == nil && path != "" {
+		err = mygo.Shell.TrashItem(path)
+	}
+	if err != nil {
+		a.update(func() {
+			if !a.closed {
+				a.legacyCleanupErr = err
+			}
+		})
+	}
+}
 
 // Only the old shipped runtime directory is eligible. User-data paths and
 // unexpected directory layouts are never moved by the upgrade cleanup.
 func legacyRuntimeDirectory(resources, userData string) (string, error) {
-	root, err := filepath.EvalSymlinks(resources)
+	root, err := physicalDirectoryPath(resources)
 	if err != nil {
 		return "", err
 	}
 	old := filepath.Join(root, "desktop-kernel")
-	if _, err := os.Stat(old); os.IsNotExist(err) {
+	info, err := os.Lstat(old)
+	if os.IsNotExist(err) {
 		return "", nil
 	} else if err != nil {
 		return "", err
 	}
-	resolved, err := filepath.EvalSymlinks(old)
-	if err != nil {
-		return "", err
+	// A junction in a parent is fine, but never recycle a link at the target.
+	if !info.IsDir() {
+		return "", errors.New("legacy runtime is not an ordinary directory; files were preserved")
 	}
-	if resolved != old {
-		return "", errors.New("legacy runtime path is redirected; files were preserved")
-	}
-	data, err := filepath.EvalSymlinks(userData)
+	data, err := physicalDirectoryPath(userData)
 	if err != nil {
 		return "", err
 	}

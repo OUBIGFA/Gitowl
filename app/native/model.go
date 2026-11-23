@@ -100,6 +100,8 @@ type app struct {
 	lastSavedSHA      string
 	projectDrafts     map[string]projectDraft
 
+	legacyCleanupErr error // Upgrade maintenance is independent of repository state.
+
 	logo       ui.ImageSource
 	logoErr    error
 	serviceErr error

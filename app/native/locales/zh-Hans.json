@@ -20,6 +20,7 @@
   "connecting": "正在启动仓库服务…",
   "failedService": "仓库服务不可用：{message}",
   "failedLogo": "无法加载 Gitowl 标志：{message}",
+  "failedLegacyCleanup": "无法清理旧版程序文件：{message}",
   "failedOpen": "无法打开项目：{message}",
   "failedBrowse": "无法选择目录：{message}",
   "failedStatus": "无法读取修改：{message}",

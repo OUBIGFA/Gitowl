@@ -321,19 +321,7 @@ func run(entry, node, initialPath, profile string, initialLaunch nativeLaunchOpt
 					a.receiveCoreEvent(event)
 					if packaged && event.Snapshot != nil && !legacyChecked {
 						legacyChecked = true
-						go func() {
-							path, err := legacyRuntimeDirectory(resources, userData)
-							if err == nil && path != "" {
-								err = mygo.Shell.TrashItem(path)
-							}
-							if err != nil {
-								win.Update(func() {
-									if !a.closed {
-										a.openErr = fmt.Errorf("previous runtime retained: %w", err)
-									}
-								})
-							}
-						}()
+						go a.recycleLegacyRuntime(resources, userData)
 					}
 				})
 			})

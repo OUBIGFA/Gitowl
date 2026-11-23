@@ -20,6 +20,7 @@
   "connecting": "正在啟動儲存庫服務…",
   "failedService": "儲存庫服務無法使用：{message}",
   "failedLogo": "無法載入 Gitowl 標誌：{message}",
+  "failedLegacyCleanup": "無法清理舊版程式檔案：{message}",
   "failedOpen": "無法開啟專案：{message}",
   "failedBrowse": "無法選取目錄：{message}",
   "failedStatus": "無法讀取變更：{message}",

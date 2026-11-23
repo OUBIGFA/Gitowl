@@ -236,6 +236,18 @@ func (msgs Messages) FailedLogo(message string) string {
 	return Catalog.Format(msgs.locale, "failedLogo", map[string]any{"message": message})
 }
 
+// FailedLegacyCleanup says "Could not clean up files from the previous version: {message}"
+// in the language the app shows.
+func FailedLegacyCleanup(message string) string {
+	return In(i18n.Locale()).FailedLegacyCleanup(message)
+}
+
+// FailedLegacyCleanup says "Could not clean up files from the previous version: {message}"
+// in the language of msgs.
+func (msgs Messages) FailedLegacyCleanup(message string) string {
+	return Catalog.Format(msgs.locale, "failedLegacyCleanup", map[string]any{"message": message})
+}
+
 // FailedOpen says "Could not open project: {message}"
 // in the language the app shows.
 func FailedOpen(message string) string { return In(i18n.Locale()).FailedOpen(message) }

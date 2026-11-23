@@ -20,6 +20,7 @@
   "connecting": "Starting repository service…",
   "failedService": "Repository service unavailable: {message}",
   "failedLogo": "Could not load the Gitowl logo: {message}",
+  "failedLegacyCleanup": "Could not clean up files from the previous version: {message}",
   "failedOpen": "Could not open project: {message}",
   "failedBrowse": "Could not select directory: {message}",
   "failedStatus": "Could not read changes: {message}",

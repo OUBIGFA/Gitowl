@@ -258,6 +258,10 @@ func (a *app) workspaceNotices(c *ui.Context, tx locales.Messages) {
 	if a.logoErr != nil {
 		showError(c, tx.FailedLogo(a.logoErr.Error()))
 	}
+	if a.legacyCleanupErr != nil {
+		ui.Text(c, tx.FailedLegacyCleanup(a.legacyCleanupErr.Error())).TextColor(c.Theme().Warning).
+			Margin(0, 0, 12, 0).Role(ui.RoleStatus)
+	}
 	if a.openErr != nil && !a.openModal {
 		showError(c, tx.FailedOpen(a.openErr.Error()))
 	}

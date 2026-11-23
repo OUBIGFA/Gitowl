@@ -449,7 +449,7 @@
     },
     {
       "path": "app/native/go.mod",
-      "sha256": "808eaffa3f57a0b0a32783f0610723df537a944a46887a39630b4e241d0149bf"
+      "sha256": "cdfaf61e55312004f46eca13f6981158af2bedba2f3363e85cd91f71fac229fb"
     },
     {
       "path": "app/native/go.sum",
