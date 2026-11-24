@@ -16,7 +16,7 @@ Gitowl 基于 [GitHub Desktop](https://github.com/desktop/desktop) 的公开源�
 
 2026-11-21 的后台迁移直接复用现有 Git/账户/恢复实现，将生产宿主改为 Node。SQLite 存储、ImageMagick/UPNG 解码、Undici 网络与独立 Markdown 解析组件的精确版本、源包和许可证见 [native-runtimes.json](native-runtimes.json)。完整用途与迁移方式见 [后台说明](../references/node-backend.md)。保留的 Electron 许可证和旧入口用于上游/迁移对照，不进入新生产包。
 
-原生图标采用未修改的 Lucide 资源，版本、许可和每个文件的校验见 [native-icons.json](native-icons.json)；上游图标预览采用原 @primer/octicons SVG，完整登记见 [octicons.json](octicons.json)。设计审查使用 Impeccable 的操作型界面/重设计指引，以及 Damir Sokolovsky（[@heydamir](https://github.com/heydamir/unslop)）的 unslop 检查清单；开发工具版本、执行范围与许可证见 [design-tools.json](design-tools.json)。它们不进入应用运行时，HTML/CSS 检测结果也不用于宣称 MyGo 原生界面通过验收。
+原生图标采用 [Solar Icons](https://github.com/saoudi-h/solar-icons) 的 Linear 风格（代码 MIT，图标作品由 480 Design 以 CC BY 4.0 授权，需署名），只把写死的黑色描边/填充改为 `currentColor` 以跟随主题，几何形状不变；修订、两份许可证及每个文件的上游与本地校验见 [native-icons.json](native-icons.json)，由 `tools/record_solar_icons.py` 生成。Solar 没有对应字形的编辑器图标（分级标题、求和符号、自动换行）保留 Lucide 路径并改用 1.5 线宽，许可见 [lucide-LICENSE](licenses/native/lucide-LICENSE)；上游图标预览采用原 @primer/octicons SVG，完整登记见 [octicons.json](octicons.json)。设计审查使用 Impeccable 的操作型界面/重设计指引，以及 Damir Sokolovsky（[@heydamir](https://github.com/heydamir/unslop)）的 unslop 检查清单；开发工具版本、执行范围与许可证见 [design-tools.json](design-tools.json)。它们不进入应用运行时，HTML/CSS 检测结果也不用于宣称 MyGo 原生界面通过验收。
 
 小型公开测试夹具可以进入 `references/` 或现有测试夹具目录；模型、字体、安装包、真实用户数据、下载缓存和未确认许可的二进制资源放在被忽略的 `.local/` 或发布资产中。需要公开分发的第三方材料先补齐来源、版权、SPDX 标识、文件 SHA-256 和修改范围，再进入源码或构建流程。
 

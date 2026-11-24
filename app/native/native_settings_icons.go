@@ -1,6 +1,6 @@
 package main
 
-// Settings categories each get one Lucide line icon, so the navigation reads
+// Settings categories each get one Solar Linear icon, so the navigation reads
 // at a glance as in the system settings apps. Other dialogs with navigation
 // (repository settings) keep text alone: their pages are not a fixed set.
 var settingsNavigationIcons = map[string]string{

@@ -13,6 +13,7 @@
 # line endings and whitespace. Source edits still use the normal checks.
 /third_party/licenses/native/node-LICENSE -text -whitespace
 /third_party/licenses/native/npm_* -text -whitespace
+/third_party/licenses/native/solar-icons-LICENSE* -text -whitespace
 *.png binary
 *.jpg binary
 *.jpeg binary

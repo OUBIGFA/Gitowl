@@ -1,16 +1,4 @@
-<!-- @license lucide-static v1.70.0 - ISC -->
-<svg
-  class="lucide lucide-plus"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M5 12h14" />
-  <path d="M12 5v14" />
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 12L20 12" stroke-width="1.5" stroke-linecap="round" stroke="currentColor"/>
+<path d="M12.0204 4L12.0205 20.0003" stroke-width="1.5" stroke-linecap="round" stroke="currentColor"/>
 </svg>

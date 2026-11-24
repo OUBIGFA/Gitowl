@@ -1,7 +1,7 @@
 """Register/copy the exact locked upstream Octicons SVGs for native icon previews.
 
 These are original mature-library assets, never generated/hand-drawn paths. The
-production UI still uses Lucide; upstream development icon previews retain their
+production UI uses Solar Linear; upstream development icon previews retain their
 own library instead of substituting text or unrelated shapes.
 """
 import argparse

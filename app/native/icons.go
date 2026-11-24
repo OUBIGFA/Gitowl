@@ -7,8 +7,9 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
-// The unmodified Lucide source assets and their licenses/checksums are registered
-// in third_party/native-icons.json. MyGo owns SVG layout and rendering.
+// Solar Linear icons (tools/record_solar_icons.py): upstream geometry with the
+// black paint as currentColor. Sources, licenses and checksums are registered in
+// third_party/native-icons.json. MyGo owns SVG layout and rendering.
 //
 //go:embed icons/*.svg
 var iconFiles embed.FS

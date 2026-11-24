@@ -11,7 +11,7 @@ import (
 )
 
 // All variants retain MyGo's native focus, keyboard and accessibility behavior.
-// Only their surface, spacing and Lucide content differ from the default button.
+// Only their surface, spacing and Solar icon content differ from the default button.
 func quietSurface(c *ui.Context, button ui.Element) ui.Element {
 	button.Radius(radiusControl).TextColor(c.Theme().Text)
 	if !button.IsDisabled() && button.Pressed() {

@@ -42,7 +42,7 @@ func (a *app) workspaceDiffToggle(c *ui.Context, tx locales.Messages) {
 	button := ui.ButtonBase(c.Key("toggle-diff")).Size(36, 36).Padding(9).Label(label).Tooltip(label).
 		Expanded(a.reviewingFile).Disabled(!a.ready)
 	quietSurface(c, button).Children(func() {
-		// Reuse the registered Lucide panel symbols, facing the right pane.
+		// Reuse the registered Solar panel symbols, facing the right pane.
 		ui.Icon(c, icons[icon]).FontSize(18).Rotate(180)
 	}).OnClick(func() {
 		if a.reviewingFile {

@@ -1,164 +1,639 @@
 {
-  "name": "lucide-static",
-  "version": "1.70.0",
-  "source": "https://github.com/lucide-icons/lucide",
-  "npmIntegrity": "sha512-A9UgY98g94IuHQY7rl7/AFwHX7T1qNpzryim+Kw5CGhdV2STobtBY+ib/Z44ohyqXEJB88gvXFAeJ87uOOHKLw==",
-  "license": "ISC; Feather-derived icons retain MIT notices",
-  "licenseFile": "third_party/licenses/native/lucide-LICENSE",
-  "licenseSha256": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57",
-  "modifications": "none; rendered as monochrome icons by MyGo ui.Icon",
+  "name": "solar-icons",
+  "style": "Linear",
+  "source": "https://github.com/saoudi-h/solar-icons",
+  "revision": "ab241e1bf578dcfe45b0197aee59bd9a08b5fe68",
+  "archive": "solar-icons-ab241e1bf578dcfe45b0197aee59bd9a08b5fe68.tar.gz",
+  "archiveSha256": "3a2a416eda190d089eab9283cd99f2f1896ff9005e86fbe0e18195e477a0a4ba",
+  "license": "MIT (Hakim Saoudi); icon artwork CC BY 4.0",
+  "attribution": "Solar Icons Set by 480 Design (https://www.figma.com/community/file/1166831539721848736), CC BY 4.0",
+  "licenseFile": "third_party/licenses/native/solar-icons-LICENSE",
+  "licenseSha256": "79ca906d7d543e10e4630cddb239c3765678fa18d624a33b99b65bf19e51741a",
+  "thirdPartyLicenseFile": "third_party/licenses/native/solar-icons-LICENSE-THIRD-PARTY",
+  "thirdPartyLicenseSha256": "055cc14f0eca227d9af49d408e3c5d3407fb688158e123b28f67177e1ec5f7d8",
+  "modifications": "black stroke/fill paint replaced by currentColor for MyGo ui.Icon tinting; geometry unchanged; line endings LF",
+  "generator": "tools/record_solar_icons.py",
   "files": [
     {
-      "path": "app/native/icons/folder.svg",
-      "sha256": "c67f53e0e26cb88c6030fc43d8c02591eaea5c48643a98693a706f7208f0e631"
-    },
-    {
-      "path": "app/native/icons/folder-open.svg",
-      "sha256": "ea786e6f32454e9d4e818ab97207c94f28d36463a4775347e6e690006080f32f"
-    },
-    {
-      "path": "app/native/icons/plus.svg",
-      "sha256": "6785279aad64300db83832507ef7909f5c4470334add79dcc0fa5b74564fd08e"
-    },
-    {
-      "path": "app/native/icons/chevron-right.svg",
-      "sha256": "bb612d70c6438fc1db7e3a1553ae6979a030f34f5a4486246eaef697b33395d4"
-    },
-    {
-      "path": "app/native/icons/chevron-left.svg",
-      "sha256": "4b44625e062328fadad5aaf649d71d4f6b72b49adde7193468bfc4d669cdc427"
-    },
-    {
-      "path": "app/native/icons/chevron-down.svg",
-      "sha256": "ff32eb8d7f31b0e773f7618deaf4e212ac8cbb5c480b110a72823e975ccb86db"
-    },
-    {
-      "path": "app/native/icons/arrow-left.svg",
-      "sha256": "a2da54389919145a33b20c0723710c4e1f9116bf41c6d09f3e84c1ac386dbfa3"
-    },
-    {
-      "path": "app/native/icons/file.svg",
-      "sha256": "b31effdd3f00e9ace5083b618d8c9449589f26c9e0d5a1a066db97ff5ffdb167"
-    },
-    {
-      "path": "app/native/icons/file-text.svg",
-      "sha256": "411f1e52b691e42cf958c14659a4305bcb9e15f5e5ffbb52987fbafa099d4f2c"
-    },
-    {
-      "path": "app/native/icons/file-code.svg",
-      "sha256": "27f1e39b0d45154fad9dd0b5c28eca26764a06fb84c897bcaea37cf10bb12a32"
-    },
-    {
-      "path": "app/native/icons/image.svg",
-      "sha256": "46edc0e20b84f327844f7733c8d2cb3739c4e3cb4000a64cf9e52d8b28edf8e2"
-    },
-    {
-      "path": "app/native/icons/history.svg",
-      "sha256": "815e002405d5f97cfe3c8331b1cc34dbe0e0e8655b3a09096e4f67d36facb656"
-    },
-    {
-      "path": "app/native/icons/git-branch.svg",
-      "sha256": "160b73332db6ced1b82bc6976e8cb04e9fddf453cade4bdbfdeaa0beeff77975"
-    },
-    {
-      "path": "app/native/icons/check.svg",
-      "sha256": "a0adbb843813a89f6f509155bb710a47de44c39e73f984e23cd89d3392828eaf"
-    },
-    {
-      "path": "app/native/icons/settings.svg",
-      "sha256": "c02c11ec0c28c77e3865bb8ba960c62e1752eef44f45f70821f669d983d2796a"
-    },
-    {
-      "path": "app/native/icons/search.svg",
-      "sha256": "b395924bb54d8c436cb5bf6aa21899dfbf5f43a8a3b4252ed88d3391ec724aa5"
-    },
-    {
-      "path": "app/native/icons/ellipsis.svg",
-      "sha256": "a544da4f89679ee871b2d1e26fc0edd39e9af101c6d6fb4dcdd86e5622045b43"
-    },
-    {
-      "path": "app/native/icons/panel-left-close.svg",
-      "sha256": "b56b8975c53c9f78eeec3bfc159100d42afde63b5fb5dd15ed5a2fa0efad10a7"
-    },
-    {
-      "path": "app/native/icons/panel-left-open.svg",
-      "sha256": "dce0714b971fb1b25e954dff5e13c3499b54bd72b9acdc422d65b677c3dc9a2c"
-    },
-    {
-      "path": "app/native/icons/refresh-cw.svg",
-      "sha256": "d2da45f193b5a64eb08fe91da5aafec8a8c5fff57da852d124efaf3636f83389"
-    },
-    {
-      "path": "app/native/icons/arrow-up-right.svg",
-      "sha256": "1c647ffb1298c179ea1461bee9712a454c3394a6bcdfe0ac587e407b66dbce2b"
-    },
-    {
-      "path": "app/native/icons/x.svg",
-      "sha256": "4fcd3eb7104ef5e1ae949ebc9f316b72e3839bd790766d9795ee5f8d1eace91e"
-    },
-    {
-      "path": "app/native/icons/circle-check.svg",
-      "sha256": "3715ba897186b5b1946d58e1fbdca7b804c301ff9b1b0d8f031b68ef1a6601dc"
-    },
-    {
-      "path": "app/native/icons/copy.svg",
-      "sha256": "865d4712a410fef237c2fbbeda4b4efcad30f98f22bac6d7a1b4d35daf82019b"
+      "path": "app/native/icons/accessibility.svg",
+      "source": "packages/core/svgs/ui/Linear/accessibility.svg",
+      "upstreamSha256": "2475654538d1ffb78d34e9047d9ca72a6ca2102c1ebb118b728424c029f64706",
+      "sha256": "6693dba1465abe4c934756201048044fe6ca41d5114a64b96e5b42ad37fb2d93"
     },
     {
       "path": "app/native/icons/arrow-down.svg",
-      "sha256": "4b369faeb45175bfa70c4f4f7cbb2e87096b4bf12d288c1d2c15d2c0e927db12"
+      "source": "packages/core/svgs/arrows/Linear/arrow-down.svg",
+      "upstreamSha256": "5173babb0acbbc892544058842f9bc986ee4b26da11cbe2f0f62d69cdd3bb926",
+      "sha256": "b90526f00acad03c769e05661f64390d49b13892b19ccc261c8a9c916f64eeed"
+    },
+    {
+      "path": "app/native/icons/arrow-left.svg",
+      "source": "packages/core/svgs/arrows/Linear/arrow-left.svg",
+      "upstreamSha256": "6bc3811fb79b6e01491541a4d86ba1c43a6e22b79711d0738922dac589edab3d",
+      "sha256": "7e23f2feca38f2f1a0c58ccd8684358e457fd3e15133b96e1856a262eef98c08"
     },
     {
       "path": "app/native/icons/arrow-up.svg",
-      "sha256": "39c82281c3562da84645699a3fe17012328340c4e2582741b013dab78e6d346b"
+      "source": "packages/core/svgs/arrows/Linear/arrow-up.svg",
+      "upstreamSha256": "01d0492986b1814942668df578c4d3bc2d06ea3abb037b5158c4a94bb9c3d9b6",
+      "sha256": "87ddeda874330abd04445488a97110844d9502c80c06d7b6141828a8225da128"
     },
     {
-      "path": "app/native/icons/cloud-upload.svg",
-      "sha256": "02a39d3749bc738e547547b7451e00e240ab62c2e7a6d34e6950a371248cd248"
-    },
-    {
-      "path": "app/native/icons/user-round.svg",
-      "sha256": "a189200fd41929f4bd66c4f0e5e6b3e2ee74e0db344f2d194e188535d9c57d16"
-    },
-    {
-      "path": "app/native/icons/plug.svg",
-      "sha256": "d02bec451480121c8cca9757b345b622e4907adf5aa3d265b27aaf1470499c4d"
-    },
-    {
-      "path": "app/native/icons/bot.svg",
-      "sha256": "209e6fd51b785f01fd8ceeb9919225f38c4c7f934d168239cebd5cb13af426f8"
-    },
-    {
-      "path": "app/native/icons/palette.svg",
-      "sha256": "b5a2443964f532ea9aa3a4db3589b0e939a6865a4f702b83254bcf27e039be19"
+      "path": "app/native/icons/arrow-up-right.svg",
+      "source": "packages/core/svgs/arrows/Linear/arrow-right-up.svg",
+      "upstreamSha256": "363239711117302cfd51383b4b6d40196f99a5c4435f93c7e643ad43012dd6ac",
+      "sha256": "d759812d2465cc31bd024ddf9bbdeee65a0f7317c56cf719efc9ba7376bbce98"
     },
     {
       "path": "app/native/icons/bell.svg",
-      "sha256": "09e02e4e2732612f66ba3c602a459749ce3f3d6d616df06471edbbe36f37959d"
+      "source": "packages/core/svgs/notifications/Linear/bell.svg",
+      "upstreamSha256": "f58bca3ae3735b3c8edd1368e9db4da2997dcde7c06485554fbe354f01fd86e8",
+      "sha256": "1c0895f776b8248c927cde0d24a8a6c5560bc070417af8c0ab6bc6b50ef87696"
     },
     {
-      "path": "app/native/icons/shield-check.svg",
-      "sha256": "4472323e4d46471c0e7e6448d5bd042cd66bc8e11b65108be6321e7cb76541af"
+      "path": "app/native/icons/bot.svg",
+      "source": "packages/core/svgs/devices/Linear/bot.svg",
+      "upstreamSha256": "4e0ed602976f78b91a3b0b081325f379eca01fcb0c64fa91e43194c4e455eb04",
+      "sha256": "024032fca8fc071ed2404c00c11626674a03e2e7bcfd7fc1e9b30de8453d0dca"
     },
     {
-      "path": "app/native/icons/sliders-horizontal.svg",
-      "sha256": "19bc958ca282ef044b9e43cfc6a22c6a252ff153919917c2b479c0e0c1202ada"
+      "path": "app/native/icons/check.svg",
+      "source": "packages/core/svgs/ui/Linear/check.svg",
+      "upstreamSha256": "32b02cb4851327f2dade75d3b571f8fa45f4e6475c4ddd39acbb5cb5f7ebdee8",
+      "sha256": "7e110cb794516865b5776db7c5124c46a07ac1561c191c05ab4ec99b9e04ff0a"
     },
     {
-      "path": "app/native/icons/accessibility.svg",
-      "sha256": "70592d366f3e373c261ed063923010050c16c173a7db19d7433512f6ca15679b"
+      "path": "app/native/icons/chevron-down.svg",
+      "source": "packages/core/svgs/arrows/Linear/alt-arrow-down.svg",
+      "upstreamSha256": "eab60f152580c4984bb13af4fa272f5140de787b56aaed2bc4e4d910b73b56b9",
+      "sha256": "8e42384e777c48265d1890d43a8867a4cece3ea5190fa7cc5d008e33532008be"
     },
     {
-      "path": "app/native/icons/server.svg",
-      "sha256": "a9360713df211361ff9e3796f55e594cf75ff70a0f9b60d2f042c33a72689105"
+      "path": "app/native/icons/chevron-right.svg",
+      "source": "packages/core/svgs/arrows/Linear/alt-arrow-right.svg",
+      "upstreamSha256": "096225275617dbbb4acea4a56abd4f5cafd7ebc662d9969c2934737bcadc13d2",
+      "sha256": "f4f0af3829e8792c250537e592080155988119f0c85bb81d4eba955597d1f36a"
     },
     {
-      "path": "app/native/icons/tag.svg",
-      "sha256": "68bb0f33c0fcf497f46e5375c89ce90fa11edcad31288cc5b1a40d9a2f29d068"
+      "path": "app/native/icons/circle-check.svg",
+      "source": "packages/core/svgs/ui/Linear/check-circle.svg",
+      "upstreamSha256": "3cc6709c933299f2e1f7199a991cc35d3f64514b94b3927e8a9fdf2f8f643932",
+      "sha256": "61661f9b25bafe7c8c6a3488675f6dd2eea6621246e10f04af7160907bb81db8"
+    },
+    {
+      "path": "app/native/icons/cloud-upload.svg",
+      "source": "packages/core/svgs/weather/Linear/cloud-upload.svg",
+      "upstreamSha256": "5f8c3feea42df4dd93021e71a9ef62e3da7f0b395233c3bd53fe652da6d3e175",
+      "sha256": "3c38834c9fc139afd4f528204063ebe289b8ae41b19b8fd85fa3a50b4101c037"
+    },
+    {
+      "path": "app/native/icons/copy.svg",
+      "source": "packages/core/svgs/ui/Linear/copy.svg",
+      "upstreamSha256": "5e1b934af53b0655de3bcce9df923c0d2faf468e12a9e111ab82124d069e2029",
+      "sha256": "2175d370975898eb8786db5713107b78650e4080b2c03942654f639e7c6b8134"
     },
     {
       "path": "app/native/icons/download.svg",
-      "sha256": "ad2856652924190146d9a439a8f4540c666311a5c142e0d7d012a2a2f74bb01e"
+      "source": "packages/core/svgs/arrows-action/Linear/download-minimalistic.svg",
+      "upstreamSha256": "6b7eb63993667f8cb3bb271c5c1c02220e52d41479f7131cb380bbb19f453c33",
+      "sha256": "29d39292b7de76ac80b2294282295693423f8645c9072114977647a057d01813"
+    },
+    {
+      "path": "app/native/icons/ellipsis.svg",
+      "source": "packages/core/svgs/ui/Linear/menu-dots.svg",
+      "upstreamSha256": "3b9103a7a7ecdc7e5e1c4cd994501b00ea6964c0fa8d5c0c4519e2cdf392974c",
+      "sha256": "8b4c88c2ab36dca1dd08b7b0f6cfcfc8c4d5b4f0a64e99b3e6a9245d9ab8cf91"
+    },
+    {
+      "path": "app/native/icons/file.svg",
+      "source": "packages/core/svgs/files/Linear/file.svg",
+      "upstreamSha256": "567717ab17685aeedaa6fa609f1bd40e3bc29fd301b0b57dd8b9a88628ac82cb",
+      "sha256": "9bd767b5ab635d57d8500580d3f83ed74a1a8f74ed8a9f70401f1b43915b5779"
+    },
+    {
+      "path": "app/native/icons/file-code.svg",
+      "source": "packages/core/svgs/files/Linear/file-code.svg",
+      "upstreamSha256": "e667312b93ed0a41e846092182bcce2b92187041859126494812318e16f06439",
+      "sha256": "ce217c529003b58e3e932753720bee302a9ea2764fa8671b4636a87046092bca"
+    },
+    {
+      "path": "app/native/icons/file-text.svg",
+      "source": "packages/core/svgs/files/Linear/file-text.svg",
+      "upstreamSha256": "690e1a1cdb34fad2b2623852c08bf8ff168fc90a180eb6ed079b08675ee71945",
+      "sha256": "48833eb9c443fbd108ac2a76c63449e0516f0f973fedcede4a5b26464d730b88"
+    },
+    {
+      "path": "app/native/icons/folder.svg",
+      "source": "packages/core/svgs/folders/Linear/folder.svg",
+      "upstreamSha256": "cdc5caad5186f76ab5e15ec2006a58cd03412705354d843af0be8be7fd08efbf",
+      "sha256": "0f362aff5ecc753c13c8d90e0af9e84404e1c999a80be303a6e46d0ed9bee13c"
+    },
+    {
+      "path": "app/native/icons/folder-open.svg",
+      "source": "packages/core/svgs/folders/Linear/folder-open.svg",
+      "upstreamSha256": "c5b10fcbf21ca52293ed33e7526258d8b7ec374da41e305986b1a0a82bdcae4e",
+      "sha256": "dc811d3aaa677e7a16145ee04bc3608dc9b459c3f4d8002233297a677356bfdf"
+    },
+    {
+      "path": "app/native/icons/git-branch.svg",
+      "source": "packages/core/svgs/it/Linear/git-branch.svg",
+      "upstreamSha256": "d963a71a5dc1649724cac66788ee6ccd5fe5d8df6f15c5f2e9d12060b3a4692a",
+      "sha256": "65b529ade200ff3e02d0a54d2ebea8238bd9c073d14a2ac5b0f4a4ce7899cf47"
+    },
+    {
+      "path": "app/native/icons/history.svg",
+      "source": "packages/core/svgs/time/Linear/history.svg",
+      "upstreamSha256": "cb58765e7cc961f4490cdbebe263365e28641c6809a15d11e11d1a9e3bd286dc",
+      "sha256": "e8735062d8fa12a5bc1f9638e53cd521f4578289c9a511ce3f1c0e82ef330a65"
+    },
+    {
+      "path": "app/native/icons/image.svg",
+      "source": "packages/core/svgs/video/Linear/gallery.svg",
+      "upstreamSha256": "7198f587e975cb49c248addbd597ccb929c55be2bb764e3decdfd062ef4cb209",
+      "sha256": "63e447908d2a7c08522f61ecfbb954d98d7584f9ee48a2884af913d7f11f9391"
+    },
+    {
+      "path": "app/native/icons/palette.svg",
+      "source": "packages/core/svgs/tools/Linear/palette.svg",
+      "upstreamSha256": "b7d5ad76b0f3f59e2e4968b41c26b3e8fb5d414f597483f2e9817f932b1a0d65",
+      "sha256": "72f0bdd27c963ce49bea579bb3cee59675372711a400193fccc65c4696ca9573"
+    },
+    {
+      "path": "app/native/icons/panel-left-close.svg",
+      "source": "packages/core/svgs/it/Linear/panel-left-close.svg",
+      "upstreamSha256": "a00856584617d4ce0bcbf2f995b63140f5a38f62d6748e2b63350e1c7cfca610",
+      "sha256": "266e5ee84c770e6d6065b50048d4063f78c651a2b731ad34d6f93bc750be80d3"
+    },
+    {
+      "path": "app/native/icons/panel-left-open.svg",
+      "source": "packages/core/svgs/it/Linear/panel-left-open.svg",
+      "upstreamSha256": "2b951b0253c11000ff5e776f3247fbc8b409a3e9f4aa3b7b5e17f340ad99d110",
+      "sha256": "68c37998c9436e63089e94bb9342eed3decc70366323abe24b748bce014bf7ca"
+    },
+    {
+      "path": "app/native/icons/plug.svg",
+      "source": "packages/core/svgs/devices/Linear/plug.svg",
+      "upstreamSha256": "5120f3dd33dc871a9a738da1c55964a9096a3b642ea0104281802b7cbcafcd7f",
+      "sha256": "54a6398e501b8ac3c3791bf73cd2b852f2532923f49a8c75fc4b8f2b0aa5bfe7"
+    },
+    {
+      "path": "app/native/icons/plus.svg",
+      "source": "packages/core/svgs/ui/Linear/add.svg",
+      "upstreamSha256": "11c9e5fa88700d293a04b58e42c3f7925acc1f55db1c4ad007a5951cbb727bae",
+      "sha256": "f05f47d5a372109c9509d3afbbff03b9180f17a4df6b3c978a8b1bea9ab6a199"
+    },
+    {
+      "path": "app/native/icons/refresh-cw.svg",
+      "source": "packages/core/svgs/arrows/Linear/refresh.svg",
+      "upstreamSha256": "5b0946f5b72102459fb7001f3f8458833cb2192294443e29ef36dd3c14cddcce",
+      "sha256": "1d3ccb6a87bf26dbdf3b3071276fa208ea0aceef3683cb289d5ccf10959d13c5"
+    },
+    {
+      "path": "app/native/icons/search.svg",
+      "source": "packages/core/svgs/search/Linear/magnifier.svg",
+      "upstreamSha256": "3cf85ed5efae91a9fda3278f9279216d1bcc655a833b8c9c1a3179c6fc263260",
+      "sha256": "30b7f0c7b67d1847ca70f0abc81d1a8051ae63de0cf9f1d0e0889b88d45ed901"
+    },
+    {
+      "path": "app/native/icons/server.svg",
+      "source": "packages/core/svgs/devices/Linear/server.svg",
+      "upstreamSha256": "5833a41db194e5b5af6b48439330f6973fbc4f70cb0682e9abf7209ca70e4973",
+      "sha256": "86ec8106e1c02ba82c620bf6053f23105e44931a0b01905384cc7631d00d0e44"
+    },
+    {
+      "path": "app/native/icons/settings.svg",
+      "source": "packages/core/svgs/settings/Linear/settings.svg",
+      "upstreamSha256": "0e7d0c4749d07973aad4fe9ea26683feda555bcfe6ac7fdd152e87be0733b748",
+      "sha256": "6c9c1cd16a1f23b059eb7d0dea88ea9e5a95c17177422b32bf7b2a00ada43b20"
+    },
+    {
+      "path": "app/native/icons/shield-check.svg",
+      "source": "packages/core/svgs/security/Linear/shield-check.svg",
+      "upstreamSha256": "27d40bc05c8ca89a6ae2bff27cde88169bb61fd3bc29a2da9952f8bde3df19ae",
+      "sha256": "5a5c8832afa44337de3c273e0d1ace9bb9f538587858093636ba26109a4e2b2d"
+    },
+    {
+      "path": "app/native/icons/sliders-horizontal.svg",
+      "source": "packages/core/svgs/settings/Linear/tuning-2.svg",
+      "upstreamSha256": "9971afdaa86ff3a67af0a39ee9f7cdc37797cb2b5dc4488dee880ce96988a065",
+      "sha256": "d9c7e649d2d2e1323ec2e85c967e9ac04a8de5335302793df4e5d12d14c21d5d"
+    },
+    {
+      "path": "app/native/icons/tag.svg",
+      "source": "packages/core/svgs/money/Linear/tag.svg",
+      "upstreamSha256": "3d6af3ba93fe202c9c6b516600814cc0e1f2c1ea9481ff4e9720fc53a075b562",
+      "sha256": "15baff6e0b8e0e226a1b5b01f011100075fc922ea9ee0061926aa9d29b719df3"
+    },
+    {
+      "path": "app/native/icons/user-round.svg",
+      "source": "packages/core/svgs/users/Linear/user-rounded.svg",
+      "upstreamSha256": "de17333b3c47320dc8ef10cb56b8896b757b8ab748a87793adabca34a04df590",
+      "sha256": "eed43bb05b45eefd6de5e450a87815c1e90ec3975aa5e5a1a21682b05f37db2e"
+    },
+    {
+      "path": "app/native/icons/x.svg",
+      "source": "packages/core/svgs/ui/Linear/close.svg",
+      "upstreamSha256": "03bbb66553e3b8830fe8abf8b0849266b48b38dcdbe069235b8af7a761c97e91",
+      "sha256": "fca279ea3a95a13f31c6f74cad8bc5dc3bef09797d0797ecaece36a611b140c9"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/alt-arrow-down.svg",
+      "source": "packages/core/svgs/arrows/Linear/alt-arrow-down.svg",
+      "upstreamSha256": "eab60f152580c4984bb13af4fa272f5140de787b56aaed2bc4e4d910b73b56b9",
+      "sha256": "8e42384e777c48265d1890d43a8867a4cece3ea5190fa7cc5d008e33532008be"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/alt-arrow-right.svg",
+      "source": "packages/core/svgs/arrows/Linear/alt-arrow-right.svg",
+      "upstreamSha256": "096225275617dbbb4acea4a56abd4f5cafd7ebc662d9969c2934737bcadc13d2",
+      "sha256": "f4f0af3829e8792c250537e592080155988119f0c85bb81d4eba955597d1f36a"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/arrow-down.svg",
+      "source": "packages/core/svgs/arrows/Linear/arrow-down.svg",
+      "upstreamSha256": "5173babb0acbbc892544058842f9bc986ee4b26da11cbe2f0f62d69cdd3bb926",
+      "sha256": "b90526f00acad03c769e05661f64390d49b13892b19ccc261c8a9c916f64eeed"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/arrow-up.svg",
+      "source": "packages/core/svgs/arrows/Linear/arrow-up.svg",
+      "upstreamSha256": "01d0492986b1814942668df578c4d3bc2d06ea3abb037b5158c4a94bb9c3d9b6",
+      "sha256": "87ddeda874330abd04445488a97110844d9502c80c06d7b6141828a8225da128"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/double-alt-arrow-left.svg",
+      "source": "packages/core/svgs/arrows/Linear/double-alt-arrow-left.svg",
+      "upstreamSha256": "6f73039a09fc9bfdbd54c2e1b7b4b9d3b4de4806957627ff1fc485283d94442e",
+      "sha256": "94e615129cb1b9414460642a76dea89af2e52c92f13fd79158f03fa18016c08d"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/square-alt-arrow-right.svg",
+      "source": "packages/core/svgs/arrows/Linear/square-alt-arrow-right.svg",
+      "upstreamSha256": "b60871bcd29da867aa8f58c25a56df4c4bc43d7b37eb08b9eb93588cabe22e78",
+      "sha256": "5f6ccc424f53079d6a00a6b84b2bb01b2d77fe36cd8873c5562cb03a9cdbf8e2"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/transfer-horizontal.svg",
+      "source": "packages/core/svgs/arrows/Linear/transfer-horizontal.svg",
+      "upstreamSha256": "209263764737d3950406396301f6dc5a063a5130621955947611e45ba6fda943",
+      "sha256": "e2847d28578e232454778f594504be49f00d5736f7edf4a054be9c83219d687e"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/arrow-down-to-line.svg",
+      "source": "packages/core/svgs/arrows-action/Linear/arrow-down-to-line.svg",
+      "upstreamSha256": "1d2807a3c480367cfe105f1cfb594b8eef102a7fcff4819040fdbb371f73d37c",
+      "sha256": "280395f636e3eb4ae391e6544cc6f1d52fb67b50544e1b0c724f6c2cc16a278d"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/arrow-left-to-line.svg",
+      "source": "packages/core/svgs/arrows-action/Linear/arrow-left-to-line.svg",
+      "upstreamSha256": "235f2f2b54f991549440a951d487496e8e659a830499ef10dc4cdce8f98aa1ed",
+      "sha256": "fac5b8254289df6f2f3b3433486c580debad40525101c4f2f9ec26c24f77ca76"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/arrow-right-to-line.svg",
+      "source": "packages/core/svgs/arrows-action/Linear/arrow-right-to-line.svg",
+      "upstreamSha256": "af27e9e988e5e1def2f34e6400fb74bf7bcacae2394d23a1b5b2307ab4c13d87",
+      "sha256": "261e3e9145f27f134ad1c7c60403986dc1e6119af70cc82cc67fa6c58501d65b"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/arrow-up-to-line.svg",
+      "source": "packages/core/svgs/arrows-action/Linear/arrow-up-to-line.svg",
+      "upstreamSha256": "df093f1c0423f2845a5e19daed6c86785594d54def6e2b80d598404e111d4e1e",
+      "sha256": "e415ec03936abe4f8680a7495b4e25158853478cc157608eaf96f9f2a1e9528f"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/move-vertical.svg",
+      "source": "packages/core/svgs/arrows-action/Linear/move-vertical.svg",
+      "upstreamSha256": "c49052a9b62c8562108faaef6ba23bc2112fa82519e84cc7098c98028401cd23",
+      "sha256": "6fc9ad7b4f33b6f02a521dce1d13e66e7d5a3fe7efc3292dc4067041926f3d47"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/table.svg",
+      "source": "packages/core/svgs/business/Linear/table.svg",
+      "upstreamSha256": "cb49b4e0fbf2dcc6340f62aaa34befc12d87dc659932c98b6ac5386e24a09491",
+      "sha256": "4b30728cab47912d6b4ecc6da5d5ed4955a76cd2a9aac8025b3de868eaf2a884"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/table-cells-merge.svg",
+      "source": "packages/core/svgs/business/Linear/table-cells-merge.svg",
+      "upstreamSha256": "9ad341b550995792af434ca5edf0fae0601a8370206b2b91f4a539665b1b062c",
+      "sha256": "84526bd002e117bc5343ba255ff9ca7e0a665e841fb35aa255a05977f0600c2d"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/table-cells-split.svg",
+      "source": "packages/core/svgs/business/Linear/table-cells-split.svg",
+      "upstreamSha256": "7f42b85ff6cb50e4b44470b99b46031e4e3894364bff18e448fce4cc38740b91",
+      "sha256": "acb1ecca29e6f30463e350955d5c60177d6be13a78124d0bd70c17e672e5719b"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/lightbulb.svg",
+      "source": "packages/core/svgs/devices/Linear/lightbulb.svg",
+      "upstreamSha256": "75689f457261f2ec45e1ce4469ccd8c23dcc498ae564f92381cf679d9d0f2650",
+      "sha256": "ce7ed5bb727e0b017dce104aacf6e232c311982b2881a81e6872fccb48ac5e8c"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/smile-circle.svg",
+      "source": "packages/core/svgs/faces/Linear/smile-circle.svg",
+      "upstreamSha256": "4548625879a8094fa8e94ddc49614664a76e738d3cec38231721ba465af7b2a0",
+      "sha256": "0434a6c317c7ace7b737f1e49be787f2f78717acb6d220a8ad1f7f3dd31b6922"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/code.svg",
+      "source": "packages/core/svgs/it/Linear/code.svg",
+      "upstreamSha256": "76dc4aa1cbb4491a4a0da8e9b5b1db07a45f4e07bb89bb95186918ebff17a86d",
+      "sha256": "bfe0dbaacb4187b2d916729a342874d82bfb9cbd3f6cf247f7f84eaaed26ad99"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/code-square.svg",
+      "source": "packages/core/svgs/it/Linear/code-square.svg",
+      "upstreamSha256": "6828bed4f25e60e6a4742d78b4908d069dea03a07486121be9f0cef7214e4d61",
+      "sha256": "b46ace574c6399565f2ac954abdaa8225aee0e928defe7def0a34ae2b2938dc3"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/workflow.svg",
+      "source": "packages/core/svgs/it/Linear/workflow.svg",
+      "upstreamSha256": "6a2eecefce0d379b7639391a4807f3806d167309e1e21bf64d1a33de99a7e415",
+      "sha256": "0a1a78b1cd2851d9daba405a0c8084ef2d8a4205ce84a7e2443daa152a0e240e"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/list.svg",
+      "source": "packages/core/svgs/list/Linear/list.svg",
+      "upstreamSha256": "d4f600c547bbcf7f7749738143053b403661741b8be6a618271e4be6111a2286",
+      "sha256": "50bfb5152937c60d216c6a4863932382ac99126d323a8cefe15a4d749e1f028c"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/list-check.svg",
+      "source": "packages/core/svgs/list/Linear/list-check.svg",
+      "upstreamSha256": "d3fe474a3527210cfdb29a6b7143a113b1cd6ed68320eadf986d332c6e3e44be",
+      "sha256": "9855b084379108238ced446f7cbc4a7b08bf24bf844ca9f6bf6cc3d09283b0d4"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/list-indent-decrease.svg",
+      "source": "packages/core/svgs/list/Linear/list-indent-decrease.svg",
+      "upstreamSha256": "4271aaecb8d8c9eb45c34af630bf0c494264a381029acf2f4b89d6987d5b1b73",
+      "sha256": "66b1b810556a6203dd311a03fec876c29a25a4d1fea11947aee3169daeb6c9c5"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/list-indent-increase.svg",
+      "source": "packages/core/svgs/list/Linear/list-indent-increase.svg",
+      "upstreamSha256": "79954140f108136c5daab9c96ea37c5f26325e215a4bc2ac50c496404840536c",
+      "sha256": "693a77180e2cacf1b63c6da6f26a2f1d1f522b1b5ce4c75f3061aca0199efe32"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/list-ordered.svg",
+      "source": "packages/core/svgs/list/Linear/list-ordered.svg",
+      "upstreamSha256": "377d793ecd9dc91ef4275124f7dfa459976297053afb15821dfc70b197475021",
+      "sha256": "1719fa710a4e999959c73e1362688a0b217bb3b199949ecd3fe5ee4c90e9499f"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/list-unordered.svg",
+      "source": "packages/core/svgs/list/Linear/list-unordered.svg",
+      "upstreamSha256": "0b7510e2d5c4313a8dc05c21bb296593b94da79d9c06840444963ea1d1635439",
+      "sha256": "dc1031c4b6cc61081314f7db09fea8ff29e0e710f09833815f61c5cfd0f5844d"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/sort-from-bottom-to-top.svg",
+      "source": "packages/core/svgs/list/Linear/sort-from-bottom-to-top.svg",
+      "upstreamSha256": "5bfbed58b4d6e797fe58678f2e39a146d872a786891dec709a2f8468b872d427",
+      "sha256": "976f3eb3e840fd2b5a56131798b3b363cf75f30d0c7dc3661d8f7c00c876be6e"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/sort-from-top-to-bottom.svg",
+      "source": "packages/core/svgs/list/Linear/sort-from-top-to-bottom.svg",
+      "upstreamSha256": "9a2ec9435a1f4e067bbac210fcfb77f770337a25c662b6b376756dee6bf680da",
+      "sha256": "f30f9d5d75acb267acd36aafe59659c58ab275dd892a2d17f3956e4706a4b60f"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/chat-square-warning.svg",
+      "source": "packages/core/svgs/messages/Linear/chat-square-warning.svg",
+      "upstreamSha256": "180f51eba79a7bc5f13f25a0c4af72c6bce1c6c69e8496d917b9a627be6f12cf",
+      "sha256": "12eec4ff4e2ffc75bd04c00e31ff5090c4b0de6a950ff2b438e423247a78da3d"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/pen.svg",
+      "source": "packages/core/svgs/messages/Linear/pen.svg",
+      "upstreamSha256": "414a2e39b117f582551bd6bd071c6095381e2fd96ac9db7576116a5363d02016",
+      "sha256": "f2fa1beb48d18bdab0fa6a7fdff0949716b9471db4f62bcf18a3b4f4809fecd5"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/pen-2.svg",
+      "source": "packages/core/svgs/messages/Linear/pen-2.svg",
+      "upstreamSha256": "d5063ac05aa44eb9174a66ac745af08c49ec4ed07259b19ff945c8704b4d65d1",
+      "sha256": "bd3489759fa3c36a405462c320a4fbea8d2d76fc7449c366b706cfc23ce17ca5"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/bookmark.svg",
+      "source": "packages/core/svgs/school/Linear/bookmark.svg",
+      "upstreamSha256": "043268a9993a671f089c5d6807708a5836d7691fe035b0ec70fb2d8e74edef45",
+      "sha256": "c5ec9eae9e18568ec62c8b9d356d2a2b35bf6931810e6fb27b6234e389f8aec0"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/lock.svg",
+      "source": "packages/core/svgs/security/Linear/lock.svg",
+      "upstreamSha256": "6031fb69f9b9e863496d20140a70304e40f95442ede85abff6a2d466485b08c7",
+      "sha256": "86b6e8fd95b84b6e75d1a845df20ac0fd10a0e40d27714d971d2663c933880c8"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/lock-unlocked.svg",
+      "source": "packages/core/svgs/security/Linear/lock-unlocked.svg",
+      "upstreamSha256": "b4704daa3c4874f04cc026e614565dc09399abf2d008f67de25359b5f297ab11",
+      "sha256": "ff912c1c9dc1fd6c35eb96d6e59b542dffde23edab87ae5c650b6e489a4e6f4d"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/columns-2.svg",
+      "source": "packages/core/svgs/settings/Linear/columns-2.svg",
+      "upstreamSha256": "475c0033990f61e012e49c81a77863ecc152d8741d53d9b4855b11d46bc6c810",
+      "sha256": "7f8553c9c41cd3594354127bc3bfa70036835a4d7f773ce2214db3d81cd65322"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/link.svg",
+      "source": "packages/core/svgs/text-formatting/Linear/link.svg",
+      "upstreamSha256": "5de39d8160598b1436ebf9e058b633dcb0ed3c6bb351710452a3eeb3c85d90af",
+      "sha256": "5ff34f29d37aedc4e4728bbbd0e239a9c9484d67bd44a34e58928caa7fb13448"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/paragraph.svg",
+      "source": "packages/core/svgs/text-formatting/Linear/paragraph.svg",
+      "upstreamSha256": "137bdfff067267d7fe160ff8d096593190fdef617d5b2719dab66e9aacc2764b",
+      "sha256": "29467d6c35a6f340f94cad49ce477baee7d92a08ed19804c1a0198b4991fa68c"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/quote.svg",
+      "source": "packages/core/svgs/text-formatting/Linear/quote.svg",
+      "upstreamSha256": "9aaa2bc5535df810236438ac1d48544b9170ccc4aa21894ef5f4c6016f095294",
+      "sha256": "8836f9014ed31daf60dcd84b1fdf2b1bde22380df3a60964139abf60427cb827"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/text-align-center.svg",
+      "source": "packages/core/svgs/text-formatting/Linear/text-align-center.svg",
+      "upstreamSha256": "332d9f9867cab17f79bc0ad6f8b859b6c704b25cd9bd320f5b8d5143ac5c5b26",
+      "sha256": "13372ea2f86df20929700a1c40cfe105ff7fb204fcc71da842bfbf4cb03cbce1"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/text-align-left.svg",
+      "source": "packages/core/svgs/text-formatting/Linear/text-align-left.svg",
+      "upstreamSha256": "b45201b7608530df5656abb79c2d89e4fc9f76c87d46ee8dd7f1c5807086c4cc",
+      "sha256": "dde8ee8707dacb67cb08de8944690ce4155656cb4f3c56e9047f655f84a5c6b6"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/text-align-right.svg",
+      "source": "packages/core/svgs/text-formatting/Linear/text-align-right.svg",
+      "upstreamSha256": "3514230b12e5cb1285aecb7173f80e3dcc84c120c1266ec6cdb3797e211e26df",
+      "sha256": "db03a099c6558434f00a52b84ef9809f1eef989b2949d12343ebb30cdae99c69"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/text-bold.svg",
+      "source": "packages/core/svgs/text-formatting/Linear/text-bold.svg",
+      "upstreamSha256": "9403f871fc5aa02302cda682551a3a10b4ddec721b05fc4017222bdacb1abe17",
+      "sha256": "19554fac0a7a7d2c82428250c272ec286847163f14c41b10fa9abdcffb9ef801"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/text-cross.svg",
+      "source": "packages/core/svgs/text-formatting/Linear/text-cross.svg",
+      "upstreamSha256": "959f70fa3f6066f42fafabe51a0ecb173f579c7f442abe55536a72ec765a6338",
+      "sha256": "03290816c4320cda57deb22a11593b489ac18e7d4b62bf2220479efa303bce4c"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/text-format.svg",
+      "source": "packages/core/svgs/text-formatting/Linear/text-format.svg",
+      "upstreamSha256": "fdda3e1ac1635d1eb7b40034cd79add2626fec1b2fb2561baaa2b8a00eedc874",
+      "sha256": "81f0819152990c928a73e7003c7b46a4aa83945d5ddf08249bf7d7d841b69d0a"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/text-italic.svg",
+      "source": "packages/core/svgs/text-formatting/Linear/text-italic.svg",
+      "upstreamSha256": "bf011e071a31e36e00936a892ee271f541a39cdd6f72bbfab86cad7d888957da",
+      "sha256": "b9320b0b7e76007780ab2e53ce9f49bdc6e716aef3a129330990f3cd45df4ced"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/text-underline.svg",
+      "source": "packages/core/svgs/text-formatting/Linear/text-underline.svg",
+      "upstreamSha256": "b900fa007e74aea8ac202db95ea37452d0e75c1ab08d9370fa452388c7d38c2b",
+      "sha256": "a631ae8ad57e4a25dec9e8527d88bc39f8bfb31f1e54cdc16b4b2c64c1ae9091"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/paint-bucket.svg",
+      "source": "packages/core/svgs/tools/Linear/paint-bucket.svg",
+      "upstreamSha256": "8e8f2fd09140e7aacc6af33e04296c9baa2bd1d760df13b8238081b345760e37",
+      "sha256": "5cc6f9e8ee06012e3069d1c70cef691b36d800b968cb9f2034aab46382a39941"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/palette.svg",
+      "source": "packages/core/svgs/tools/Linear/palette.svg",
+      "upstreamSha256": "b7d5ad76b0f3f59e2e4968b41c26b3e8fb5d414f597483f2e9817f932b1a0d65",
+      "sha256": "72f0bdd27c963ce49bea579bb3cee59675372711a400193fccc65c4696ca9573"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/add.svg",
+      "source": "packages/core/svgs/ui/Linear/add.svg",
+      "upstreamSha256": "11c9e5fa88700d293a04b58e42c3f7925acc1f55db1c4ad007a5951cbb727bae",
+      "sha256": "f05f47d5a372109c9509d3afbbff03b9180f17a4df6b3c978a8b1bea9ab6a199"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/add-square.svg",
+      "source": "packages/core/svgs/ui/Linear/add-square.svg",
+      "upstreamSha256": "f3d3b7c8c76c0ca04904b4e1cc36c2b95f685b010d27951423f86295a0190dc0",
+      "sha256": "de242e8070a81f9aeb1538c8c5220c28f692fc634346a44e8120948eb0cce8ea"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/check.svg",
+      "source": "packages/core/svgs/ui/Linear/check.svg",
+      "upstreamSha256": "32b02cb4851327f2dade75d3b571f8fa45f4e6475c4ddd39acbb5cb5f7ebdee8",
+      "sha256": "7e110cb794516865b5776db7c5124c46a07ac1561c191c05ab4ec99b9e04ff0a"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/close.svg",
+      "source": "packages/core/svgs/ui/Linear/close.svg",
+      "upstreamSha256": "03bbb66553e3b8830fe8abf8b0849266b48b38dcdbe069235b8af7a761c97e91",
+      "sha256": "fca279ea3a95a13f31c6f74cad8bc5dc3bef09797d0797ecaece36a611b140c9"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/copy.svg",
+      "source": "packages/core/svgs/ui/Linear/copy.svg",
+      "upstreamSha256": "5e1b934af53b0655de3bcce9df923c0d2faf468e12a9e111ab82124d069e2029",
+      "sha256": "2175d370975898eb8786db5713107b78650e4080b2c03942654f639e7c6b8134"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/copy-add.svg",
+      "source": "packages/core/svgs/ui/Linear/copy-add.svg",
+      "upstreamSha256": "0cc3ef2467d6f1684957447e61b26f31b66f0c06ed57e3333ad8a59593764700",
+      "sha256": "24f9204f312278db6e95b083b529074193b4c4936488083a59f5937ab4c3db76"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/danger.svg",
+      "source": "packages/core/svgs/ui/Linear/danger.svg",
+      "upstreamSha256": "7d4beaabd13a036aeff093e35f1e2a9bc86d0d011f75b26643fc310e2738f265",
+      "sha256": "f8d198f2cd787591001d7d62c64bb76bcf135f43f4cd7e48f8c1833d07baae3a"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/danger-triangle.svg",
+      "source": "packages/core/svgs/ui/Linear/danger-triangle.svg",
+      "upstreamSha256": "b8e1581a7c1611086cf9343d92bbb549e8c5e1c2215f2201682b225d6ee5b330",
+      "sha256": "0443c2d6f943ac2a0d917392e9e6305731ce89e7b733dea0e239a8245a5671ce"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/forbidden-circle.svg",
+      "source": "packages/core/svgs/ui/Linear/forbidden-circle.svg",
+      "upstreamSha256": "d46db98add99ececba118bef4b1269c17f6ab1582e31b2527c9e13cb480d4b49",
+      "sha256": "2001f80b981d3343b373e789a8ca9536785ec4ad972bdf66c78ddfafb759e609"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/grip-vertical.svg",
+      "source": "packages/core/svgs/ui/Linear/grip-vertical.svg",
+      "upstreamSha256": "c037fc634492a44ec4aa23de4daf18204d51d858c830f416439dceaefef6d863",
+      "sha256": "a901aeda8f21eed72a53ef4fdd2a252521054bb8a53e9f6fdb9adf0ca8dd621b"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/info-circle.svg",
+      "source": "packages/core/svgs/ui/Linear/info-circle.svg",
+      "upstreamSha256": "57acd8e8a15528ce6fc2e654fa61daa4ef8069222eb063926e2d4a1417978742",
+      "sha256": "5637c68e3aa57f187d49b6235ec7b13c5122b60597f11ee24c111edffb9e8c56"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/minus.svg",
+      "source": "packages/core/svgs/ui/Linear/minus.svg",
+      "upstreamSha256": "a3fa941c535a5c454a6a34bf623010d3520f35ddeae97a5524a5d8840247730d",
+      "sha256": "5755b0436db1ffd1b64a8dc10f789e86643ffa0bb22c943a4b4eeefea6a5beb9"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/scissors.svg",
+      "source": "packages/core/svgs/ui/Linear/scissors.svg",
+      "upstreamSha256": "dd38eb25aaeb3aa5c059108e56d78228c4fb8ee22b20820334b11e42bc47753a",
+      "sha256": "c27f4fca4a3df76f47cf1103151a9840bd6a73c6ec9e425b47bb1e85cf9788e8"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/trash-bin-minimalistic.svg",
+      "source": "packages/core/svgs/ui/Linear/trash-bin-minimalistic.svg",
+      "upstreamSha256": "cf4aab672ba098eaf52a772f77bb7b0ab5e74d4a9861d6a670215bdb2b0b8df9",
+      "sha256": "67bf083126607a8e345901382b83179964a678a344f914ace77b9f12a1407731"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/gallery.svg",
+      "source": "packages/core/svgs/video/Linear/gallery.svg",
+      "upstreamSha256": "7198f587e975cb49c248addbd597ccb929c55be2bb764e3decdfd062ef4cb209",
+      "sha256": "63e447908d2a7c08522f61ecfbb954d98d7584f9ee48a2884af913d7f11f9391"
+    },
+    {
+      "path": "app/native/internal/arcmd/editor/icons/bookmark-bold.svg",
+      "source": "packages/core/svgs/school/Bold/bookmark.svg",
+      "upstreamSha256": "8286fc3f05610b4ac49e10afd9afdfcae8c9cdea122cfa9daebcedc27fef9f8f",
+      "sha256": "65a1a1a28a78588bd1f6be185040a9db3f571ea0550d7ae44bef1fa819957d20"
     }
-  ]
+  ],
+  "retainedLucide": {
+    "reason": "no Solar equivalent; drawn at stroke-width 1.5 to match Solar Linear",
+    "path": "app/native/internal/arcmd/editor/icons.go",
+    "icons": [
+      "heading-1",
+      "heading-2",
+      "heading-3",
+      "heading-4",
+      "heading-5",
+      "sigma",
+      "wrap-text"
+    ],
+    "licenseFile": "third_party/licenses/native/lucide-LICENSE",
+    "licenseSha256": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57"
+  }
 }

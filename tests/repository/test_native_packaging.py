@@ -102,11 +102,25 @@ class NativePackagingTests(unittest.TestCase):
 
     def test_registered_native_icons(self):
         manifest = json.loads((ROOT / 'third_party/native-icons.json').read_text(encoding='utf-8'))
-        self.assertEqual(manifest['name'], 'lucide-static')
+        self.assertEqual((manifest['name'], manifest['style']), ('solar-icons', 'Linear'))
         self.assertTrue(manifest['files'])
+        registered = set()
         for item in manifest['files']:
-            self.assertEqual(hashlib.sha256((ROOT / item['path']).read_bytes()).hexdigest(), item['sha256'])
-        self.assertEqual(hashlib.sha256((ROOT / manifest['licenseFile']).read_bytes()).hexdigest(), manifest['licenseSha256'])
+            data = (ROOT / item['path']).read_bytes()
+            self.assertEqual(hashlib.sha256(data).hexdigest(), item['sha256'])
+            self.assertTrue(item['source'].startswith('packages/core/svgs/'))
+            self.assertIn(b'currentColor', data)
+            self.assertNotIn(b'"black"', data)
+            registered.add(item['path'])
+        for directory in ('app/native/icons', 'app/native/internal/arcmd/editor/icons'):
+            shipped = {path.relative_to(ROOT).as_posix() for path in (ROOT / directory).glob('*.svg')}
+            self.assertTrue(shipped)
+            self.assertLessEqual(shipped, registered, 'Every shipped native icon must be registered')
+        for key in ('licenseFile', 'thirdPartyLicenseFile'):
+            sha_key = key.replace('File', 'Sha256')
+            self.assertEqual(hashlib.sha256((ROOT / manifest[key]).read_bytes()).hexdigest(), manifest[sha_key])
+        retained = manifest['retainedLucide']
+        self.assertEqual(hashlib.sha256((ROOT / retained['licenseFile']).read_bytes()).hexdigest(), retained['licenseSha256'])
 
     def test_logo_is_the_user_supplied_original(self):
         research = json.loads((ROOT / 'third_party/research-sources.json').read_text(encoding='utf-8'))

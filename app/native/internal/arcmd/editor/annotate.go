@@ -550,8 +550,8 @@ func flattenSVG(d string) [][][2]float32 {
 	return out
 }
 
-// iconAnnotate is Lucide's pencil-line.
-var iconAnnotate = lucide(`<path d="M13 21h8"/><path d="m15 5 4 4"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>`)
+// iconAnnotate is Solar's pen over a line.
+var iconAnnotate = solar("pen-2")
 
 // annotationPanelWidth and annotationPanelHeight are the mark picker's
 // size: four rows of tiles, the colors and the remover.

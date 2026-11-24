@@ -15,7 +15,7 @@ type nativeChoice[T comparable] struct {
 }
 
 // The native select base retains keyboard/overlay semantics. Only its neutral
-// variant and Lucide chevron change; accessible values retain the full names.
+// variant and Solar chevron change; accessible values retain the full names.
 func workspaceSelect[T comparable](c *ui.Context, value *T, label, placeholder string, choices []nativeChoice[T], disabled bool) ui.Element {
 	shown := placeholder
 	for _, choice := range choices {
