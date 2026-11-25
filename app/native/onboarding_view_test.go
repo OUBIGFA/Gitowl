@@ -267,6 +267,21 @@ func TestKernelOnboardingCancelAndCoreStepReset(t *testing.T) {
 	}
 }
 
+// A completed or reset sign-in can be absent while Welcome is still visible.
+// Its Cancel control must survive the frames between pointer down and up.
+func TestKernelOnboardingCancelWithClearedSignIn(t *testing.T) {
+	for _, locale := range []string{"en", "zh-Hans", "zh-Hant"} {
+		t.Run(locale, func(t *testing.T) {
+			h := newOnboardingHarness(locale, &backend.KernelOnboarding{Step: "SignInToDotComWithBrowser"}, nil)
+			h.tt.Frame()
+			onboardingClick(t, h.tt, locales.In(locale).Cancel())
+			if len(h.decisions) != 1 || h.decisions[0] != (onboardingDecision{action: "advance", step: "Start"}) {
+				t.Fatalf("Cancel did not leave the empty sign-in page: %+v", h.decisions)
+			}
+		})
+	}
+}
+
 type signInHarness struct {
 	tt        *ui.Tester
 	id        int

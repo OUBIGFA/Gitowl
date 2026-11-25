@@ -7,6 +7,7 @@ import (
 	"github.com/egoist/mygo"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -101,6 +102,8 @@ func TestNativeOAuthNonceAndRenewal(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Setenv("TEST_ENV", "1")
+	t.Setenv("GIT_CONFIG_GLOBAL", filepath.Join(t.TempDir(), "empty.gitconfig"))
+	t.Setenv("GIT_CONFIG_NOSYSTEM", "1")
 	k, err := NewNativeKernel(ctx, git, filepath.Join(t.TempDir(), "profile"), nil)
 	if err != nil {
 		t.Fatal(err)
@@ -108,6 +111,31 @@ func TestNativeOAuthNonceAndRenewal(t *testing.T) {
 	defer k.Close()
 	n := k.native
 	n.oauthConfig = nativeOAuthConfig{ClientID: "fixture", ClientSecret: "fixture-secret", CallbackScheme: "x-github-desktop-auth"}
+	n.resources = t.TempDir()
+	config, err := json.Marshal(n.oauthConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(n.resources, "native-launch.json"), config, 0600); err != nil {
+		t.Fatal(err)
+	}
+	var state string
+	n.onEvent = func(event KernelEvent) {
+		if event.External == nil {
+			return
+		}
+		address, err := url.Parse(event.External.URL)
+		if err != nil {
+			t.Fatal(err)
+		}
+		state = address.Query().Get("state")
+		if address.Host != "github.com" || address.Path != "/login/oauth/authorize" || state == "" {
+			t.Fatal("browser authentication did not receive a GitHub authorization URL and nonce")
+		}
+		if err := k.ReplyExternal(ctx, event.External.ID, true); err != nil {
+			t.Fatal(err)
+		}
+	}
 	requests := 0
 	n.httpClient = &http.Client{Transport: componentTransport(func(r *http.Request) (*http.Response, error) {
 		requests++
@@ -134,20 +162,33 @@ func TestNativeOAuthNonceAndRenewal(t *testing.T) {
 		}
 		return &http.Response{StatusCode: 200, Header: make(http.Header), Body: io.NopCloser(strings.NewReader(body))}, nil
 	})}
-	n.oauthPending = &nativeOAuthPending{state: "nonce", endpoint: "https://api.github.com", expires: time.Now().Add(time.Minute)}
+	if _, err := k.AdvanceWelcome(ctx, "SignInToDotComWithBrowser"); err != nil {
+		t.Fatal(err)
+	}
 	if err := n.finishSignIn(ctx, "x-github-desktop-auth://oauth?state=wrong&code=fixture"); err == nil || requests != 0 {
 		t.Fatal("unmatched callback made a request")
 	}
 	t.Cleanup(func() {
 		mygo.Secrets.Service(credentialService(n.credentialNamespace, "https://api.github.com")).Delete("fixture")
 	})
-	if err := n.finishSignIn(ctx, "x-github-desktop-auth://oauth?state=nonce&code=fixture"); err != nil {
+	callback := "x-github-desktop-auth://oauth?state=" + state + "&code=fixture"
+	result, err := k.DispatchApplicationURL(ctx, callback)
+	if err != nil {
 		t.Fatal(err)
 	}
 	if len(n.accounts) != 1 || len(n.accounts[0].Emails) != 1 || requests != 3 {
 		t.Fatal("account metadata incomplete")
 	}
-	if err := n.finishSignIn(ctx, "x-github-desktop-auth://oauth?state=nonce&code=fixture"); err == nil || requests != 3 {
+	// The public callback must finish the visible login step, not just save a
+	// token. Otherwise Welcome renders an empty, permanently waiting page.
+	welcome := result.Snapshot.Onboarding
+	if welcome == nil || welcome.Step != "ConfigureGit" || welcome.Account == nil || welcome.Account.Name != "Fixture" || welcome.Account.PreferredEmail != "fixture@example.invalid" {
+		t.Fatalf("successful OAuth did not advance Welcome with the account identity: %+v", welcome)
+	}
+	if result.Snapshot.SignIn != nil || result.Snapshot.CurrentPopup != nil || !result.Snapshot.Welcome {
+		t.Fatal("successful OAuth left authentication open or skipped author confirmation")
+	}
+	if err := n.finishSignIn(ctx, callback); err == nil || requests != 3 {
 		t.Fatal("OAuth callback replay accepted")
 	}
 	if err := n.saveCredential(n.accounts[0], nativeCredential{AccessToken: "old", RefreshToken: "old-refresh", ExpiresAt: 1, RefreshTokenExpiresAt: time.Now().Add(time.Hour).UnixMilli()}); err != nil {
@@ -156,6 +197,63 @@ func TestNativeOAuthNonceAndRenewal(t *testing.T) {
 	token, err := n.accountCredential(n.accounts[0])
 	if err != nil || token.AccessToken != "new-fixture-token" || requests != 4 {
 		t.Fatalf("renewal failed %v", err)
+	}
+	// Leaving the first-run login page still protects the user's navigation
+	// when a valid browser callback arrives late, as in the upstream flow.
+	if _, err := k.AdvanceWelcome(ctx, "SignInToDotComWithBrowser"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := k.AdvanceWelcome(ctx, "Start"); err != nil {
+		t.Fatal(err)
+	}
+	result, err = k.DispatchApplicationURL(ctx, "x-github-desktop-auth://oauth?state="+state+"&code=fixture")
+	if err != nil || result.Snapshot.Onboarding.Step != "Start" {
+		t.Fatal("a late OAuth callback reopened the canceled setup step", err)
+	}
+	n.state.Welcome, n.state.Onboarding = false, nil
+	if _, err := k.SignIn(ctx, nil); err != nil {
+		t.Fatal(err)
+	}
+	result, err = k.DispatchApplicationURL(ctx, "x-github-desktop-auth://oauth?state="+state+"&code=fixture")
+	if err != nil || result.Snapshot.Welcome || result.Snapshot.Onboarding != nil || result.Snapshot.CurrentPopup != nil {
+		t.Fatal("settings sign-in unexpectedly started first-run setup", err)
+	}
+}
+
+func TestNativeWelcomeUsesSavedAccountForAuthorConfirmation(t *testing.T) {
+	ctx := context.Background()
+	git, err := exec.LookPath("git")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("TEST_ENV", "1")
+	configPath := filepath.Join(t.TempDir(), "empty.gitconfig")
+	t.Setenv("GIT_CONFIG_GLOBAL", configPath)
+	t.Setenv("GIT_CONFIG_NOSYSTEM", "1")
+	k, err := NewNativeKernel(ctx, git, filepath.Join(t.TempDir(), "profile"), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer k.Close()
+	// This is the installed failure's persisted state: an account was saved
+	// successfully, but first-run author confirmation has not completed.
+	const account = `[{"login":"fixture","id":42,"endpoint":"https://api.github.com","emails":[{"email":"private@example.invalid","primary":true,"visibility":"private"},{"email":"42+fixture@users.noreply.github.com","primary":false}]}]`
+	if err := k.native.store.Set(ctx, "users", account); err != nil {
+		t.Fatal(err)
+	}
+	if err := k.native.loadAccounts(ctx); err != nil {
+		t.Fatal(err)
+	}
+	result, err := k.AdvanceWelcome(ctx, "ConfigureGit")
+	if err != nil {
+		t.Fatal(err)
+	}
+	identity := result.Snapshot.Onboarding.Account
+	if identity == nil || identity.Name != "fixture" || identity.PreferredEmail != "42+fixture@users.noreply.github.com" || len(identity.Emails) != 2 {
+		t.Fatalf("saved account was lost or its private address displaced no-reply: %+v", identity)
+	}
+	if _, err := os.Stat(configPath); !os.IsNotExist(err) || !result.Snapshot.Welcome {
+		t.Fatal("displaying the saved identity wrote Git config or bypassed confirmation")
 	}
 }
 

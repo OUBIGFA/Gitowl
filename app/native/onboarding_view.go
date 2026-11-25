@@ -350,7 +350,9 @@ func syncKernelSignInForm(form *kernelSignInForm, id int, state *backend.KernelS
 	if state != nil {
 		kind = state.Kind
 	}
-	if form.popupID != id || form.kind != kind || state == nil {
+	// An absent sign-in is a stable state too. Remounting it every frame
+	// replaces Cancel between pointer down and up and drops the click.
+	if form.popupID != id || form.kind != kind {
 		*form = kernelSignInForm{popupID: id, kind: kind, session: form.session + 1}
 	}
 }

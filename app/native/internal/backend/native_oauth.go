@@ -184,5 +184,11 @@ func (n *NativeOwner) finishSignIn(ctx context.Context, raw string) error {
 	n.state.SignIn = nil
 	n.state.CurrentPopup = nil
 	n.state.Popups = []KernelPopup{}
+	// OAuth completion must also advance the first-run page. Clearing SignIn
+	// alone leaves that page displaying its transient "please wait" state.
+	// A callback after the user left login must not navigate them back.
+	if n.state.Welcome && n.state.Onboarding != nil && (n.state.Onboarding.Step == "SignInToDotComWithBrowser" || n.state.Onboarding.Step == "SignInToEnterprise") {
+		return n.welcome(ctx, "ConfigureGit")
+	}
 	return nil
 }

@@ -20,9 +20,10 @@ type nativeAccount struct {
 	Emails    []nativeEmail `json:"emails"`
 }
 type nativeEmail struct {
-	Email    string `json:"email"`
-	Verified bool   `json:"verified"`
-	Primary  bool   `json:"primary"`
+	Email      string `json:"email"`
+	Verified   bool   `json:"verified"`
+	Primary    bool   `json:"primary"`
+	Visibility string `json:"visibility,omitempty"`
 }
 type nativeCredential struct {
 	AccessToken           string `json:"accessToken"`

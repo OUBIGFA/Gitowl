@@ -14,6 +14,35 @@ func (n *NativeOwner) welcome(ctx context.Context, step string) error {
 	n.state.Welcome = true
 	n.state.Onboarding = &KernelOnboarding{Step: step}
 	if step == "ConfigureGit" {
+		if len(n.accounts) > 0 {
+			account := n.accounts[0]
+			identity := &KernelOnboardingAccount{Name: account.Name, Enterprise: account.Endpoint != "https://api.github.com"}
+			if identity.Name == "" {
+				identity.Name = account.Login
+			}
+			// Keep the upstream preference: public primary, then no-reply,
+			// then the first address. Private primary must not displace no-reply.
+			publicPrimary, noReply := "", ""
+			for _, email := range account.Emails {
+				identity.Emails = append(identity.Emails, email.Email)
+				if email.Primary && (email.Visibility == "" || email.Visibility == "public") {
+					publicPrimary = email.Email
+				}
+				if strings.Contains(strings.ToLower(email.Email), "@users.noreply.") {
+					noReply = email.Email
+				}
+			}
+			if len(identity.Emails) > 0 {
+				identity.PreferredEmail = identity.Emails[0]
+			}
+			if noReply != "" {
+				identity.PreferredEmail = noReply
+			}
+			if publicPrimary != "" {
+				identity.PreferredEmail = publicPrimary
+			}
+			n.state.Onboarding.Account = identity
+		}
 		for _, item := range []struct {
 			key  string
 			dest **string
