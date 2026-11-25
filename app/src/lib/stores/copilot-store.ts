@@ -831,9 +831,10 @@ export class CopilotStore extends BaseStore {
     credentials: ICopilotCredentialContext = this.createCredentialContext(
       account
     ),
-    options: Pick<CopilotClientOptions, 'logLevel' | 'env'> = {}
+    options: Pick<CopilotClientOptions, 'logLevel' | 'env'> = {},
+    signal?: AbortSignal
   ): Promise<CopilotClient> {
-    const runtimePath = getCopilotRuntimePath(join(__dirname, 'copilot'))
+    const runtimePath = await this.prepareRuntime(signal)
     if (!(await pathExists(runtimePath))) {
       throw new Error(
         'Cannot create Copilot client: Runtime entry point not found'
@@ -870,6 +871,26 @@ export class CopilotStore extends BaseStore {
       this.clientTokenProviders.set(client, credentials.tokenProvider)
     }
     return client
+  }
+
+  private async prepareRuntime(signal?: AbortSignal): Promise<string> {
+    if (process.env.GITOWL_NODE_CORE === '1') {
+      const { getNativeCopilotRuntime } = await import(
+        '../copilot-runtime-download'
+      )
+      return getNativeCopilotRuntime(await getPath('userData')).prepare(signal)
+    }
+    return getCopilotRuntimePath(join(__dirname, 'copilot'))
+  }
+
+  private async runtimeInstalled(): Promise<boolean> {
+    if (process.env.GITOWL_NODE_CORE === '1') {
+      const { getNativeCopilotRuntime } = await import(
+        '../copilot-runtime-download'
+      )
+      return getNativeCopilotRuntime(await getPath('userData')).isInstalled()
+    }
+    return true
   }
 
   /** Preserve custom instructions without discovering hooks, config, or skills. */
@@ -913,15 +934,21 @@ export class CopilotStore extends BaseStore {
     })
   }
 
-  /** Whether the packaged SDK runtime needed for assisted commit planning is installed. */
+  /** Whether assisted planning has a bundled or downloadable SDK runtime. */
   public async isAssistedCommitRuntimeAvailable(): Promise<boolean> {
+    // Eligibility does not download anything. The published manifest means the
+    // runtime can be prepared after the user explicitly starts a Copilot action.
+    if (process.env.GITOWL_NODE_CORE === '1') {
+      return pathExists(join(__dirname, 'copilot-runtime.json'))
+    }
     return pathExists(getCopilotRuntimePath(join(__dirname, 'copilot')))
   }
 
   /** Reuse current session-bound authentication with the planner's isolated runtime policy. */
   protected async createAssistedCommitClient(
     account: Account,
-    repositoryPath: string
+    repositoryPath: string,
+    signal?: AbortSignal
   ): Promise<ICopilotPlanningClient> {
     const client = await this.createClient(
       account,
@@ -930,7 +957,8 @@ export class CopilotStore extends BaseStore {
       {
         logLevel: 'none',
         env: getAssistedCommitClientEnvironment(),
-      }
+      },
+      signal
     )
     return getCopilotPlanningClient(client, config =>
       this.createSession(client, config)
@@ -1037,7 +1065,7 @@ export class CopilotStore extends BaseStore {
       }
       throwIfCancelled()
       client = await awaitCancellableCopilotOperation(
-        () => this.createAssistedCommitClient(account, repositoryPath),
+        () => this.createAssistedCommitClient(account, repositoryPath, signal),
         {
           signal,
           cancellationError,
@@ -1177,7 +1205,10 @@ export class CopilotStore extends BaseStore {
       const requestedModelId =
         request?.kind === 'copilot' ? request.modelId : null
       const cachedModels = await awaitCancellableCopilotOperation(
-        () => this.getCachedModels(account),
+        async () => {
+          await this.prepareRuntime(signal)
+          return this.getCachedModels(account)
+        },
         {
           signal,
           cancellationError: () => new CommitMessageGenerationCancelledError(),
@@ -1202,7 +1233,7 @@ export class CopilotStore extends BaseStore {
 
     try {
       client = await awaitCancellableCopilotOperation(
-        () => this.createClient(account, repositoryPath, credentials),
+        () => this.createClient(account, repositoryPath, credentials, {}, signal),
         {
           signal,
           cancellationError: () => new CommitMessageGenerationCancelledError(),
@@ -1394,7 +1425,7 @@ export class CopilotStore extends BaseStore {
     let client: CopilotClient
     try {
       client = await awaitCancellableCopilotOperation(
-        () => this.createClient(account, repositoryPath),
+        () => this.createClient(account, repositoryPath, undefined, {}, signal),
         {
           signal,
           cancellationError: () => new CopilotConflictResolutionAbortError(),
@@ -1694,8 +1725,12 @@ export class CopilotStore extends BaseStore {
    * would mean Copilot legitimately reports no models.
    */
   public async listModels(
-    account: Account
+    account: Account,
+    allowDownload = true
   ): Promise<ReadonlyArray<Model> | null> {
+    if (!allowDownload && !(await this.runtimeInstalled())) {
+      return null
+    }
     const key = getCopilotModelCacheKey(account)
     if (
       !this.signedInAccountKeys.has(key) ||
@@ -1720,8 +1755,12 @@ export class CopilotStore extends BaseStore {
    * result if it is less than {@link QuotaSnapshotsCacheTTL} old.
    */
   public async getQuotaSnapshots(
-    account: Account
+    account: Account,
+    allowDownload = true
   ): Promise<CopilotQuotaSnapshots | null> {
+    if (!allowDownload && !(await this.runtimeInstalled())) {
+      return null
+    }
     const key = getCopilotAccountCacheKey(account)
     if (
       !this.signedInAccountKeys.has(key) ||

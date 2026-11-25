@@ -75,6 +75,15 @@ export async function copyRuntimePackages(target: string): Promise<void> {
       recursive: true,
       filter: path => {
         const rel = relative(directory, path).replaceAll('\\', '/')
+        // These files describe/debug builds; Node executes the published JS.
+        // Retain executable TS sources and every license/notice unchanged.
+        if (
+          /\.(?:[cm]?js|css|d\.[cm]?ts)\.map$|\.d\.[cm]?ts$|\.tsbuildinfo$/.test(
+            rel
+          )
+        ) {
+          return false
+        }
         // The application uses the library's default wasm32 entry and the one
         // Windows x64 SQLite prebuild; other CPU binaries and compiler sources
         // are not consumed at runtime. Published license files are retained.
@@ -216,10 +225,30 @@ async function prepare() {
     await cp(join(root, 'app/node_modules/dugite/git'), join(staging, 'git'), {
       recursive: true,
     })
-    await cp(
-      join(root, 'app/node_modules/@github/copilot-sdk-win32-x64'),
-      join(staging, 'copilot'),
-      { recursive: true }
+    const copilot = manifest.bundledInputs.find(
+      (input: { package: string }) =>
+        input.package === '@github/copilot-sdk-win32-x64'
+    )
+    const copilotFiles = await inventory(join(root, copilot.path))
+    // The complete official package is acquired on demand. Keep both registry
+    // integrity and installed file hashes bound to this build's locked inputs.
+    await writeFile(
+      join(staging, 'copilot-runtime.json'),
+      JSON.stringify({
+        schemaVersion: 1,
+        package: copilot.package,
+        version: copilot.version,
+        platform: 'win32',
+        arch: 'x64',
+        url: copilot.source,
+        integrity: copilot.integrity,
+        files: await Promise.all(
+          copilotFiles.map(async file => ({
+            ...file,
+            size: (await stat(join(root, copilot.path, file.path))).size,
+          }))
+        ),
+      }) + '\n'
     )
     const trampoline = join(
       root,

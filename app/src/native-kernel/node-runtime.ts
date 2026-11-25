@@ -21,6 +21,7 @@ import { getDesktopHost } from '../lib/desktop-host'
 import type { NodeKernelTransport } from './node-transport'
 import { waitForRepositoryGitOperations } from '../lib/git/repository-operation'
 import { stopImageWorker } from './image-worker-client'
+import { getNativeCopilotRuntime } from '../lib/copilot-runtime-download'
 
 /** The existing business runtime/presenters, hosted by Node without a DOM. */
 export function startNodeRuntime(transport: NodeKernelTransport) {
@@ -33,6 +34,7 @@ export function startNodeRuntime(transport: NodeKernelTransport) {
   process.env.LOCAL_GIT_DIRECTORY ??= Path.resolve(__dirname, 'git')
   delete process.env.GIT_EXEC_PATH
 
+  const copilotDownload = getNativeCopilotRuntime(getDesktopHost().userData)
   const runtime = getAppRuntime()
   const presenter = new DesktopPresenter(runtime)
   const startup = new NativeStartup(runtime)
@@ -63,7 +65,7 @@ export function startNodeRuntime(transport: NodeKernelTransport) {
         Math.max(1, Math.min(2147483647, ...delays))
       )
     }
-    return result
+    return { ...result, copilotRuntime: copilotDownload.status }
   }
   // Every push goes through this one encoder, in order: a push names the
   // sections its predecessor already delivered instead of repeating them.
@@ -72,6 +74,14 @@ export function startNodeRuntime(transport: NodeKernelTransport) {
     transport.publish(pushes.encode(snapshot()))
   }
   const scheduledPush = new SnapshotScheduler(pushState)
+  const downloadChanged = () => {
+    if (loaded) {
+      scheduledPush.schedule()
+    }
+  }
+  copilotDownload.events.on('change', downloadChanged)
+  transport.events.on('copilot-runtime-cancel', () => copilotDownload.cancel())
+  transport.events.on('host-closed', () => copilotDownload.cancel())
 
   const stateUpdates = presenter.onDidUpdate(() => {
     if (loaded) {
@@ -117,6 +127,8 @@ export function startNodeRuntime(transport: NodeKernelTransport) {
     )
   })
   const dispose = async () => {
+    copilotDownload.cancel()
+    copilotDownload.events.off('change', downloadChanged)
     globalThis.clearTimeout(dateRefreshTimer)
     scheduledPush.dispose()
     stateUpdates.dispose()

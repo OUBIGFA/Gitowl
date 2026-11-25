@@ -27,13 +27,28 @@ it('ships the complete Node resources, verified codecs/storage and no Electron e
     'git/cmd/git.exe',
     'git/ucrt64/libexec/git-core/git-credential-desktop.exe',
     'desktop-trampoline/desktop-askpass-trampoline.exe',
-    'copilot/prebuilds/win32-x64/copilot-runtime.exe',
-    'copilot/prebuilds/win32-x64/runtime.node',
+    'copilot-runtime.json',
     'static/licenses.json',
     'emoji.json',
   ]) {
     assert.ok(paths.includes(name), `Missing production resource: ${name}`)
   }
+  assert.deepEqual(
+    paths.filter(path => path.startsWith('copilot/')),
+    [],
+    'Copilot is a verified first-use download, not an installer payload'
+  )
+  assert.deepEqual(
+    paths.filter(
+      path =>
+        path.startsWith('node_modules/') &&
+        /\.(?:[cm]?js|css|d\.[cm]?ts)\.map$|\.d\.[cm]?ts$|\.tsbuildinfo$/.test(
+          path
+        )
+    ),
+    [],
+    'Dependency debug maps, type declarations and build caches are not runtime resources'
+  )
   assert.ok(
     !paths.some(path =>
       /(^|\/)(electron\.exe|native-kernel\.html|renderer\.js|chrome.*\.pak)$/.test(

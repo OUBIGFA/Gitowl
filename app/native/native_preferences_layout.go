@@ -31,6 +31,9 @@ type preferenceGeometryCache map[string]preferenceLayout
 func preferenceGeometryKey(c *ui.Context, popup *backend.KernelPopupPresentation, navigation *backend.KernelDialogField, form *nativeDialogForm, width, height float32) string {
 	h := sha256.New()
 	fmt.Fprint(h, width, height, c.Zoom(), c.Locale(), c.Theme().Font, c.Theme().FontSize, c.Theme().Spacing, c.Theme().Radius, popup.Type, popup.TitleKey, popup.Description, popup.DescriptionKey, form.busy, form.err, form.appearanceMeasureKey)
+	if form.copilotRuntime != nil {
+		fmt.Fprint(h, form.copilotRuntime.Phase, form.copilotRuntime.Error)
+	}
 	if popup.Error != nil {
 		fmt.Fprint(h, *popup.Error)
 	}
@@ -304,6 +307,21 @@ func measurePreferencesWithin(c *ui.Context, popup *backend.KernelPopupPresentat
 		actualHeight, measured := float32(navCount)*navHeight+float32(max(0, navCount-1)*4), true
 		candidate := preferenceLayout{columnWidth: columnWidth, columns: cols}
 		pageWidth := columnWidth*float32(cols) + float32(cols-1)*24
+		noticeHeight := float32(0)
+		if form.copilotRuntime != nil {
+			// The download notice is part of dialog chrome. Measure the real
+			// control so adding it cannot clip the original dialog footer.
+			noticeWidth := pageWidth + navWidth + navGap
+			probe := ui.Column(c.Key(fmt.Sprintf("measure-copilot-%g-%s", noticeWidth, contentKey))).Absolute().Top(0).Left(0).Width(noticeWidth).MinHeight(1).Invisible().Shrink(0)
+			probe.Children(func() { renderCopilotRuntimeNotice(c, form.copilotRuntime, func() {}) })
+			bounds := probe.LayoutBounds()
+			if bounds.H <= 0 || math.Abs(float64(bounds.W-noticeWidth)) > 1 {
+				measured = false
+				c.Invalidate()
+			} else {
+				noticeHeight = bounds.H + 16
+			}
+		}
 		for _, page := range pages {
 			sample := *popup
 			sample.Fields = page.Fields
@@ -344,7 +362,7 @@ func measurePreferencesWithin(c *ui.Context, popup *backend.KernelPopupPresentat
 			bodyHeight = actualHeight
 		}
 		allMeasured = allMeasured && measured
-		candidate = preferenceLayout{navigation: navWidth, columnWidth: columnWidth, columns: cols, measured: measured, width: 48 + navWidth + navGap + columnWidth*float32(cols) + float32(cols-1)*24, height: chrome + bodyHeight}
+		candidate = preferenceLayout{navigation: navWidth, columnWidth: columnWidth, columns: cols, measured: measured, width: 48 + navWidth + navGap + columnWidth*float32(cols) + float32(cols-1)*24, height: chrome + bodyHeight + noticeHeight}
 		// Choose the arrangement that uses the available width and height most
 		// evenly. A tall window must not force a narrow, towering single column.
 		score := max(float64(candidate.width/availableWidth), float64(candidate.height/availableHeight))

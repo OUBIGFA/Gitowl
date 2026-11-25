@@ -39,6 +39,7 @@ import type {
 } from './image-presentation'
 import type { ApplicationTheme } from '../ui/lib/application-theme'
 import type { CLIAction } from '../lib/cli-action'
+import type { ICopilotRuntimeDownloadStatus } from '../lib/copilot-runtime-download'
 
 /** Only presentation requests are admitted; no reflected Dispatcher methods. */
 export type NativeKernelCommand =
@@ -315,6 +316,7 @@ export interface INativeKernelSnapshot extends INativeImagePresentation {
   readonly onboarding: IKernelOnboardingView | null
   readonly signIn: IKernelSignInView | null
   readonly errorCount: number
+  readonly copilotRuntime?: ICopilotRuntimeDownloadStatus | null
 }
 
 export type NativeKernelResponse =

@@ -239,6 +239,9 @@ func (a *app) workspaceTitleBar(c *ui.Context, tx locales.Messages, padding floa
 }
 
 func (a *app) workspaceNotices(c *ui.Context, tx locales.Messages) {
+	if a.coreSnapshot != nil && a.coreSnapshot.CurrentPopup == nil {
+		renderCopilotRuntimeNotice(c, a.coreSnapshot.CopilotRuntime, a.cancelCopilotRuntime)
+	}
 	if a.nativeWorkspace() != nil {
 		a.workspaceOverlayView(c)
 		a.workspaceConflictControls(c)

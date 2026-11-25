@@ -125,6 +125,18 @@ async function git(path: string, args: string[]) {
 
 // This test checks the exported behaviour, not source-text matching or a replacement UI controller.
 describe('native settings partition with original core', () => {
+  it('allows component acquisition only when Copilot settings are opened', async t => {
+    const requests: Array<boolean | undefined> = []
+    const models = t.mock.method(runtime.dispatcher, 'fetchCopilotModels', async (...args: boolean[]) => { requests.push(args[0]) })
+    t.mock.method(runtime.dispatcher, 'fetchCopilotQuotaSnapshots', async () => {})
+    const p = await popup({ type: PopupType.Preferences })
+    await reply(p, 'load')
+    assert.deepEqual(requests, [false])
+    await reply(p, 'navigate', { tab: 'copilot' })
+    assert.equal(models.mock.callCount(), 2)
+    assert.equal(requests[1], undefined)
+    await reply(p, 'cancel')
+  })
   it('keeps preference edits disabled until the original initial load completes', async () => {
     const p = await popup({ type: PopupType.Preferences })
     assert.ok(

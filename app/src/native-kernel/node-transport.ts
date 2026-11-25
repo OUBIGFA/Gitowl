@@ -338,6 +338,9 @@ export class NodeKernelTransport implements INativeWindowPresentation {
 
   private stopAdmission(): void {
     this.inputClosed = true
+    // Stop optional component downloads before waiting for admitted requests;
+    // otherwise an offline download could hold shutdown for its full timeout.
+    this.events.emit('host-closed')
     for (const pending of this.platform.values()) {
       pending.reject(
         new Error(
@@ -530,6 +533,7 @@ export class NodeKernelTransport implements INativeWindowPresentation {
               'native-theme-updated',
               'notification-event',
               'native-activity',
+              'copilot-runtime-cancel',
             ].includes(value.name as string)
           ) {
             this.send({

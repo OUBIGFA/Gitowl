@@ -26,13 +26,13 @@ npm run build:native
 npm run prepare:native-runtime
 ```
 
-`output/native-runtime/backend/` 包含锁定 Node、完整业务 bundle、Git/凭据 helper、Copilot、数据库与图像依赖、CLI 和许可证，不含 Electron、Chromium 页面或兼容 React renderer。仅复制本次编译器列出的资产，避免旧 chunk 混入。
+`output/native-runtime/backend/` 包含锁定 Node、完整业务 bundle、Git/凭据 helper、Copilot 下载校验清单、数据库与图像依赖、CLI 和许可证，不含 Electron、Chromium 页面或兼容 React renderer。仅复制本次编译器列出的资产，避免旧 chunk 混入。外部依赖的调试映射、类型声明和编译缓存不进入运行目录；许可证原文保留。
 
 `third_party/native-runtimes.json` 登记实际输入字节，`runtime-receipt.json` 记录全部运行文件哈希。只有输入与所有输出一致才复用。冒烟从实际运行目录启动，验证初始状态、EOF 请求结算、Git、SQLite、原生模块和实际图像像素。
 
 `GITOWL_SKIP_RUNTIME_SMOKE=1` 只在用户明确要求时使用。构建会记录 `runtimeSmoke: skipped-by-request`，不能写成通过。默认执行或复用相同输入下的有效成功记录。
 
-Copilot 仍是单独的随包运行时，移除 Electron 不等于移除 Copilot。平台数据和凭据继续使用 Gitowl 自身的用户目录与系统凭据命名空间。
+Copilot 使用锁定官方 SDK，原生组件首次使用时下载并核验，详见 [后台说明](node-backend.md#copilot-首次使用)。构建仍验证本地官方输入以生成完整文件清单，不把约 155 MiB 的组件复制进基础安装包。平台数据和凭据继续使用 Gitowl 自身的用户目录与系统凭据命名空间。
 
 ## 验证与可选记录
 

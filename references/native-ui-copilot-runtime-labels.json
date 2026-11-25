@@ -1,0 +1,37 @@
+{
+  "copilotRuntime.downloading": {
+    "en": "Downloading Copilot component…",
+    "zh-Hans": "正在下载 Copilot 组件…",
+    "zh-Hant": "正在下載 Copilot 元件…"
+  },
+  "copilotRuntime.verifying": {
+    "en": "Verifying Copilot component…",
+    "zh-Hans": "正在校验 Copilot 组件…",
+    "zh-Hant": "正在驗證 Copilot 元件…"
+  },
+  "copilotRuntime.extracting": {
+    "en": "Preparing Copilot component…",
+    "zh-Hans": "正在准备 Copilot 组件…",
+    "zh-Hant": "正在準備 Copilot 元件…"
+  },
+  "copilotRuntime.error": {
+    "en": "Copilot component could not be prepared",
+    "zh-Hans": "未能准备 Copilot 组件",
+    "zh-Hant": "無法準備 Copilot 元件"
+  },
+  "copilotRuntime.retry": {
+    "en": "Check your connection, then repeat the Copilot action to retry.",
+    "zh-Hans": "检查网络后，再次执行 Copilot 操作即可重试。",
+    "zh-Hant": "檢查網路後，再次執行 Copilot 操作即可重試。"
+  },
+  "copilotRuntime.cancel": {
+    "en": "Cancel download",
+    "zh-Hans": "取消下载",
+    "zh-Hant": "取消下載"
+  },
+  "copilotRuntime.dismiss": {
+    "en": "Dismiss",
+    "zh-Hans": "关闭提示",
+    "zh-Hant": "關閉提示"
+  }
+}

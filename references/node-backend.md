@@ -22,9 +22,17 @@ Gitowl 的可见界面继续使用 MyGo。生产后台使用独立 Node 进程�
 | 实时通知 | 原 Alive/StableSocket + Undici WebSocket + MyGo | 复用上游 Origin 规则；通知事件在 SQLite 设置中保留，支持重启后点击 |
 | 图像 | ImageMagick magick-wasm、Photopea UPNG | 解码、方向及动画合成在独立工作线程执行 |
 | Markdown 链接 | 原 marked/DOMPurify/过滤器 + JSDOM | 独立无脚本、无资源加载解析文档；不安装全局 DOM，不显示网页 |
-| Copilot/自定义供应商 | 原 SDK 与项目管理逻辑 | 保留模型选择、权限、取消和草稿行为；Copilot 原生运行时仍随包提供 |
+| Copilot/自定义供应商 | 原 SDK 与项目管理逻辑 | 保留模型选择、权限、取消和草稿行为；需要 Copilot SDK 的操作首次使用时下载锁定的官方组件 |
 
 精确版本、来源、校验和许可见 [运行依赖登记](../third_party/native-runtimes.json) 与 npm 锁文件。新包不含 Electron、隐藏 renderer、Chromium 资源或调试 source map。源码中的上游对照入口和用于旧数据验证的开发工具不属于生产运行资源。
+
+## Copilot 首次使用
+
+基础安装包携带 `copilot-runtime.json`，记录已锁定平台包的官方 npm 地址、SHA-512 及完整文件 SHA-256 清单。首次主动查询 Copilot 模型或调用 SDK 功能时，后台通过现有系统代理下载，使用 Windows 自带的 libarchive/tar 解包，逐文件验证后原子启用。不执行 npm 安装脚本，不自动追随新版本。
+
+组件存入 Gitowl 自有用户目录下 `desktop-kernel/components/copilot/`。同版本后续使用无需下载；重新启动后首次使用会核对缓存文件。兼容的旧随包组件可直接复制复用；不匹配时下载本版本组件。普通启动、账号后台刷新和打开普通设置页不会触发首次下载；进入 Copilot 设置才允许准备模型组件。Git、LFS 和 hook 不依赖该下载。
+
+界面显示下载量、校验和准备状态，支持取消。失败后显示原因，再次执行原操作即可重试。并发请求共用下载，单个请求取消不打断其他请求；取消下载或关闭宿主终止共享任务。半成品位于组件目录的 `_temp/`，不作为可用组件。清理默认进回收站，回收失败记录原因并保留。部分自定义供应商的高级辅助流程也使用官方 Copilot SDK，因此同样需要该组件；直接调用供应商 SDK 的普通生成不受影响。
 
 ## 旧数据迁移
 

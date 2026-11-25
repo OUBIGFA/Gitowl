@@ -187,8 +187,7 @@ async function fixture(t: { after: (fn: () => Promise<void>) => void }) {
     'desktop-trampoline/desktop-askpass-trampoline.exe',
     'process-proxy.exe',
     'printenvz.exe',
-    'copilot/prebuilds/win32-x64/copilot-runtime.exe',
-    'copilot/prebuilds/win32-x64/runtime.node',
+    'copilot-runtime.json',
     'static/licenses.json',
     'emoji.json',
   ])

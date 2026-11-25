@@ -1324,7 +1324,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
       return
     }
 
-    this.fetchCopilotModelsForCurrentAccounts().catch(e => {
+    this.fetchCopilotModelsForCurrentAccounts(false).catch(e => {
       log.warn(
         'AppStore: Failed to fetch Copilot models after account update',
         e
@@ -1344,7 +1344,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
       return
     }
 
-    this.fetchCopilotQuotaSnapshotsForCurrentAccounts().catch(e => {
+    this.fetchCopilotQuotaSnapshotsForCurrentAccounts(false).catch(e => {
       log.warn(
         'AppStore: Failed to fetch Copilot quota snapshots after account update',
         e
@@ -13032,16 +13032,18 @@ export class AppStore extends TypedBaseStore<IAppState> {
   }
 
   /** This shouldn't be called directly. See 'Dispatcher'. */
-  public async _fetchCopilotModels(): Promise<void> {
-    return this.fetchCopilotModelsForCurrentAccounts()
+  public async _fetchCopilotModels(allowDownload = true): Promise<void> {
+    return this.fetchCopilotModelsForCurrentAccounts(allowDownload)
   }
 
   /** This shouldn't be called directly. See 'Dispatcher'. */
-  public async _fetchCopilotQuotaSnapshots(): Promise<void> {
-    return this.fetchCopilotQuotaSnapshotsForCurrentAccounts()
+  public async _fetchCopilotQuotaSnapshots(allowDownload = true): Promise<void> {
+    return this.fetchCopilotQuotaSnapshotsForCurrentAccounts(allowDownload)
   }
 
-  private async fetchCopilotModelsForCurrentAccounts(): Promise<void> {
+  private async fetchCopilotModelsForCurrentAccounts(
+    allowDownload = true
+  ): Promise<void> {
     const accounts = this.getCopilotSettingsAccounts()
     if (accounts.length === 0) {
       this.copilotModelsByAccount = new Map()
@@ -13052,7 +13054,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
     const copilotModelsByAccount = new Map(this.copilotModelsByAccount)
 
     for (const account of accounts) {
-      const models = await this.copilotStore.listModels(account)
+      const models = await this.copilotStore.listModels(account, allowDownload)
       const key = getCopilotAccountCacheKey(account)
       copilotModelsByAccount.set(key, models === null ? null : [...models])
     }
@@ -13064,7 +13066,9 @@ export class AppStore extends TypedBaseStore<IAppState> {
     this.emitUpdate()
   }
 
-  private async fetchCopilotQuotaSnapshotsForCurrentAccounts(): Promise<void> {
+  private async fetchCopilotQuotaSnapshotsForCurrentAccounts(
+    allowDownload = true
+  ): Promise<void> {
     const accounts = this.getCopilotSettingsAccounts()
     if (accounts.length === 0) {
       this.copilotQuotaSnapshotsByAccount = new Map()
@@ -13079,7 +13083,7 @@ export class AppStore extends TypedBaseStore<IAppState> {
     for (const account of accounts) {
       copilotQuotaSnapshotsByAccount.set(
         getCopilotAccountCacheKey(account),
-        await this.copilotStore.getQuotaSnapshots(account)
+        await this.copilotStore.getQuotaSnapshots(account, allowDownload)
       )
     }
 

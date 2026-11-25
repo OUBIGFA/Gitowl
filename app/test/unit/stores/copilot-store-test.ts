@@ -309,6 +309,20 @@ describe('getCopilotGHHost', () => {
 })
 
 describe('CopilotStore model cache', () => {
+  it('does not acquire a missing runtime for passive account refresh', async t => {
+    const { store } = createCopilotStoreWithModels(() => [])
+    const boundary = store as unknown as {
+      runtimeInstalled(): Promise<boolean>
+      createClient(account: Account): Promise<unknown>
+    }
+    t.mock.method(boundary, 'runtimeInstalled', async () => false)
+    const client = t.mock.method(boundary, 'createClient', async () => {
+      throw new Error('Passive refresh must not acquire a component')
+    })
+    assert.equal(await store.listModels(makeAccount(), false), null)
+    assert.equal(await store.getQuotaSnapshots(makeAccount(), false), null)
+    assert.equal(client.mock.callCount(), 0)
+  })
   let previousPreviewFeatures: string | undefined
 
   before(() => {

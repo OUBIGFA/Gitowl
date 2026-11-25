@@ -69,6 +69,7 @@ func (a *app) coreAuthenticationView(c *ui.Context, tx locales.Messages) {
 	}
 	if popup != nil && popup.Layout == "form" && popup.ID != nil {
 		form := a.nativeDialogFormFor(popup)
+		form.copilotRuntime, form.cancelCopilotDownload = a.coreSnapshot.CopilotRuntime, a.cancelCopilotRuntime
 		form.settingsWorkArea, form.expandSettings = a.settingsWorkArea, a.expandSettings
 		if popup.Type == "Preferences" {
 			form.appearanceTop = func(c *ui.Context) { a.interfaceLanguageView(c, tx) }

@@ -215,6 +215,7 @@ type KernelRepositoryFilter struct {
 }
 
 type KernelSnapshot struct {
+	CopilotRuntime       *KernelCopilotRuntime     `json:"copilotRuntime,omitempty"`
 	Protocol             int                       `json:"protocol"`
 	Core                 string                    `json:"core"`
 	PresentationComplete bool                      `json:"presentationComplete"`
@@ -242,6 +243,14 @@ type KernelSnapshot struct {
 	ErrorCount           int                       `json:"errorCount"`
 	// Set only on the wire of a pushed snapshot; resolved before delivery.
 	Unchanged *KernelUnchanged `json:"unchanged,omitempty"`
+}
+
+// Optional first-use component acquisition, independent of repository state.
+type KernelCopilotRuntime struct {
+	Phase    string `json:"phase"`
+	Received int64  `json:"received"`
+	Total    int64  `json:"total"`
+	Error    string `json:"error,omitempty"`
 }
 
 // KernelUnchanged names the heavy sections a pushed snapshot left out because

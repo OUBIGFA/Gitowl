@@ -7980,6 +7980,76 @@ func (msgs Messages) DialogLabelA3e4d8d2d28d3554() string {
 	return Catalog.Format(msgs.locale, "dialogLabel_a3e4d8d2d28d3554", nil)
 }
 
+// DialogLabelD5a0883cb10cb398 says "Downloading Copilot component…"
+// in the language the app shows.
+func DialogLabelD5a0883cb10cb398() string { return In(i18n.Locale()).DialogLabelD5a0883cb10cb398() }
+
+// DialogLabelD5a0883cb10cb398 says "Downloading Copilot component…"
+// in the language of msgs.
+func (msgs Messages) DialogLabelD5a0883cb10cb398() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_d5a0883cb10cb398", nil)
+}
+
+// DialogLabel60f5e2f96ff35fdb says "Verifying Copilot component…"
+// in the language the app shows.
+func DialogLabel60f5e2f96ff35fdb() string { return In(i18n.Locale()).DialogLabel60f5e2f96ff35fdb() }
+
+// DialogLabel60f5e2f96ff35fdb says "Verifying Copilot component…"
+// in the language of msgs.
+func (msgs Messages) DialogLabel60f5e2f96ff35fdb() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_60f5e2f96ff35fdb", nil)
+}
+
+// DialogLabel22c8c8af8a6a14de says "Preparing Copilot component…"
+// in the language the app shows.
+func DialogLabel22c8c8af8a6a14de() string { return In(i18n.Locale()).DialogLabel22c8c8af8a6a14de() }
+
+// DialogLabel22c8c8af8a6a14de says "Preparing Copilot component…"
+// in the language of msgs.
+func (msgs Messages) DialogLabel22c8c8af8a6a14de() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_22c8c8af8a6a14de", nil)
+}
+
+// DialogLabelDa38c88470233a09 says "Copilot component could not be prepared"
+// in the language the app shows.
+func DialogLabelDa38c88470233a09() string { return In(i18n.Locale()).DialogLabelDa38c88470233a09() }
+
+// DialogLabelDa38c88470233a09 says "Copilot component could not be prepared"
+// in the language of msgs.
+func (msgs Messages) DialogLabelDa38c88470233a09() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_da38c88470233a09", nil)
+}
+
+// DialogLabel13da320a8094cbf4 says "Check your connection, then repeat the Copilot action to retry."
+// in the language the app shows.
+func DialogLabel13da320a8094cbf4() string { return In(i18n.Locale()).DialogLabel13da320a8094cbf4() }
+
+// DialogLabel13da320a8094cbf4 says "Check your connection, then repeat the Copilot action to retry."
+// in the language of msgs.
+func (msgs Messages) DialogLabel13da320a8094cbf4() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_13da320a8094cbf4", nil)
+}
+
+// DialogLabel42f9c3c5ed7dbc73 says "Cancel download"
+// in the language the app shows.
+func DialogLabel42f9c3c5ed7dbc73() string { return In(i18n.Locale()).DialogLabel42f9c3c5ed7dbc73() }
+
+// DialogLabel42f9c3c5ed7dbc73 says "Cancel download"
+// in the language of msgs.
+func (msgs Messages) DialogLabel42f9c3c5ed7dbc73() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_42f9c3c5ed7dbc73", nil)
+}
+
+// DialogLabel0ef63ac03cd2f0cf says "Dismiss"
+// in the language the app shows.
+func DialogLabel0ef63ac03cd2f0cf() string { return In(i18n.Locale()).DialogLabel0ef63ac03cd2f0cf() }
+
+// DialogLabel0ef63ac03cd2f0cf says "Dismiss"
+// in the language of msgs.
+func (msgs Messages) DialogLabel0ef63ac03cd2f0cf() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_0ef63ac03cd2f0cf", nil)
+}
+
 // DialogLabel5eef7c65b6322982 says "Image comparison"
 // in the language the app shows.
 func DialogLabel5eef7c65b6322982() string { return In(i18n.Locale()).DialogLabel5eef7c65b6322982() }

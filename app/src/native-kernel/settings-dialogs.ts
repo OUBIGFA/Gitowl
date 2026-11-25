@@ -1354,6 +1354,10 @@ async function reply(
     const tab = choice(v.tab, tabs)
     f.prefs = { ...f.prefs!, selectedIndex: tabs.indexOf(tab) }
     changed(p)
+    if (tab === 'copilot') {
+      r.dispatcher.fetchCopilotModels()
+      r.dispatcher.fetchCopilotQuotaSnapshots()
+    }
     if (tab === 'notifications' && supportsNotifications()) {
       f.notificationPermission = await getNotificationsPermission()
       if (frames.has(p)) {
@@ -1374,8 +1378,10 @@ async function reply(
           ...f.prefs!,
           ...(await loadPreferences({ accounts: s.accounts })),
         }
-        r.dispatcher.fetchCopilotModels()
-        r.dispatcher.fetchCopilotQuotaSnapshots()
+        // Opening general preferences must not acquire an optional component.
+        const allowDownload = tabs[f.prefs.selectedIndex] === 'copilot'
+        r.dispatcher.fetchCopilotModels(allowDownload)
+        r.dispatcher.fetchCopilotQuotaSnapshots(allowDownload)
         if (supportsNotifications()) {
           f.notificationPermission = await getNotificationsPermission()
         }

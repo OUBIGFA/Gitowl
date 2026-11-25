@@ -33,6 +33,8 @@ type nativeDialogValue struct {
 // it. No callbacks, account secrets, Git decisions or second popup stack live
 // here. A submitted password editor is remounted to clear native undo history.
 type nativeDialogForm struct {
+	copilotRuntime        *backend.KernelCopilotRuntime
+	cancelCopilotDownload func()
 	// Extra native settings share this popup's navigation without adding
 	// fields to the original Preferences draft or changing its wire contract.
 	sections             []nativeDialogSection
@@ -384,7 +386,7 @@ func renderNativeDialog(c *ui.Context, tx locales.Messages, popup *backend.Kerne
 		}
 		panel.Width(preferences.width).Height(preferences.height).Padding(24).Gap(16).Radius(radiusSurface).
 			Border(1, c.Theme().Border).Background(c.Theme().Background).Clip().Label(title)
-		if !form.presentedLayout.measured && form.err == nil && (popup.Error == nil || *popup.Error == "") {
+		if !form.presentedLayout.measured && form.err == nil && (popup.Error == nil || *popup.Error == "") && form.copilotRuntime == nil {
 			// Cold layout and the original load finish before the first paint.
 			// The backdrop still owns modality and Escape; only the panel waits.
 			panel.Invisible()
@@ -398,6 +400,7 @@ func renderNativeDialog(c *ui.Context, tx locales.Messages, popup *backend.Kerne
 				iconButton(c.Key("close-preferences"), tx.Close(), "x").Disabled(form.busy || !canClose).OnClick(dismiss)
 			}
 		})
+		renderCopilotRuntimeNotice(c, form.copilotRuntime, form.cancelCopilotDownload)
 		ui.Row(c.Key("dialog-body")).Grow(1).MinHeight(0).FillWidth().AlignItems(ui.Stretch).Gap(24).Children(func() {
 			if navigation != nil {
 				ui.Column(c.Key("dialog-navigation")).Width(preferences.navigation).Shrink(0).FillHeight().

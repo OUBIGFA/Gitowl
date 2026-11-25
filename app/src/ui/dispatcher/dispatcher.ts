@@ -4545,13 +4545,13 @@ export class Dispatcher {
   }
 
   /** Fetch the list of available Copilot models from the SDK. */
-  public fetchCopilotModels(): Promise<void> {
-    return this.appStore._fetchCopilotModels()
+  public fetchCopilotModels(allowDownload = true): Promise<void> {
+    return this.appStore._fetchCopilotModels(allowDownload)
   }
 
   /** Fetch Copilot quota usage snapshots from the SDK. */
-  public fetchCopilotQuotaSnapshots(): Promise<void> {
-    return this.appStore._fetchCopilotQuotaSnapshots()
+  public fetchCopilotQuotaSnapshots(allowDownload = true): Promise<void> {
+    return this.appStore._fetchCopilotQuotaSnapshots(allowDownload)
   }
 
   /**
