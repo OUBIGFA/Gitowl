@@ -404,6 +404,7 @@ func kernelEnvironment(userData string) []string {
 
 // Kernel connects MyGo to the single Node business owner over inherited pipes.
 type Kernel struct {
+	native  *NativeOwner
 	client  *Client
 	service *Service
 	onEvent func(KernelEvent)
@@ -456,10 +457,30 @@ func StartKernel(config KernelConfig, onEvent func(KernelEvent)) (*Kernel, error
 	return k, nil
 }
 
-func (k *Kernel) Done() <-chan struct{} { return k.client.Done() }
-func (k *Kernel) Err() error            { return k.client.Err() }
-func (k *Kernel) InFlight() int         { return k.client.InFlight() }
-func (k *Kernel) CriticalInFlight() int { return k.client.CriticalInFlight() }
+func (k *Kernel) Done() <-chan struct{} {
+	if k.native != nil {
+		return k.native.done
+	}
+	return k.client.Done()
+}
+func (k *Kernel) Err() error {
+	if k.native != nil {
+		return nil
+	}
+	return k.client.Err()
+}
+func (k *Kernel) InFlight() int {
+	if k.native != nil {
+		return int(k.native.active.Load())
+	}
+	return k.client.InFlight()
+}
+func (k *Kernel) CriticalInFlight() int {
+	if k.native != nil {
+		return int(k.native.active.Load())
+	}
+	return k.client.CriticalInFlight()
+}
 
 func validateKernelSnapshot(snapshot KernelSnapshot) error {
 	// Only a push may omit sections, and receiveEvent has restored them by now.
@@ -581,6 +602,9 @@ func (k *Kernel) command(ctx context.Context, command any) (KernelResult, error)
 }
 
 func (k *Kernel) commandKind(ctx context.Context, command any, media bool) (KernelResult, error) {
+	if k.native != nil {
+		return k.native.command(ctx, command)
+	}
 	var out KernelResult
 	if err := k.client.call(ctx, "kernel.command", command, &out, false, media); err != nil {
 		return out, err
@@ -770,6 +794,17 @@ func (k *Kernel) SignIn(ctx context.Context, endpoint *string) (KernelResult, er
 }
 
 func (k *Kernel) WindowState(ctx context.Context, state KernelWindowState) error {
+	if k.native != nil {
+		if state.Focused && !k.native.windowFocused.Swap(true) {
+			select {
+			case k.native.refreshWake <- struct{}{}:
+			default:
+			}
+		} else if !state.Focused {
+			k.native.windowFocused.Store(false)
+		}
+		return nil
+	}
 	var out struct {
 		Updated bool `json:"updated"`
 	}
@@ -798,6 +833,9 @@ var (
 // requests normal original-kernel shutdown. Unlike the research Service.Close,
 // it never kills a process with an unresolved write or pretends one was canceled.
 func (k *Kernel) Close() error {
+	if k.native != nil {
+		return k.native.close()
+	}
 	// The UI defers quitting until admitted work settles, so this normally
 	// finds nothing in flight. Other exits (session end, a late canceled
 	// reply) still wait for real replies off the UI thread instead of refusing

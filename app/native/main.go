@@ -1,5 +1,5 @@
-// Gitowl's MyGo frontend owns the native window and platform APIs. The single
-// Node backend runs the directly reused Git/account/recovery business runtime.
+// MyGo and the Go owner run in one process. Repository semantics belong to the
+// bundled official Git executable; Node is only used by development tools.
 package main
 
 import (
@@ -20,6 +20,30 @@ import (
 var BuildNumber = "dev"
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "--credential-helper" {
+		if len(os.Args) != 3 {
+			os.Exit(2)
+		}
+		if err := backend.CredentialHelper(os.Args[2], os.Stdin, os.Stdout); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
+	if len(os.Args) == 2 && os.Getenv("GITOWL_ASKPASS_ADDRESS") != "" {
+		if err := backend.Askpass(os.Args[1], os.Stdout); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
+	if len(os.Args) == 2 && (os.Args[1] == "--gitowl-install-cli" || os.Args[1] == "--gitowl-uninstall-cli") {
+		if err := installNativeCLI(os.Args[1] == "--gitowl-uninstall-cli"); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
 	workingDirectory, err := os.Getwd()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -57,8 +81,25 @@ func run(entry, node, initialPath, profile string, initialLaunch nativeLaunchOpt
 		return nil
 	}
 	resources, resourceErr := mygo.App.Path(mygo.PathResources)
+	if initialLaunch.nativeResources != "" {
+		if !mygo.IsDev() || profile == "" || !filepath.IsAbs(initialLaunch.nativeResources) {
+			return errors.New("native resources override requires an isolated development profile")
+		}
+		resources = initialLaunch.nativeResources
+		resourceErr = nil
+	}
 	userData, userDataErr := mygo.App.Path(mygo.PathUserData)
-	config, configErr := backend.ResolveKernelConfig(resources, userData, entry, node)
+	// Explicit legacy entries remain only for old-runtime differential tests.
+	// Normal installed launches instantiate the Go owner in this process.
+	native := entry == "" && node == ""
+	if !native && !mygo.IsDev() {
+		return errors.New("packaged Gitowl does not use an external JavaScript backend")
+	}
+	config := backend.KernelConfig{UserData: userData}
+	var configErr error
+	if !native {
+		config, configErr = backend.ResolveKernelConfig(resources, userData, entry, node)
+	}
 	logo, logoErr := loadLogo(resources)
 	a := newCoreApp(nil, logo)
 	a.serviceErr, a.logoErr = errors.Join(resourceErr, userDataErr, configErr), logoErr
@@ -82,7 +123,11 @@ func run(entry, node, initialPath, profile string, initialLaunch nativeLaunchOpt
 		launches.automaticSchemes = []string{"gitowl", "gitowl-auth"}
 	}
 	if configErr == nil {
-		callback, err := registerNativeOAuthCallback(config.Entry, profile != "", mygo.App.RegisterURLScheme)
+		callbackEntry := config.Entry
+		if native {
+			callbackEntry = filepath.Join(resources, "backend", "native-entry")
+		}
+		callback, err := registerNativeOAuthCallback(callbackEntry, profile != "", mygo.App.RegisterURLScheme)
 		if callback != "" && profile == "" {
 			launches.automaticSchemes = append(launches.automaticSchemes, callback)
 		}
@@ -316,7 +361,7 @@ func run(entry, node, initialPath, profile string, initialLaunch nativeLaunchOpt
 		if a.serviceErr == nil {
 			var err error
 			legacyChecked := false
-			core, err = backend.StartKernel(config, func(event backend.KernelEvent) {
+			onEvent := func(event backend.KernelEvent) {
 				win.Update(func() {
 					a.receiveCoreEvent(event)
 					if packaged && event.Snapshot != nil && !legacyChecked {
@@ -324,7 +369,12 @@ func run(entry, node, initialPath, profile string, initialLaunch nativeLaunchOpt
 						go a.recycleLegacyRuntime(resources, userData)
 					}
 				})
-			})
+			}
+			if native {
+				core, err = backend.NewNativeKernel(a.ctx, filepath.Join(resources, "backend", "git", "cmd", "git.exe"), userData, onEvent)
+			} else {
+				core, err = backend.StartKernel(config, onEvent)
+			}
 			a.core, a.serviceErr = core, err
 			if core != nil {
 				go func() { <-core.Done(); win.Update(func() { a.serviceStopped(core.Err()) }) }()

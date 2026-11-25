@@ -1,8 +1,8 @@
-; Run the original Desktop CLI registration helpers against this installation.
+; Run native CLI registration against this installation.
 ; MyGo already owns shortcuts, protocol registration and the uninstall entry.
 !macro GitowlCLI event
   ClearErrors
-  ExecWait '"$INSTDIR\backend\node.exe" "$INSTDIR\backend\install-cli.js" --gitowl-${event}-cli' $0
+  ExecWait '"$INSTDIR\Gitowl.exe" --gitowl-${event}-cli' $0
   IfErrors gitowl_cli_failed_${event}
   IntCmp $0 0 gitowl_cli_done_${event}
   gitowl_cli_failed_${event}:

@@ -9,7 +9,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
-import zipfile
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -47,118 +47,6 @@ def locked_package(directory, lockfile, key):
             'source': locked['resolved'], 'integrity': locked.get('integrity')}
 
 
-def electron_materials(materials):
-    package = ROOT / 'node_modules/electron'
-    locked = locked_package(package, 'package-lock.json', 'node_modules/electron')
-    version = locked['version']
-    name = f'electron-v{version}-win32-x64.zip'
-    archive = ROOT / '.local/downloads' / name
-    checksums = ROOT / '.local/downloads' / f'electron-v{version}-SHASUMS256.txt'
-    base = f'https://github.com/electron/electron/releases/download/v{version}/'
-    # Never infer provenance from an executable or silently download a mirror.
-    # Registration requires the official release archive and its SHA256 list.
-    if not archive.is_file() or not checksums.is_file():
-        raise RuntimeError(f'Missing official Electron inputs: cache {base}{name} and {base}SHASUMS256.txt in .local/downloads')
-    expected = json.loads((package / 'checksums.json').read_text())[name]
-    entries = {line.split()[-1].lstrip('*'): line.split()[0] for line in checksums.read_text().splitlines() if line.strip()}
-    if entries.get(name) != expected or sha(archive.read_bytes()) != expected:
-        raise RuntimeError('Electron archive differs from official checksums / locked npm package')
-    with zipfile.ZipFile(archive) as bundle:
-        records = [{'path': item.filename, 'sha256': sha(bundle.read(item))}
-                   for item in bundle.infolist() if not item.is_dir()]
-        if tree_hash(records) != tree_hash(inventory(package / 'dist')):
-            raise RuntimeError('Installed Electron dist differs from the official archive')
-        licenses = []
-        for name in ('LICENSE', 'LICENSES.chromium.html'):
-            path = 'third_party/licenses/native/electron-' + name
-            data = bundle.read(name)
-            if len(data) <= 8 * 1024 * 1024:
-                materials[path] = data
-                licenses.append({'path': path, 'runtimePath': name, 'sha256': sha(data)})
-            else:
-                # Preserve the original 20 MiB notices byte-for-byte while each
-                # reviewable UTF-8 input obeys the repository's 10 MiB limit.
-                # Runtime still carries the one original official HTML file.
-                parts = []
-                remaining = data
-                while remaining:
-                    end = min(len(remaining), 8 * 1024 * 1024)
-                    if end < len(remaining):
-                        end = remaining.rfind(b'\n', 0, end) + 1
-                    if not end:
-                        raise RuntimeError('Cannot split Electron notices at a UTF-8 line boundary')
-                    part = remaining[:end]
-                    part.decode('utf-8')
-                    part_path = f'third_party/licenses/native/electron-Chromium-notices-{len(parts) + 1}.html'
-                    materials[part_path] = part
-                    parts.append({'path': part_path, 'sha256': sha(part)})
-                    remaining = remaining[end:]
-                licenses.append({'runtimePath': name, 'sha256': sha(data), 'parts': parts})
-    return {**locked, 'role': 'original Desktop kernel host', 'platform': 'win32-x64',
-            'source': base + archive.name, 'archiveSha256': expected,
-            'checksumsSource': base + 'SHASUMS256.txt', 'checksumsSha256': sha(checksums.read_bytes()),
-            'executableSha256': sha((package / 'dist/electron.exe').read_bytes()),
-            'distTreeSha256': tree_hash(records), 'distFileCount': len(records),
-            'license': 'MIT and Chromium bundled third-party notices', 'licenses': licenses}
-
-
-def bundled_inputs():
-    """Register bytes copied by script/build.ts, including optional SDK/FFI assets."""
-    specs = [
-        ('app/node_modules/dugite/git', 'app/node_modules/dugite', 'app/package-lock.json', 'node_modules/dugite'),
-        ('app/node_modules/@github/copilot-sdk-win32-x64', 'app/node_modules/@github/copilot-sdk-win32-x64', 'app/package-lock.json', 'node_modules/@github/copilot-sdk-win32-x64'),
-        ('app/node_modules/@koromix/koffi-win32-x64', 'app/node_modules/@koromix/koffi-win32-x64', 'app/package-lock.json', 'node_modules/@koromix/koffi-win32-x64'),
-    ]
-    records = []
-    for path, package, lock, key in specs:
-        files = inventory(ROOT / path)
-        records.append({**locked_package(ROOT / package, lock, key), 'path': path,
-                        'treeSha256': tree_hash(files), 'fileCount': len(files)})
-    # Resolve helpers through the exact upstream APIs, not guessed locations.
-    result = subprocess.run(['node', '-e', 'console.log(JSON.stringify([require("process-proxy").getProxyCommandPath(),require("printenvz").getPrintenvzPath()]))'], cwd=ROOT, check=True, capture_output=True, text=True)
-    proxy, printenvz = json.loads(result.stdout)
-    helpers = [
-        ('app/node_modules/desktop-trampoline/build/Release/desktop-askpass-trampoline.exe', 'app/node_modules/desktop-trampoline', 'app/package-lock.json', 'node_modules/desktop-trampoline'),
-        ('app/node_modules/desktop-trampoline/build/Release/desktop-credential-helper-trampoline.exe', 'app/node_modules/desktop-trampoline', 'app/package-lock.json', 'node_modules/desktop-trampoline'),
-        (Path(proxy).relative_to(ROOT).as_posix(), 'node_modules/process-proxy', 'package-lock.json', 'node_modules/process-proxy'),
-        (Path(printenvz).relative_to(ROOT).as_posix(), 'node_modules/printenvz', 'package-lock.json', 'node_modules/printenvz'),
-    ]
-    for path, package, lock, key in helpers:
-        records.append({**locked_package(ROOT / package, lock, key), 'path': path,
-                        'sha256': sha((ROOT / path).read_bytes())})
-    return records
-
-
-def node_runtime_inputs(materials):
-    """Lock installed source/codec/storage inputs and preserve upstream notices."""
-    names = ['indexeddbshim', 'websql-configurable', 'better-sqlite3',
-             '@imagemagick/magick-wasm', 'upng-js', 'jsdom', 'undici', 'typeson-registry', 'canvas']
-    records = []
-    for name in names:
-        path = 'app/node_modules/' + name
-        package = ROOT / path
-        files = inventory(package)
-        licenses = []
-        for file in sorted(package.iterdir()):
-            if file.is_file() and file.name.upper().split('.')[0].split('-')[0] in ('LICENSE', 'LICENCE', 'COPYING', 'NOTICE', 'PATENTS'):
-                dest = 'third_party/licenses/native/npm_' + name.replace('/', '_').replace('@', '') + '-' + file.name
-                materials[dest] = file.read_bytes()
-                licenses.append({'path': dest, 'sha256': sha(materials[dest])})
-        if name == 'canvas' and not licenses:
-            readme = (package / 'Readme.md').read_text(encoding='utf-8')
-            text = readme[readme.index('## License'):]
-            dest = 'third_party/licenses/native/npm_canvas-LICENSE.txt'
-            materials[dest] = text.encode('utf-8')
-            licenses.append({'path': dest, 'sha256': sha(materials[dest])})
-        if not licenses:
-            raise RuntimeError('Missing source license for ' + name)
-        records.append({**locked_package(package, 'app/package-lock.json', 'node_modules/' + name),
-                        'path': path, 'treeSha256': tree_hash(files), 'fileCount': len(files), 'licenses': licenses})
-    node_dir = ROOT / '.local/toolchains' / ('node-v' + (ROOT / '.node-version').read_text().strip() + '-win-x64')
-    materials['third_party/licenses/native/node-LICENSE'] = (node_dir / 'LICENSE').read_bytes()
-    return records
-
-
 def collect():
     result = subprocess.run(['go', 'list', '-deps', '-json', './...', 'github.com/egoist/mygo/cmd/mygo'], cwd=ROOT / 'app/native', check=True, capture_output=True, text=True, encoding='utf-8')
     cache = Path(os.environ.get('GOMODCACHE', ROOT / '.local/go-mod'))
@@ -190,10 +78,36 @@ def collect():
     node_dir = ROOT / '.local/toolchains' / ('node-v' + node_version + '-win-x64')
     git = ROOT / 'app/node_modules/dugite/git'
     embedded = json.loads((ROOT / 'app/node_modules/dugite/script/embedded-git.json').read_text())['win32-x64']
+    runtime_inputs = []
+    for name, runtime_path in [('dugite', 'app/node_modules/dugite/git'),
+                               ('@github/copilot-sdk-win32-x64', 'app/node_modules/@github/copilot-sdk-win32-x64')]:
+        files = inventory(ROOT / runtime_path)
+        runtime_inputs.append({**locked_package(ROOT / 'app/node_modules' / name, 'app/package-lock.json', 'node_modules/' + name),
+                               'path': runtime_path, 'treeSha256': tree_hash(files), 'fileCount': len(files),
+                               'delivery': 'on-demand' if name.startswith('@github/copilot') else 'bundled'})
+    sqlite_manifest = json.loads((cache / 'github.com/egoist/mygo@v0.10.0/plugins/sqlite/internal/sqlitecore/mygo-plugin.json').read_text())
+    sqlite = sqlite_manifest['libraries'][0]['files']['windows-amd64']
+    magick_root = ROOT / '.local/imagemagick-7.1.2-36'
+    magick_archive = ROOT / '.local/downloads/ImageMagick-7.1.2-36-portable-Q8-x64.7z'
+    magick_archive_sha = '90e3a8ee011710cf4e570c040eaf430daf6e69b1fab084fc3214cb695f961bdc'
+    if sha(magick_archive.read_bytes()) != magick_archive_sha:
+        raise RuntimeError('ImageMagick archive differs from the official release digest')
+    for name in ['LICENSE.txt', 'NOTICE.txt']:
+        materials['third_party/licenses/native/imagemagick-' + name] = (magick_root / name).read_bytes()
     metadata = {
-        'schemaVersion': 3,
-        'host': 'node',
-        'bundledInputs': bundled_inputs() + node_runtime_inputs(materials),
+        'schemaVersion': 4,
+        'host': 'go',
+        'bundledInputs': runtime_inputs,
+        'nativeLibraries': [
+            {'name': 'Sqlitecore', 'version': 'MyGo-v0.10.0/SQLite-3.53.4', 'source': sqlite['url'],
+             'sha256': sqlite['sha256'], 'sourceHash': sqlite['sourceHash'],
+             'localPath': '.local/downloads/' + sqlite['url'].split('/')[-1]},
+            {'name': 'ImageMagick', 'version': '7.1.2-36-Q8-x64',
+             'source': 'https://github.com/ImageMagick/ImageMagick/releases/download/7.1.2-36/' + magick_archive.name,
+             'archiveSha256': magick_archive_sha, 'sha256': sha((magick_root / 'magick.exe').read_bytes()),
+             'localPath': '.local/imagemagick-7.1.2-36/magick.exe',
+             'licenses': ['third_party/licenses/native/imagemagick-LICENSE.txt', 'third_party/licenses/native/imagemagick-NOTICE.txt']},
+        ],
         # These are original source contracts outside the runtime-only adapter.
         # Keep Preview gated until the owner adapts and verifies them together.
         'packaging': {'previewReady': False, 'originalCore': 'desktop/desktop',
@@ -202,12 +116,14 @@ def collect():
                           'The native CLI and protocol adapters are implemented; full upstream feature parity and source-bound frontend acceptance are not certified.',
                           'A public Gitowl update feed and signed distribution are not configured; real account OAuth/Copilot acceptance remains pending.'
                       ]},
-        'node': {'role': 'production-backend-and-build-tool', 'version': node_version, 'source': 'https://nodejs.org/dist/v' + node_version + '/node-v' + node_version + '-win-x64.zip', 'executableSha256': sha((node_dir / 'node.exe').read_bytes()), 'archiveSha256': sha((ROOT / '.local/downloads' / ('node-v' + node_version + '-win-x64.zip')).read_bytes()), 'license': 'MIT and bundled third-party notices', 'licenseSha256': sha((node_dir / 'LICENSE').read_bytes())},
+        'node': {'role': 'build-tool-only', 'version': node_version, 'source': 'https://nodejs.org/dist/v' + node_version + '/node-v' + node_version + '-win-x64.zip', 'executableSha256': sha((node_dir / 'node.exe').read_bytes()), 'archiveSha256': sha((ROOT / '.local/downloads' / ('node-v' + node_version + '-win-x64.zip')).read_bytes()), 'license': 'MIT and bundled third-party notices', 'licenseSha256': sha((node_dir / 'LICENSE').read_bytes())},
         'git': {'dugiteVersion': json.loads((ROOT / 'app/node_modules/dugite/package.json').read_text())['version'], 'archive': embedded, 'executableSha256': sha((git / 'cmd/git.exe').read_bytes()), 'source': 'https://github.com/desktop/dugite-native', 'license': 'GPL-2.0 and bundled third-party notices', 'licenseSha256': sha((git / 'LICENSE.txt').read_bytes())},
         'goModules': sorted(modules, key=lambda m: m['module']),
         'npmLicenses': 'Generated by the existing script/licenses/update-license-dump.ts allowlist and bundled in licenses/npm-licenses.json.',
         'lockfiles': [{'path': path, 'sha256': sha((ROOT / path).read_text(encoding='utf-8').encode('utf-8'))} for path in ['package-lock.json', 'app/package-lock.json', 'app/native/go.mod', 'app/native/go.sum']],
     }
+    metadata['node']['role'] = 'build-tool-only'
+    metadata['npmLicenses'] = 'Only the pinned structured-clone codec is retained for one-time legacy migration, with its package notices; no JavaScript business runtime is shipped.'
     materials['third_party/native-runtimes.json'] = (json.dumps(metadata, indent=2) + '\n').encode()
     return materials
 

@@ -6,7 +6,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $runtimeManifest = Get-Content (Join-Path $root 'third_party/native-runtimes.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-if ($Preview -and ($runtimeManifest.schemaVersion -ne 3 -or $runtimeManifest.packaging.previewReady -ne $true)) {
+if ($Preview -and ($runtimeManifest.schemaVersion -ne 4 -or $runtimeManifest.packaging.previewReady -ne $true)) {
     throw ('GITOWL_PREVIEW_NOT_READY: original Desktop frontend acceptance is pending. ' + ($runtimeManifest.packaging.blockers -join ' '))
 }
 if ($BuildNumber -notmatch '^[0-9]{14}$') { throw 'BuildNumber must use yyyyMMddHHmmss' }
@@ -14,6 +14,7 @@ $env:PATH = (Join-Path $root '.local/toolchains/node-v24.22.1-win-x64') + ';' + 
 $env:GOMODCACHE = Join-Path $root '.local/go-mod'
 $env:GOCACHE = Join-Path $root '.local/go-build'
 $env:GOTMPDIR = Join-Path $root '_temp/go-build'
+$env:MYGO_NATIVE_SQLITECORE = Join-Path $root ($runtimeManifest.nativeLibraries | Where-Object { $_.name -eq 'Sqlitecore' }).localPath
 New-Item -ItemType Directory -Force $env:GOTMPDIR | Out-Null
 
 function Check-Exit([string]$Step) {
@@ -74,6 +75,13 @@ try {
         $env:MYGO_LDFLAGS = "-X main.BuildNumber=$BuildNumber"
         & npm.cmd run prepare:native-runtime
         Check-Exit 'Prepare checked runtime and licenses'
+        $runtimeReceipt = Get-Content 'output/native-runtime/runtime-receipt.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+        $validation = Get-Content 'output/native-runtime/go-runtime-validation.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+        $validationHash = (& python tools/prepare_go_runtime.py --validation-hash).Trim()
+        Check-Exit 'Read native validation source hash'
+        if ($validation.host -ne 'go' -or $validation.passed -ne $true -or $validation.inputHash -ne $runtimeReceipt.inputHash -or $validation.validationHash -ne $validationHash) {
+            throw 'Run the native validation against these exact Go runtime inputs before packaging'
+        }
         $env:GITOWL_RUNTIME_SMOKE = Join-Path $root 'output/native-runtime/backend'
         if ($Preview) {
             Push-Location app/native
@@ -94,9 +102,9 @@ try {
             sourceTree=$sourceTree; sourceSnapshot='staged Git inputs'
             authenticodeSigned=$false; fullFeatureParity=($null -ne $acceptance)
             originalCore='desktop/desktop'; presentationComplete=($null -ne $acceptance)
-            runtimeHost='node'; embeddedBrowser=$false
+            runtimeHost='go'; embeddedBrowser=$false
             runtimeInputHash=(Get-Content 'output/native-runtime/runtime-receipt.json' -Raw -Encoding UTF8 | ConvertFrom-Json).inputHash
-            runtimeSmoke=if ($env:GITOWL_SKIP_RUNTIME_SMOKE -eq '1') { 'skipped-by-request' } else { 'passed' }
+            runtimeSmoke='passed'
             desktopAcceptance=if ($null -ne $acceptance) { 'source-bound-parent-review' } else { 'not-required' }; installedAcceptance='not-required'; channel='research-preview'
         }
         if ($null -ne $acceptance) {

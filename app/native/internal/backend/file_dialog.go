@@ -24,6 +24,7 @@ type KernelFileDialog struct {
 // ReplyFileDialog must not enter the UI's ordered command queue: a command in
 // that queue may be waiting for this very picker to finish.
 func (k *Kernel) ReplyFileDialog(ctx context.Context, id int, paths []string, dialogErr error) error {
+	if k.native!=nil{return k.native.answer(id,paths,dialogErr)}
 	if paths == nil {
 		paths = []string{}
 	}

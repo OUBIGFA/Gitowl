@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<policymap>
+  <!-- Repository images cannot execute delegates or read external URLs/files. -->
+  <policy domain="delegate" rights="none" pattern="*"/>
+  <policy domain="filter" rights="none" pattern="*"/>
+  <policy domain="path" rights="none" pattern="@*"/>
+  <policy domain="path" rights="none" pattern="*"/>
+  <!-- Images arrive over stdin; pixels leave over stdout. Nested SVG images
+       cannot open arbitrary local files even when their codec is allowed. -->
+  <policy domain="path" rights="read|write" pattern="{-,*/imagemagick/-}"/>
+  <!-- Seekable codecs spool stdin into ImageMagick's own temporary files. -->
+  <policy domain="path" rights="read|write" pattern="*/Temp/magick-*"/>
+  <policy domain="coder" rights="none" pattern="{HTTP,HTTPS,URL,FTP,FILE,MSL,MVG,EPHEMERAL,PS,PS2,PS3,PDF,XPS}"/>
+  <policy domain="resource" name="memory" value="128MiB"/>
+  <policy domain="resource" name="map" value="0"/>
+  <policy domain="resource" name="disk" value="0"/>
+  <policy domain="resource" name="thread" value="1"/>
+  <policy domain="resource" name="time" value="30"/>
+</policymap>

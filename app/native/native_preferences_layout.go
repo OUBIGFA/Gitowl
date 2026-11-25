@@ -114,7 +114,7 @@ func preferenceItems(c *ui.Context, fields []backend.KernelDialogField, page str
 		if field.Kind == "checkbox" {
 			labelWidth -= 28
 		}
-		_, label := preferenceTextSize(c, max(1, labelWidth), nativeDialogLabel(c.Locale(), field.LabelKey), c.Theme().FontSize)
+		_, label := preferenceTextSize(c, max(1, labelWidth), nativeDialogFieldLabel(c.Locale(), field), c.Theme().FontSize)
 		h := label + 6 + 40
 		switch field.Kind {
 		case "checkbox":
@@ -238,7 +238,7 @@ func measurePreferencesWithin(c *ui.Context, popup *backend.KernelPopupPresentat
 	preferredColumn := float32(0)
 	for _, page := range pages {
 		for _, field := range page.Fields {
-			w, _ := preferenceTextSize(c, 0, nativeDialogLabel(c.Locale(), field.LabelKey), c.Theme().FontSize)
+			w, _ := preferenceTextSize(c, 0, nativeDialogFieldLabel(c.Locale(), field), c.Theme().FontSize)
 			preferredColumn = max(preferredColumn, w+28)
 			for _, choice := range field.Choices {
 				if repositoryEntryDialog(popup) {

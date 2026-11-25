@@ -26,24 +26,33 @@ class NativePackagingTests(unittest.TestCase):
         self.assertIn(b'GITOWL_PREVIEW_NOT_READY', result.stderr)
         self.assertEqual(installer.read_bytes() if installer.is_file() else None, before)
 
-    def test_runtime_resources_use_node_without_shipping_electron(self):
+    def test_runtime_resources_use_go_without_shipping_node_or_electron(self):
         config = json.loads((ROOT / 'app/native/mygo.json').read_text(encoding='utf-8'))
         self.assertIn('../../output/native-runtime/backend', config['resources'])
         self.assertNotIn('../../output/native-runtime/desktop-kernel', config['resources'])
         self.assertNotIn('../../output/native-runtime/service', config['resources'])
+        self.assertIn('../../output/native-runtime/Sqlitecore.dll', config['resources'])
         manifest = json.loads((ROOT / 'third_party/native-runtimes.json').read_text(encoding='utf-8'))
-        self.assertEqual(manifest['schemaVersion'], 3)
-        self.assertEqual(manifest['node']['role'], 'production-backend-and-build-tool')
+        self.assertEqual(manifest['schemaVersion'], 4)
+        self.assertEqual(manifest['node']['role'], 'build-tool-only')
         self.assertEqual(manifest['packaging']['originalCore'], 'desktop/desktop')
         self.assertFalse(manifest['packaging']['presentationComplete'])
         self.assertFalse(manifest['packaging']['previewReady'])
         self.assertTrue(manifest['packaging']['blockers'])
         self.assertNotIn('electron', manifest)
-        self.assertEqual(manifest['host'], 'node')
+        self.assertEqual(manifest['host'], 'go')
         self.assertRegex(manifest['node']['executableSha256'], r'\A[0-9a-f]{64}\Z')
         self.assertRegex(manifest['node']['archiveSha256'], r'\A[0-9a-f]{64}\Z')
         packages = {item['package'] for item in manifest['bundledInputs']}
-        self.assertTrue({'dugite', 'desktop-trampoline', 'process-proxy', 'printenvz', '@github/copilot-sdk-win32-x64', '@koromix/koffi-win32-x64'} <= packages)
+        self.assertEqual({'dugite', '@github/copilot-sdk-win32-x64'}, packages)
+        libraries = {item['name']: item for item in manifest['nativeLibraries']}
+        self.assertEqual(set(libraries), {'Sqlitecore', 'ImageMagick'})
+        for item in libraries.values():
+            self.assertRegex(item['sha256'], r'\A[0-9a-f]{64}\Z')
+            self.assertTrue(item['source'].startswith('https://github.com/'))
+        modules = {item['module'] for item in manifest['goModules']}
+        self.assertIn('github.com/github/copilot-sdk/go', modules)
+        self.assertIn('github.com/kettek/apng', modules)
         for item in manifest['bundledInputs']:
             lock = json.loads((ROOT / item['lockfile']).read_text(encoding='utf-8'))['packages'][item['lockKey']]
             self.assertEqual(item['version'], lock['version'])

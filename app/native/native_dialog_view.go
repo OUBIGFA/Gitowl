@@ -220,6 +220,14 @@ func nativeDialogChoiceLabel(locale, label string) string {
 	return label // Technical model, account, branch and repository names are data.
 }
 
+// Model/account names are presentation data, not translation catalog keys.
+func nativeDialogFieldLabel(locale string, field backend.KernelDialogField) string {
+	if field.Label != "" {
+		return field.Label
+	}
+	return nativeDialogLabel(locale, field.LabelKey)
+}
+
 func nativeDialogValid(popup *backend.KernelPopupPresentation) bool {
 	if popup == nil || !popup.Supported || popup.Layout != "form" || popup.ID == nil || *popup.ID <= 0 || popup.TitleKey == "" {
 		return false
@@ -545,7 +553,7 @@ func renderNativeDialogButton(c *ui.Context, action backend.KernelDialogAction, 
 }
 
 func renderNativeDialogField(c *ui.Context, field backend.KernelDialogField, form *nativeDialogForm, changed func()) {
-	label := nativeDialogLabel(c.Locale(), field.LabelKey)
+	label := nativeDialogFieldLabel(c.Locale(), field)
 	value, disabled := form.values[field.ID], field.Disabled || form.busy
 	if field.Kind == "checkbox" {
 		ui.Checkbox(c, &value.check, label).FillWidth().Disabled(disabled).OnChange(changed)

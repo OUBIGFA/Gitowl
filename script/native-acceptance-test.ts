@@ -48,11 +48,13 @@ import { commandEnvironment, runRecordedCommand } from './native-acceptance'
 const nodeSummary =
   'ℹ tests 2\nℹ suites 1\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\n'
 const productionTests = [
-  'TestNativeViewUsesOriginalDesktopKernel',
-  'TestNativePreferencesFitAllOriginalPages',
-  'TestNativeGenerationUsesOriginalDesktopKernel',
-  'TestNativeMediaUsesOriginalDesktopKernel',
-  'TestOriginalKernelFreshProfileCompletesNativeWelcome',
+  'TestNativeViewUsesDirectGoGitOwner',
+  'TestNativeOwnerGitWorkflowWithoutNode',
+  'TestNativeStoreReadsActualRetiredStorage',
+  'TestNativeImageMagickPreservesCodecFrames',
+  'TestNativeCopilotComponentAndSDK',
+  'TestNativeGitSpawnsAskpassAndCancelsPrompt',
+  'TestSelectedCommitUsesOfficialLFSAndHooks',
 ]
 const installerTests = [
   'TestGitowlInstallerProcessMessages',
@@ -147,6 +149,7 @@ async function fixture(t: { after: (fn: () => Promise<void>) => void }) {
       '../static/logos/gitowl/logo.png',
       '../static/logos/gitowl/icons',
       '../../third_party/licenses/arcmd',
+      '../../output/native-runtime/Sqlitecore.dll',
       '../../output/native-runtime/backend',
       '../../output/native-runtime/build-info.json',
     ],
@@ -173,42 +176,23 @@ async function fixture(t: { after: (fn: () => Promise<void>) => void }) {
   await file('.local/mygo-gitowl-0.8.1/ui.go', 'fixture original MyGo')
   await file('.local/mygo-gitowl-0.8.1/.gitowl-patch', hash('fixture archive'))
   for (const path of [
-    'node.exe',
-    'Node-LICENSE.txt',
-    'main.js',
-    'migration.js',
-    'cli.js',
-    'install-cli.js',
-    'image-worker.js',
     'native-launch.json',
-    'koffi.node',
     'git/cmd/git.exe',
-    'git/ucrt64/libexec/git-core/git-credential-desktop.exe',
-    'desktop-trampoline/desktop-askpass-trampoline.exe',
-    'process-proxy.exe',
-    'printenvz.exe',
     'copilot-runtime.json',
-    'static/licenses.json',
-    'emoji.json',
-  ])
-    {await file(`${runtimePath}/${path}`, `fixture ${path}`)}
-  await json(`${runtimePath}/node-runtime-sources.json`, [
-    'app/src/native-kernel/node-runtime.ts',
-  ])
-  await json(`${runtimePath}/package.json`, {
-    productName: 'Gitowl',
-    version: '0.1.0',
-    bundleID: 'io.github.oubigfa.gitowl',
-    main: 'main.js',
-  })
+    'imagemagick/magick.exe',
+    'imagemagick/policy.xml',
+    'migration/legacy-export.cjs',
+  ]) {
+    await file(`${runtimePath}/${path}`, `fixture ${path}`)
+  }
   const runtime = await json(runtimeReceiptPath, {
-    schemaVersion: 3,
-    host: 'node',
+    schemaVersion: 4,
+    host: 'go',
     originalCore: 'desktop/desktop',
     inputHash: hash('fixture-inputs'),
     buildFlags: {
       NODE_ENV: 'production',
-      host: 'node',
+      host: 'go',
       RELEASE_CHANNEL: 'production',
     },
     files: await inventory(join(root, runtimePath)),
@@ -227,6 +211,8 @@ async function fixture(t: { after: (fn: () => Promise<void>) => void }) {
     ) {
       stdout += nodeSummary
     }
+    if (suite === 'runtime')
+      stdout += 'Reused identical verified Go runtime resources\n'
     if (['kernel', 'production-kernel', 'native-unit'].includes(suite)) {
       stdout += goResults(productionTests)
     }
@@ -661,12 +647,12 @@ it('requires the real-kernel entries in both development and production smoke ru
           nodeSummary +
             goResults(
               productionTests.filter(
-                name => name !== 'TestNativePreferencesFitAllOriginalPages'
+                name => name !== 'TestNativeOwnerGitWorkflowWithoutNode'
               )
             ),
           ''
         ),
-      /TestNativePreferencesFitAllOriginalPages/
+      /TestNativeOwnerGitWorkflowWithoutNode/
     )
   }
 })
@@ -759,12 +745,15 @@ it('allows the bundled Git system profile while rejecting actual profile directo
 it('validates every runtime byte and rejects test-seed/harness files even with a rehashed receipt', async t => {
   const f = await fixture(t)
   await validateRuntime(f.root, f.runtime)
-  await f.file(`${runtimePath}/main.js`, 'tampered output')
+  await f.file(`${runtimePath}/copilot-runtime.json`, 'tampered output')
   await assert.rejects(
     validateRuntime(f.root, f.runtime),
     /Runtime bytes differ/
   )
-  await f.file(`${runtimePath}/main.js`, 'fixture main.js')
+  await f.file(
+    `${runtimePath}/copilot-runtime.json`,
+    'fixture copilot-runtime.json'
+  )
   await f.file(`${runtimePath}/app/seed-profile.js`, 'test seed must not ship')
   const receipt = JSON.parse(
     await readFile(join(f.root, runtimeReceiptPath), 'utf8')

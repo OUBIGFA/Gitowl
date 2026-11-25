@@ -20,6 +20,7 @@ type KernelDialogField struct {
 	IconLibrary   string               `json:"iconLibrary"`
 	ID            string               `json:"id"`
 	LabelKey      string               `json:"labelKey"`
+	Label         string               `json:"label,omitempty"`
 	Kind          string               `json:"kind"`
 	Value         any                  `json:"value"`
 	Text          string               `json:"text"`

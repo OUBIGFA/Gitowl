@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 3,
-  "host": "node",
+  "schemaVersion": 4,
+  "host": "go",
   "bundledInputs": [
     {
       "package": "dugite",
@@ -11,7 +11,8 @@
       "integrity": "sha512-deO3178Y8uQ0y4Es5eD31PST78nyWskfqLDi+Za5UBHYvdlMMwuFirwShgCuX+8aT3B1BZ6xlr4Bb8j0eq4Bag==",
       "path": "app/node_modules/dugite/git",
       "treeSha256": "1dd63e8bd4da78575226d9b6451947a0f0db35163a6654baf11523d4550b904c",
-      "fileCount": 375
+      "fileCount": 375,
+      "delivery": "bundled"
     },
     {
       "package": "@github/copilot-sdk-win32-x64",
@@ -22,218 +23,29 @@
       "integrity": "sha512-YaItpumZwGmq1kgVscVNmO0W401tSJ7JRC5hW8QIynDwgQzADuc9GnrOn8kNQdvPVM8jOfd+H30UUQ9ZE8/7xQ==",
       "path": "app/node_modules/@github/copilot-sdk-win32-x64",
       "treeSha256": "6095af2b8a4233aab175e90e5430ae703311ee0a4905a45ed2bfe06c11aca9cc",
-      "fileCount": 87
-    },
-    {
-      "package": "@koromix/koffi-win32-x64",
-      "version": "3.2.1",
-      "lockfile": "app/package-lock.json",
-      "lockKey": "node_modules/@koromix/koffi-win32-x64",
-      "source": "https://registry.npmjs.org/@koromix/koffi-win32-x64/-/koffi-win32-x64-3.2.1.tgz",
-      "integrity": "sha512-ZmZNiBO6bkOSh3QNzgfvb1cMY0yMobn6ZQrSMqbAce21qyYL8niIbyipz9N/PIRDciGhsV0wUxnZsxIO+yWsHQ==",
-      "path": "app/node_modules/@koromix/koffi-win32-x64",
-      "treeSha256": "620ea097403355289a684d1cec6471a1f329d5dafebc752429c58624e8aa9150",
-      "fileCount": 5
-    },
-    {
-      "package": "desktop-trampoline",
-      "version": "0.9.12",
-      "lockfile": "app/package-lock.json",
-      "lockKey": "node_modules/desktop-trampoline",
-      "source": "file:../vendor/desktop-trampoline",
-      "integrity": null,
-      "path": "app/node_modules/desktop-trampoline/build/Release/desktop-askpass-trampoline.exe",
-      "sha256": "1f254c75fe9050e0a31e9f2248ff2baefe8de7d104680c5166623d894afd88a0"
-    },
-    {
-      "package": "desktop-trampoline",
-      "version": "0.9.12",
-      "lockfile": "app/package-lock.json",
-      "lockKey": "node_modules/desktop-trampoline",
-      "source": "file:../vendor/desktop-trampoline",
-      "integrity": null,
-      "path": "app/node_modules/desktop-trampoline/build/Release/desktop-credential-helper-trampoline.exe",
-      "sha256": "613e425bb19d1680ec8da611ab8740f06335aa6331c6092527af933e24e5cd47"
-    },
-    {
-      "package": "process-proxy",
-      "version": "0.6.0",
-      "lockfile": "package-lock.json",
-      "lockKey": "node_modules/process-proxy",
-      "source": "https://registry.npmjs.org/process-proxy/-/process-proxy-0.6.0.tgz",
-      "integrity": "sha512-Ic7sU/XQQBJ1mdd8zLcrPakUdg5RrKmJKk3BV+5sLzbVhQRdQxOrG1ycA0dHeGr1TwFWHg37xArYiLEOiBx9kA==",
-      "path": "node_modules/process-proxy/bin/process-proxy-win32-x64.exe",
-      "sha256": "ae99f7e9b2d64e6b525023c195ea78da5425e534c4633f08b4a9c5f3e59f509a"
-    },
-    {
-      "package": "printenvz",
-      "version": "1.0.0",
-      "lockfile": "package-lock.json",
-      "lockKey": "node_modules/printenvz",
-      "source": "file:vendor/printenvz",
-      "integrity": null,
-      "path": "node_modules/printenvz/build/Release/printenvz.exe",
-      "sha256": "6207a08cf9b21f5d00742f8b9c7bcd46fadc6765a169e9297accdf167854f715"
-    },
-    {
-      "package": "indexeddbshim",
-      "version": "19.0.8",
-      "lockfile": "app/package-lock.json",
-      "lockKey": "node_modules/indexeddbshim",
-      "source": "https://registry.npmjs.org/indexeddbshim/-/indexeddbshim-19.0.8.tgz",
-      "integrity": "sha512-rdnHkGFJm7GUs8TT1syiWJz3Roe7dXk3PEamutvl1ED84L1fM08AzoP5Yi1kl0XhTJxE1xtv99aNEwBtqQYWaQ==",
-      "path": "app/node_modules/indexeddbshim",
-      "treeSha256": "7a6511238545f8884d93d7ebb008e9a5fcecbeb17e971a6eade5a7e1f36519ce",
-      "fileCount": 113,
-      "licenses": [
-        {
-          "path": "third_party/licenses/native/npm_indexeddbshim-LICENSE-APACHE.txt",
-          "sha256": "c38b5f754d279021e58c5cab1e4f9b25891bd2ed03964f42c5b9533085006239"
-        },
-        {
-          "path": "third_party/licenses/native/npm_indexeddbshim-LICENSE-MIT.txt",
-          "sha256": "7e6abf974005cb8f7a3cbd6250fc31309659f46a29a95f8192cab28c16a3b9ac"
-        }
-      ]
-    },
-    {
-      "package": "websql-configurable",
-      "version": "4.1.0",
-      "lockfile": "app/package-lock.json",
-      "lockKey": "node_modules/websql-configurable",
-      "source": "https://registry.npmjs.org/websql-configurable/-/websql-configurable-4.1.0.tgz",
-      "integrity": "sha512-EsVxHtOa4WMCEmRCxMl+H3Lp0tLwkAGBT693CoPCAw1YE5ZEX9TuVGwpvo9Jy/7ieBUod1Jm4gRDLEEjEwjONA==",
-      "path": "app/node_modules/websql-configurable",
-      "treeSha256": "c91c193ede1fa3e963b5b92e4492ba3163669b2a0ed52ddf95abd3b1cc7c068c",
-      "fileCount": 51,
-      "licenses": [
-        {
-          "path": "third_party/licenses/native/npm_websql-configurable-LICENSE",
-          "sha256": "bf41d90b4fb789f6eac84eafedafe33695311236732f4efe8e3ebf9f4521c719"
-        }
-      ]
-    },
-    {
-      "package": "better-sqlite3",
-      "version": "13.2.0",
-      "lockfile": "app/package-lock.json",
-      "lockKey": "node_modules/better-sqlite3",
-      "source": "https://registry.npmjs.org/better-sqlite3/-/better-sqlite3-13.2.0.tgz",
-      "integrity": "sha512-Z8Q/9x/uNyKxA1v4FNodyItRVRw1TeKBrmj32JhxhR0ceNcBY+wMobt/Bv7M7TzwPAXjnZRtNaEsATnUZSKWZQ==",
-      "path": "app/node_modules/better-sqlite3",
-      "treeSha256": "abe1c3376b414c6656c1bce463765e48679dc4afaad4473ea1640963ea9f5970",
       "fileCount": 87,
-      "licenses": [
-        {
-          "path": "third_party/licenses/native/npm_better-sqlite3-LICENSE",
-          "sha256": "09856b52897c91ab67e7456ef43067019f31dfd3b87fda72e655736b1ebdee55"
-        }
-      ]
+      "delivery": "on-demand"
+    }
+  ],
+  "nativeLibraries": [
+    {
+      "name": "Sqlitecore",
+      "version": "MyGo-v0.10.0/SQLite-3.53.4",
+      "source": "https://github.com/egoist/mygo/releases/download/native-sqlitecore/Sqlitecore-windows-amd64-029fd2db48c3.dll",
+      "sha256": "029fd2db48c3cc30de13f0a5f33c7604460f8f61496b9e641d7de7e394d3f8e6",
+      "sourceHash": "f9507095cbbe51626c43c6d9237a38bc94c596cf700a88c029d2f0abb065b818",
+      "localPath": ".local/downloads/Sqlitecore-windows-amd64-029fd2db48c3.dll"
     },
     {
-      "package": "@imagemagick/magick-wasm",
-      "version": "0.0.46",
-      "lockfile": "app/package-lock.json",
-      "lockKey": "node_modules/@imagemagick/magick-wasm",
-      "source": "https://registry.npmjs.org/@imagemagick/magick-wasm/-/magick-wasm-0.0.46.tgz",
-      "integrity": "sha512-0HKJmmqUTFwXm6Z/1lGtOx7JE/FpZiJg8sXBnAho1NgzunEOkgUILU7rskUnYbtdG/hJiFe9viVatWuWDZ9S0g==",
-      "path": "app/node_modules/@imagemagick/magick-wasm",
-      "treeSha256": "0c3791e616a5cbe0604cd84ad2679e5184234022ddb5d3f40aa561dbe54c50ff",
-      "fileCount": 9,
+      "name": "ImageMagick",
+      "version": "7.1.2-36-Q8-x64",
+      "source": "https://github.com/ImageMagick/ImageMagick/releases/download/7.1.2-36/ImageMagick-7.1.2-36-portable-Q8-x64.7z",
+      "archiveSha256": "90e3a8ee011710cf4e570c040eaf430daf6e69b1fab084fc3214cb695f961bdc",
+      "sha256": "d9cfc8e4a833672f63f8a44a462dc697f45287ca931f948a8a23d664e0d7563a",
+      "localPath": ".local/imagemagick-7.1.2-36/magick.exe",
       "licenses": [
-        {
-          "path": "third_party/licenses/native/npm_imagemagick_magick-wasm-LICENSE",
-          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
-        },
-        {
-          "path": "third_party/licenses/native/npm_imagemagick_magick-wasm-NOTICE",
-          "sha256": "253997f509bd6a2397b4cb33a4e6ecd671feec8c09117b03fd698e6e824e2e68"
-        }
-      ]
-    },
-    {
-      "package": "upng-js",
-      "version": "2.1.0",
-      "lockfile": "app/package-lock.json",
-      "lockKey": "node_modules/upng-js",
-      "source": "https://registry.npmjs.org/upng-js/-/upng-js-2.1.0.tgz",
-      "integrity": "sha512-d3xzZzpMP64YkjP5pr8gNyvBt7dLk/uGI67EctzDuVp4lCZyVMo0aJO6l/VDlgbInJYDY6cnClLoBp29eKWI6g==",
-      "path": "app/node_modules/upng-js",
-      "treeSha256": "b566de884e2ae844577d65892547dd3874fde4df9f4325a9ab9b9e3e37e14017",
-      "fileCount": 4,
-      "licenses": [
-        {
-          "path": "third_party/licenses/native/npm_upng-js-LICENSE",
-          "sha256": "c1fb8861eca211bf5aea574358aba7039396c0c1824c2a1477cc126d398efd89"
-        }
-      ]
-    },
-    {
-      "package": "jsdom",
-      "version": "27.4.0",
-      "lockfile": "app/package-lock.json",
-      "lockKey": "node_modules/jsdom",
-      "source": "https://registry.npmjs.org/jsdom/-/jsdom-27.4.0.tgz",
-      "integrity": "sha512-mjzqwWRD9Y1J1KUi7W97Gja1bwOOM5Ug0EZ6UDK3xS7j7mndrkwozHtSblfomlzyB4NepioNt+B2sOSzczVgtQ==",
-      "path": "app/node_modules/jsdom",
-      "treeSha256": "1a87ab27351dc3cc2d01c5fe62a2d06dbeb4ae31d4d1791227c85f4b227a6013",
-      "fileCount": 557,
-      "licenses": [
-        {
-          "path": "third_party/licenses/native/npm_jsdom-LICENSE.txt",
-          "sha256": "242d37e7cab25cbafc36cc973ee88f9345fddf066afe4f72b7ac3d9ad4e24cce"
-        }
-      ]
-    },
-    {
-      "package": "undici",
-      "version": "8.13.1",
-      "lockfile": "app/package-lock.json",
-      "lockKey": "node_modules/undici",
-      "source": "https://registry.npmjs.org/undici/-/undici-8.13.1.tgz",
-      "integrity": "sha512-Kt7EaPjh0s93lJH/PmW3d5rhkcpUa6fS3jqZ7+YGxNd9L7Xy/i827xe4C2uhhq+pJebM4tQOl5AgHmW11G5Skg==",
-      "path": "app/node_modules/undici",
-      "treeSha256": "1b755d1b9899b01266e0ac34e3c41ddf11453235d4f53ab0dcad3d2723ef309c",
-      "fileCount": 218,
-      "licenses": [
-        {
-          "path": "third_party/licenses/native/npm_undici-LICENSE",
-          "sha256": "a6db8096b2707bc0102d256917d4d33f298ba36d8c3f25de067a2b5bb379db27"
-        }
-      ]
-    },
-    {
-      "package": "typeson-registry",
-      "version": "15.0.0",
-      "lockfile": "app/package-lock.json",
-      "lockKey": "node_modules/typeson-registry",
-      "source": "https://registry.npmjs.org/typeson-registry/-/typeson-registry-15.0.0.tgz",
-      "integrity": "sha512-stB6pW/dtIRSwUnWiWTAKKLX+doIU/R7/jNo0NyiVRNgIzRwx+Wyqp4WVbvHpdkmPxuz/8Kx1befcHrD4sSluQ==",
-      "path": "app/node_modules/typeson-registry",
-      "treeSha256": "bddd8ae9a85b03a797c708160eed35dd341c3e98d10bacab9d85dd9394c804c5",
-      "fileCount": 308,
-      "licenses": [
-        {
-          "path": "third_party/licenses/native/npm_typeson-registry-LICENSE-MIT.txt",
-          "sha256": "844fc6fe4c1aea9e0b1d9a01a2a676a48af41b92730cd34a69e7f07ee2d9e176"
-        }
-      ]
-    },
-    {
-      "package": "canvas",
-      "version": "3.2.3",
-      "lockfile": "app/package-lock.json",
-      "lockKey": "node_modules/canvas",
-      "source": "https://registry.npmjs.org/canvas/-/canvas-3.2.3.tgz",
-      "integrity": "sha512-PzE5nJZPz72YUAfo8oTp0u3fqqY7IzlTubneAihqDYAUcBk7ryeCmBbdJBEdaH0bptSOe2VT2Zwcb3UaFyaSWw==",
-      "path": "app/node_modules/canvas",
-      "treeSha256": "b6e88ba3837653bb235d773edf4f7f08e1e0ccdeae198a8d9fd4f75ab64fe578",
-      "fileCount": 209,
-      "licenses": [
-        {
-          "path": "third_party/licenses/native/npm_canvas-LICENSE.txt",
-          "sha256": "d653de7328f017cd593cd28eadd19483af37e681121715bfbe74e3666a580b25"
-        }
+        "third_party/licenses/native/imagemagick-LICENSE.txt",
+        "third_party/licenses/native/imagemagick-NOTICE.txt"
       ]
     }
   ],
@@ -248,7 +60,7 @@
     ]
   },
   "node": {
-    "role": "production-backend-and-build-tool",
+    "role": "build-tool-only",
     "version": "24.22.1",
     "source": "https://nodejs.org/dist/v24.22.1/node-v24.22.1-win-x64.zip",
     "executableSha256": "d702daa815eabbff763c7d3808e235cf031cf2ca70211b56847bc72f51e240e5",
@@ -296,6 +108,17 @@
       ]
     },
     {
+      "module": "github.com/coder/websocket",
+      "version": "v1.8.15",
+      "source": "https://pkg.go.dev/github.com/coder/websocket@v1.8.15",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/github.com_coder_websocket-LICENSE.txt",
+          "sha256": "cc0975a5f6305145bdd7b41ce9479632fdac3870e6ac4281f28017f18c767c4e"
+        }
+      ]
+    },
+    {
       "module": "github.com/ebitengine/purego",
       "version": "v0.11.1",
       "source": "https://pkg.go.dev/github.com/ebitengine/purego@v0.11.1",
@@ -318,6 +141,39 @@
       ]
     },
     {
+      "module": "github.com/github/copilot-sdk/go",
+      "version": "v1.0.27-preview.1",
+      "source": "https://pkg.go.dev/github.com/github/copilot-sdk/go@v1.0.27-preview.1",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/github.com_github_copilot-sdk_go-LICENSE",
+          "sha256": "2510b446bc1f0cf9702453075d20cd88631e20e5642658edb7325d9c1eb534f7"
+        }
+      ]
+    },
+    {
+      "module": "github.com/go-logr/logr",
+      "version": "v1.4.3",
+      "source": "https://pkg.go.dev/github.com/go-logr/logr@v1.4.3",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/github.com_go-logr_logr-LICENSE",
+          "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1"
+        }
+      ]
+    },
+    {
+      "module": "github.com/go-logr/stdr",
+      "version": "v1.2.2",
+      "source": "https://pkg.go.dev/github.com/go-logr/stdr@v1.2.2",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/github.com_go-logr_stdr-LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        }
+      ]
+    },
+    {
       "module": "github.com/go-text/typesetting",
       "version": "v0.3.5",
       "source": "https://pkg.go.dev/github.com/go-text/typesetting@v0.3.5",
@@ -325,6 +181,39 @@
         {
           "path": "third_party/licenses/native/github.com_go-text_typesetting-LICENSE",
           "sha256": "6b1bf94c77d7faa0ce94f8745595bfaf4c404f8b3873f5c2ce55ca15f8e44eca"
+        }
+      ]
+    },
+    {
+      "module": "github.com/google/jsonschema-go",
+      "version": "v0.4.2",
+      "source": "https://pkg.go.dev/github.com/google/jsonschema-go@v0.4.2",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/github.com_google_jsonschema-go-LICENSE",
+          "sha256": "2d56c53449691d85d9aea245eb8dac12713e9075d70d5557b82ae1e94805b357"
+        }
+      ]
+    },
+    {
+      "module": "github.com/google/uuid",
+      "version": "v1.6.0",
+      "source": "https://pkg.go.dev/github.com/google/uuid@v1.6.0",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/github.com_google_uuid-LICENSE",
+          "sha256": "0a8d61ed3cbfd5312326e8126c31ce9c627a283adc99131b56896d29ada04b2d"
+        }
+      ]
+    },
+    {
+      "module": "github.com/kettek/apng",
+      "version": "v0.0.0-20250827064933-2bb5f5fcf253",
+      "source": "https://pkg.go.dev/github.com/kettek/apng@v0.0.0-20250827064933-2bb5f5fcf253",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/github.com_kettek_apng-LICENSE",
+          "sha256": "f3d64e632ae2f09a250551696c1d185ca821d85b70624eb45d29800a30ec4649"
         }
       ]
     },
@@ -358,6 +247,50 @@
         {
           "path": "third_party/licenses/native/go.digitalxero.dev_rpm-LICENSE",
           "sha256": "4bf8e0e57c748fc582142448427f95d5e0e9db2823607e403d3ea3ba04d6654d"
+        }
+      ]
+    },
+    {
+      "module": "go.opentelemetry.io/auto/sdk",
+      "version": "v1.1.0",
+      "source": "https://pkg.go.dev/go.opentelemetry.io/auto/sdk@v1.1.0",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/go.opentelemetry.io_auto_sdk-LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        }
+      ]
+    },
+    {
+      "module": "go.opentelemetry.io/otel",
+      "version": "v1.35.0",
+      "source": "https://pkg.go.dev/go.opentelemetry.io/otel@v1.35.0",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/go.opentelemetry.io_otel-LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        }
+      ]
+    },
+    {
+      "module": "go.opentelemetry.io/otel/metric",
+      "version": "v1.35.0",
+      "source": "https://pkg.go.dev/go.opentelemetry.io/otel/metric@v1.35.0",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/go.opentelemetry.io_otel_metric-LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        }
+      ]
+    },
+    {
+      "module": "go.opentelemetry.io/otel/trace",
+      "version": "v1.35.0",
+      "source": "https://pkg.go.dev/go.opentelemetry.io/otel/trace@v1.35.0",
+      "licenses": [
+        {
+          "path": "third_party/licenses/native/go.opentelemetry.io_otel_trace-LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
         }
       ]
     },
@@ -437,7 +370,7 @@
       ]
     }
   ],
-  "npmLicenses": "Generated by the existing script/licenses/update-license-dump.ts allowlist and bundled in licenses/npm-licenses.json.",
+  "npmLicenses": "Only the pinned structured-clone codec is retained for one-time legacy migration, with its package notices; no JavaScript business runtime is shipped.",
   "lockfiles": [
     {
       "path": "package-lock.json",
@@ -449,11 +382,11 @@
     },
     {
       "path": "app/native/go.mod",
-      "sha256": "cdfaf61e55312004f46eca13f6981158af2bedba2f3363e85cd91f71fac229fb"
+      "sha256": "987d1c085a4f11c791fd57bd160e6c54a24ed1f2235c3a0019a4c250e485a60e"
     },
     {
       "path": "app/native/go.sum",
-      "sha256": "8d6c80da32538153cc8d3f2edf55eb5180350efc210abcdf6e6b80ff77feb36a"
+      "sha256": "ed69d5b6447acb4bfd7336861be3fe74b9f78525f3e4aa840551b029b929b1b7"
     }
   ]
 }

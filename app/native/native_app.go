@@ -613,6 +613,12 @@ func (a *app) saveCoreVersion(pushAfterCommit bool) {
 	// Pending draft writes are manual edits, even if the last receipt still
 	// describes a generated message. The queued save uses the latest UI text.
 	commit := backend.KernelCommitContext{Summary: a.commitSummary, Description: &body, MessageGeneratedByCopilot: a.coreDraftPending == 0 && a.coreSnapshot.Selected.Message.GeneratedByCopilot, PushAfterCommit: pushAfterCommit}
+	if vm := a.nativeCommitView(); vm != nil {
+		commit.Amend = vm.Amending
+		for _, author := range vm.CoAuthors {
+			commit.Trailers = append(commit.Trailers, backend.KernelTrailer{Token: "Co-authored-by", Value: author.Name + " <" + author.Email + ">"})
+		}
+	}
 	core, ctx := a.core, a.ctx
 	a.coreCommitPending, a.savingVersion, a.saveErr = true, true, nil
 	a.queueCore(nativeOperation{
@@ -690,6 +696,13 @@ func (a *app) replyCorePopup(reply backend.KernelPopupReply) {
 		return
 	}
 	form := a.coreDialogForms[reply.PopupID]
+	if reply.Action == "customProviders" && a.coreSnapshot != nil && a.coreSnapshot.CurrentPopup != nil && a.coreSnapshot.CurrentPopup.Type == "Preferences" {
+		a.coreSettingsSection = "providers"
+		if form != nil {
+			form.finishReply(false, nil)
+		}
+		return
+	}
 	automatic := form != nil && (form.changePending || form.navigationPending) && form.changeAction == reply.Action
 	a.runCoreTask(func() (backend.KernelResult, error) { return core.ReplyPopup(ctx, reply) }, func(_ backend.KernelResult, err error) {
 		if a.corePopupForm.popupID == reply.PopupID {

@@ -2,7 +2,7 @@ import { execFile } from 'child_process'
 import { readFile, readdir } from 'fs/promises'
 import { promisify } from 'util'
 import { crc32 } from 'zlib'
-import { hash, inventory, reusableRuntime } from './prepare-native-runtime'
+import { hash, inventory } from './prepare-native-runtime'
 import {
   Artifact,
   SourceTreeEvidence,
@@ -196,6 +196,7 @@ export const usesNativeAssets = (suite: Suite) =>
 export const usesRuntime = (suite: Suite) =>
   [
     'runtime',
+    'kernel',
     'production-kernel',
     'script',
     'native-build',
@@ -363,9 +364,7 @@ export function validateResults(suite: Suite, stdout: string, stderr: string) {
     stderr,
     ['kernel', 'production-kernel'].includes(suite)
   )
-  if (
-    ['unit', 'script', 'kernel', 'runtime', 'production-kernel'].includes(suite)
-  ) {
+  if (['unit', 'script'].includes(suite)) {
     check(results.node.length > 0, `${suite}: no Node runner summary`)
     check(
       results.node.every(
@@ -396,20 +395,28 @@ export function validateResults(suite: Suite, stdout: string, stderr: string) {
   }
   if (suite === 'kernel' || suite === 'production-kernel') {
     const required = [
-      'TestNativeViewUsesOriginalDesktopKernel',
-      'TestNativePreferencesFitAllOriginalPages',
-      'TestNativeGenerationUsesOriginalDesktopKernel',
-      'TestNativeMediaUsesOriginalDesktopKernel',
+      'TestNativeViewUsesDirectGoGitOwner',
+      'TestNativeOwnerGitWorkflowWithoutNode',
+      'TestNativeStoreReadsActualRetiredStorage',
+      'TestNativeImageMagickPreservesCodecFrames',
+      'TestNativeCopilotComponentAndSDK',
+      'TestNativeGitSpawnsAskpassAndCancelsPrompt',
+      'TestSelectedCommitUsesOfficialLFSAndHooks',
     ]
-    if (suite === 'production-kernel') {
-      required.push('TestOriginalKernelFreshProfileCompletesNativeWelcome')
-    }
     for (const name of required) {
       check(
         results.goPass.has(name) && !results.goSkip.has(name),
         `Required production test did not run: ${name}`
       )
     }
+  }
+  if (suite === 'runtime') {
+    check(
+      /(?:Prepared native runtime resources: \d+ files, no Node or Electron executable|Reused identical verified Go runtime resources)/.test(
+        stdout
+      ),
+      'Missing verified Go runtime assembly result'
+    )
   }
   if (suite === 'installer-tests') {
     for (const name of [
@@ -521,17 +528,11 @@ export async function validateRuntime(root: string, reference: Artifact) {
   check(reference.path === runtimeReceiptPath, 'Wrong runtime receipt path')
   const receipt = await evidenceJSON(root, reference)
   check(
-    receipt.schemaVersion === 3 &&
-      receipt.host === 'node' &&
+    receipt.schemaVersion === 4 &&
+      receipt.host === 'go' &&
       receipt.originalCore === 'desktop/desktop' &&
       isSHA(receipt.inputHash),
-    'Invalid original runtime receipt'
-  )
-  check(
-    receipt.buildFlags?.NODE_ENV === 'production' &&
-      receipt.buildFlags.host === 'node' &&
-      receipt.buildFlags.RELEASE_CHANNEL === 'production',
-    'Not the registered isolated production runtime'
+    'Invalid native runtime receipt'
   )
   check(
     Array.isArray(receipt.files) && receipt.files.length > 0,
@@ -544,7 +545,7 @@ export async function validateRuntime(root: string, reference: Artifact) {
     const gitSystemProfile = file.path === 'git/etc/profile'
     check(
       gitSystemProfile ||
-        !/(?:native-service|seed-profile|(?:^|\/)electron\.exe$|^renderer\.|(?:^|\/)(?:test|tests|__tests__|profiles?)(?:\/|$))/i.test(
+        !/(?:native-service|seed-profile|(?:^|\/)(?:node|electron)\.exe$|^(?:main|renderer)\.|(?:^|\/)(?:test|tests|__tests__|profiles?)(?:\/|$))/i.test(
           file.path
         ),
       `Test/research resource in shipping runtime: ${file.path}`
@@ -555,70 +556,21 @@ export async function validateRuntime(root: string, reference: Artifact) {
     receipt.files.map((file: Artifact) => `${runtimePath}/${file.path}`)
   )
   check(
-    await reusableRuntime(
-      await safePath(root, reference.path),
-      await safePath(root, runtimePath),
-      receipt.inputHash
-    ),
+    JSON.stringify(await inventory(await safePath(root, runtimePath))) ===
+      JSON.stringify(receipt.files),
     'Runtime bytes differ from production receipt'
   )
   const paths = new Set(receipt.files.map((f: Artifact) => f.path))
   for (const name of [
-    'node.exe',
-    'Node-LICENSE.txt',
-    'main.js',
-    'migration.js',
-    'cli.js',
-    'install-cli.js',
-    'image-worker.js',
     'native-launch.json',
-    'koffi.node',
     'git/cmd/git.exe',
-    'git/ucrt64/libexec/git-core/git-credential-desktop.exe',
-    'desktop-trampoline/desktop-askpass-trampoline.exe',
-    'process-proxy.exe',
-    'printenvz.exe',
     'copilot-runtime.json',
-    'static/licenses.json',
-    'emoji.json',
-    'node-runtime-sources.json',
-    'package.json',
-  ])
-    {check(paths.has(name), `Missing production runtime asset: ${name}`)}
-  const sources = JSON.parse(
-    await readFile(
-      await safePath(root, `${runtimePath}/node-runtime-sources.json`),
-      'utf8'
-    )
-  )
-  check(
-    Array.isArray(sources) && sources.length > 0,
-    'Missing runtime source inputs'
-  )
-  check(
-    !sources.some((source: string) =>
-      /native-service|seed-profile|app\/test\/|node_modules\/electron\//.test(
-        source
-      )
-    ),
-    'Production bundle includes a test/research/Electron entry'
-  )
-  check(
-    !sources.some((source: string) =>
-      /^(?:[a-z]:[\\/]|\/|file:\/\/)/i.test(source)
-    ),
-    'Machine-local source path in runtime inventory'
-  )
-  const pkg = JSON.parse(
-    await readFile(await safePath(root, `${runtimePath}/package.json`), 'utf8')
-  )
-  check(
-    pkg.productName === 'Gitowl' &&
-      pkg.version === '0.1.0' &&
-      pkg.bundleID === 'io.github.oubigfa.gitowl' &&
-      pkg.main === 'main.js',
-    'Runtime identity changed'
-  )
+    'imagemagick/magick.exe',
+    'imagemagick/policy.xml',
+    'migration/legacy-export.cjs',
+  ]) {
+    check(paths.has(name), `Missing production runtime asset: ${name}`)
+  }
   const config = JSON.parse(
     await readFile(await safePath(root, 'app/native/mygo.json'), 'utf8')
   )
@@ -634,6 +586,7 @@ export async function validateRuntime(root: string, reference: Artifact) {
         '../static/logos/gitowl/logo.png',
         '../static/logos/gitowl/icons',
         '../../third_party/licenses/arcmd',
+        '../../output/native-runtime/Sqlitecore.dll',
         '../../output/native-runtime/backend',
         '../../output/native-runtime/build-info.json',
       ]),
@@ -1161,6 +1114,7 @@ export async function validatePackagedAssets(
   const stage = await safePath(root, directory)
   const allowed = new Set([
     'Gitowl.exe',
+    'Sqlitecore.dll',
     'backend',
     'arcmd',
     'icons',
@@ -1180,11 +1134,7 @@ export async function validatePackagedAssets(
     await readFile(await safePath(root, runtimeReceiptPath), 'utf8')
   )
   check(
-    await reusableRuntime(
-      await safePath(root, runtimeReceiptPath),
-      await safePath(root, `${directory}/backend`),
-      acceptance.runtimeInputHash
-    ),
+    JSON.stringify(await inventory(await safePath(root, `${directory}/backend`))) === JSON.stringify(runtime.files),
     'Packaged runtime differs from accepted runtime'
   )
   check(

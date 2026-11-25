@@ -17,12 +17,13 @@ func nativeProfileIdentity(profile string) string {
 }
 
 type nativeLaunchOptions struct {
+	nativeResources                         string
 	entry, node, profile                    string
 	openPath, cloneURL, branch, protocolURL string
 }
 
-// Only launcher arguments are decoded here. Git/clone/checkout/OAuth semantics
-// are forwarded to the original Desktop Dispatcher and parseAppURL.
+// Only launcher arguments are decoded here. The selected backend owns Git,
+// clone, checkout and OAuth; development can still use the old comparison host.
 func parseNativeLaunchOptions(args []string, workingDirectory string) (nativeLaunchOptions, error) {
 	var options nativeLaunchOptions
 	flags := flag.NewFlagSet("gitowl", flag.ContinueOnError)
@@ -30,6 +31,7 @@ func parseNativeLaunchOptions(args []string, workingDirectory string) (nativeLau
 	flags.StringVar(&options.entry, "kernel", "", "original Desktop app entry")
 	flags.StringVar(&options.node, "node", "", "Node backend executable")
 	flags.StringVar(&options.profile, "user-data", "", "isolated development profile")
+	flags.StringVar(&options.nativeResources, "native-resources", "", "verified resources for an isolated development run")
 	flags.StringVar(&options.openPath, "cli-open", "", "original open-repository action")
 	flags.StringVar(&options.cloneURL, "cli-clone", "", "original clone-url action")
 	flags.StringVar(&options.branch, "cli-branch", "", "original clone branch")

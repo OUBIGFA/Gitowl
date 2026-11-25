@@ -14,6 +14,7 @@
 /third_party/licenses/native/node-LICENSE -text -whitespace
 /third_party/licenses/native/npm_* -text -whitespace
 /third_party/licenses/native/solar-icons-LICENSE* -text -whitespace
+/third_party/licenses/native/imagemagick-* -text -whitespace
 *.png binary
 *.jpg binary
 *.jpeg binary

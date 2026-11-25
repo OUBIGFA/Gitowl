@@ -8050,6 +8050,246 @@ func (msgs Messages) DialogLabel0ef63ac03cd2f0cf() string {
 	return Catalog.Format(msgs.locale, "dialogLabel_0ef63ac03cd2f0cf", nil)
 }
 
+// DialogLabelF17b8dcc240e5141 says "Refresh"
+// in the language the app shows.
+func DialogLabelF17b8dcc240e5141() string { return In(i18n.Locale()).DialogLabelF17b8dcc240e5141() }
+
+// DialogLabelF17b8dcc240e5141 says "Refresh"
+// in the language of msgs.
+func (msgs Messages) DialogLabelF17b8dcc240e5141() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_f17b8dcc240e5141", nil)
+}
+
+// DialogLabelF0d296756ebb41e3 says "Branch (optional)"
+// in the language the app shows.
+func DialogLabelF0d296756ebb41e3() string { return In(i18n.Locale()).DialogLabelF0d296756ebb41e3() }
+
+// DialogLabelF0d296756ebb41e3 says "Branch (optional)"
+// in the language of msgs.
+func (msgs Messages) DialogLabelF0d296756ebb41e3() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_f0d296756ebb41e3", nil)
+}
+
+// DialogLabel2be37b91ca1eb20f says "Automatic"
+// in the language the app shows.
+func DialogLabel2be37b91ca1eb20f() string { return In(i18n.Locale()).DialogLabel2be37b91ca1eb20f() }
+
+// DialogLabel2be37b91ca1eb20f says "Automatic"
+// in the language of msgs.
+func (msgs Messages) DialogLabel2be37b91ca1eb20f() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_2be37b91ca1eb20f", nil)
+}
+
+// DialogLabelA36b721841ca281b says "Refresh Copilot models"
+// in the language the app shows.
+func DialogLabelA36b721841ca281b() string { return In(i18n.Locale()).DialogLabelA36b721841ca281b() }
+
+// DialogLabelA36b721841ca281b says "Refresh Copilot models"
+// in the language of msgs.
+func (msgs Messages) DialogLabelA36b721841ca281b() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_a36b721841ca281b", nil)
+}
+
+// DialogLabel5cbc39b751e0bdd4 says "Sign in and assign an account to the current repository on the Accounts page."
+// in the language the app shows.
+func DialogLabel5cbc39b751e0bdd4() string { return In(i18n.Locale()).DialogLabel5cbc39b751e0bdd4() }
+
+// DialogLabel5cbc39b751e0bdd4 says "Sign in and assign an account to the current repository on the Accounts page."
+// in the language of msgs.
+func (msgs Messages) DialogLabel5cbc39b751e0bdd4() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_5cbc39b751e0bdd4", nil)
+}
+
+// DialogLabelBb54ef8c7ba1b189 says "Automatic change detection is unavailable. Refresh to check the repository; periodic checks continue."
+// in the language the app shows.
+func DialogLabelBb54ef8c7ba1b189() string { return In(i18n.Locale()).DialogLabelBb54ef8c7ba1b189() }
+
+// DialogLabelBb54ef8c7ba1b189 says "Automatic change detection is unavailable. Refresh to check the repository; periodic checks continue."
+// in the language of msgs.
+func (msgs Messages) DialogLabelBb54ef8c7ba1b189() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_bb54ef8c7ba1b189", nil)
+}
+
+// DialogLabel751488064ecf2102 says "Recover an interrupted commit…"
+// in the language the app shows.
+func DialogLabel751488064ecf2102() string { return In(i18n.Locale()).DialogLabel751488064ecf2102() }
+
+// DialogLabel751488064ecf2102 says "Recover an interrupted commit…"
+// in the language of msgs.
+func (msgs Messages) DialogLabel751488064ecf2102() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_751488064ecf2102", nil)
+}
+
+// DialogLabel02cd051484dbdc77 says "A previous commit needs review. Open recovery before committing again."
+// in the language the app shows.
+func DialogLabel02cd051484dbdc77() string { return In(i18n.Locale()).DialogLabel02cd051484dbdc77() }
+
+// DialogLabel02cd051484dbdc77 says "A previous commit needs review. Open recovery before committing again."
+// in the language of msgs.
+func (msgs Messages) DialogLabel02cd051484dbdc77() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_02cd051484dbdc77", nil)
+}
+
+// DialogLabel2537c12b59a67788 says "Commit recovery"
+// in the language the app shows.
+func DialogLabel2537c12b59a67788() string { return In(i18n.Locale()).DialogLabel2537c12b59a67788() }
+
+// DialogLabel2537c12b59a67788 says "Commit recovery"
+// in the language of msgs.
+func (msgs Messages) DialogLabel2537c12b59a67788() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_2537c12b59a67788", nil)
+}
+
+// DialogLabel2fda8ae55a9cc6a6 says "Generate a commit-message draft"
+// in the language the app shows.
+func DialogLabel2fda8ae55a9cc6a6() string { return In(i18n.Locale()).DialogLabel2fda8ae55a9cc6a6() }
+
+// DialogLabel2fda8ae55a9cc6a6 says "Generate a commit-message draft"
+// in the language of msgs.
+func (msgs Messages) DialogLabel2fda8ae55a9cc6a6() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_2fda8ae55a9cc6a6", nil)
+}
+
+// DialogLabelAc631d702b4f0c7f says "Send selected changes to this service to generate a draft. A successful result replaces the current draft. Review it …"
+// in the language the app shows.
+func DialogLabelAc631d702b4f0c7f() string { return In(i18n.Locale()).DialogLabelAc631d702b4f0c7f() }
+
+// DialogLabelAc631d702b4f0c7f says "Send selected changes to this service to generate a draft. A successful result replaces the current draft. Review it …"
+// in the language of msgs.
+func (msgs Messages) DialogLabelAc631d702b4f0c7f() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_ac631d702b4f0c7f", nil)
+}
+
+// DialogLabelF948a8337d4abb20 says "Retained operation"
+// in the language the app shows.
+func DialogLabelF948a8337d4abb20() string { return In(i18n.Locale()).DialogLabelF948a8337d4abb20() }
+
+// DialogLabelF948a8337d4abb20 says "Retained operation"
+// in the language of msgs.
+func (msgs Messages) DialogLabelF948a8337d4abb20() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_f948a8337d4abb20", nil)
+}
+
+// DialogLabelAb64b44909c1ad6e says "Finish staging only when Git”s commit and the original staging area still match. Inspect the retained files if stagi…"
+// in the language the app shows.
+func DialogLabelAb64b44909c1ad6e() string { return In(i18n.Locale()).DialogLabelAb64b44909c1ad6e() }
+
+// DialogLabelAb64b44909c1ad6e says "Finish staging only when Git”s commit and the original staging area still match. Inspect the retained files if stagi…"
+// in the language of msgs.
+func (msgs Messages) DialogLabelAb64b44909c1ad6e() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_ab64b44909c1ad6e", nil)
+}
+
+// DialogLabelB148f90ea66ab913 says "Finish staging"
+// in the language the app shows.
+func DialogLabelB148f90ea66ab913() string { return In(i18n.Locale()).DialogLabelB148f90ea66ab913() }
+
+// DialogLabelB148f90ea66ab913 says "Finish staging"
+// in the language of msgs.
+func (msgs Messages) DialogLabelB148f90ea66ab913() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_b148f90ea66ab913", nil)
+}
+
+// DialogLabelD9ebefec0b5774bc says "Show recovery files"
+// in the language the app shows.
+func DialogLabelD9ebefec0b5774bc() string { return In(i18n.Locale()).DialogLabelD9ebefec0b5774bc() }
+
+// DialogLabelD9ebefec0b5774bc says "Show recovery files"
+// in the language of msgs.
+func (msgs Messages) DialogLabelD9ebefec0b5774bc() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_d9ebefec0b5774bc", nil)
+}
+
+// DialogLabel3de7ffadb868a6b6 says "Recycle recovery files"
+// in the language the app shows.
+func DialogLabel3de7ffadb868a6b6() string { return In(i18n.Locale()).DialogLabel3de7ffadb868a6b6() }
+
+// DialogLabel3de7ffadb868a6b6 says "Recycle recovery files"
+// in the language of msgs.
+func (msgs Messages) DialogLabel3de7ffadb868a6b6() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_3de7ffadb868a6b6", nil)
+}
+
+// DialogLabel6317b8ec02c69467 says "Show in file manager"
+// in the language the app shows.
+func DialogLabel6317b8ec02c69467() string { return In(i18n.Locale()).DialogLabel6317b8ec02c69467() }
+
+// DialogLabel6317b8ec02c69467 says "Show in file manager"
+// in the language of msgs.
+func (msgs Messages) DialogLabel6317b8ec02c69467() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_6317b8ec02c69467", nil)
+}
+
+// DialogLabel8a7888ddde988619 says "Delete merged branch…"
+// in the language the app shows.
+func DialogLabel8a7888ddde988619() string { return In(i18n.Locale()).DialogLabel8a7888ddde988619() }
+
+// DialogLabel8a7888ddde988619 says "Delete merged branch…"
+// in the language of msgs.
+func (msgs Messages) DialogLabel8a7888ddde988619() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_8a7888ddde988619", nil)
+}
+
+// DialogLabelF61c598efcb2c993 says "Select All"
+// in the language the app shows.
+func DialogLabelF61c598efcb2c993() string { return In(i18n.Locale()).DialogLabelF61c598efcb2c993() }
+
+// DialogLabelF61c598efcb2c993 says "Select All"
+// in the language of msgs.
+func (msgs Messages) DialogLabelF61c598efcb2c993() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_f61c598efcb2c993", nil)
+}
+
+// DialogLabelC949d2a613f6bb67 says "Git authentication"
+// in the language the app shows.
+func DialogLabelC949d2a613f6bb67() string { return In(i18n.Locale()).DialogLabelC949d2a613f6bb67() }
+
+// DialogLabelC949d2a613f6bb67 says "Git authentication"
+// in the language of msgs.
+func (msgs Messages) DialogLabelC949d2a613f6bb67() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_c949d2a613f6bb67", nil)
+}
+
+// DialogLabel5f2ed63ff55386f5 says "Response"
+// in the language the app shows.
+func DialogLabel5f2ed63ff55386f5() string { return In(i18n.Locale()).DialogLabel5f2ed63ff55386f5() }
+
+// DialogLabel5f2ed63ff55386f5 says "Response"
+// in the language of msgs.
+func (msgs Messages) DialogLabel5f2ed63ff55386f5() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_5f2ed63ff55386f5", nil)
+}
+
+// DialogLabel49537d24796cefa1 says "Resolve conflicts"
+// in the language the app shows.
+func DialogLabel49537d24796cefa1() string { return In(i18n.Locale()).DialogLabel49537d24796cefa1() }
+
+// DialogLabel49537d24796cefa1 says "Resolve conflicts"
+// in the language of msgs.
+func (msgs Messages) DialogLabel49537d24796cefa1() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_49537d24796cefa1", nil)
+}
+
+// DialogLabelFab592090aeeb028 says "File to mark as resolved"
+// in the language the app shows.
+func DialogLabelFab592090aeeb028() string { return In(i18n.Locale()).DialogLabelFab592090aeeb028() }
+
+// DialogLabelFab592090aeeb028 says "File to mark as resolved"
+// in the language of msgs.
+func (msgs Messages) DialogLabelFab592090aeeb028() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_fab592090aeeb028", nil)
+}
+
+// DialogLabel85350d42255de536 says "Edit the conflicted file and save it. Select it here to stage the resolution, then continue the Git operation."
+// in the language the app shows.
+func DialogLabel85350d42255de536() string { return In(i18n.Locale()).DialogLabel85350d42255de536() }
+
+// DialogLabel85350d42255de536 says "Edit the conflicted file and save it. Select it here to stage the resolution, then continue the Git operation."
+// in the language of msgs.
+func (msgs Messages) DialogLabel85350d42255de536() string {
+	return Catalog.Format(msgs.locale, "dialogLabel_85350d42255de536", nil)
+}
+
 // DialogLabel5eef7c65b6322982 says "Image comparison"
 // in the language the app shows.
 func DialogLabel5eef7c65b6322982() string { return In(i18n.Locale()).DialogLabel5eef7c65b6322982() }

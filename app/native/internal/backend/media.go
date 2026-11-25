@@ -22,6 +22,9 @@ type KernelMediaChunk struct {
 // ReadMediaFrame never expands the line scanner limit or blocks unrelated Git
 // replies. Frame chunks use the ordinary multiplexed request IDs and context.
 func (k *Kernel) ReadMediaFrame(ctx context.Context, id string, index int) (*image.NRGBA, KernelMediaChunk, error) {
+	if k.native != nil {
+		return k.native.media.frame(ctx, id, index)
+	}
 	var first KernelMediaChunk
 	var pixels []byte
 	for offset := 0; ; {

@@ -14,6 +14,7 @@ type KernelPlatformRequest struct {
 }
 
 func (k *Kernel) ReplyPlatform(ctx context.Context, id int, value any, operationErr error) error {
+	if k.native!=nil{return k.native.answer(id,value,operationErr)}
 	var message *string
 	if operationErr != nil {
 		text := operationErr.Error()
@@ -36,6 +37,10 @@ func (k *Kernel) ReplyPlatform(ctx context.Context, id int, value any, operation
 }
 
 func (k *Kernel) PlatformEvent(ctx context.Context, name string, args ...any) error {
+	if k.native!=nil{
+		if name=="copilot-runtime-cancel"{k.native.cancelMu.Lock();if k.native.generationCancel!=nil{k.native.generationCancel()};k.native.cancelMu.Unlock()}
+		return nil
+	}
 	var result struct {
 		Received bool `json:"received"`
 	}

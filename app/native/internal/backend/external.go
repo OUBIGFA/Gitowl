@@ -11,6 +11,7 @@ type KernelExternalRequest struct {
 
 // A browser reply cannot queue behind an operation waiting for that browser.
 func (k *Kernel) ReplyExternal(ctx context.Context, id int, opened bool) error {
+	if k.native!=nil{return k.native.answer(id,opened,nil)}
 	var out struct {
 		Received bool `json:"received"`
 	}
