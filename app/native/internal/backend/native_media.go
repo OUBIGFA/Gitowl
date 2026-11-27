@@ -256,12 +256,18 @@ func (n *NativeOwner) imageDiff(ctx context.Context, path, commit string) (*Diff
 		if err != nil && !errors.Is(err, gitcli.ErrObjectMissing) {
 			return nil, err
 		}
-		parents, parentErr := n.current.Run(ctx, nil, "rev-list", "--parents", "-n", "1", commit, "--")
-		if parentErr != nil {
-			return nil, parentErr
+		base := n.historyBase
+		if base == "" {
+			parents, parentErr := n.current.Run(ctx, nil, "rev-list", "--parents", "-n", "1", commit, "--")
+			if parentErr != nil {
+				return nil, parentErr
+			}
+			if ids := strings.Fields(string(parents)); len(ids) > 1 {
+				base = ids[1]
+			}
 		}
-		if ids := strings.Fields(string(parents)); len(ids) > 1 {
-			previous, err = n.current.Blob(ctx, ids[1], previousPath, 64<<20)
+		if base != "" {
+			previous, err = n.current.Blob(ctx, base, previousPath, 64<<20)
 			if err != nil && !errors.Is(err, gitcli.ErrObjectMissing) {
 				return nil, err
 			}

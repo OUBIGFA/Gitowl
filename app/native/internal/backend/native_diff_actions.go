@@ -33,20 +33,18 @@ func (n *NativeOwner) diffAction(ctx context.Context, data json.RawMessage) erro
 		w.CanExpand = true
 		return nil
 	}
-	old, commit := "", ""
+	old, base, commit := "", "", ""
 	files := n.state.Selected.Files
 	if n.state.Selected.Section == "history" {
 		files = n.state.Selected.HistoryFiles
-		if len(n.state.Selected.HistorySelection) > 0 {
-			commit = n.state.Selected.HistorySelection[0]
-		}
+		base, commit = n.historyBase, n.historyTip
 	}
 	for _, file := range files {
 		if file.ID == a.FileID && file.OldPath != nil {
 			old = *file.OldPath
 		}
 	}
-	current, err := n.current.DiffFile(ctx, a.FileID, old, commit, 3, false)
+	current, err := n.current.DiffFileBetween(ctx, a.FileID, old, base, commit, 3, false)
 	if err != nil {
 		return err
 	}
@@ -111,7 +109,7 @@ func (n *NativeOwner) diffAction(ctx context.Context, data json.RawMessage) erro
 		})
 		return nil
 	}
-	expanded, err := n.current.DiffFile(ctx, a.FileID, old, commit, 1000000, n.state.Workspace.HideWhitespace)
+	expanded, err := n.current.DiffFileBetween(ctx, a.FileID, old, base, commit, 1000000, n.state.Workspace.HideWhitespace)
 	if err != nil {
 		return err
 	}

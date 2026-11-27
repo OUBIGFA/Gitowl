@@ -65,6 +65,8 @@ type NativeOwner struct {
 	refreshWake         chan struct{}
 	windowFocused       atomic.Bool
 	starting            bool
+	historyBase         string
+	historyTip          string
 }
 
 func NewNativeKernel(ctx context.Context, git, userData string, onEvent func(KernelEvent)) (*Kernel, error) {
@@ -572,6 +574,7 @@ func (n *NativeOwner) selectRepository(ctx context.Context, reference KernelRepo
 	n.state.MissingRepository = nil
 	n.current = r
 	n.media.clear()
+	n.historyBase, n.historyTip = "", ""
 	n.status = gitcli.Status{}
 	n.include = make(map[string]bool)
 	n.partial = make(map[string]nativePartialSelection)
@@ -773,28 +776,69 @@ func (n *NativeOwner) historyFiles(ctx context.Context) error {
 	s.HistoryFiles = []KernelFile{}
 	s.HistoryFileID = nil
 	s.Diff = nil
+	s.DiffSelection = nil
+	s.HistoryLinesAdded, s.HistoryLinesDeleted = 0, 0
+	n.state.Workspace.TextDiff = nil
+	n.state.Workspace.HistorySelectionContiguous = true
+	n.historyBase, n.historyTip = "", ""
 	if len(s.HistorySelection) == 0 {
 		return nil
 	}
-	changes, err := n.current.Changes(ctx, s.HistorySelection[0])
+	if len(s.HistorySelection) > 1 {
+		// Native selection order can follow Ctrl-click order. Compare the
+		// oldest selected commit's first parent with the newest selected tree.
+		ordered := []string{}
+		first, last := -1, -1
+		for i, commit := range s.History {
+			if slices.Contains(s.HistorySelection, commit.SHA) {
+				if first < 0 {
+					first = i
+				}
+				last = i
+				ordered = append(ordered, commit.SHA)
+			}
+		}
+		if len(ordered) != len(s.HistorySelection) || last-first+1 != len(ordered) {
+			n.state.Workspace.HistorySelectionContiguous = false
+			return nil
+		}
+		s.HistorySelection = ordered
+		parents, err := n.current.Run(ctx, nil, "rev-list", "--parents", "-n", "1", ordered[len(ordered)-1], "--")
+		if err != nil {
+			return err
+		}
+		if ids := strings.Fields(string(parents)); len(ids) > 1 {
+			n.historyBase = ids[1]
+		} else {
+			// Ask this repository's Git for the empty tree's object-format ID.
+			empty, err := n.current.Run(ctx, strings.NewReader(""), "hash-object", "-t", "tree", "--stdin")
+			if err != nil {
+				return err
+			}
+			n.historyBase = strings.TrimSpace(string(empty))
+		}
+	}
+	n.historyTip = s.HistorySelection[0]
+	changes, err := n.current.ChangesBetween(ctx, n.historyBase, n.historyTip)
 	if err != nil {
 		return err
 	}
 	for _, file := range changes {
 		s.HistoryFiles = append(s.HistoryFiles, KernelFile{ID: file.Path, Path: file.Path, OldPath: textPointer(file.OldPath), Status: fileStatus(gitcli.File{Index: file.Status})})
 	}
-	return nil
+	_, s.HistoryLinesAdded, s.HistoryLinesDeleted, err = n.current.SummaryBetween(ctx, n.historyBase, n.historyTip)
+	return err
 }
 func (n *NativeOwner) selectDiff(ctx context.Context, path string, history bool) error {
 	n.state.Selected.Diff = nil
 	n.state.Selected.DiffSelection = nil
 	n.state.Workspace.TextDiff = nil
-	commit := ""
+	base, commit := "", ""
 	if history {
-		if len(n.state.Selected.HistorySelection) == 0 {
-			return errors.New("no selected commit")
+		if n.historyTip == "" || !n.state.Workspace.HistorySelectionContiguous {
+			return errors.New("select contiguous commits to view their diff")
 		}
-		commit = n.state.Selected.HistorySelection[0]
+		base, commit = n.historyBase, n.historyTip
 	}
 	oldPath := ""
 	files := n.state.Selected.Files
@@ -807,7 +851,7 @@ func (n *NativeOwner) selectDiff(ctx context.Context, path string, history bool)
 			break
 		}
 	}
-	text, err := n.current.DiffFile(ctx, path, oldPath, commit, 3, false)
+	text, err := n.current.DiffFileBetween(ctx, path, oldPath, base, commit, 3, false)
 	if err != nil {
 		return err
 	}

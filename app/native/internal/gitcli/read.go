@@ -10,11 +10,21 @@ import (
 type Change struct{ Path, OldPath, Status string }
 
 func (r *Repository) Changes(ctx context.Context, commit string) ([]Change, error) {
-	if !objectID(commit) {
+	return r.ChangesBetween(ctx, "", commit)
+}
+
+// An empty base requests a single commit (including root/merge semantics).
+// Otherwise the two immutable endpoints describe the complete selection.
+func (r *Repository) ChangesBetween(ctx context.Context, base, commit string) ([]Change, error) {
+	if !objectID(commit) || base != "" && !objectID(base) {
 		return nil, errors.New("a full commit object ID is required")
 	}
-	data, err := r.engine.load(ctx, "changes\x00"+r.CommonDir+"\x00"+commit, func() ([]byte, error) {
-		return r.Run(ctx, nil, "diff-tree", "--root", "--first-parent", "--no-commit-id", "--name-status", "-r", "-z", "-M", commit, "--")
+	data, err := r.engine.load(ctx, "changes\x00"+r.CommonDir+"\x00"+base+"\x00"+commit, func() ([]byte, error) {
+		args := []string{"diff-tree", "--root", "--first-parent", "--no-commit-id", "--name-status", "-r", "-z", "-M"}
+		if base != "" {
+			args = append(args, base)
+		}
+		return r.Run(ctx, nil, append(args, commit, "--")...)
 	})
 	if err != nil {
 		return nil, err
@@ -52,11 +62,18 @@ func (r *Repository) Diff(ctx context.Context, path, commit string) (string, err
 // DiffFile keeps both paths of a rename in Git's path filter. This is necessary
 // for line selections to refer to the original file rather than a new blob.
 func (r *Repository) DiffFile(ctx context.Context, path, oldPath, commit string, contextLines int, hideWhitespace bool) (string, error) {
-	if commit != "" && !objectID(commit) {
+	return r.DiffFileBetween(ctx, path, oldPath, "", commit, contextLines, hideWhitespace)
+}
+
+// DiffFileBetween keeps the same endpoints for the initial and expanded view.
+func (r *Repository) DiffFileBetween(ctx context.Context, path, oldPath, base, commit string, contextLines int, hideWhitespace bool) (string, error) {
+	if commit != "" && !objectID(commit) || base != "" && (!objectID(base) || commit == "") {
 		return "", errors.New("a full commit object ID is required")
 	}
 	args := []string{"diff", "--no-ext-diff", "--no-textconv", "--no-color", "--src-prefix=a/", "--dst-prefix=b/"}
-	if commit != "" {
+	if base != "" {
+		args = append(args, base, commit)
+	} else if commit != "" {
 		args = []string{"show", "--format=", "--first-parent", "--no-ext-diff", "--no-textconv", "--no-color", "--src-prefix=a/", "--dst-prefix=b/", commit}
 	}
 	args = append(args, "--unified="+strconv.Itoa(contextLines))
@@ -130,10 +147,18 @@ func (r *Repository) References(ctx context.Context) ([]Reference, error) {
 }
 
 func (r *Repository) Summary(ctx context.Context, commit string) (int, int, int, error) {
-	if !objectID(commit) {
+	return r.SummaryBetween(ctx, "", commit)
+}
+
+// Statistics must use the same trees as the file list, not a sum of commits.
+func (r *Repository) SummaryBetween(ctx context.Context, base, commit string) (int, int, int, error) {
+	if !objectID(commit) || base != "" && !objectID(base) {
 		return 0, 0, 0, errors.New("a full commit object ID is required")
 	}
-	data, err := r.engine.load(ctx, "summary\x00"+r.CommonDir+"\x00"+commit, func() ([]byte, error) {
+	data, err := r.engine.load(ctx, "summary\x00"+r.CommonDir+"\x00"+base+"\x00"+commit, func() ([]byte, error) {
+		if base != "" {
+			return r.Run(ctx, nil, "diff", "--numstat", "-z", base, commit, "--")
+		}
 		return r.Run(ctx, nil, "show", "--format=", "--first-parent", "--numstat", "-z", commit, "--")
 	})
 	if err != nil {

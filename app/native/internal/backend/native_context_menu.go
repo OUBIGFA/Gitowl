@@ -261,7 +261,10 @@ func (n *NativeOwner) discardFiles(ctx context.Context, identity string, paths [
 						return e
 					}
 					if len(entries) > 0 {
-						if _, e = n.current.Run(ctx, nil, "restore", "--source="+status.Head, "--worktree", "--", candidate); e != nil {
+						// Restore both copies together so Git records the checked-out
+						// size after filters/CRLF conversion. Worktree-only restore
+						// leaves a false modification under GIT_OPTIONAL_LOCKS=0.
+						if _, e = n.current.Run(ctx, nil, "restore", "--source="+status.Head, "--staged", "--worktree", "--", candidate); e != nil {
 							return e
 						}
 					}
