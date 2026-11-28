@@ -6,13 +6,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/OUBIGFA/Gitowl/app/native/internal/gitcli"
-
 	"os"
 	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
+
+	"github.com/OUBIGFA/Gitowl/app/native/internal/gitcli"
 )
 
 func (n *NativeOwner) workspaceMenus() {
@@ -92,6 +92,7 @@ func (n *NativeOwner) repositoryMenuCommand(ctx context.Context, c nativeCommand
 				if n.watchCancel != nil {
 					n.watchCancel()
 				}
+				n.clearDiff()
 				n.current = nil
 				n.state.Selected = nil
 				n.state.Workspace = nil

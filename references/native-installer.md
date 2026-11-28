@@ -44,6 +44,8 @@ npm run check:repo
 
 `test:kernel` 验证 Go 业务层、真实 Git、旧格式迁移和生产 MyGo 控件；仓库、远端和用户资料均隔离。真实桌面交互与截图在私有测试桌面执行，不抢占用户桌面。
 
+开发中可用 `npm run test:kernel -- --package ./internal/gitcli` 或 `--run TestNativeRefresh` 缩小检查范围，重复 `--package` 可检查多个模块。局部测试与基准不更新完整构建回执。完整回执同时绑定原生源码/资源、MyGo 补丁和准备脚本；继承的 `GOFLAGS` 会被明确拒绝，防止隐藏筛选影响验收。详见 [模块验证约定](architecture.md#并行开发与验证)。
+
 可选来源绑定验收记录仍由 `script/native-acceptance.ts` 校验：
 
 ```powershell

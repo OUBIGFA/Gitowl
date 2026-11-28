@@ -11,8 +11,8 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
-// Only presentation mutations use this ordered queue. The original Dispatcher
-// still owns their semantics; replies to its modal callbacks and cancellation
+// Only presentation mutations use this ordered queue. The active backend
+// owns their semantics; replies to its modal callbacks and cancellation
 // are concurrent so a pending hook/SSH prompt cannot block its own answer.
 type nativeOperation struct {
 	call      func() (backend.KernelResult, error)

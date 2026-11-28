@@ -162,9 +162,14 @@ func (n *NativeOwner) reportWatchError(err error) {
 
 func (n *NativeOwner) refreshAndPublish(ctx context.Context, full bool) (bool, error) {
 	before := n.state.Revision
-	_, err := n.refresh(ctx, full)
+	changed, err := n.refresh(ctx, full)
 	if err != nil {
 		return false, err
+	}
+	// No presentation input changed, so avoid rebuilding every context menu and
+	// comparing the full snapshot on idle reconciliation/watch notifications.
+	if !changed && !full {
+		return false, nil
 	}
 	n.publish()
 	return n.state.Revision != before, nil

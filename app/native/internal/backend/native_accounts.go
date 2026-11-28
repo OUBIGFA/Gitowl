@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/egoist/mygo"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/egoist/mygo"
 )
 
 type nativeAccount struct {
@@ -87,7 +88,10 @@ func credentialService(namespace, endpoint string) string {
 
 // Keep the exact legacy keytar service/login. MyGo's documented Secrets.Service
 // interface reads those records without exporting secrets to an application file.
-func (n *NativeOwner) accountCredential(account nativeAccount) (nativeCredential, error) {
+func (n *NativeOwner) accountCredential(ctx context.Context, account nativeAccount) (nativeCredential, error) {
+	if err := ctx.Err(); err != nil {
+		return nativeCredential{}, err
+	}
 	data, err := mygo.Secrets.Service(credentialService(n.credentialNamespace, account.Endpoint)).Get(account.Login)
 	if err != nil {
 		return nativeCredential{}, err
@@ -112,7 +116,7 @@ func (n *NativeOwner) accountCredential(account nativeAccount) (nativeCredential
 		if token.RefreshToken == "" || (token.RefreshTokenExpiresAt > 0 && time.Now().UnixMilli() >= token.RefreshTokenExpiresAt) {
 			return nativeCredential{}, errors.New("account requires sign-in")
 		}
-		updated, err := n.oauthToken(n.ctx, account.Endpoint, map[string]string{"grant_type": "refresh_token", "refresh_token": token.RefreshToken})
+		updated, err := n.oauthToken(ctx, account.Endpoint, map[string]string{"grant_type": "refresh_token", "refresh_token": token.RefreshToken})
 		if err != nil {
 			return nativeCredential{}, err
 		}

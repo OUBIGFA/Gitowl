@@ -9,6 +9,17 @@ import (
 
 type Change struct{ Path, OldPath, Status string }
 
+// All preview paths use the same patch grammar, including untracked files.
+// User diff settings must not change path prefixes or disable the rename
+// semantics used by the file list and partial-line commit formatter.
+func diffOptions(contextLines int, hideWhitespace bool) []string {
+	args := []string{"--no-ext-diff", "--no-textconv", "--no-color", "--no-relative", "--src-prefix=a/", "--dst-prefix=b/", "-M", "--unified=" + strconv.Itoa(contextLines)}
+	if hideWhitespace {
+		args = append(args, "--ignore-all-space")
+	}
+	return args
+}
+
 func (r *Repository) Changes(ctx context.Context, commit string) ([]Change, error) {
 	return r.ChangesBetween(ctx, "", commit)
 }
@@ -70,15 +81,13 @@ func (r *Repository) DiffFileBetween(ctx context.Context, path, oldPath, base, c
 	if commit != "" && !objectID(commit) || base != "" && (!objectID(base) || commit == "") {
 		return "", errors.New("a full commit object ID is required")
 	}
-	args := []string{"diff", "--no-ext-diff", "--no-textconv", "--no-color", "--src-prefix=a/", "--dst-prefix=b/"}
+	options := diffOptions(contextLines, hideWhitespace)
+	args := append([]string{"diff"}, options...)
 	if base != "" {
 		args = append(args, base, commit)
 	} else if commit != "" {
-		args = []string{"show", "--format=", "--first-parent", "--no-ext-diff", "--no-textconv", "--no-color", "--src-prefix=a/", "--dst-prefix=b/", commit}
-	}
-	args = append(args, "--unified="+strconv.Itoa(contextLines))
-	if hideWhitespace {
-		args = append(args, "--ignore-all-space")
+		args = append([]string{"show", "--format=", "--first-parent"}, options...)
+		args = append(args, commit)
 	}
 	if commit == "" {
 		if head, err := r.Run(ctx, nil, "rev-parse", "--verify", "HEAD"); err == nil && len(head) > 0 {
@@ -108,7 +117,8 @@ func (r *Repository) DiffFileBetween(ctx context.Context, path, oldPath, base, c
 	if len(data) == 0 && commit == "" {
 		tracked, err := r.Run(ctx, nil, "ls-files", "--error-unmatch", "--", path)
 		if err != nil && len(tracked) == 0 {
-			data, err = r.Run(ctx, nil, "diff", "--no-index", "--no-ext-diff", "--no-textconv", "--no-color", "--", "/dev/null", path)
+			args := append([]string{"diff", "--no-index"}, options...)
+			data, err = r.Run(ctx, nil, append(args, "--", "/dev/null", path)...)
 			var command *CommandError
 			if errors.As(err, &command) && command.ExitCode == 1 {
 				err = nil

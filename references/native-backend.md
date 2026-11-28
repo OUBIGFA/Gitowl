@@ -2,6 +2,8 @@
 
 生产路径为 `MyGo → 同进程 Go 状态层 → 随包的官方 Git`。基础安装不包含 Node、Electron、JavaScript 业务 bundle、Keytar 或 Koffi。Node 仍是源码构建和旧格式兼容测试的开发工具。
 
+模块职责、修改边界和局部验证入口见 [架构与开发说明](architecture.md)。
+
 ## 复用依据
 
 对照 [51code 的固定修订](https://github.com/ysicing/51code/tree/128dbe5850f5387dece67e616c1b1116b411927d)：它使用 Go/MyGo、外部 Git、后台检查和局部更新，Windows 版也携带 Git/SSH/LFS。其 README 同时说明克隆、交互式 rebase、认证设置等功能边界。轻量来自进程结构、按需工作和功能范围，不能用不同平台的安装包直接比较。

@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/OUBIGFA/Gitowl/app/native/internal/gitcli"
 	"path/filepath"
 	"strings"
 	"sync"
+
+	"github.com/OUBIGFA/Gitowl/app/native/internal/gitcli"
 )
 
 type nativeMetadata struct {
@@ -67,16 +68,6 @@ func (n *NativeOwner) refreshWorkspaceMetadata(data, stash []byte) error {
 		selected := workspace.Stash != nil && workspace.Stash.SHA == fields[0] && workspace.Stash.Selected
 		workspace.Stash = &KernelWorkspaceStash{SHA: fields[0], Branch: fields[1], LoadState: "NotLoaded", Selected: selected, Files: []KernelFile{}}
 	}
-	remaining := 0
-	for _, file := range n.status.Files {
-		if file.Conflict {
-			remaining++
-		}
-	}
-	workspace.Conflict = nil
-	if n.status.Operation != "" {
-		workspace.Conflict = &KernelWorkspaceConflict{Kind: n.status.Operation, Identity: n.status.Fingerprint, Remaining: remaining, CanContinue: remaining == 0, CanAbort: true}
-	}
 	workspace.Compare.Branches = []KernelWorkspaceBranch{}
 	for _, group := range workspace.Branches {
 		for _, branch := range group.Items {
@@ -91,6 +82,22 @@ func (n *NativeOwner) refreshWorkspaceMetadata(data, stash []byte) error {
 		workspace.CurrentBranchRef = &ref
 	}
 	return nil
+}
+
+// Conflict resolution changes the index/worktree even when refs and config do
+// not change. Its controls belong to every status refresh, not metadata scans.
+func (n *NativeOwner) refreshConflict() {
+	workspace := n.state.Workspace
+	remaining := 0
+	for _, file := range n.status.Files {
+		if file.Conflict {
+			remaining++
+		}
+	}
+	workspace.Conflict = nil
+	if n.status.Operation != "" {
+		workspace.Conflict = &KernelWorkspaceConflict{Kind: n.status.Operation, Identity: n.status.Fingerprint, Remaining: remaining, CanContinue: remaining == 0, CanAbort: true}
+	}
 }
 
 func (n *NativeOwner) showStash(ctx context.Context) error {

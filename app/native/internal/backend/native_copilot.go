@@ -18,7 +18,7 @@ import (
 func boolPointer(value bool) *bool { return &value }
 
 func (n *NativeOwner) copilotClient(ctx context.Context, account nativeAccount) (*copilot.Client, error) {
-	token, err := n.accountCredential(account)
+	token, err := n.accountCredential(ctx, account)
 	if err != nil {
 		return nil, err
 	}
@@ -240,7 +240,7 @@ func (n *NativeOwner) generateMessage(ctx context.Context) error {
 		}
 		request, cancel := context.WithTimeout(ctx, time.Duration(seconds*float64(time.Second)))
 		defer cancel()
-		text, err = providerGenerate(request, nativeHTTPClient(), provider, g.Selection.ModelID, secret, prompt)
+		text, err = providerGenerate(request, n.httpClient, provider, g.Selection.ModelID, secret, prompt)
 	} else {
 		text, err = n.copilotGenerate(ctx, prompt)
 	}
@@ -272,5 +272,5 @@ func (n *NativeOwner) generateMessage(ctx context.Context) error {
 }
 
 func (n *NativeOwner) initComponent(manifest string) {
-	n.component = &nativeComponent{manifestPath: manifest, cache: filepath.Join(n.userData, "desktop-kernel", "components", "copilot"), client: nativeHTTPClient(), recycle: func(path string) error { return n.recycle(path) }, progress: func(status *KernelCopilotRuntime) { n.state.CopilotRuntime = status; n.publish() }}
+	n.component = &nativeComponent{manifestPath: manifest, cache: filepath.Join(n.userData, "desktop-kernel", "components", "copilot"), client: n.httpClient, recycle: func(path string) error { return n.recycle(path) }, progress: func(status *KernelCopilotRuntime) { n.state.CopilotRuntime = status; n.publish() }}
 }

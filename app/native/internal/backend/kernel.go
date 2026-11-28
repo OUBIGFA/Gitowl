@@ -80,8 +80,8 @@ type KernelTrailer struct {
 	Value string `json:"value"`
 }
 
-// KernelSelected is a view projection, not a native repository/draft cache.
-// These fields are replaced from each original AppStore snapshot.
+// KernelSelected is the active backend's view projection, not a second
+// repository/draft cache owned by the window. Published snapshots are read-only.
 type KernelSelected struct {
 	Repository           KernelRepository     `json:"repository"`
 	Section              string               `json:"section"`
@@ -118,15 +118,15 @@ type KernelAccount struct {
 	CopilotEnabled bool   `json:"copilotEnabled"`
 }
 
-// Popup carries only explicit presentation data. Original callbacks stay in
-// the renderer, addressed by its opaque ID; credentials are never in snapshots.
+// Popup carries explicit presentation data. Its opaque ID addresses a callback
+// owned by the active backend; credentials are never included in snapshots.
 type KernelPopup struct {
 	ID   *int   `json:"id"`
 	Type string `json:"type"`
 }
 
-// Only the original assignment identity crosses the presentation boundary.
-// Tokens and account storage remain in the Desktop kernel.
+// Only assignment identity crosses the presentation boundary. Tokens remain
+// in the account owner's system credential store.
 type KernelAccountIdentity struct {
 	Endpoint string `json:"endpoint"`
 	Login    string `json:"login"`

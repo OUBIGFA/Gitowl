@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/egoist/mygo"
 	"io"
 	"net/http"
 	"net/url"
@@ -14,6 +13,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/egoist/mygo"
 )
 
 // Child invocations use the production helper functions, so Git really spawns
@@ -194,7 +195,7 @@ func TestNativeOAuthNonceAndRenewal(t *testing.T) {
 	if err := n.saveCredential(n.accounts[0], nativeCredential{AccessToken: "old", RefreshToken: "old-refresh", ExpiresAt: 1, RefreshTokenExpiresAt: time.Now().Add(time.Hour).UnixMilli()}); err != nil {
 		t.Fatal(err)
 	}
-	token, err := n.accountCredential(n.accounts[0])
+	token, err := n.accountCredential(ctx, n.accounts[0])
 	if err != nil || token.AccessToken != "new-fixture-token" || requests != 4 {
 		t.Fatalf("renewal failed %v", err)
 	}

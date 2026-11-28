@@ -1,5 +1,7 @@
 # 运行性能与同步行为
 
+当前运行边界见 [Go 后台说明](native-backend.md)，模块与测量入口见 [架构说明](architecture.md)。下文按日期保留历史结果；早期 Electron/Node 数值不能直接用于当前 Go 版本。
+
 2026-11-20：Gitowl 不再要求严格复用上游内核。采用方案及官方来源见 [调查记录](../third_party/performance-evaluation.md)。本轮保留当前 Electron 宿主和随包 Git，修改实际同步和刷新路径。
 
 ## 用户可见变化

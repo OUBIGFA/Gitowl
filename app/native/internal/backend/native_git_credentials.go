@@ -6,14 +6,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/OUBIGFA/Gitowl/app/native/internal/gitcli"
-	"github.com/egoist/mygo"
 	"io"
 	"net/url"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/OUBIGFA/Gitowl/app/native/internal/gitcli"
+	"github.com/egoist/mygo"
 )
 
 // CredentialHelper implements Git's documented credential protocol. Tokens
@@ -107,7 +108,7 @@ func (n *NativeOwner) gitCredentialEnvironment(ctx context.Context, repository *
 	if account.Login == "" {
 		return nil, errors.New("assigned account requires sign-in")
 	}
-	if _, err := n.accountCredential(account); err != nil {
+	if _, err := n.accountCredential(ctx, account); err != nil {
 		return nil, err
 	}
 	executable, err := os.Executable()

@@ -4,7 +4,6 @@ package gitcli
 
 import (
 	"bytes"
-	"container/list"
 	"context"
 	"errors"
 	"fmt"
@@ -12,7 +11,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -39,55 +37,6 @@ func (b *boundedOutput) Write(data []byte) (int, error) {
 		return max(0, remaining), ErrOutputLimit
 	}
 	return b.Buffer.Write(data)
-}
-
-type cacheEntry struct {
-	key  string
-	data []byte
-	cost int64
-}
-type cache struct {
-	mu          sync.Mutex
-	limit, used int64
-	items       map[string]*list.Element
-	lru         *list.List
-}
-
-func newCache(limit int64) *cache {
-	return &cache{limit: limit, items: make(map[string]*list.Element), lru: list.New()}
-}
-func (c *cache) get(key string) ([]byte, bool) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	e := c.items[key]
-	if e == nil {
-		return nil, false
-	}
-	c.lru.MoveToFront(e)
-	return bytes.Clone(e.Value.(cacheEntry).data), true
-}
-func (c *cache) put(key string, data []byte) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	// Charge keys and a conservative per-entry overhead as well as payloads.
-	cost := int64(len(key) + len(data) + 128)
-	if cost > c.limit || len(data) > maxCachedObject {
-		return
-	}
-	if old := c.items[key]; old != nil {
-		c.used -= old.Value.(cacheEntry).cost
-		c.lru.Remove(old)
-		delete(c.items, key)
-	}
-	for c.used+cost > c.limit {
-		old := c.lru.Back()
-		entry := old.Value.(cacheEntry)
-		c.used -= entry.cost
-		delete(c.items, entry.key)
-		c.lru.Remove(old)
-	}
-	c.items[key] = c.lru.PushFront(cacheEntry{key, bytes.Clone(data), cost})
-	c.used += cost
 }
 
 type Stats struct {
@@ -128,52 +77,6 @@ func (e *Engine) Init(ctx context.Context, path string) ([]byte, error) {
 }
 func (e *Engine) Clone(ctx context.Context, remote, path string) ([]byte, error) {
 	return e.run(ctx, "", nil, nil, "clone", "--", remote, path)
-}
-
-func (e *Engine) load(ctx context.Context, key string, read func() ([]byte, error)) ([]byte, error) {
-	for {
-		if data, ok := e.cache.get(key); ok {
-			e.hits.Add(1)
-			return data, nil
-		}
-		e.mu.Lock()
-		// A load may finish between the first cache check and acquiring this
-		// lock. Recheck before registering another process for the same object.
-		if data, ok := e.cache.get(key); ok {
-			e.mu.Unlock()
-			e.hits.Add(1)
-			return data, nil
-		}
-		if flight := e.loads[key]; flight != nil {
-			e.mu.Unlock()
-			select {
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			case <-flight.done:
-			}
-			if errors.Is(flight.err, context.Canceled) && ctx.Err() == nil {
-				continue
-			}
-			return bytes.Clone(flight.data), flight.err
-		}
-		flight := &objectLoad{done: make(chan struct{})}
-		e.loads[key] = flight
-		e.mu.Unlock()
-		flight.data, flight.err = read()
-		if flight.err == nil {
-			e.cache.put(key, flight.data)
-		}
-		e.mu.Lock()
-		delete(e.loads, key)
-		close(flight.done)
-		e.mu.Unlock()
-		return bytes.Clone(flight.data), flight.err
-	}
-}
-func (e *Engine) Stats() Stats {
-	e.cache.mu.Lock()
-	defer e.cache.mu.Unlock()
-	return Stats{e.commands.Load(), e.hits.Load(), e.cache.used, len(e.cache.items)}
 }
 
 // CommandError preserves Git's exit status and diagnostic output. Callers must
@@ -273,74 +176,4 @@ func (e *Engine) Open(ctx context.Context, path string) (*Repository, error) {
 	r := &Repository{Path: lines[0], GitDir: lines[1], CommonDir: lines[2], engine: e}
 	e.repositories[r.Path] = r
 	return r, nil
-}
-
-func objectID(value string) bool {
-	if len(value) != 40 && len(value) != 64 {
-		return false
-	}
-	for _, c := range value {
-		if !(c >= '0' && c <= '9' || c >= 'a' && c <= 'f') {
-			return false
-		}
-	}
-	return true
-}
-
-// Blob resolves mutable references every time and caches bytes only under the
-// actual immutable object ID. Full commit:path resolution is itself immutable.
-// Worktrees share the common Git identity; independent repositories remain
-// isolated so a cached object cannot manufacture access to a missing object.
-func (r *Repository) Blob(ctx context.Context, revision, path string, limit int) ([]byte, error) {
-	if strings.ContainsRune(revision+path, 0) {
-		return nil, errors.New("invalid Git object path")
-	}
-	key := "resolve\x00" + r.CommonDir + "\x00" + revision + ":" + path
-	read := func() ([]byte, error) {
-		// Read size before allocating content. NUL framing preserves filenames
-		// containing newlines, and 'missing' is distinct from process failure.
-		data, err := r.Run(ctx, strings.NewReader(revision+":"+path+"\x00"), "cat-file", "--batch-check", "-Z")
-		if err == nil && strings.HasSuffix(string(data), " missing\x00") {
-			return nil, ErrObjectMissing
-		}
-		return data, err
-	}
-	var metadata []byte
-	var err error
-	if objectID(revision) {
-		metadata, err = r.engine.load(ctx, key, read)
-	} else {
-		metadata, err = read()
-	}
-	if err != nil {
-		return nil, err
-	}
-	if strings.HasSuffix(string(metadata), " missing\x00") {
-		return nil, ErrObjectMissing
-	}
-	fields := strings.Fields(strings.TrimSuffix(string(metadata), "\x00"))
-	if len(fields) != 3 || !objectID(fields[0]) || fields[1] != "blob" {
-		return nil, errors.New("Git returned invalid blob metadata")
-	}
-	size, err := strconv.ParseInt(fields[2], 10, 64)
-	if err != nil || size < 0 {
-		return nil, errors.New("Git returned an invalid object size")
-	}
-	if size > 64<<20 || limit > 0 && size > int64(limit) {
-		return nil, ErrOutputLimit
-	}
-	oid := fields[0]
-	objectKey := "blob\x00" + r.CommonDir + "\x00" + oid
-	if data, ok := r.engine.cache.get(objectKey); ok {
-		r.engine.hits.Add(1)
-		return data, nil
-	}
-	data, err := r.engine.load(ctx, objectKey, func() ([]byte, error) { return r.Run(ctx, nil, "cat-file", "blob", oid) })
-	if err != nil {
-		return nil, err
-	}
-	if int64(len(data)) != size {
-		return nil, errors.New("Git returned an incomplete blob")
-	}
-	return data, nil
 }

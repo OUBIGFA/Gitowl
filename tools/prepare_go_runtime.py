@@ -22,11 +22,19 @@ def inventory(directory):
 
 
 def validation_hash():
-    """Bind validation to Go code/tests and the exact prepared runtime assets."""
-    paths = [p for p in (ROOT / 'app/native').rglob('*')
-             if p.is_file() and p.suffix in ('.go', '.mod', '.sum', '.json')]
-    paths += [ROOT / p for p in ('tools/test_go_kernel.py', 'references/native-legacy-fixture.cjs',
-                                 'output/native-runtime/runtime-receipt.json')]
+    """Bind validation to native code/assets, patched toolkit and real resources."""
+    # Use the same repository boundary as review/build inputs. This includes
+    # untracked source during development, but excludes ignored scratch files.
+    names = subprocess.check_output(
+        ['git', 'ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', 'app/native'],
+        cwd=ROOT).decode('utf-8').split('\0')
+    paths = {ROOT / name for name in names if name and (ROOT / name).is_file()}
+    paths.update(ROOT / p for p in (
+        'tools/test_go_kernel.py', 'tools/prepare_go_runtime.py', 'tools/prepare_mygo.py',
+        'references/native-legacy-fixture.cjs', 'third_party/mygo.json',
+        'output/native-runtime/runtime-receipt.json'))
+    toolkit = json.loads((ROOT / 'third_party/mygo.json').read_text(encoding='utf-8'))
+    paths.update(ROOT / patch['path'] for patch in toolkit['patches'])
     return sha(json.dumps({p.relative_to(ROOT).as_posix(): sha(p.read_bytes()) for p in paths}, sort_keys=True).encode())
 
 
